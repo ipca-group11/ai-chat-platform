@@ -1,0 +1,51 @@
+# TLS front door for the Azure VM. Caddy gets a Let's Encrypt cert for {$DOMAIN} and
+# serves the shell on 443 plus the three Module Federation remotes on their own ports
+# (the shell loads them from https://{$DOMAIN}:300x, baked in at image-build time).
+#
+# Vite's preview server only answers requests whose Host is localhost and only sends CORS
+# headers to localhost origins, so Host is rewritten upstream and CORS for the remotes is
+# set here instead.
+
+(remote) {
+	header Access-Control-Allow-Origin "https://{$DOMAIN}"
+	header Vary Origin
+	header -Server
+}
+
+{$DOMAIN} {
+	encode gzip
+	# Grafana serves itself under /grafana (GF_SERVER_SERVE_FROM_SUB_PATH), so the prefix
+	# is passed through unchanged.
+	handle /grafana* {
+		reverse_proxy grafana:3000
+	}
+	handle {
+		reverse_proxy shell:3000 {
+			header_up Host localhost
+		}
+	}
+}
+
+{$DOMAIN}:3001 {
+	import remote
+	reverse_proxy mfe-auth:3001 {
+		header_up Host localhost
+		header_down -Access-Control-Allow-Origin
+	}
+}
+
+{$DOMAIN}:3002 {
+	import remote
+	reverse_proxy mfe-chat:3002 {
+		header_up Host localhost
+		header_down -Access-Control-Allow-Origin
+	}
+}
+
+{$DOMAIN}:3003 {
+	import remote
+	reverse_proxy mfe-settings:3003 {
+		header_up Host localhost
+		header_down -Access-Control-Allow-Origin
+	}
+}

@@ -22,7 +22,7 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
     };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(attachment)));
 
-    const { result } = renderHook(() => usePendingAttachments("chat-1", "ollama", "llama3.2:1b"), {
+    const { result } = renderHook(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"), {
       wrapper: withQueryClient(),
     });
 
@@ -36,7 +36,7 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    const { result } = renderHook(() => usePendingAttachments("chat-1", "ollama", "llama3.2:1b"), {
+    const { result } = renderHook(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"), {
       wrapper: withQueryClient(),
     });
 
@@ -51,7 +51,7 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    const { result } = renderHook(() => usePendingAttachments("chat-1", "ollama", "llama3.2:1b"), {
+    const { result } = renderHook(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"), {
       wrapper: withQueryClient(),
     });
 
@@ -64,7 +64,7 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
 
   it("removePending removes a staged attachment", () => {
     vi.stubGlobal("fetch", vi.fn());
-    const { result } = renderHook(() => usePendingAttachments("chat-1", "ollama", "llama3.2:1b"), {
+    const { result } = renderHook(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"), {
       wrapper: withQueryClient(),
     });
 

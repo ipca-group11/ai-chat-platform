@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /** LLM providers supported by `conversation-service`'s adapter layer (FR6). */
-export const llmProviderSchema = z.enum(["ollama", "openai", "anthropic"]);
+export const llmProviderSchema = z.enum(["openai", "anthropic"]);
 export type LlmProvider = z.infer<typeof llmProviderSchema>;
 
 /** Provider + model chosen per chat (persisted, applies to every message in that chat). */

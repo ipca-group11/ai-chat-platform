@@ -46,7 +46,7 @@ describe("useSendMessage (AC-51, AC-60)", () => {
     const { ensureChatStream } = await import("../model/stream-registry");
 
     const { result } = renderHook(() => useSendMessage(), { wrapper: withQueryClient() });
-    result.current.mutate({ chatId: "chat-1", content: "Hello", userId: "user-1", provider: "ollama" });
+    result.current.mutate({ chatId: "chat-1", content: "Hello", userId: "user-1", provider: "anthropic" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(userMessage);
@@ -84,7 +84,7 @@ describe("useRetryMessage (AC-73)", () => {
     const wrapper = withQueryClient(client);
 
     const { result } = renderHook(() => useRetryMessage(), { wrapper });
-    result.current.mutate({ chatId: "chat-1", messageId: "msg-assistant-1", userId: "user-1", provider: "ollama" });
+    result.current.mutate({ chatId: "chat-1", messageId: "msg-assistant-1", userId: "user-1", provider: "anthropic" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(client.getQueryData<Message[]>(["chats", "chat-1", "messages"])?.[0]?.status).toBe("streaming");

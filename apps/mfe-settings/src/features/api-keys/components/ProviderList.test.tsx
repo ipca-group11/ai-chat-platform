@@ -24,11 +24,11 @@ describe("ProviderList", () => {
     expect(screen.getByLabelText("Anthropic API key")).toBeInTheDocument();
   });
 
-  it("AC-77: renders Ollama as a static 'no API key required' state with no input", () => {
+  it("lists only key-based providers (no keyless/local provider)", () => {
     renderWithQueryClient(<ProviderList />);
 
-    expect(screen.getByText(/no api key is required/i)).toBeInTheDocument();
-    expect(screen.queryByLabelText("Ollama API key")).not.toBeInTheDocument();
+    expect(screen.queryByText(/no api key is required/i)).not.toBeInTheDocument();
+    expect(screen.queryByText("Ollama")).not.toBeInTheDocument();
   });
 
   it("AC-76: saving a key for a provider updates its masked display", async () => {

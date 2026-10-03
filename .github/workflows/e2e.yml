@@ -19,7 +19,19 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Ports compose.yaml publishes (shell on APP_PORT 8000, APIs on 4001/4002); the
+    # fixtures' fallbacks target a different local setup.
+    env:
+      BASE_URL: http://localhost:8000
+      E2E_SHELL_HEALTH_URL: http://localhost:8000/
+      E2E_AUTH_HEALTH_URL: http://localhost:4001/health
+      E2E_CONVERSATION_HEALTH_URL: http://localhost:4002/health
     steps:
+      # Building every app image fills the runner's ~14 GB free disk; drop preinstalled
+      # SDKs this job never uses.
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost && df -h /
+
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
@@ -35,9 +47,8 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm --filter e2e exec playwright install --with-deps chromium
 
-      # Brings up the full stack, including the ollama-pull init step that
-      # pre-pulls llama3.2:1b (STACK.md decision #7) so provider calls in the
-      # send-and-stream/queue/parallel-sessions specs don't need a live pull.
+      # Brings up the full stack. Specs that need a real LLM reply run only when the
+      # ANTHROPIC_API_KEY secret is set; otherwise they are skipped.
       - name: Start docker compose stack
         run: docker compose up -d --build
 
@@ -48,6 +59,7 @@ jobs:
         run: pnpm exec nx run e2e:e2e
         env:
           CI: "true"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Upload Playwright report
         if: failure()

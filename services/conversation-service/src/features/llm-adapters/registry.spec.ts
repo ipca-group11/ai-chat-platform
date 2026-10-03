@@ -3,20 +3,19 @@ import { createProviderRegistry } from "./registry.js";
 
 describe("createProviderRegistry", () => {
   it("AC-64: selects the adapter implementation based on the configured provider", () => {
-    const registry = createProviderRegistry({ ollamaBaseUrl: "http://localhost:11434" });
-    expect(registry.get("ollama").id).toBe("ollama");
+    const registry = createProviderRegistry();
     expect(registry.get("openai").id).toBe("openai");
     expect(registry.get("anthropic").id).toBe("anthropic");
   });
 
   it("throws a clear error for an unregistered provider id", () => {
-    const registry = createProviderRegistry({ ollamaBaseUrl: "http://localhost:11434" });
+    const registry = createProviderRegistry();
     expect(() => registry.get("unknown" as never)).toThrow(/No LLM provider adapter registered/);
   });
 
   it("AC-65: every registered adapter implements the same LlmProvider surface", () => {
-    const registry = createProviderRegistry({ ollamaBaseUrl: "http://localhost:11434" });
-    for (const id of ["ollama", "openai", "anthropic"] as const) {
+    const registry = createProviderRegistry();
+    for (const id of ["openai", "anthropic"] as const) {
       const adapter = registry.get(id);
       expect(typeof adapter.sendMessage).toBe("function");
       expect(typeof adapter.supportsVision).toBe("function");

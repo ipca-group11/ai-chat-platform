@@ -9,12 +9,11 @@
  * should re-declare these shapes, so that swap is a one-line change per import.
  */
 
-export type Provider = "ollama" | "openai" | "anthropic";
+export type Provider = "openai" | "anthropic";
 
-export const PROVIDERS: readonly Provider[] = ["ollama", "openai", "anthropic"];
+export const PROVIDERS: readonly Provider[] = ["anthropic", "openai"];
 
 export const PROVIDER_MODELS: Record<Provider, readonly string[]> = {
-  ollama: ["llama3.2:1b", "llama3.2:3b", "llama3.1:8b", "qwen3:4b", "qwen3:8b", "deepseek-r1:8b"],
   openai: ["gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-5-mini", "o4-mini"],
   anthropic: [
     "claude-opus-5-5",

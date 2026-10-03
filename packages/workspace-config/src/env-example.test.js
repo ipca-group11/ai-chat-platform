@@ -47,14 +47,12 @@ describe("AC-7: .env.example lists every environment variable needed by every se
     expect(undocumented).toEqual([]);
   });
 
-  it("AC-7: documents core secrets/config every service needs (JWT, DB, uploads, Ollama, correlation header)", () => {
+  it("AC-7: documents core secrets/config every service needs (JWT, DB, uploads, correlation header)", () => {
     for (const key of [
       "JWT_SECRET",
       "AUTH_SERVICE_DATABASE_URL",
       "CONVERSATION_SERVICE_DATABASE_URL",
       "UPLOAD_DIR",
-      "OLLAMA_BASE_URL",
-      "OLLAMA_MODEL",
       "CORRELATION_HEADER",
     ]) {
       expect(env).toHaveProperty(key);

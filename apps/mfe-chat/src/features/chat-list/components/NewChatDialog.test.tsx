@@ -40,23 +40,31 @@ describe("NewChatDialog (AC-42, AC-48)", () => {
   it("offers reasoning for models that support it and sends the choice", async () => {
     const onCreate = vi.fn();
     render(<NewChatDialog open onClose={vi.fn()} onCreate={onCreate} />);
-    expect(screen.queryByRole("checkbox", { name: /Reasoning/ })).not.toBeInTheDocument();
 
     await userEvent.type(screen.getByLabelText("Chat title"), "Thinking chat");
     await userEvent.click(screen.getByLabelText("Model"));
-    await userEvent.click(await screen.findByRole("option", { name: "qwen3:4b" }));
+    await userEvent.click(await screen.findByRole("option", { name: "claude-3-5-haiku-latest" }));
+    expect(screen.queryByRole("checkbox", { name: /Reasoning/ })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByLabelText("Model"));
+    await userEvent.click(await screen.findByRole("option", { name: "claude-sonnet-5-5" }));
     await userEvent.click(screen.getByRole("checkbox", { name: /Reasoning/ }));
     await userEvent.click(screen.getByText("Create"));
 
-    expect(onCreate).toHaveBeenCalledWith({ title: "Thinking chat", provider: "ollama", model: "qwen3:4b", reasoning: true });
+    expect(onCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Thinking chat", provider: "anthropic", model: "claude-sonnet-5-5", reasoning: true }),
+    );
   });
 
   it("offers web fetch for models that support it and sends the choice", async () => {
     const onCreate = vi.fn();
     render(<NewChatDialog open onClose={vi.fn()} onCreate={onCreate} />);
-    expect(screen.queryByRole("checkbox", { name: /Web fetch/ })).not.toBeInTheDocument();
 
     await userEvent.type(screen.getByLabelText("Chat title"), "Research");
+    await userEvent.click(screen.getByLabelText("Provider"));
+    await userEvent.click(await screen.findByRole("option", { name: "OpenAI" }));
+    expect(screen.queryByRole("checkbox", { name: /Web fetch/ })).not.toBeInTheDocument();
+
     await userEvent.click(screen.getByLabelText("Provider"));
     await userEvent.click(await screen.findByRole("option", { name: /anthropic/i }));
     await userEvent.click(screen.getByRole("checkbox", { name: /Web fetch/ }));

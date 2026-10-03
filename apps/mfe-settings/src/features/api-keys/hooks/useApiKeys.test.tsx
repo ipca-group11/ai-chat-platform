@@ -16,11 +16,10 @@ describe("useApiKeys", () => {
     expect(openai?.record).toBeNull();
   });
 
-  it("AC-77: reports ollama as not requiring a key", () => {
+  it("AC-76: reports every provider as requiring a key", () => {
     const { result } = renderHook(() => useApiKeys("user-1"));
 
-    const ollama = result.current.providers.find((p) => p.provider === "ollama");
-    expect(ollama?.requiresKey).toBe(false);
+    expect(result.current.providers.every((p) => p.requiresKey)).toBe(true);
   });
 
   it("AC-76: saveKey adds a key and it's reflected in providers", () => {

@@ -25,7 +25,7 @@ describe("Composer (AC-51, AC-66)", () => {
   it("AC-51: sends a typed message and clears the input", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(sentMessage, 201)));
 
-    render(<Composer chatId="chat-1" userId="user-1" provider="ollama" model="llama3.2:1b" />, {
+    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
       wrapper: withQueryClient(),
     });
 
@@ -38,7 +38,7 @@ describe("Composer (AC-51, AC-66)", () => {
 
   it("the Send button is disabled while the message is empty and there are no attachments", () => {
     vi.stubGlobal("fetch", vi.fn());
-    render(<Composer chatId="chat-1" userId="user-1" provider="ollama" model="llama3.2:1b" />, {
+    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
       wrapper: withQueryClient(),
     });
 
@@ -48,7 +48,7 @@ describe("Composer (AC-51, AC-66)", () => {
   it("AC-51: sends on Enter (without Shift) without inserting a newline", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(sentMessage, 201)));
 
-    render(<Composer chatId="chat-1" userId="user-1" provider="ollama" model="llama3.2:1b" />, {
+    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
       wrapper: withQueryClient(),
     });
 
@@ -61,7 +61,7 @@ describe("Composer (AC-51, AC-66)", () => {
   it("shows the send error when the message fails to send", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ message: "Server error" }), { status: 500 })));
 
-    render(<Composer chatId="chat-1" userId="user-1" provider="ollama" model="llama3.2:1b" />, {
+    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
       wrapper: withQueryClient(),
     });
 
@@ -73,7 +73,7 @@ describe("Composer (AC-51, AC-66)", () => {
 
   it("AC-68: a rejected attachment blocks sending until it is removed", async () => {
     vi.stubGlobal("fetch", vi.fn());
-    render(<Composer chatId="chat-1" userId="user-1" provider="ollama" model="llama3.2:1b" />, {
+    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
       wrapper: withQueryClient(),
     });
 

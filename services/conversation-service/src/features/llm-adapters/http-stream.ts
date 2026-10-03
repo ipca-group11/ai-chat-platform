@@ -1,6 +1,6 @@
 /**
  * Small fetch-response streaming helpers shared by the provider adapters. Kept
- * provider-agnostic (NDJSON for Ollama, SSE `data:` lines for OpenAI/Anthropic) so each
+ * provider-agnostic (raw lines, or SSE `data:` lines for OpenAI/Anthropic) so each
  * adapter only has to parse its own payload shape.
  */
 

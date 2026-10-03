@@ -54,7 +54,7 @@ Vitest suite against its own business logic, inside its own `apps/*`/`services/*
   (`src/**/*.spec.ts`), covering request handlers, validation, and business logic — not
   just the "happy path" of each acceptance criterion the pod's PLAN.md assigns it.
 - `conversation-service` (owned by the `chat` pod) additionally mocks the LLM/HTTP calls
-  for every provider adapter (Ollama, OpenAI, Anthropic) in its own unit tests — no live
+  for every provider adapter (OpenAI, Anthropic) in its own unit tests — no live
   network calls are allowed from `vitest run`.
 - `packages/ui` (owned by `design-system`) covers hooks/model code; Storybook stories
   themselves are exempted from the coverage count (see the default `exclude` above) since

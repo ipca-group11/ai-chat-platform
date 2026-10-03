@@ -1,0 +1,166 @@
+# Production stack for the Azure VM. Pull-only: every app image is built and pushed to
+# GHCR by .github/workflows/deploy.yml, which copies this file + Caddyfile to the VM and
+# runs `docker compose pull && docker compose up -d`. Nothing is built on the VM.
+#
+# Only Caddy is published (80/443 + 3001-3003 over TLS); Grafana is served by Caddy at
+# /grafana. Prometheus stays on the VM's loopback; reach it over an SSH tunnel. Secrets come from ~/ai-chat/.env on
+# the VM (see README.md); IMAGE_PREFIX and IMAGE_TAG are set by the deploy job.
+
+name: llm-chat
+
+x-image: &app
+  restart: unless-stopped
+  networks: [llm-chat]
+
+networks:
+  llm-chat:
+
+volumes:
+  postgres-data:
+  grafana-data:
+  uploads-data:
+  caddy-data:
+
+services:
+  postgres:
+    <<: *app
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: llmchat
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: llmchat
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U llmchat"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth-service:
+    <<: *app
+    image: ${IMAGE_PREFIX:?}/auth-service:${IMAGE_TAG:-latest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "4001"
+      DATABASE_URL: postgresql://llmchat:${POSTGRES_PASSWORD}@postgres:5432/llmchat?schema=auth
+      JWT_SECRET: ${JWT_SECRET:?}
+      ACCESS_TOKEN_TTL_SECONDS: "900"
+      REFRESH_TOKEN_TTL_SECONDS: "604800"
+      CORS_ORIGIN: https://${DOMAIN:?}
+      COOKIE_SECURE: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  conversation-service:
+    <<: *app
+    image: ${IMAGE_PREFIX}/conversation-service:${IMAGE_TAG:-latest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "4002"
+      DATABASE_URL: postgresql://llmchat:${POSTGRES_PASSWORD}@postgres:5432/llmchat?schema=conversation
+      JWT_SECRET: ${JWT_SECRET}
+      UPLOAD_DIR: /data/uploads
+      CORS_ORIGIN: https://${DOMAIN}
+    volumes:
+      - uploads-data:/data/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4002/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mfe-auth:
+    <<: *app
+    image: ${IMAGE_PREFIX}/mfe-auth:${IMAGE_TAG:-latest}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mfe-chat:
+    <<: *app
+    image: ${IMAGE_PREFIX}/mfe-chat:${IMAGE_TAG:-latest}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3002/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mfe-settings:
+    <<: *app
+    image: ${IMAGE_PREFIX}/mfe-settings:${IMAGE_TAG:-latest}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3003/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  shell:
+    <<: *app
+    image: ${IMAGE_PREFIX}/shell:${IMAGE_TAG:-latest}
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      conversation-service:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      AUTH_SERVICE_URL: http://auth-service:4001
+      CONVERSATION_SERVICE_URL: http://conversation-service:4002
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  caddy:
+    <<: *app
+    image: caddy:2-alpine
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "3001:3001"
+      - "3002:3002"
+      - "3003:3003"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on: [shell, mfe-auth, mfe-chat, mfe-settings]
+
+  prometheus:
+    <<: *app
+    image: ${IMAGE_PREFIX}/prometheus:${IMAGE_TAG:-latest}
+    ports:
+      - "127.0.0.1:9090:9090"
+    depends_on: [auth-service, conversation-service]
+
+  grafana:
+    <<: *app
+    image: ${IMAGE_PREFIX}/grafana:${IMAGE_TAG:-latest}
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?}
+      # Public at https://$DOMAIN/grafana via Caddy; login required, no self sign-up.
+      GF_SERVER_ROOT_URL: https://${DOMAIN}/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SECURITY_COOKIE_SECURE: "true"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3300:3000"
+    depends_on: [prometheus]
