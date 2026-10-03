@@ -7,7 +7,6 @@ import type { Provider } from "./types";
  * model it doesn't recognise as a reasoning model.
  */
 const REASONING_MODEL_PATTERNS: Record<Provider, RegExp> = {
-  ollama: /qwen3|deepseek-r1|gpt-oss|magistral|phi4-reasoning/,
   openai: /^(o\d|gpt-[5-9])/,
   anthropic: /claude-(fable|mythos|opus-[45]|sonnet-[45]|haiku-4|3-7-sonnet)/,
 };
@@ -17,7 +16,6 @@ const REASONING_MODEL_PATTERNS: Record<Provider, RegExp> = {
  * `supportsWebFetch` in conversation-service's provider adapters, which is authoritative.
  */
 const WEB_FETCH_MODEL_PATTERNS: Record<Provider, RegExp | null> = {
-  ollama: null,
   openai: null,
   anthropic: /claude-(fable|mythos|opus-[45]|sonnet-[45]|haiku-4|3-7-sonnet)/,
 };

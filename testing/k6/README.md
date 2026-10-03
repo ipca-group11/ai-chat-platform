@@ -11,8 +11,8 @@ task O6). It drives >=5 virtual users through register/login -> create chat -> s
 - [k6](https://k6.io/docs/get-started/installation/) installed locally (`brew install k6`,
   or the official Docker image `grafana/k6`). Not an npm package — the `k6` package on npm
   is a dummy for editor autocompletion only.
-- A running stack: `docker compose up -d` from the repo root (services, Postgres, and
-  Ollama with `llama3.2:1b` pre-pulled per `STACK.md` decision #7).
+- A running stack: `docker compose up -d` from the repo root (services and Postgres)
+  plus a valid Anthropic API key, since every reply is a real provider call.
 
 ## Running
 
@@ -44,7 +44,7 @@ K6_BASE_URL=http://localhost:3001 K6_CHAT_BASE_URL=http://localhost:3002 \
 
 ## CI / scheduling
 
-This test needs the full stack (all services + Postgres + Ollama) running, so it is
+This test needs the full stack (all services + Postgres + a provider API key) running, so it is
 **not** part of the fast per-PR `nx affected` loop (unlike `packages/test-config`'s unit
 coverage gate). Run it:
 

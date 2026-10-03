@@ -31,7 +31,7 @@ export default defineConfig({
   // UC6 (parallel-sessions) needs several concurrent streams from a single
   // worker's browser contexts, and UC7 (isolation) needs two independent
   // browser contexts in the same test — keep worker count modest so the
-  // shared docker-compose stack (single Ollama instance) isn't overloaded.
+  // shared docker-compose stack (and the provider's rate limits) aren't overloaded.
   workers: isCI ? 2 : undefined,
   reporter: [
     ["list"],

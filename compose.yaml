@@ -13,7 +13,7 @@
 # also publishes its own fixed 127.0.0.1 port so the browser can reach it; their
 # Module-Federation-remote-entry / API base URLs are baked in at build time to match
 # those same ports (see each Dockerfile's `ARG VITE_*` and docs/DEPLOY.md). `postgres`
-# and `ollama` are internal-only (reached over the compose network, never published).
+# is internal-only (reached over the compose network, never published).
 #
 # No bind mounts: uploads use a named volume, and prometheus/grafana config is baked into
 # their images at build time (observability/*.Dockerfile) instead of mounted from disk.
@@ -26,7 +26,6 @@ networks:
 
 volumes:
   postgres-data:
-  ollama-data:
   grafana-data:
   uploads-data:
 
@@ -45,34 +44,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    networks:
-      - llm-chat
-
-  ollama:
-    image: ollama/ollama:latest
-    restart: unless-stopped
-    volumes:
-      - ollama-data:/root/.ollama
-    healthcheck:
-      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    networks:
-      - llm-chat
-
-  # One-shot init job: pre-pulls the default local model (STACK.md decision #7) so this
-  # environment starts with a working model already available offline.
-  ollama-pull:
-    image: ollama/ollama:latest
-    restart: "no"
-    depends_on:
-      ollama:
-        condition: service_healthy
-    entrypoint: ["sh", "-c"]
-    command: ["ollama pull ${OLLAMA_MODEL:-llama3.2:1b} || true"]
-    environment:
-      OLLAMA_HOST: ollama:11434
     networks:
       - llm-chat
 
@@ -111,16 +82,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      ollama:
-        condition: service_healthy
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: "4002"
       DATABASE_URL: ${CONVERSATION_SERVICE_DATABASE_URL:-postgresql://llmchat:llmchat_local_dev@postgres:5432/llmchat?schema=conversation}
       JWT_SECRET: ${JWT_SECRET:-local-dev-only-change-me}
       UPLOAD_DIR: /data/uploads
-      OLLAMA_BASE_URL: http://ollama:11434
-      OLLAMA_DEFAULT_MODEL: ${OLLAMA_MODEL:-llama3.2:1b}
       CORS_ORIGIN: http://localhost:${APP_PORT:-8000},http://127.0.0.1:${APP_PORT:-8000}
     ports:
       - "127.0.0.1:${CONVERSATION_SERVICE_PORT:-4002}:4002"

@@ -19,7 +19,7 @@ async function setup(processor: ReturnType<typeof vi.fn> = vi.fn().mockReturnVal
   const queueManager = new QueueManager(processor);
   const bus = new ChatEventBus();
   const service = new MessagesService(messagesRepo, chatsService, queueManager, bus);
-  const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
+  const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
   return { chatsService, messagesRepo, queueManager, bus, service, chat };
 }
 

@@ -9,8 +9,8 @@ const chatA: Chat = {
   id: "chat-1",
   title: "First chat",
   ownerId: "user-1",
-  provider: "ollama",
-  model: "llama3.2:1b",
+  provider: "anthropic",
+  model: "claude-3-5-haiku-latest",
   createdAt: "2026-01-01T00:00:00.000Z",
   updatedAt: "2026-01-01T00:00:00.000Z",
 };

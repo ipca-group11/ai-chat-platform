@@ -16,8 +16,8 @@ const chat: Chat = {
   id: "chat-1",
   title: "My chat",
   ownerId: "user-1",
-  provider: "ollama",
-  model: "llama3.2:1b",
+  provider: "anthropic",
+  model: "claude-3-5-haiku-latest",
   createdAt: "2026-01-01T00:00:00.000Z",
   updatedAt: "2026-01-01T00:00:00.000Z",
 };
@@ -99,7 +99,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
   });
 
   describe("reasoning toggle", () => {
-    const reasoningChat: Chat = { ...chat, model: "qwen3:4b", reasoning: false };
+    const reasoningChat: Chat = { ...chat, model: "claude-sonnet-5-5", reasoning: false };
 
     function stubFetch(current: Chat) {
       const fetchMock = vi.fn((url: string, init?: RequestInit) => {
@@ -160,7 +160,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
         "fetch",
         vi.fn((url: string) => {
           if (url.includes("/messages")) return Promise.resolve(jsonResponse([reply]));
-          return Promise.resolve(jsonResponse({ ...chat, model: "qwen3:4b", reasoning: true }));
+          return Promise.resolve(jsonResponse({ ...chat, model: "claude-sonnet-5-5", reasoning: true }));
         })
       );
       render(<ChatView chatId="chat-1" userId="user-1" />, { wrapper: withQueryClient() });

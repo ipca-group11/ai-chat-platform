@@ -8,8 +8,6 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
   UPLOAD_DIR: z.string().default("./data/uploads"),
   MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(10 * 1024 * 1024),
-  OLLAMA_BASE_URL: z.string().default("http://localhost:11434"),
-  OLLAMA_DEFAULT_MODEL: z.string().default("llama3.2:1b"),
   LOG_LEVEL: z.string().default("info"),
 });
 

@@ -3,7 +3,6 @@
 #
 # Prerequisites (native, on the host):
 #   - Postgres 16 on localhost:5432 with role/db `llmchat` (see docs/DEV.md)
-#   - Ollama on localhost:11434 with the model in OLLAMA_DEFAULT_MODEL pulled
 #
 # Open http://localhost:5000/ — the shell dev server loads the remotes from
 # localhost:5001-5003 and proxies /auth -> :4001 and /api -> :4002.
@@ -20,8 +19,6 @@ export NODE_ENV=development
 export JWT_SECRET="${JWT_SECRET:-local-dev-only-change-me}"
 export COOKIE_SECURE=false
 export CORS_ORIGIN="http://localhost:5000,http://127.0.0.1:5000"
-export OLLAMA_BASE_URL="${OLLAMA_BASE_URL:-http://localhost:11434}"
-export OLLAMA_DEFAULT_MODEL="${OLLAMA_DEFAULT_MODEL:-llama3.2:1b}"
 PG="${PG_URL:-postgresql://llmchat:llmchat_local_dev@localhost:5432/llmchat}"
 AUTH_DB="$PG?schema=auth"
 CONV_DB="$PG?schema=conversation"

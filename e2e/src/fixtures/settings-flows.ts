@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { test, type Page } from "@playwright/test";
 
 /**
  * Shared `mfe-settings` (configuration page) helpers, built on the
@@ -15,7 +15,24 @@ export function apiKeyField(page: Page, provider: string) {
 
 export async function saveApiKey(page: Page, provider: string, key: string): Promise<void> {
   await apiKeyField(page, provider).fill(key);
-  await page.getByRole("button", { name: /^save$/i }).click();
+  await page
+    .getByRole("form", { name: new RegExp(`${provider} API key form`, "i") })
+    .getByRole("button", { name: /save key|update key/i })
+    .click();
+}
+
+/** Real Anthropic key for specs that need an actual LLM reply (no local model ships). */
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY ?? "";
+
+/**
+ * Skips the calling test unless `ANTHROPIC_API_KEY` is set; otherwise saves it in
+ * Settings so this tab's chats can call Anthropic. Keys live in the tab's
+ * sessionStorage, so call it on the same page that will send messages.
+ */
+export async function configureAnthropicKey(page: Page): Promise<void> {
+  test.skip(!ANTHROPIC_API_KEY, "Needs a real LLM reply: set ANTHROPIC_API_KEY to run.");
+  await openSettings(page);
+  await saveApiKey(page, "Anthropic", ANTHROPIC_API_KEY);
 }
 
 export async function removeApiKey(page: Page, provider: string): Promise<void> {

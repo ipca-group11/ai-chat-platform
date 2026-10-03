@@ -1,7 +1,8 @@
 # Deploy (local Docker)
 
 This is a browser-rendered microfrontend app (Module Federation) with two backend APIs,
-Postgres, Ollama, and Prometheus/Grafana. `compose.yaml` at the repo root builds and runs
+Postgres, and Prometheus/Grafana. There is no local LLM: replies come from a hosted
+provider (Anthropic, or OpenAI) using the API key each user enters in Settings. `compose.yaml` at the repo root builds and runs
 all of it. `docker-compose.yml` is a separate, pre-existing dev-environment file (kept for
 `packages/workspace-config`'s own test suite); **use `compose.yaml`** for the standardized
 local deploy described here.
@@ -16,10 +17,11 @@ docker compose -f compose.yaml up --build
 Open **http://127.0.0.1:8000/** (or `http://127.0.0.1:${APP_PORT}/` if you set `APP_PORT`)
 once `shell` reports healthy. From there:
 - Register/log in (`mfe-auth`, served on its own port, see below).
+- Open Settings (`mfe-settings`) and enter your Anthropic API key — keys are stored in
+  the browser only and sent per request; nothing answers until a key is set.
 - Create chats and send messages (`mfe-chat`), streamed via SSE from
-  `conversation-service`, answered by the pre-pulled `llama3.2:1b` Ollama model (first
-  reply may take a minute while `ollama-pull` finishes downloading the model).
-- Manage LLM provider API keys (`mfe-settings`) — keys are stored in the browser only.
+  `conversation-service`, answered by the chat's Anthropic model (new chats default to
+  `claude-haiku-4-5`).
 
 Prometheus is at `http://127.0.0.1:9090/`, Grafana at `http://127.0.0.1:3300/`
 (login `admin`/`admin` by default) with a Prometheus datasource and a
@@ -37,7 +39,7 @@ Dockerfile's `ARG VITE_*` and `apps/shell/module-federation.config.ts`/
 therefore also publishes its own fixed `127.0.0.1` port so the browser can reach it. The
 only exception is `mfe-chat`, whose API client defaults to a same-origin `/api` path;
 `shell`'s preview server proxies `/api/*` to `conversation-service` for it (see
-`apps/shell/vite.config.ts`). `postgres` and `ollama` are internal-only and are never
+`apps/shell/vite.config.ts`). `postgres` is internal-only and is never
 published to the host.
 
 | Service | Host port (default) | Purpose |
@@ -50,7 +52,7 @@ published to the host.
 | `conversation-service` | `127.0.0.1:4002` | Chat REST/SSE API, called directly by the browser and via `shell`'s `/api` proxy |
 | `prometheus` | `127.0.0.1:9090` | Metrics |
 | `grafana` | `127.0.0.1:3300` | Dashboards |
-| `postgres`, `ollama` | *(not published)* | Internal only, reached over the compose network |
+| `postgres` | *(not published)* | Internal only, reached over the compose network |
 
 If you change a `*_PORT` variable, the matching service's build-time remote/API URL is
 derived from the same variable (see `compose.yaml`'s `build.args`), so the two always
@@ -59,7 +61,7 @@ stay in sync — no need to edit anything else.
 ## Configuration
 
 All configuration is environment variables; see `.env.example` for the full list and
-defaults (Postgres credentials, `JWT_SECRET`, token TTLs, Ollama model, ports, Grafana
+defaults (Postgres credentials, `JWT_SECRET`, token TTLs, ports, Grafana
 admin credentials). Copy it to `.env` and edit before `docker compose up` to override
 anything; every variable already has a safe local-only default so this step is optional.
 LLM provider API keys (OpenAI/Anthropic) are **not** configured here — they're entered
@@ -88,6 +90,6 @@ local use.
 
 ```sh
 docker compose -f compose.yaml down          # stop and remove containers
-docker compose -f compose.yaml down -v       # also remove volumes (Postgres data, Ollama
-                                              # models, uploaded files, Grafana data)
+docker compose -f compose.yaml down -v       # also remove volumes (Postgres data,
+                                              # uploaded files, Grafana data)
 ```

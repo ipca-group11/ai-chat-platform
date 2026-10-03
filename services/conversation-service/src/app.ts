@@ -40,7 +40,7 @@ export function createApp(prisma: PrismaClient, env: Env, logger: Logger = creat
 
   const messagesRepo = createMessagesRepository(prisma);
   const bus = new ChatEventBus();
-  const providerRegistry = createProviderRegistry({ ollamaBaseUrl: env.OLLAMA_BASE_URL });
+  const providerRegistry = createProviderRegistry();
 
   const attachmentsRepo = createAttachmentsRepository(prisma);
   const storage = createFileSystemStorage(env.UPLOAD_DIR);

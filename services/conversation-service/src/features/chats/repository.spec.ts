@@ -24,9 +24,9 @@ describe("createChatsRepository", () => {
   it("AC-42: create delegates to prisma.chat.create", async () => {
     const prisma = mockPrisma();
     const repo = createChatsRepository(prisma);
-    await repo.create({ ownerId: "u1", ownerEmail: "u1@example.com", title: "t", provider: "ollama", model: "m" });
+    await repo.create({ ownerId: "u1", ownerEmail: "u1@example.com", title: "t", provider: "anthropic", model: "m" });
     expect(prisma.chat.create).toHaveBeenCalledWith({
-      data: { ownerId: "u1", ownerEmail: "u1@example.com", title: "t", provider: "ollama", model: "m" },
+      data: { ownerId: "u1", ownerEmail: "u1@example.com", title: "t", provider: "anthropic", model: "m" },
     });
   });
 

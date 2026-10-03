@@ -22,7 +22,7 @@ function tokenFor(userId: string): string {
 }
 
 function fakeProvider(): LlmProvider {
-  return { id: "ollama", supportsVision: () => true, supportsReasoning: () => false, supportsWebFetch: () => false, async *sendMessage() {} };
+  return { id: "anthropic", supportsVision: () => true, supportsReasoning: () => false, supportsWebFetch: () => false, async *sendMessage() {} };
 }
 
 function buildApp() {
@@ -45,7 +45,7 @@ function buildApp() {
 describe("attachments routes", () => {
   it("AC-66: an authenticated user can upload a file attached to a message", async () => {
     const { app, chatsService, messagesRepo } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
     const message = await messagesRepo.create({ chatId: chat.id, ownerId: "user-1", role: "user", content: "hi", status: "sent" });
     const token = tokenFor("user-1");
 
@@ -68,7 +68,7 @@ describe("attachments routes", () => {
 
   it("AC-66: rejects an upload with no file attached", async () => {
     const { app, chatsService, messagesRepo } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
     const message = await messagesRepo.create({ chatId: chat.id, ownerId: "user-1", role: "user", content: "hi", status: "sent" });
     const token = tokenFor("user-1");
 
@@ -81,7 +81,7 @@ describe("attachments routes", () => {
 
   it("AC-68: rejects a disallowed file type with a 400", async () => {
     const { app, chatsService, messagesRepo } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
     const message = await messagesRepo.create({ chatId: chat.id, ownerId: "user-1", role: "user", content: "hi", status: "sent" });
     const token = tokenFor("user-1");
 

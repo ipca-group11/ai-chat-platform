@@ -16,7 +16,7 @@ import type { SseEvent } from "../../shared/contracts/chat.js";
 import { asUser } from "../../test-utils/principal.js";
 
 class ScriptedProvider implements LlmProvider {
-  readonly id = "ollama" as const;
+  readonly id = "anthropic" as const;
   constructor(private readonly script: (context: SendMessageContext, options?: SendMessageOptions) => AsyncIterable<LlmStreamChunk>) {}
   sendMessage(context: SendMessageContext, options?: SendMessageOptions): AsyncIterable<LlmStreamChunk> {
     return this.script(context, options);
@@ -49,7 +49,7 @@ async function setupChatWithUserMessage() {
   const chatsService = new ChatsService(chatsRepo);
   const messagesRepo = new FakeMessagesRepository();
   const bus = new ChatEventBus();
-  const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
+  const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
   const userMessage = await messagesRepo.create({
     chatId: chat.id,
     ownerId: "user-1",
@@ -237,7 +237,7 @@ describe("createMessageProcessor", () => {
   it("AC-72/74: a provider error is caught, surfaced, and marks the message failed without throwing", async () => {
     const { chatsService, messagesRepo, bus, chat, userMessage } = await setupChatWithUserMessage();
     const provider = new ScriptedProvider(async function* () {
-      throw new ProviderError("ollama", "rate limited", { retryable: true });
+      throw new ProviderError("anthropic", "rate limited", { retryable: true });
       yield "";
     });
     const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
@@ -256,22 +256,22 @@ describe("createMessageProcessor", () => {
   it("AC-50: subsequent messages use the chat's persisted provider and model, even after it changes", async () => {
     const { chatsService, messagesRepo, bus, chat, userMessage } = await setupChatWithUserMessage();
     const seenRequests: Array<{ providerId: string; model: string }> = [];
-    const ollamaProvider = new ScriptedProvider(async function* (context) {
-      seenRequests.push({ providerId: "ollama", model: context.model });
+    const anthropicProvider = new ScriptedProvider(async function* (context) {
+      seenRequests.push({ providerId: "anthropic", model: context.model });
       yield "first";
     });
-    const anthropicProvider: LlmProvider = {
-      id: "anthropic",
+    const openaiProvider: LlmProvider = {
+      id: "openai",
       supportsVision: () => false,
       supportsReasoning: () => false,
       supportsWebFetch: () => false,
       sendMessage: async function* (context: SendMessageContext) {
-        seenRequests.push({ providerId: "anthropic", model: context.model });
+        seenRequests.push({ providerId: "openai", model: context.model });
         yield "second";
       },
     };
     const registry: ProviderRegistry = {
-      get: (providerId) => (providerId === "anthropic" ? anthropicProvider : ollamaProvider),
+      get: (providerId) => (providerId === "openai" ? openaiProvider : anthropicProvider),
     };
     const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registry, bus });
 
@@ -280,7 +280,7 @@ describe("createMessageProcessor", () => {
 
     // Editing the chat persists a new provider/model (AC-49); a later message must pick
     // up that new configuration rather than reusing what the first request used.
-    await chatsService.update("user-1", chat.id, { provider: "anthropic", model: "claude-3-5-sonnet" });
+    await chatsService.update("user-1", chat.id, { provider: "openai", model: "gpt-4o" });
     const secondUserMessage = await messagesRepo.create({
       chatId: chat.id,
       ownerId: "user-1",
@@ -292,8 +292,8 @@ describe("createMessageProcessor", () => {
     await processor(chat.id, { messageId: secondUserMessage.id, content: "again", attachmentIds: [] }, new AbortController().signal);
 
     expect(seenRequests).toEqual([
-      { providerId: "ollama", model: "llama3.2:1b" },
-      { providerId: "anthropic", model: "claude-3-5-sonnet" },
+      { providerId: "anthropic", model: "claude-haiku-4-5" },
+      { providerId: "openai", model: "gpt-4o" },
     ]);
   });
 

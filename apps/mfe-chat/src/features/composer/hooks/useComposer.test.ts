@@ -14,7 +14,7 @@ describe("useComposer", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    const { result } = renderHook(() => useComposer({ chatId: "chat-1", userId: "user-1", provider: "ollama", model: "llama3.2:1b" }), {
+    const { result } = renderHook(() => useComposer({ chatId: "chat-1", userId: "user-1", provider: "anthropic", model: "claude-3-5-haiku-latest" }), {
       wrapper: withQueryClient(),
     });
 

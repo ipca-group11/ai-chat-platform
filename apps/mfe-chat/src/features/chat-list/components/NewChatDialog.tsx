@@ -24,8 +24,8 @@ export interface NewChatDialogProps {
 /** AC-42 (create), AC-48 (provider/model chosen at creation time). */
 export function NewChatDialog({ open, onClose, onCreate, submitting }: NewChatDialogProps) {
   const [title, setTitle] = useState("");
-  const [provider, setProvider] = useState<Provider>("ollama");
-  const [model, setModel] = useState("llama3.2:1b");
+  const [provider, setProvider] = useState<Provider>("anthropic");
+  const [model, setModel] = useState("claude-haiku-4-5");
   const [reasoning, setReasoning] = useState(false);
   const canReason = supportsReasoning(provider, model);
   const [webFetch, setWebFetch] = useState(false);

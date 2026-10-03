@@ -10,7 +10,6 @@ export interface ProviderModelSelectProps {
 }
 
 const PROVIDER_LABELS: Record<Provider, string> = {
-  ollama: "Ollama",
   openai: "OpenAI",
   anthropic: "Anthropic",
 };

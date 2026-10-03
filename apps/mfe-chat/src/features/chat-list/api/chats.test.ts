@@ -8,8 +8,8 @@ const chatA: Chat = {
   id: "chat-1",
   title: "First chat",
   ownerId: "user-1",
-  provider: "ollama",
-  model: "llama3.2:1b",
+  provider: "anthropic",
+  model: "claude-3-5-haiku-latest",
   createdAt: "2026-01-01T00:00:00.000Z",
   updatedAt: "2026-01-01T00:00:00.000Z",
 };
@@ -85,14 +85,14 @@ describe("useCreateChat (AC-42, AC-48, AC-49)", () => {
     const wrapper = withQueryClient();
     const { result } = renderHook(() => useCreateChat(), { wrapper });
 
-    result.current.mutate({ title: "First chat", provider: "ollama", model: "llama3.2:1b" });
+    result.current.mutate({ title: "First chat", provider: "anthropic", model: "claude-3-5-haiku-latest" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(JSON.parse(init.body as string)).toEqual({
       title: "First chat",
-      provider: "ollama",
-      model: "llama3.2:1b",
+      provider: "anthropic",
+      model: "claude-3-5-haiku-latest",
     });
   });
 });

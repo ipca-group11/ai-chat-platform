@@ -3,9 +3,9 @@ import { z } from "zod";
 /**
  * Providers supported by the LLM configuration feature (FR17-FR20, US-23..US-26).
  *
- * `ollama` never requires an API key; `openai` and `anthropic` do.
+ * Both `openai` and `anthropic` require an API key.
  */
-export const providerSchema = z.enum(["openai", "anthropic", "ollama"]);
+export const providerSchema = z.enum(["openai", "anthropic"]);
 
 export type Provider = z.infer<typeof providerSchema>;
 
@@ -15,7 +15,7 @@ export const PROVIDERS: readonly Provider[] = providerSchema.options;
 export const PROVIDERS_REQUIRING_KEY: readonly Provider[] = ["openai", "anthropic"];
 
 /** Providers that never require an API key (AC-77). */
-export const PROVIDERS_WITHOUT_KEY: readonly Provider[] = ["ollama"];
+export const PROVIDERS_WITHOUT_KEY: readonly Provider[] = [];
 
 /** True when `provider` needs an API key configured before use (AC-77). */
 export function providerRequiresApiKey(provider: Provider): boolean {

@@ -6,7 +6,7 @@ import { z } from "zod";
  * can switch to `import { chat } from "@shared-types"` once the package lands.
  */
 
-export const providerSchema = z.enum(["ollama", "openai", "anthropic"]);
+export const providerSchema = z.enum(["openai", "anthropic"]);
 export type Provider = z.infer<typeof providerSchema>;
 
 export const messageRoleSchema = z.enum(["user", "assistant", "system"]);
