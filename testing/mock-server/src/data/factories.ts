@@ -2,6 +2,8 @@ import type { chat } from "@app/shared-types";
 import { createRng, type Rng } from "../prng.js";
 import type { MockMember, MockProviderKey, MockUser } from "./types.js";
 
+// Password of the seeded mock users; test data only, never a real account (AICHAT-27 WAIVERS.md W11)
+// nosemgrep: node_password
 export const MOCK_PASSWORD = "Mock-pass-1234";
 
 const SENTENCES = [

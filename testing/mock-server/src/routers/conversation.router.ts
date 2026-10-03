@@ -40,6 +40,8 @@ const FAULT_DESCRIPTIONS: Record<FaultScenario, string> = {
 };
 
 const SCENARIO_HEADER = "x-mock-scenario";
+// HTTP header name, not a secret (AICHAT-27 WAIVERS.md W2)
+// nosemgrep: node_api_key
 const API_KEY_HEADER = "x-llm-api-key";
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const ALLOWED_FILES = [
