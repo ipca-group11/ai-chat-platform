@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { formatTable } from './coverage-summary.mjs';
+import { formatTable } from './coverage-summary.ts';
 
-const m = (pct) => ({ pct });
+const m = (pct: number) => ({ pct });
 
 test('formats one row per project with two decimals', () => {
   const out = formatTable([

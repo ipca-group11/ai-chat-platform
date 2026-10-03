@@ -4,7 +4,7 @@
 //   <out>/<name>.png  terminal-style screenshot rendered with headless Chrome
 //
 // Usage:
-//   node scripts/evidence/term-shot.mjs --out docs/AICHAT-27/evidence --name 01-semgrep-baseline -- <command...>
+//   node scripts/evidence/term-shot.ts --out docs/AICHAT-27/evidence --name 01-semgrep-baseline -- <command...>
 //
 // Options:
 //   --out <dir>      output folder (created if missing)
@@ -14,7 +14,7 @@
 //   --tail <n>       keep only the last n lines in the image (the .log keeps everything)
 //
 // Re-render an existing .log without running the command again (keeps the command, output and exit code):
-//   node scripts/evidence/term-shot.mjs --from-log docs/AICHAT-34/evidence/01-before-shell.log
+//   node scripts/evidence/term-shot.ts --from-log docs/AICHAT-34/evidence/01-before-shell.log
 //
 // The script exits with the command's exit code, so it can wrap checks that are expected to fail.
 
@@ -24,18 +24,40 @@ import { join, resolve, dirname, basename } from "node:path";
 import { tmpdir } from "node:os";
 
 const argv = process.argv.slice(2);
-const stripAnsi = (s) => s.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "").replace(/\x1b\][^\x07]*\x07/g, "");
-const opts = {};
-let command, raw, status, outDir, name, takenAt;
+const stripAnsi = (s: string): string => s.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "").replace(/\x1b\][^\x07]*\x07/g, "");
+interface Options {
+  out?: string;
+  name?: string;
+  title?: string;
+  width?: string;
+  tail?: string;
+}
+
+const opts: Options = {};
+
+/** Reads `--key value` pairs from `args[from]` up to (not including) `to`. */
+function readOptions(args: string[], from: number, to: number): void {
+  for (let i = from; i < to; i += 2) {
+    const key = (args[i] ?? "").replace(/^--/, "");
+    (opts as Record<string, string | undefined>)[key] = args[i + 1];
+  }
+}
+
+let command: string;
+let raw: string;
+let status: number | null;
+let outDir: string;
+let name: string;
+let takenAt: Date;
 
 if (argv[0] === "--from-log") {
   // .log layout: "$ <command>" / output... / "[exit <n>]"
   const logFile = resolve(argv[1] ?? "");
-  for (let i = 2; i < argv.length; i += 2) opts[argv[i].replace(/^--/, "")] = argv[i + 1];
+  readOptions(argv, 2, argv.length);
   const text = readFileSync(logFile, "utf8").replace(/\n+$/, "");
   const lines = text.split("\n");
-  command = lines[0].replace(/^\$ /, "");
-  const exitLine = lines.at(-1).match(/^\[exit (\S+)\]$/);
+  command = (lines[0] ?? "").replace(/^\$ /, "");
+  const exitLine = lines.at(-1)?.match(/^\[exit (\S+)\]$/);
   status = exitLine ? Number(exitLine[1]) : 0;
   raw = lines.slice(1, exitLine ? -1 : undefined).join("\n");
   outDir = dirname(logFile);
@@ -44,11 +66,11 @@ if (argv[0] === "--from-log") {
 } else {
   const sep = argv.indexOf("--");
   if (sep === -1 || sep === argv.length - 1) {
-    console.error("usage: term-shot.mjs --out <dir> --name <name> [--title t] [--width px] [--tail n] -- <command...>");
-    console.error("       term-shot.mjs --from-log <file.log> [--title t] [--width px] [--tail n]");
+    console.error("usage: term-shot.ts --out <dir> --name <name> [--title t] [--width px] [--tail n] -- <command...>");
+    console.error("       term-shot.ts --from-log <file.log> [--title t] [--width px] [--tail n]");
     process.exit(2);
   }
-  for (let i = 0; i < sep; i += 2) opts[argv[i].replace(/^--/, "")] = argv[i + 1];
+  readOptions(argv, 0, sep);
   command = argv.slice(sep + 1).join(" ");
   outDir = resolve(opts.out ?? "evidence");
   name = opts.name ?? `shot-${Date.now()}`;
@@ -70,10 +92,16 @@ const title = opts.title ?? `${name} · ai-chat-platform`;
 // ANSI SGR -> HTML spans (16 colours, bold, dim)
 const PALETTE = ["#1e1e1e", "#f14c4c", "#23d18b", "#f5f543", "#3b8eea", "#d670d6", "#29b8db", "#e5e5e5"];
 const BRIGHT = ["#666666", "#f14c4c", "#23d18b", "#f5f543", "#3b8eea", "#d670d6", "#29b8db", "#ffffff"];
-const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-function ansiToHtml(text) {
+const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+interface Style {
+  fg?: string | undefined;
+  bold?: boolean;
+  dim?: boolean;
+}
+
+function ansiToHtml(text: string): string {
   let html = "";
-  let style = {};
+  let style: Style = {};
   const open = () => {
     const css = [];
     if (style.fg) css.push(`color:${style.fg}`);

@@ -5,7 +5,7 @@ fetched at test time; the tests never touch the network.
 
 ## Recorded
 
-Written by `node scripts/record-llm-fixtures.mjs` from a local Ollama (OpenAI-compatible
+Written by `node scripts/record-llm-fixtures.ts` from a local Ollama (OpenAI-compatible
 `/v1/chat/completions` and Anthropic-compatible `/v1/messages`). Ids, request ids,
 timestamps and keys are replaced by placeholders.
 

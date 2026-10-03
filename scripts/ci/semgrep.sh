@@ -3,7 +3,7 @@
 #   scripts/ci/semgrep.sh [output-dir]          -> writes <output-dir>/semgrep.sarif
 # This script only scans and writes the reports (exit 0 unless Semgrep itself fails).
 # SARIF keeps nosemgrep-ed findings but marks them as suppressed.
-# The gate is scripts/ci/sast-summary.mjs (reads the SARIF): it exits 1 when there is an ERROR finding (WARNINGs never fail).
+# The gate is scripts/ci/sast-summary.ts (reads the SARIF): it exits 1 when there is an ERROR finding (WARNINGs never fail).
 set -uo pipefail
 
 SEMGREP_IMAGE="${SEMGREP_IMAGE:-semgrep/semgrep:1.140.0}"

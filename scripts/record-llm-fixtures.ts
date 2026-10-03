@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Records provider streams as replay fixtures (AICHAT-25). MANUAL ONLY, never run in CI.
 //
-//   node scripts/record-llm-fixtures.mjs [anthropic|openai ...]
+//   node scripts/record-llm-fixtures.ts [anthropic|openai ...]
 //
 // Default target is a local Ollama (OpenAI- and Anthropic-compatible endpoints). The same
 // script records from the real APIs when the env vars below point at them:
@@ -24,14 +24,30 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = process.env.FIXTURES_DIR ?? join(root, "services/conversation-service/src/test-utils/fixtures/llm");
-const env = (name, fallback) => process.env[name] || fallback;
+const env = (name: string, fallback: string): string => process.env[name] || fallback;
 
 const PROMPTS = {
   text: "Reply with one short sentence that greets the user in Portuguese, using accents.",
   maxTokens: "Count from 1 to 50, separated by spaces.",
 };
 
-const providers = {
+interface Provider {
+  url: () => string;
+  key: () => string;
+  headers: (key: string) => Record<string, string>;
+  body: (prompt: string, maxTokens: number) => Record<string, unknown>;
+}
+
+type ProviderName = "anthropic" | "openai";
+
+interface Scenario {
+  provider: ProviderName;
+  file: string;
+  prompt: string;
+  maxTokens: number;
+}
+
+const providers: Record<ProviderName, Provider> = {
   anthropic: {
     url: () => `${env("ANTHROPIC_BASE_URL", "http://localhost:11434")}/v1/messages`,
     // Ollama ignores the key; "ollama" is a placeholder, not a secret (AICHAT-27 WAIVERS.md, W10).
@@ -64,7 +80,7 @@ const providers = {
 
 // Scenarios a local model can produce. Others (thinking, pause_turn, provider errors) are
 // written by hand, see fixtures/llm/README.md.
-const SCENARIOS = [
+const SCENARIOS: Scenario[] = [
   { provider: "anthropic", file: "text.sse", prompt: PROMPTS.text, maxTokens: 200 },
   { provider: "anthropic", file: "max-tokens.sse", prompt: PROMPTS.maxTokens, maxTokens: 10 },
   { provider: "openai", file: "text.sse", prompt: PROMPTS.text, maxTokens: 200 },
@@ -72,7 +88,7 @@ const SCENARIOS = [
 ];
 
 /** Replaces everything that changes between runs with a fixed placeholder. */
-export function scrub(text, apiKey) {
+export function scrub(text: string, apiKey?: string): string {
   let out = text
     .replace(/msg_[A-Za-z0-9]+/g, "msg_REDACTED")
     .replace(/chatcmpl-[A-Za-z0-9-]+/g, "chatcmpl-REDACTED")
@@ -86,7 +102,7 @@ export function scrub(text, apiKey) {
   return out;
 }
 
-async function record({ provider, file, prompt, maxTokens }) {
+async function record({ provider, file, prompt, maxTokens }: Scenario): Promise<void> {
   const p = providers[provider];
   const key = p.key();
   const response = await fetch(p.url(), {

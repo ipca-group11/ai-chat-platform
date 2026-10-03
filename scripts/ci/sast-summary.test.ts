@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { collectFindings, countBySeverity, formatSummary, formatTable } from './sast-summary.mjs';
+import { collectFindings, countBySeverity, formatSummary, formatTable } from './sast-summary.ts';
 
-const res = (ruleId, file, line, extra = {}) => ({
+const res = (ruleId: string, file: string, line: number, extra: Record<string, unknown> = {}) => ({
   ruleId,
   locations: [{ physicalLocation: { artifactLocation: { uri: file }, region: { startLine: line } } }],
   ...extra,

@@ -7,9 +7,9 @@ import { fileURLToPath } from 'node:url';
 
 const SKIP = new Set(['node_modules', '.git', '.nx', 'dist']);
 
-export function findSummaries(root) {
-  const found = [];
-  const walk = (dir) => {
+export function findSummaries(root: string): string[] {
+  const found: string[] = [];
+  const walk = (dir: string): void => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       if (!entry.isDirectory() || SKIP.has(entry.name)) continue;
       const full = join(dir, entry.name);
@@ -29,10 +29,26 @@ export function findSummaries(root) {
   return found.sort();
 }
 
-const pct = (metric) =>
+interface Metric {
+  pct?: number;
+}
+
+export interface CoverageTotal {
+  lines?: Metric;
+  branches?: Metric;
+  functions?: Metric;
+  statements?: Metric;
+}
+
+export interface CoverageRow {
+  project: string;
+  total: CoverageTotal;
+}
+
+const pct = (metric: Metric | undefined): string =>
   metric && typeof metric.pct === 'number' ? `${metric.pct.toFixed(2)}%` : 'n/a';
 
-export function formatTable(rows) {
+export function formatTable(rows: CoverageRow[]): string {
   const lines = [
     '## Coverage per project',
     '',
@@ -48,10 +64,10 @@ export function formatTable(rows) {
   return `${lines.join('\n')}\n`;
 }
 
-export function buildReport(root) {
+export function buildReport(root: string): string {
   const rows = findSummaries(root).map((file) => ({
     project: relative(root, dirname(dirname(file))) || '.',
-    total: JSON.parse(readFileSync(file, 'utf8')).total ?? {},
+    total: (JSON.parse(readFileSync(file, 'utf8')) as { total?: CoverageTotal }).total ?? {},
   }));
   return formatTable(rows);
 }
