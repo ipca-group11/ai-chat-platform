@@ -68,7 +68,43 @@ docker run --rm semgrep/semgrep:1.140.0 semgrep --version
 
 **Problems and fixes.** Docker was not running at first; we started OrbStack and pulled the pinned image.
 
-### US2 · …
+### US2 · Semgrep configuration with rule packs and custom rules ([AICHAT-50](https://ipca-grupo11.atlassian.net/browse/AICHAT-50))
+
+**What and why.** We wanted one configuration that runs the same way on a laptop and in CI. `scripts/ci/semgrep.sh` runs the pinned Docker image with our own rules (`.semgrep.yml`) and nine registry packs (TypeScript, React, Express, njsscan, JWT, secrets, GitHub Actions, Dockerfile, OWASP Top 10). `.semgrepignore` leaves out generated code. The two custom rules look for secrets that get a literal fallback: a zod `.default("...")` on a name like `*_SECRET`, and `process.env.X ?? "..."` / `|| "..."`. Both are ERROR.
+
+**Files.**
+- `.semgrep.yml` (new): the two custom rules.
+- `.semgrepignore` (new): `node_modules`, `dist`, `build`, `coverage`, `.nx`, `.vite`, Prisma client (`services/*/src/generated/`), `@mf-types`, lock file, `docs/`.
+- `scripts/ci/semgrep.sh` (new): runs Semgrep and writes `semgrep-results/semgrep.sarif`.
+- `.gitignore`: ignores `semgrep-results/`.
+- `docs/AICHAT-27/SAST.md`: local run documented.
+
+**How to run.**
+
+```sh
+scripts/ci/semgrep.sh
+```
+
+**How to repeat it manually.**
+
+1. Start Docker and run the command from the repo root.
+2. Wait about 15 seconds (the first run pulls the image and the packs).
+3. Expected output: `semgrep exit code: 0` and the file `semgrep-results/semgrep.sarif`. Then `node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif` prints the table (the script is added in US5).
+
+**Result.** The first run is our baseline: 24 ERROR, 34 WARNING and 13 INFO findings. Both custom rules fire: `aichat.secret-with-literal-default-zod` finds the JWT default in `services/conversation-service/src/shared/env.ts:7`, and `aichat.secret-env-fallback-literal` finds a fallback in an e2e fixture.
+
+![Baseline scan](evidence/01-baseline-scan.png)
+
+**Problems and fixes.**
+- Registry rules cannot be listed inside `.semgrep.yml`, so the packs live in the shell script.
+- The CLI does not print its findings as a table, so we read the SARIF with a small script (US5).
+- Semgrep prints some parse warnings for shell snippets in workflow files. They are not errors and do not change the exit code.
+
+### US3 · …
+
+### US4 · …
+
+### US5 · …
 
 ## 4. How to run everything
 
