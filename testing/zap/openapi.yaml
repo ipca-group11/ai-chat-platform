@@ -1,0 +1,282 @@
+openapi: 3.0.3
+info:
+  title: AI chat platform API (as seen through the shell)
+  version: 0.1.0
+  description: |
+    Small OpenAPI file for the ZAP API scan (AICHAT-28, zap-api-scan.py), written from the Express routes of
+    auth-service (services/auth-service/src/features) and conversation-service
+    (services/conversation-service/src/features). The shell proxies /auth to auth-service and /api to
+    conversation-service (it strips the /api prefix), so the paths are the ones a browser and Caddy see.
+    It is replaced by the spec of AICHAT-12 when that lands.
+    Left out on purpose: GET /api/chats/{chatId}/stream (server-sent events never end, the scan would wait for it).
+servers:
+  - url: http://localhost:8000
+tags:
+  - name: auth
+  - name: chats
+  - name: messages
+security:
+  - sessionCookie: []
+paths:
+  /auth/register:
+    post:
+      tags: [auth]
+      summary: Create an account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Credentials" }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Sign in; the access and refresh tokens come back as httpOnly cookies
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Credentials" }
+      responses:
+        "200": { description: Signed in, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "401": { $ref: "#/components/responses/Error" }
+  /auth/refresh:
+    post:
+      tags: [auth]
+      summary: Rotate the refresh token (needs the refresh_token cookie)
+      security: []
+      responses:
+        "204": { description: Rotated }
+        "401": { $ref: "#/components/responses/Error" }
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: Revoke the refresh token and clear the cookies
+      security: []
+      responses:
+        "204": { description: Signed out }
+  /auth/me:
+    get:
+      tags: [auth]
+      summary: The signed-in user
+      responses:
+        "200": { description: The user, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "401": { $ref: "#/components/responses/Error" }
+  /api/chats:
+    get:
+      tags: [chats]
+      summary: Chats of the user (owned and shared)
+      responses:
+        "200": { description: Chats, content: { application/json: { schema: { type: object, properties: { chats: { type: array, items: { $ref: "#/components/schemas/Chat" } } } } } } }
+        "401": { $ref: "#/components/responses/Error" }
+    post:
+      tags: [chats]
+      summary: Create a chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NewChat" }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { type: object, properties: { chat: { $ref: "#/components/schemas/Chat" } } } } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+  /api/chats/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+    get:
+      tags: [chats]
+      summary: One chat
+      responses:
+        "200": { description: The chat, content: { application/json: { schema: { type: object, properties: { chat: { $ref: "#/components/schemas/Chat" } } } } } }
+        "404": { $ref: "#/components/responses/Error" }
+    patch:
+      tags: [chats]
+      summary: Rename a chat or change its model (owner only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, properties: { title: { type: string }, model: { type: string }, reasoning: { type: boolean }, webFetch: { type: boolean } } }
+      responses:
+        "200": { description: Updated }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [chats]
+      summary: Delete a chat (owner only)
+      responses:
+        "204": { description: Deleted }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/chats/{id}/members:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+    get:
+      tags: [chats]
+      summary: Members of a chat
+      responses:
+        "200": { description: Members }
+        "404": { $ref: "#/components/responses/Error" }
+    post:
+      tags: [chats]
+      summary: Share a chat with an email address (owner only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [email], properties: { email: { type: string, format: email } } }
+      responses:
+        "201": { description: Added }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/chats/{id}/members/{email}:
+    delete:
+      tags: [chats]
+      summary: Remove a member (owner only)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+        - { name: email, in: path, required: true, schema: { type: string }, example: member@example.com }
+      responses:
+        "204": { description: Removed }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/chats/{id}/membership:
+    delete:
+      tags: [chats]
+      summary: Leave a shared chat
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+      responses:
+        "204": { description: Left }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/chats/{chatId}/messages:
+    parameters:
+      - { name: chatId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+    get:
+      tags: [messages]
+      summary: Messages of a chat
+      responses:
+        "200": { description: Messages }
+        "404": { $ref: "#/components/responses/Error" }
+    post:
+      tags: [messages]
+      summary: Send a message; the answer streams on GET /api/chats/{chatId}/stream
+      parameters:
+        - { name: X-Llm-Api-Key, in: header, required: false, schema: { type: string }, example: mock-key-not-a-secret }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [content], properties: { content: { type: string, maxLength: 32000 }, attachmentIds: { type: array, items: { type: string }, maxItems: 10 } } }
+      responses:
+        "201": { description: Queued }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/chats/{chatId}/messages/{messageId}:
+    parameters:
+      - { name: chatId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+      - { name: messageId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000001 }
+    patch:
+      tags: [messages]
+      summary: Edit a queued message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [content], properties: { content: { type: string, maxLength: 32000 } } }
+      responses:
+        "200": { description: Edited }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [messages]
+      summary: Cancel a queued message
+      responses:
+        "204": { description: Cancelled }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/chats/{chatId}/messages/{messageId}/retry:
+    post:
+      tags: [messages]
+      summary: Retry a failed message
+      parameters:
+        - { name: chatId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+        - { name: messageId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000001 }
+        - { name: X-Llm-Api-Key, in: header, required: false, schema: { type: string }, example: mock-key-not-a-secret }
+      responses:
+        "202": { description: Queued again }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/chats/{chatId}/stop:
+    post:
+      tags: [messages]
+      summary: Stop the running answer
+      parameters:
+        - { name: chatId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+      responses:
+        "200": { description: Stopped }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/chats/{chatId}/messages/{messageId}/attachments:
+    post:
+      tags: [messages]
+      summary: Upload an attachment for a message
+      parameters:
+        - { name: chatId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+        - { name: messageId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000001 }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { type: object, required: [file], properties: { file: { type: string, format: binary } } }
+      responses:
+        "201": { description: Stored }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: access_token
+  responses:
+    Error:
+      description: Error with a code and a message
+      content:
+        application/json:
+          schema: { type: object, properties: { error: { type: object, properties: { code: { type: string }, message: { type: string } } } } }
+  schemas:
+    Credentials:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, example: dast-api@dast.example.com }
+        password: { type: string, minLength: 8, example: DastScan-1234 }
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        email: { type: string, format: email }
+    NewChat:
+      type: object
+      required: [title, provider, model]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200, example: DAST chat }
+        provider: { type: string, enum: [openai, anthropic] }
+        model: { type: string, example: claude-sonnet-4-5 }
+        reasoning: { type: boolean }
+        webFetch: { type: boolean }
+    Chat:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        ownerId: { type: string }
+        ownerEmail: { type: string, nullable: true }
+        provider: { type: string, enum: [openai, anthropic] }
+        model: { type: string }
+        reasoning: { type: boolean }
+        webFetch: { type: boolean }
+        createdAt: { type: string }
+        updatedAt: { type: string }

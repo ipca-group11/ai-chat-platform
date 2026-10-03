@@ -80,3 +80,79 @@ describe("DAST CI workflow (AICHAT-28)", () => {
     expect(workflow).not.toMatch(/https?:\/\/(?!localhost)[a-z0-9.-]+\.[a-z]{2,}\//i);
   });
 });
+
+describe("DAST weekly API scan (AICHAT-121)", () => {
+  it("runs on a weekly schedule and on demand, never on a pull request", () => {
+    expect(workflow).toMatch(/schedule:\s*\n\s+- cron: "[^"]+"/);
+    const cron = /cron: "([^"]+)"/.exec(workflow)?.[1] ?? "";
+    expect(cron.split(" ")).toHaveLength(5);
+    expect(cron.split(" ")[4]).not.toBe("*");
+    expect(job("api-scan")).toMatch(/if: github\.event_name == 'schedule' \|\| github\.event_name == 'workflow_dispatch'/);
+    expect(job("baseline")).toMatch(/if: github\.event_name != 'schedule'/);
+  });
+
+  it("scans the OpenAPI file with zap-api-scan.py and keeps the reports", () => {
+    expect(job("api-scan")).toContain("run: bash testing/zap/run.sh api");
+    expect(runner).toMatch(/zap-api-scan\.py -t \/zap\/wrk\/openapi\.yaml -f openapi/);
+    expect(job("api-scan")).toMatch(/if:\s*always\(\)\s*\n\s+uses: actions\/upload-artifact@v4/);
+    expect(job("api-scan")).toContain("zap-results/api.html");
+    expect(job("api-scan")).toMatch(/if:\s*always\(\)\s*\n\s+run: pnpm mock:down/);
+  });
+
+  it("sets the active High rules to FAIL", () => {
+    const failing = rules.split("\n").filter((line) => line.split("\t")[1] === "FAIL").map((line) => line.split("\t")[0]);
+    for (const id of ["40012", "40018", "90020"]) expect(failing).toContain(id);
+  });
+});
+
+describe("OpenAPI file for the API scan (AICHAT-121)", () => {
+  const spec = read("testing/zap/openapi.yaml");
+  const normalise = (path: string): string => path.replace(/:[A-Za-z]+/g, "{}").replace(/\{[^}]+\}/g, "{}");
+
+  /** `METHOD /path` of every operation in the spec, with parameters collapsed to `{}`. */
+  function specOperations(): Set<string> {
+    const operations = new Set<string>();
+    let path = "";
+    for (const line of spec.split("\n")) {
+      const pathMatch = /^ {2}(\/\S*):\s*$/.exec(line);
+      if (pathMatch) path = normalise(pathMatch[1] ?? "");
+      const method = /^ {4}(get|post|put|patch|delete):\s*$/.exec(line);
+      if (method && path) operations.add(`${(method[1] ?? "").toUpperCase()} ${path}`);
+    }
+    return operations;
+  }
+
+  /** Operations of an Express router file mounted at `prefix`, as seen through the shell. */
+  function routerOperations(file: string, mount: string): string[] {
+    const source = read(file);
+    return [...source.matchAll(/router\.(get|post|put|patch|delete)\("([^"]*)"/g)].map(
+      (m) => `${(m[1] ?? "").toUpperCase()} ${normalise(mount + (m[2] === "/" ? "" : (m[2] ?? "")))}`,
+    );
+  }
+
+  it("is OpenAPI 3 and uses the shell as the server", () => {
+    expect(spec).toMatch(/^openapi: 3\./m);
+    expect(spec).toMatch(/servers:\s*\n\s+- url: http:\/\/localhost:8000/);
+  });
+
+  it("lists every conversation-service route under /api/chats, except the endless stream", () => {
+    const features = "services/conversation-service/src/features";
+    const expected = [
+      ...routerOperations(`${features}/chats/routes.ts`, "/api/chats"),
+      ...routerOperations(`${features}/messages/routes.ts`, "/api/chats"),
+      ...routerOperations(`${features}/attachments/routes.ts`, "/api/chats"),
+    ];
+    expect(expected.length).toBeGreaterThan(10);
+    const documented = specOperations();
+    expect(expected.filter((operation) => !documented.has(operation))).toEqual([]);
+  });
+
+  it("lists every auth-service route under /auth", () => {
+    const features = "services/auth-service/src/features";
+    const source = [read(`${features}/register/api.ts`), read(`${features}/session/api.ts`)].join("\n");
+    const expected = [...source.matchAll(/Router\.(get|post)\("([^"]*)"/g)].map((m) => `${(m[1] ?? "").toUpperCase()} /auth${m[2] ?? ""}`);
+    expect(expected).toHaveLength(5);
+    const documented = specOperations();
+    expect(expected.filter((operation) => !documented.has(operation))).toEqual([]);
+  });
+});

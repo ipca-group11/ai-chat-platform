@@ -1,0 +1,3 @@
+$ bash -c node scripts/dast/zap-report.ts docs/AICHAT-28/results/us5-api-scan.json --urls | grep -E '/(api|auth)/' | head -24
+
+[exit 0]

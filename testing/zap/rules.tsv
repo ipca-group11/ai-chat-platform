@@ -16,6 +16,21 @@
 10115	FAIL	(Script Served From Malicious Domain (polyfill))	High: script served from a compromised host
 10028	FAIL	(Off-site Redirect)	High: open redirect to another site
 90002	FAIL	(Java Serialization Object)	High: serialized Java objects accepted from the client
+# Active rules (only the weekly API scan, zap-api-scan.py, runs them): High risk, so FAIL as well.
+40012	FAIL	(Cross Site Scripting (Reflected))	High: script injected into a response
+# False positive of the JSON API: ZAP reports echoed input in a JSON answer (risk Low) under the same id as persistent XSS
+# in a page (risk High). The API only answers application/json with X-Content-Type-Options: nosniff, and the UI shows
+# titles as text (React escapes them). Only /api/ is out of scope; the pages stay in scope for this rule.
+40014	OUTOFSCOPE	http://localhost:\d+/api/.*
+40014	FAIL	(Cross Site Scripting (Persistent))	High: stored script injection
+40018	FAIL	(SQL Injection)	High: SQL injection
+90019	FAIL	(Server Side Code Injection)	High: code run on the server
+90020	FAIL	(Remote OS Command Injection)	High: command run on the server
+6	FAIL	(Path Traversal)	High: files outside the upload directory
+7	FAIL	(Remote File Include)	High: remote file included by the server
+90023	FAIL	(XML External Entity Attack)	High: external entities read by the server
+40003	FAIL	(CRLF Injection)	High: response header injection
+40009	FAIL	(Server Side Include)	High: server side include injection
 # False positive: Retire.js reads the Module Federation chunk mf-entry-bootstrap-<hash>.js as the Bootstrap library. Only that file is out of scope; any other file still warns.
 10003	OUTOFSCOPE	http://localhost:\d+/assets/mf-entry-bootstrap-.*
 10003	WARN	(Vulnerable JS Library (Powered by Retire.js))	Medium: update the library, ticket it
@@ -80,3 +95,6 @@
 90030	IGNORE	(WSDL File Detection)	Informational: no WSDL in this stack
 
 120000	IGNORE	(Information Disclosure - Information in Browser localStorage and sessionStorage)	Informational: lists what the app keeps in browser storage (UI preferences); tokens are httpOnly cookies, not storage
+10106	IGNORE	(HTTP Only Site)	False positive on the local stack: the scan runs over plain HTTP. In production Caddy serves HTTPS only
+100001	IGNORE	(Unexpected Content-Type was returned)	The shell answers every unknown path with index.html (single page app fallback), so probes such as /WEB-INF/web.xml get HTML with 200
+100000	WARN	(A Server Error response code was returned by the server)	Low: client errors (4xx) are expected while a scan probes; a 500 is worth a look
