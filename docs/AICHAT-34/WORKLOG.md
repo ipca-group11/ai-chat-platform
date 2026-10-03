@@ -150,6 +150,37 @@ pnpm nx run shell:test --skip-nx-cache   # also ui, mfe-auth, e2e
 
 **Problems and fixes.** Nothing failed. The numbers are identical to the US1 measurement, so moving to the preset did not change what is counted. The `html` reporter used by these projects was replaced by the shared `text` + `lcov` + `json-summary` set.
 
+### US4 · Guard test for test targets that skip coverage ([AICHAT-118](https://ipca-grupo11.atlassian.net/browse/AICHAT-118))
+
+**What and why.** Coverage thresholds only protect us if every project's `test` target actually runs with `--coverage`. We added a test that fails when a project forgets it, so a future project cannot skip the thresholds silently.
+
+**Files.**
+- `packages/workspace-config/src/coverage-guard.js` (project discovery, `checkProject`, exempt lists with reasons)
+- `packages/workspace-config/src/coverage-guard.test.js`
+- `apps/mfe-auth/package.json` (fix found by the guard)
+- `packages/test-config/README.md` (documents the exempt list)
+
+**How to run.**
+```sh
+pnpm nx run workspace-config:test --skip-nx-cache
+# or only the guard
+cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.js
+```
+
+**How to repeat it manually.**
+1. Clean checkout of the branch, `pnpm install`.
+2. Run the guard command above. Expected: 25 tests pass.
+3. In `packages/ui/project.json` change the test command to `vitest run` (no `--coverage`) and run the guard again. Expected: 1 failure with `packages/ui: the Nx test target "vitest run" does not run with --coverage`.
+4. Revert the change (`git checkout packages/ui/project.json`) and run again. Expected: all green.
+
+**Result.** For each project with a `test` target the guard checks three things: the Nx command has `--coverage`, the `package.json` test script has `--coverage`, and the Vitest config imports `@platform/test-config`. The exempt list is `testing/k6` (k6 runtime, not Node, nothing to instrument) and, for the import check only, `packages/test-config` (it defines the preset). On its first run the guard failed on a real gap: the `apps/mfe-auth` `package.json` script still ran `vitest run` without `--coverage` (the Nx target was already fixed in US3).
+
+![guard finds mfe-auth](evidence/14-guard-finds-mfe-auth.png)
+![guard passes](evidence/15-guard-passes.png)
+![guard fails on a broken case](evidence/16-guard-fails-on-broken-case.png)
+
+**Problems and fixes.** The first run failed for `apps/mfe-auth` as described; we fixed the script and the guard passed. The deliberately broken case (`packages/ui` without `--coverage`) failed as expected and was reverted. The guard reads the files directly instead of calling the Nx CLI, so it stays fast and does not depend on the Nx daemon.
+
 ### US6 · Narrow coverage excludes ([AICHAT-139](https://ipca-grupo11.atlassian.net/browse/AICHAT-139))
 
 **What and why.** `apps/mfe-chat` excluded the whole `src/app/**` folder, which holds routes, pages, `ChatWorkspace`, `auth-context`, `use-media-query` and the `split-panes` logic. A broad exclude hides untested logic (`split-panes.ts` has a test that did not count). We narrowed it to the one real bootstrap file, `src/app/remote-entry.tsx` (Module Federation mount, no logic of its own).
@@ -191,9 +222,19 @@ The `src/app` folder alone is at 82.92 % lines, 80.11 % branches and 84.84 % fun
 
 ## 5. Results
 
-| Metric | Before | After |
-|---|---|---|
-| … | … | … |
+Coverage in % (statements / branches / functions / lines). Before = measured on 2026-10-03 before any change; After = measured with the final configuration.
+
+| Project | Before | After | Enforced before | Enforced after (S/B/F/L) |
+|---|---|---|---|---|
+| `apps/shell` | 68.71 / 60.97 / 62.12 / 70.51 | 68.71 / 60.97 / 62.12 / 70.51 | No | Yes, ratchet 68/60/62/70 |
+| `packages/ui` | 97.20 / 80.48 / 92.06 / 97.20 | 97.20 / 80.48 / 92.06 / 97.20 | No | Yes, 80/80/80/80 |
+| `apps/mfe-auth` | 92.23 / 75.40 / 93.10 / 92.23 | 92.23 / 75.40 / 93.10 / 92.23 | No | Yes, 80/75/80/80 |
+| `e2e` | 80.95 / 77.77 / 81.25 / 82.05 | 80.95 / 77.77 / 81.25 / 82.05 | No | Yes, 80/70/80/80 |
+| `apps/mfe-chat` | 93.45 / 87.11 / 91.02 / 95.20 | 89.87 / 85.21 / 89.71 / 91.86 | Yes, `src/app/**` excluded | Yes, 80/75/80/80, only `remote-entry.tsx` excluded |
+
+Other results: 13 of 13 Node test configs use `@platform/test-config`; a guard test fails any project whose test target skips `--coverage`; `pnpm test` passes for all 15 projects.
+
+![pnpm test](evidence/17-pnpm-test-all.png)
 
 ## 6. DoD check
 
