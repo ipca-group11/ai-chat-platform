@@ -1,18 +1,4 @@
-import type { TestUserConfig } from "vitest/config";
-import { coverageThresholds, type CoverageThresholds } from "./coverage-thresholds.js";
-
-export interface CoveragePresetOptions {
-  /** Glob(s) of source files coverage should be computed over. */
-  include?: string[];
-  /** Additional excludes, appended to the default test-file/story excludes. */
-  exclude?: string[];
-  /**
-   * Threshold overrides merged over the 80% default. Use `appCoverageThresholds` or
-   * `e2eCoverageThresholds` for the other groups, or a ratcheted value with a
-   * `TODO(AICHAT-17, <date>)` comment next to it.
-   */
-  thresholds?: Partial<CoverageThresholds>;
-}
+import { coverageThresholds } from "./coverage-thresholds.js";
 
 const DEFAULT_COVERAGE_EXCLUDES = [
   "**/*.spec.ts",
@@ -44,11 +30,11 @@ const DEFAULT_COVERAGE_EXCLUDES = [
  * });
  * ```
  */
-export function coveragePreset(options: CoveragePresetOptions = {}) {
+export function coveragePreset(options = {}) {
   return {
-    provider: "v8" as const,
+    provider: "v8",
     // json-summary writes coverage/coverage-summary.json, read by the CI summary.
-    reporter: ["text", "lcov", "json-summary"] as Array<"text" | "lcov" | "json-summary">,
+    reporter: ["text", "lcov", "json-summary"],
     ...(options.include ? { include: options.include } : {}),
     exclude: [...DEFAULT_COVERAGE_EXCLUDES, ...(options.exclude ?? [])],
     thresholds: { ...coverageThresholds, ...options.thresholds },
@@ -62,7 +48,7 @@ export function coveragePreset(options: CoveragePresetOptions = {}) {
  * via `vitest/config`'s `mergeConfig`, or spread manually since Vitest config objects are
  * plain objects.
  */
-export function vitestPreset(options: CoveragePresetOptions = {}): { test: TestUserConfig } {
+export function vitestPreset(options = {}) {
   return {
     test: {
       environment: "node",

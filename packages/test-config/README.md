@@ -7,10 +7,10 @@ pod's own unit tests — that is each pod's own responsibility (see AC-94 below)
 
 ## What's in here
 
-- `coverage-thresholds.ts` — the raw `{ lines, statements, functions, branches }: 80`
+- `coverage-thresholds.js` — the raw `{ lines, statements, functions, branches }: 80`
   object, plus `appCoverageThresholds` (branches 75, for `apps/*`) and
   `e2eCoverageThresholds` (branches 70).
-- `vitest.preset.ts` — `coveragePreset(options)` (a ready-to-use `test.coverage` fragment:
+- `vitest.preset.js` — `coveragePreset(options)` (a ready-to-use `test.coverage` fragment:
   `v8` provider, `text`+`lcov`+`json-summary` reporters (the last writes
   `coverage/coverage-summary.json`), the shared thresholds (overridable with
   `thresholds`), and sane default excludes
@@ -20,8 +20,9 @@ pod's own unit tests — that is each pod's own responsibility (see AC-94 below)
 ## Which projects must apply the thresholds
 
 Every Node test project (AICHAT-34): `services/*`, `packages/*`, `apps/*` and `e2e`.
-`testing/k6` is exempt (k6 runtime, no Node source). The package is consumed from its
-built `dist/`, which Nx builds before every `test` target (`dependsOn: ^build`).
+`testing/k6` is exempt (k6 runtime, no Node source). The package is plain JavaScript with
+hand-written `.d.ts` files, so Vite configs load it straight from source and no build step is
+needed (a clean checkout without `dist/` works for `vite build` and the Dockerfiles).
 
 ## How to opt a project's `test` target into failing on an unmet threshold
 

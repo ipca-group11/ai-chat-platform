@@ -108,6 +108,7 @@ pnpm nx run-many -t test --skip-nx-cache
 
 **Problems and fixes.**
 - Vite loads the config natively and the package exported `index.ts` with `.js` import suffixes, so it failed with `ERR_MODULE_NOT_FOUND`. We export the compiled `dist/` instead; the `test` target already builds dependencies first (`dependsOn: ^build`).
+- Exporting the preset from a compiled `dist/` broke `vite build` and the Docker image builds in a clean checkout ("Failed to resolve entry for package @platform/test-config"), because nothing builds `dist/` before a plain `pnpm --filter <pkg> run build`. We changed `@platform/test-config` to plain JavaScript with hand-written `.d.ts` files, so it loads from source and needs no build step (importing `.ts` sources instead broke the `tsc` build of `pact-config`). With `packages/test-config/dist` removed, the build of every app and package, then `pnpm lint && pnpm typecheck && pnpm test && pnpm build`, all pass.
 - Making `eslint-config` import the preset created a cycle with `test-config` (which uses `eslint-config` for linting): Nx reported a circular task graph and a lint rule failed. We first worked around it with overrides, then removed the cycle: `eslint-config` keeps identical thresholds inline, is listed as an exempt in the guard (US4), and the overrides were reverted. `pnpm install` shows no cyclic warning and `nx graph` works.
 - Lowered branch threshold for `apps/mfe-chat` and `apps/mfe-settings` from 80 to 75 follows the agreed app group. Their measured values still pass.
 

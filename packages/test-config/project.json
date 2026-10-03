@@ -3,7 +3,10 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/test-config",
   "projectType": "library",
-  "tags": ["type:package", "scope:shared"],
+  "tags": [
+    "type:package",
+    "scope:shared"
+  ],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",
@@ -29,10 +32,9 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p tsconfig.json",
+        "command": "echo 'test-config ships plain JavaScript with .d.ts files; nothing to build'",
         "cwd": "packages/test-config"
-      },
-      "outputs": ["{projectRoot}/dist"]
+      }
     }
   }
 }
