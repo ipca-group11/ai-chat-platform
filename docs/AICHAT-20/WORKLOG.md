@@ -214,7 +214,7 @@ pnpm --dir <project> exec vitest run -u
 |---|---|---|
 | Snapshot assertions in the repo | 0 | 36 (12 shared-types, 13 conversation-service, 10 auth-service, 1 mfe-chat) |
 | DTO fixtures in shared-types | 0 | 15, all pass `schema.parse` |
-| Snapshot test files | 0 | 5 (`.snap` files: 3) |
+| Snapshot test files | 0 | 5 (`.snap` files: 4) |
 | Component-tree snapshots | 0 | 0, and the lint rule blocks new ones |
 | Tests in shared-types | 114 | 125 |
 | Lint rules about snapshots | 0 | 2 (`platform/no-component-snapshots`, `vitest/no-large-snapshots`) |
