@@ -1,6 +1,8 @@
 import express, { Router } from "express";
 import { providerError, requestId } from "../llm/errors.js";
 import { completionId, openAiCompletion, openAiReply, openAiStream } from "../llm/openai.js";
+import { isReplay } from "../llm/replay.js";
+import { serveReplay } from "../llm/serve-replay.js";
 import { planScenario, scenarioDefinitions } from "../llm/scenarios.js";
 import { availableScenarios, selectScenario } from "../llm/select.js";
 import { dropConnection, openEventStream, writeFrames } from "../llm/sse.js";
@@ -31,6 +33,10 @@ export const openaiMock: MockModule = {
       const failure = providerError("openai", name, requestId(ctx.rng));
       if (failure) {
         res.status(failure.status).set(failure.headers).json(failure.body);
+        return;
+      }
+      if (isReplay(name)) {
+        await serveReplay("openai", name, ctx, req, res);
         return;
       }
       if (!Array.isArray(request.messages)) {

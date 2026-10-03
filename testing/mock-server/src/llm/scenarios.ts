@@ -1,6 +1,7 @@
 import type { MockConfig } from "../config.js";
 import type { ScenarioDefinition } from "../registry.js";
 import { errorScenarioDefinitions } from "./errors.js";
+import { replayDefinition } from "./replay.js";
 
 export type LlmProvider = "anthropic" | "openai";
 export type StopReason = "end_turn" | "max_tokens" | "pause_turn";
@@ -102,7 +103,7 @@ export function scenarioDefinitions(provider: LlmProvider): ScenarioDefinition[]
   const text = Object.entries(TEXT_SCENARIOS)
     .filter(([, scenario]) => scenario.providers.includes(provider))
     .map(([name, scenario]) => ({ mock: provider, name, description: scenario.description }));
-  return [...text, ...errorScenarioDefinitions(provider)];
+  return [...text, ...errorScenarioDefinitions(provider), replayDefinition(provider)];
 }
 
 export const DEFAULT_SCENARIO = "ok";
