@@ -1,6 +1,6 @@
 // Lists the source files that fall under the unit-test policy (docs/AICHAT-17/UNIT-TEST-POLICY.md)
 // and reports which of them have a co-located test or an entry in unit-test-exempt.json.
-// The rules live in packages/workspace-config/src/source-files.js (also run as a test in CI).
+// The rules live in packages/workspace-config/src/source-files.ts (also run as a test in CI).
 //
 //   node scripts/unit-test/source-files.mjs            # table per project
 //   node scripts/unit-test/source-files.mjs --list     # one line per file: status path
@@ -15,7 +15,7 @@ import {
   validateExempt,
   untestedFiles,
   fileStatus,
-} from "../../packages/workspace-config/src/source-files.js";
+} from "../../packages/workspace-config/src/source-files.ts";
 
 export { EXEMPT_FILE, CATEGORIES, listSourceFiles, colocatedTests, loadExempt, validateExempt };
 

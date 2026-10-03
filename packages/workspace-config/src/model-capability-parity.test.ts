@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PROVIDERS, PROVIDER_MODELS } from "@app/shared-types/model-capabilities";
+import { PROVIDERS, PROVIDER_MODELS, type Provider } from "@app/shared-types/model-capabilities";
 import { supportsAttachmentKind } from "@parity/mfe-chat/features/attachments/model/model-capabilities";
 import { supportsReasoning, supportsWebFetch } from "@parity/mfe-chat/shared/model-capabilities";
 import * as chatTypes from "@parity/mfe-chat/shared/types";
@@ -11,10 +11,16 @@ import { OpenAiProvider } from "@parity/conversation-service/features/llm-adapte
 // rules from packages/shared-types; this test fails when either side stops agreeing with the
 // other, for example when one of them gets its own copy of a table again.
 
-const backend = { anthropic: new AnthropicProvider(), openai: new OpenAiProvider() };
+interface ServerCapabilities {
+  supportsReasoning(model: string): boolean;
+  supportsWebFetch(model: string): boolean;
+  supportsVision(model: string): boolean;
+}
+
+const backend: Record<Provider, ServerCapabilities> = { anthropic: new AnthropicProvider(), openai: new OpenAiProvider() };
 
 /** Ids outside the catalogue, in other letter cases: the two sides must still agree. */
-const EXTRA_MODELS = {
+const EXTRA_MODELS: Record<Provider, string[]> = {
   anthropic: [
     "CLAUDE-OPUS-5-5",
     "Claude-Sonnet-5-5",
@@ -29,7 +35,7 @@ const EXTRA_MODELS = {
 };
 
 const cases = PROVIDERS.flatMap((provider) =>
-  [...PROVIDER_MODELS[provider], ...EXTRA_MODELS[provider]].map((model) => [provider, model]),
+  [...PROVIDER_MODELS[provider], ...EXTRA_MODELS[provider]].map((model): [Provider, string] => [provider, model]),
 );
 
 describe("model catalogue", () => {

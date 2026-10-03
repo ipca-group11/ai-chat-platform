@@ -11,7 +11,7 @@ import {
   loadExempt,
   untestedFiles,
   validateExempt,
-} from "./source-files.js";
+} from "./source-files";
 
 // The guard (AICHAT-138): every source file under the unit-test policy has a test next to it
 // or an entry in unit-test-exempt.json, and every exempt entry still points at a file that needs it.
@@ -33,14 +33,14 @@ describe("the rules, on a scratch repository", () => {
   const root = mkdtempSync(join(tmpdir(), "unit-guard-"));
   afterAll(() => rmSync(root, { recursive: true, force: true }));
 
-  const write = (rel, content = "export {};\n") => {
+  const write = (rel: string, content: string = "export {};\n") => {
     mkdirSync(dirname(join(root, rel)), { recursive: true });
     writeFileSync(join(root, rel), content);
   };
-  const git = (...args) => execFileSync("git", args, { cwd: root, stdio: "ignore" });
-  const exempt = (...entries) =>
+  const git = (...args: string[]) => execFileSync("git", args, { cwd: root, stdio: "ignore" });
+  const exempt = (...entries: object[]) =>
     write(EXEMPT_FILE, JSON.stringify({ version: 1, entries }));
-  const entry = (path) => ({ path, category: "barrel", reason: "Only re-exports, no logic." });
+  const entry = (path: string) => ({ path, category: "barrel", reason: "Only re-exports, no logic." });
 
   git("init", "-q");
   write("apps/demo/src/tested.ts");
