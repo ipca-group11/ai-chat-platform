@@ -47,4 +47,6 @@ export type StoredApiKeyRecord = z.infer<typeof storedApiKeyRecordSchema>;
  * test-connection). The service must use it once and never persist or log it
  * (AC-81, AC-82, AC-83).
  */
+// HTTP header name, not a secret (WAIVERS.md W2)
+// nosemgrep: node_api_key
 export const LLM_API_KEY_HEADER = "X-Llm-Api-Key";

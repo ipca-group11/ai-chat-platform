@@ -100,7 +100,36 @@ scripts/ci/semgrep.sh
 - The CLI does not print its findings as a table, so we read the SARIF with a small script (US5).
 - Semgrep prints some parse warnings for shell snippets in workflow files. They are not errors and do not change the exit code.
 
-### US3 · …
+### US3 · Triage existing SAST findings ([AICHAT-68](https://ipca-grupo11.atlassian.net/browse/AICHAT-68))
+
+**What and why.** The baseline had 24 ERROR findings, which would block every PR. We went through each one. Nothing needed a code fix: 16 are fake secrets in tests, 4 are an HTTP header name, 1 is a dummy bcrypt hash, 2 are observability Dockerfiles and 1 is the real JWT default secret. The JWT default (F1, High) is not fixed in this epic by owner decision: it is waived, and the bug is ticketed as [AICHAT-210](https://ipca-grupo11.atlassian.net/browse/AICHAT-210). The 34 WARNING and 13 INFO items stay reported and are accepted with a reason.
+
+**Files.**
+- `docs/AICHAT-27/WAIVERS.md` (new): every waiver with ID, location, count and reason.
+- `.semgrepignore`: test files, `e2e/src/fixtures/` and test setup folders.
+- `nosemgrep` comments (reason on the line above) in `apps/mfe-chat/src/shared/types.ts`, `packages/shared-types/src/api-keys/schema.ts`, `packages/shared-types/src/chat/provider.ts`, `services/conversation-service/src/shared/contracts/http.ts`, `services/auth-service/src/features/session/model.ts`, `services/conversation-service/src/shared/env.ts`, `observability/alloy.Dockerfile`, `observability/loki.Dockerfile`. Comments only, no behaviour change.
+- `docs/AICHAT-27/evidence/02-clean-scan.*`
+
+**How to run.**
+
+```sh
+scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif
+```
+
+**How to repeat it manually.**
+
+1. Run the command from the repo root with Docker running.
+2. Compare the table with `WAIVERS.md`.
+3. Expected output: `No ERROR findings`, 23 WARNING and 13 INFO, exit code 0.
+
+**Result.** 0 ERROR after triage. F1 is waived as High (W5) pointing to AICHAT-210.
+
+![Scan after triage](evidence/02-clean-scan.png)
+
+**Problems and fixes.**
+- `nosemgrep` only matched the short rule id (the last part), not the full dotted id, so we use the short one.
+- A `nosemgrep` comment must sit on the line directly above the finding, so the reason goes on its own line above it.
+- SARIF keeps suppressed findings and marks them as suppressed, so our summary script skips those entries.
 
 ### US4 · …
 

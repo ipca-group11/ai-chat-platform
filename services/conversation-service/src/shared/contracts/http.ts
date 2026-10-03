@@ -11,6 +11,8 @@ export const CORRELATION_HEADER = "X-Correlation-Id";
 /** Header used by the browser to forward a per-request LLM provider API key
  * (ARCHITECTURE.md §6, settings pod's AC-82/83). Read/forwarded/redacted here, never
  * persisted. */
+// HTTP header name, not a secret (WAIVERS.md W2)
+// nosemgrep: node_api_key
 export const LLM_API_KEY_HEADER = "X-Llm-Api-Key";
 
 export interface HeaderReader {

@@ -17,3 +17,13 @@ services/*/src/generated/
 pnpm-lock.yaml
 # Evidence is documentation (screenshots, logs), not source
 docs/
+
+# Test code never ships. Fake secrets and fixtures there only produce noise (see docs/AICHAT-27/WAIVERS.md, W1).
+*.spec.ts
+*.spec.tsx
+*.test.ts
+*.test.tsx
+*.test.js
+*.test.mjs
+e2e/src/fixtures/
+services/*/src/shared/test/
