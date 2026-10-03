@@ -1,0 +1,72 @@
+$ pnpm --dir packages/eslint-config exec vitest run --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/eslint-config
+
+ ✓ src/rules/no-component-snapshots.test.ts > no-component-snapshots > no-component-snapshots > valid > expect(screen.getByRole('button')).toBeVisible(); 48ms
+ ✓ src/rules/no-component-snapshots.test.ts > no-component-snapshots > no-component-snapshots > valid > expect(result).toEqual({ a: 1 }); 2ms
+ ✓ src/rules/no-component-snapshots.test.ts > no-component-snapshots > no-component-snapshots > valid > toMatchSnapshot(); 2ms
+ ✓ src/rules/no-component-snapshots.test.ts > no-component-snapshots > no-component-snapshots > valid > expect(a)[matcherName](); 1ms
+ ✓ src/rules/no-component-snapshots.test.ts > no-component-snapshots > no-component-snapshots > invalid > expect(container).toMatchSnapshot(); 2ms
+ ✓ src/rules/no-component-snapshots.test.ts > no-component-snapshots > no-component-snapshots > invalid > expect(container.innerHTML).toMatchInlineSnapshot(); 1ms
+ ✓ src/rules/no-component-snapshots.test.ts > no-component-snapshots > no-component-snapshots > invalid > await expect(html).toMatchFileSnapshot('./out.html'); 1ms
+ ✓ src/rules/no-component-snapshots.test.ts > no-component-snapshots > no-component-snapshots > invalid > expect(() => render()).toThrowErrorMatchingSnapshot(); 1ms
+ ✓ src/rules/no-component-snapshots.test.ts > no-component-snapshots > no-component-snapshots > invalid > expect(a)['toMatchSnapshot'](); 1ms
+ ✓ src/local-plugin.test.ts > local plugin > is named platform 1ms
+ ✓ src/local-plugin.test.ts > local plugin > exposes the feature-folder-boundaries and no-component-snapshots rules 0ms
+ ✓ src/local-plugin.test.ts > platform/feature-folder-boundaries (via the plugin) > valid > import { a } from '../../shared/a'; 49ms
+ ✓ src/local-plugin.test.ts > platform/feature-folder-boundaries (via the plugin) > invalid > import { a } from '../y/hooks/useA'; 7ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > import { useComposer } from './hooks/useComposer'; 49ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > import { chatSchema } from '../chat-list'; 5ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > import { chatSchema } from '../chat-list/index'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > import { formatDate } from '../../shared/format-date'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > import { z } from 'zod'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > import { ChatDto } from '@shared-types/chat'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > import { deep } from '../chat-list/hooks/useChatList'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > export const helper = () => {}; 2ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > export { chatSchema } from '../chat-list'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > export * from '../chat-list'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > const load = () => import('../chat-list'); 9ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > valid > const load = (path) => import(path); 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > invalid > import { useChatList } from '../chat-list/hooks/useChatList'; 2ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > invalid > import { ChatListItem } from '../chat-list/components/ChatListItem'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > invalid > export { useChatList } from '../chat-list/hooks/useChatList'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > invalid > export * from '../chat-list/hooks/useChatList'; 1ms
+ ✓ src/rules/feature-folder-boundaries.test.ts > feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals) > feature-folder-boundaries > invalid > const load = () => import('../chat-list/hooks/useChatList'); 1ms
+ ✓ src/base.test.ts > base preset > is a flat config array that registers the nx and local platform plugins 2ms
+ ✓ src/base.test.ts > base preset > ignores build output and dependency folders 0ms
+ ✓ src/base.test.ts > base preset > enforces module boundaries between apps, services and packages 0ms
+ ✓ src/base.test.ts > base preset > turns the local feature-folder rule on as an error 0ms
+ ✓ src/base.test.ts > base preset > reports an unused variable, but not one that starts with an underscore 96ms
+ ✓ src/base.test.ts > base preset > ignores an unused argument that starts with an underscore 10ms
+ ✓ src/node.test.ts > node preset > starts with every base entry, in order 2ms
+ ✓ src/node.test.ts > node preset > declares the Node globals as read-only 0ms
+ ✓ src/node.test.ts > node preset > allows console output, which the base preset only warns about 92ms
+ ✓ src/node.test.ts > node preset > does not report process or __dirname as undefined 11ms
+ ✓ src/node.test.ts > node preset > keeps the base rules on 8ms
+ ✓ src/base.test.ts > base preset > asks for `import type` when an import is only used as a type 17ms
+ ✓ src/base.test.ts > base preset > warns on console.log but allows console.warn and console.error 14ms
+ ✓ src/base.test.ts > base preset > applies the typescript-eslint recommended rules (no explicit any) 7ms
+ ✓ src/base.test.ts > base preset > applies the ESLint recommended rules 8ms
+ ✓ src/base.test.ts > base preset > flags a deep import into another feature through the local rule 7ms
+ ✓ src/base.test.ts > base preset > accepts an import of another feature's public API 7ms
+ ✓ src/base.test.ts > base preset > snapshot policy (AICHAT-20) > fails a .tsx test that uses toMatchSnapshot 10ms
+ ✓ src/base.test.ts > base preset > snapshot policy (AICHAT-20) > fails a .tsx spec that uses toMatchInlineSnapshot 8ms
+ ✓ src/base.test.ts > base preset > snapshot policy (AICHAT-20) > allows the same snapshot in a .ts test (DTOs and wire output) 8ms
+ ✓ src/base.test.ts > base preset > snapshot policy (AICHAT-20) > does not apply to non-test .tsx files 8ms
+ ✓ src/base.test.ts > base preset > snapshot policy (AICHAT-20) > fails an inline snapshot longer than 50 lines 8ms
+ ✓ src/base.test.ts > base preset > snapshot policy (AICHAT-20) > accepts a short inline snapshot 12ms
+ ✓ src/react.test.ts > react preset > starts with every base entry and adds one JSX entry 1ms
+ ✓ src/react.test.ts > react preset > scopes the React rules to jsx and tsx files and pins the React version 1ms
+ ✓ src/react.test.ts > react preset > switches off the rules a modern React setup does not need 0ms
+ ✓ src/react.test.ts > react preset > reports a hook called conditionally 183ms
+ ✓ src/react.test.ts > react preset > reports a list rendered without keys 20ms
+ ✓ src/react.test.ts > react preset > accepts a clean component without importing React 14ms
+ ✓ src/react.test.ts > react preset > does not apply the React rules to plain .ts files 8ms
+
+ Test Files  6 passed (6)
+      Tests  60 passed (60)
+   Start at  17:27:42
+   Duration  1.35s (import 69%, tests 21%, transform 9%)
+
+
+[exit 0]

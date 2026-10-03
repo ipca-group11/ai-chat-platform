@@ -78,4 +78,47 @@ describe("base preset", () => {
     const ids = await lintRuleIds(base, "export { thing } from '../other';\n", "src/features/mine/index.ts");
     expect(ids).not.toContain("platform/feature-folder-boundaries");
   });
+
+  describe("snapshot policy (AICHAT-20)", () => {
+    const componentTest = [
+      "import { expect, it } from 'vitest';",
+      "it('renders', () => {",
+      "  expect(<div />).toMatchSnapshot();",
+      "});",
+      "",
+    ].join("\n");
+
+    it("fails a .tsx test that uses toMatchSnapshot", async () => {
+      expect(await lintRuleIds(base, componentTest, "src/Button.test.tsx")).toContain(
+        "platform/no-component-snapshots",
+      );
+    });
+
+    it("fails a .tsx spec that uses toMatchInlineSnapshot", async () => {
+      const code = componentTest.replace("toMatchSnapshot", "toMatchInlineSnapshot");
+      expect(await lintRuleIds(base, code, "src/Button.spec.tsx")).toContain("platform/no-component-snapshots");
+    });
+
+    it("allows the same snapshot in a .ts test (DTOs and wire output)", async () => {
+      const code = componentTest.replace("<div />", "{ a: 1 }");
+      expect(await lintRuleIds(base, code, "src/dto.test.ts")).not.toContain("platform/no-component-snapshots");
+    });
+
+    it("does not apply to non-test .tsx files", async () => {
+      const code = "export const f = (e: { toMatchSnapshot(): void }) => e.toMatchSnapshot();\n";
+      expect(await lintRuleIds(base, code, "src/Button.tsx")).not.toContain("platform/no-component-snapshots");
+    });
+
+    it("fails an inline snapshot longer than 50 lines", async () => {
+      const body = Array.from({ length: 60 }, (_, i) => `  "key${i}": ${i},`).join("\n");
+      const code = `import { expect, it } from 'vitest';\nit('big', () => {\n  expect(x).toMatchInlineSnapshot(\`\n{\n${body}\n}\n\`);\n});\n`;
+      expect(await lintRuleIds(base, code, "src/dto.test.ts")).toContain("vitest/no-large-snapshots");
+    });
+
+    it("accepts a short inline snapshot", async () => {
+      const code =
+        "import { expect, it } from 'vitest';\nit('small', () => {\n  expect(x).toMatchInlineSnapshot(`\n{ \"a\": 1 }\n`);\n});\n";
+      expect(await lintRuleIds(base, code, "src/dto.test.ts")).not.toContain("vitest/no-large-snapshots");
+    });
+  });
 });

@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import nxPlugin from "@nx/eslint-plugin";
+import vitestPlugin from "@vitest/eslint-plugin";
 import tseslint from "typescript-eslint";
 import type { ConfigArray } from "typescript-eslint";
 import localPlugin from "./local-plugin.ts";
@@ -71,6 +72,23 @@ const base: ConfigArray = tseslint.config(
       ],
       "@typescript-eslint/consistent-type-imports": "error",
       "no-console": ["warn", { allow: ["warn", "error"] }],
+    },
+  },
+  // Snapshot policy (docs/AICHAT-20): snapshots are for DTOs and wire output only.
+  {
+    files: ["**/*.{test,spec}.{ts,tsx}"],
+    plugins: { vitest: vitestPlugin },
+    rules: {
+      // Inline snapshots and .snap files above 50 lines are too big to review.
+      "vitest/no-large-snapshots": ["error", { maxSize: 50 }],
+    },
+  },
+  {
+    files: ["**/*.{test,spec}.tsx"],
+    plugins: { platform: localPlugin },
+    rules: {
+      // No snapshot of a component tree, ever.
+      "platform/no-component-snapshots": "error",
     },
   },
 );
