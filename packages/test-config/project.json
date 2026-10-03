@@ -32,7 +32,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'test-config ships plain JavaScript with .d.ts files; nothing to build'",
+        "command": "echo 'test-config ships TypeScript source; nothing to build'",
         "cwd": "packages/test-config"
       }
     }

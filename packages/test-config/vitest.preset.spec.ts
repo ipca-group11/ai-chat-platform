@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coveragePreset, vitestPreset } from "./vitest.preset.js";
+import { coveragePreset, vitestPreset } from "./vitest.preset.ts";
 
 describe("coveragePreset", () => {
   it("AC-97: uses the v8 provider and the shared 80% thresholds", () => {

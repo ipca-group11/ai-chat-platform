@@ -4,15 +4,12 @@
   "private": true,
   "license": "UNLICENSED",
   "type": "module",
-  "main": "./index.js",
+  "main": "./index.ts",
   "exports": {
-    ".": {
-      "types": "./index.d.ts",
-      "default": "./index.js"
-    }
+    ".": "./index.ts"
   },
   "scripts": {
-    "build": "echo 'test-config ships plain JavaScript with .d.ts files; nothing to build'",
+    "build": "echo 'test-config ships TypeScript source; nothing to build'",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run --coverage",
@@ -27,6 +24,5 @@
     "@vitest/coverage-v8": "5.0.1",
     "typescript": "6.0.3",
     "vitest": "5.0.1"
-  },
-  "types": "./index.d.ts"
+  }
 }

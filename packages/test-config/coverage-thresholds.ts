@@ -1,3 +1,10 @@
+export type CoverageThresholds = {
+  lines: number;
+  statements: number;
+  functions: number;
+  branches: number;
+};
+
 /**
  * Shared Vitest coverage thresholds (`STACK.md` decision #6, AC-97): 80% line/statement/
  * function/branch coverage, enforced on `services/*` and `packages/ui` business logic.
@@ -5,7 +12,7 @@
  * `test.coverage.thresholds` option (directly, or via `vitestPreset` in `vitest.preset.ts`)
  * so `nx affected -t test` fails the build when a project's coverage drops below this bar.
  */
-export const coverageThresholds = Object.freeze({
+export const coverageThresholds = Object.freeze<CoverageThresholds>({
   lines: 80,
   statements: 80,
   functions: 80,
@@ -13,7 +20,7 @@ export const coverageThresholds = Object.freeze({
 });
 
 /** Thresholds for `apps/mfe-*` and `apps/shell` (AICHAT-34 README §5): branches 75. */
-export const appCoverageThresholds = Object.freeze({
+export const appCoverageThresholds = Object.freeze<CoverageThresholds>({
   lines: 80,
   statements: 80,
   functions: 80,
@@ -21,7 +28,7 @@ export const appCoverageThresholds = Object.freeze({
 });
 
 /** Thresholds for the `e2e` helper project (AICHAT-34 README §5): branches 70. */
-export const e2eCoverageThresholds = Object.freeze({
+export const e2eCoverageThresholds = Object.freeze<CoverageThresholds>({
   lines: 80,
   statements: 80,
   functions: 80,
