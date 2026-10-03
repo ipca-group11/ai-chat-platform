@@ -2,8 +2,8 @@
 # GHCR by .github/workflows/deploy.yml, which copies this file + Caddyfile to the VM and
 # runs `docker compose pull && docker compose up -d`. Nothing is built on the VM.
 #
-# Only Caddy is published (80/443 + 3001-3003 over TLS). Grafana and Prometheus stay on
-# the VM's loopback; reach them over an SSH tunnel. Secrets come from ~/ai-chat/.env on
+# Only Caddy is published (80/443 + 3001-3003 over TLS); Grafana is served by Caddy at
+# /grafana. Prometheus stays on the VM's loopback; reach it over an SSH tunnel. Secrets come from ~/ai-chat/.env on
 # the VM (see README.md); IMAGE_PREFIX and IMAGE_TAG are set by the deploy job.
 
 name: llm-chat
@@ -153,6 +153,12 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?}
+      # Public at https://$DOMAIN/grafana via Caddy; login required, no self sign-up.
+      GF_SERVER_ROOT_URL: https://${DOMAIN}/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SECURITY_COOKIE_SECURE: "true"
     volumes:
       - grafana-data:/var/lib/grafana
     ports:

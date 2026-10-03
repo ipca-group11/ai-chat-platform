@@ -45,8 +45,10 @@ Don't change `POSTGRES_PASSWORD` after first boot: Postgres only reads it when i
 
 Open inbound ports (NSG `vm-ai-chatNSG`): 22, 80, 443, 3001-3003. Ports 3001-3003 are the
 Module Federation remotes, which the shell loads from the browser on their own origins.
-Grafana (3300) and Prometheus (9090) are bound to the VM's loopback; reach Grafana with
-`ssh -L 3300:127.0.0.1:3300 azureuser@<host>`.
+Grafana is public at https://ai-chat-jpc.swedencentral.cloudapp.azure.com/grafana/ (user
+`admin`, password `GRAFANA_ADMIN_PASSWORD` from the VM's `.env`; sign-up and anonymous access
+are off). Prometheus (9090) stays on the VM's loopback; reach it with
+`ssh -L 9090:127.0.0.1:9090 azureuser@<host>`.
 
 LLM keys are not configured on the server: each user pastes their Anthropic key in
 Settings, and the browser sends it with each request.
