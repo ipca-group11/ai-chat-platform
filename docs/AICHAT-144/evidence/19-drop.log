@@ -1,0 +1,31 @@
+$ cd testing/mock-server && (PORT=4110 TOKENS=12 TOKEN_INTERVAL_MS=40 TTFT_MS=200 npx tsx src/main.ts > /dev/null & PID=$!; sleep 3; curl -sN localhost:4110/anthropic/v1/messages -H content-type:application/json -H 'X-Mock-Scenario: drop' -d '{"model":"claude-sonnet-4-5","max_tokens":100,"stream":true,"messages":[{"role":"user","content":"hi"}]}' | cut -c1-120; echo "curl exit code: ${PIPESTATUS[0]}"; kill $PID)
+event: message_start
+data: {"type":"message_start","message":{"id":"msg_mock8706c4fb2627","type":"message","role":"assistant","content":[],"m
+
+event: content_block_start
+data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}}
+
+event: ping
+data: {"type":"ping"}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"Seed "}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"seed "}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"repeatable "}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"from "}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"run "}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"server "}}
+
+curl exit code: 18
+
+[exit 0]

@@ -1,0 +1,26 @@
+$ cd testing/mock-server && (PORT=4110 TOKENS=12 TOKEN_INTERVAL_MS=40 TTFT_MS=200 npx tsx src/main.ts > /dev/null & PID=$!; sleep 3; curl -s localhost:4110/__admin/scenarios | jq -r '.scenarios[] | [.mock, .name, .description] | @tsv' | column -t -s $'\t'; kill $PID)
+anthropic  drop              Closes the connection halfway through the answer, with no closing event
+anthropic  error-401         Fails the request with 401 authentication_error
+anthropic  error-429         Fails the request with 429 rate_limit_error with retry-after: 2
+anthropic  error-500         Fails the request with 500 api_error
+anthropic  error-529         Fails the request with 529 overloaded_error (Anthropic only status)
+anthropic  long              Answer ten times longer than TOKENS
+anthropic  max-tokens        Answer cut short: stop reason max_tokens (finish_reason length on OpenAI)
+anthropic  ok                Normal answer of TOKENS tokens that ends with end_turn
+anthropic  pause-turn        Stops with pause_turn after a web fetch; the continuation request ends with end_turn
+anthropic  replay:<fixture>  Serves the recorded stream <FIXTURES_DIR>/anthropic/<fixture>.sse byte for byte
+anthropic  slow              The first token arrives 5000 ms later than TTFT_MS says
+anthropic  thinking          A thinking block (with signature) before the answer
+anthropic  web-fetch         The answer uses a web_fetch server tool call and its result
+openai     drop              Closes the connection halfway through the answer, with no closing event
+openai     error-401         Fails the request with 401 invalid_api_key
+openai     error-429         Fails the request with 429 rate_limit_exceeded with retry-after: 2
+openai     error-500         Fails the request with 500 server_error
+openai     error-503         Fails the request with 503 server_error (OpenAI's overloaded status)
+openai     long              Answer ten times longer than TOKENS
+openai     max-tokens        Answer cut short: stop reason max_tokens (finish_reason length on OpenAI)
+openai     ok                Normal answer of TOKENS tokens that ends with end_turn
+openai     replay:<fixture>  Serves the recorded stream <FIXTURES_DIR>/openai/<fixture>.sse byte for byte
+openai     slow              The first token arrives 5000 ms later than TTFT_MS says
+
+[exit 0]

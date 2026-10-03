@@ -21,11 +21,14 @@ FROM node:24-alpine AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /workspace/testing/mock-server/dist/main.cjs ./main.cjs
+# Recorded provider streams (AICHAT-25) served by the `replay:<fixture>` scenario; copied from the repo at build time.
+COPY services/conversation-service/src/test-utils/fixtures/llm ./fixtures
 
 RUN addgroup -S app && adduser -S app -G app && chown -R app:app /app
 USER app
 
-ENV PORT=4010
+ENV PORT=4010 \
+    FIXTURES_DIR=/app/fixtures
 EXPOSE 4010
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:'+process.env.PORT+'/__admin/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"
