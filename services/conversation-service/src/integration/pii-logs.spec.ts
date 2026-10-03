@@ -1,9 +1,9 @@
 /**
  * AICHAT-94 (and AICHAT-112): drive every route of conversation-service with planted fake
  * PII and prove none of it reaches the logs. The logger writes to memory; the assertions
- * use the shared detector from `@platform/test-utils/pii`.
+ * use the shared detector from `@platform/pii-detector`.
  */
-import { createLogCapture, describePii, findPiiInLines } from "@platform/test-utils/pii";
+import { createLogCapture, describePii, findPiiInLines } from "@platform/pii-detector";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { createLogger } from "../shared/logger.js";

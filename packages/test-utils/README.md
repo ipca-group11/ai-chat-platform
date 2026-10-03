@@ -32,7 +32,7 @@ Source.last.emit("token", { messageId: "m1", token: "Hi" });
 
 ## PII detector: `@platform/test-utils/pii`
 
-For the telemetry tests of AICHAT-32 (service logs, `/metrics`, Faro). Node only, no DOM.
+For the telemetry tests of AICHAT-32 (service logs, `/metrics`, Faro). Node only, no DOM. The code is in `packages/pii-detector` (`@platform/pii-detector`), a package of its own so the services can use it without a dependency cycle; `@platform/test-utils/pii` re-exports it.
 
 | Export | What it does |
 |---|---|

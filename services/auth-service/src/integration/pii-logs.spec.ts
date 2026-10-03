@@ -1,10 +1,10 @@
 /**
  * AICHAT-94: drive every route of auth-service with planted fake PII and prove none of it
  * reaches the logs. The logger writes to memory; the assertions use the shared detector from
- * `@platform/test-utils/pii`. Session tokens and `Set-Cookie` are checked in
+ * `@platform/pii-detector`. Session tokens and `Set-Cookie` are checked in
  * `session-tokens-in-logs.spec.ts` (AICHAT-112), so the "token" kind is skipped here.
  */
-import { createLogCapture, describePii, findPiiInLines } from "@platform/test-utils/pii";
+import { createLogCapture, describePii, findPiiInLines } from "@platform/pii-detector";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { createLogger } from "../shared/logger.js";
