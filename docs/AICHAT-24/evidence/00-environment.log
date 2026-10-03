@@ -1,0 +1,14 @@
+$ node -v; pnpm -v; docker --version; docker run --rm --entrypoint k6 ai-chat-k6-sse version; docker image ls ai-chat-k6-sse; sw_vers -productVersion
+v24.21.0
+10.4.0
+Docker version 29.4.0, build 9d7ad9f
+k6 v2.3.0 (go1.27.1, linux/arm64)
+Extensions:
+  github.com/phymbert/xk6-sse v0.2.0, k6/x/sse [js]
+
+IMAGE                   ID             DISK USAGE   CONTENT SIZE   EXTRA
+ai-chat-k6-sse:latest   9ef0d67a3369        166MB         49.8MB        
+26.3
+WARNING: This output is designed for human readability. For machine-readable output, please use --format.
+
+[exit 0]

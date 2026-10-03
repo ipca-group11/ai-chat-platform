@@ -7,5 +7,5 @@
     "sourceMap": false,
     "types": ["k6", "node"]
   },
-  "include": ["*.ts"]
+  "include": ["*.ts", "lib/**/*.ts", "types/**/*.ts"]
 }

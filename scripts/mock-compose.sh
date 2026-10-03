@@ -10,6 +10,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 export COMPOSE_FILE=compose.yaml:compose.mock.yaml
+# LOAD=1 adds the CPU and memory limits of the production VM (compose.load.yaml, AICHAT-24).
+if [ "${LOAD:-0}" = "1" ]; then COMPOSE_FILE="$COMPOSE_FILE:compose.load.yaml"; fi
 action="${1:-up}"
 profile="${2:-${MOCK_PROFILE:-llm}}"
 
