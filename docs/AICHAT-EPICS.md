@@ -47,6 +47,7 @@ All stories were created in Jira on 2026-10-03 as children of their epic, assign
 | AICHAT-34 | Review (merged into the integration branch) | [WORKLOG](AICHAT-34/WORKLOG.md) | #4 |
 | AICHAT-31 | Review (merged into the integration branch) | [WORKLOG](AICHAT-31/WORKLOG.md) | #7 |
 | AICHAT-27 | Review (merged into the integration branch) | [WORKLOG](AICHAT-27/WORKLOG.md) | #9 |
+| AICHAT-25 | Review (merged into the integration branch) | [WORKLOG](AICHAT-25/WORKLOG.md) | #11 |
 
 ## Suggested order
 

@@ -11,7 +11,7 @@ title: "AICHAT-25 · Provider adapter testing with recorded responses: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-25-provider-adapter-testing-with-recorded-responses` |
 | Started / finished | 2026-10-03 / 2026-10-03 |
-| Pull requests | #… |
+| Pull requests | [#11](https://github.com/ipca-group11/ai-chat-platform/pull/11) |
 | Status | In Review |
 
 ## 1. DoR review
@@ -211,7 +211,7 @@ node scripts/record-llm-fixtures.mjs
 | Lint, typecheck and test on affected projects | ✅ | [nx affected](evidence/06-nx-affected.png) |
 | Evidence captured | ✅ | [evidence folder](evidence/) |
 | Documented (how to run, how to re-record) | ✅ | section 3 and the fixtures README |
-| CI | pending PR run | — |
+| CI | ✅ `nx affected`, `sast` and `secret-scan` green on [#11](https://github.com/ipca-group11/ai-chat-platform/pull/11). The first run failed SAST on the placeholder key `"ollama"` in the recording script; we waived it as a false positive (AICHAT-27 `WAIVERS.md` W10) | [PR checks](https://github.com/ipca-group11/ai-chat-platform/pull/11/checks) |
 
 ## 7. Notes for the report
 
