@@ -55,3 +55,16 @@ jobs:
             if [ "$code" -eq 0 ]; then echo "Result: no leaks found."; else echo "Result: **leaks found** (values are redacted in the log). The merge is blocked."; fi
           } >> "$GITHUB_STEP_SUMMARY"
           exit "$code"
+
+  sast:
+    name: sast (semgrep)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan with Semgrep CE (pinned image)
+        run: scripts/ci/semgrep.sh semgrep-results
+
+      # Fails the job when an unsuppressed ERROR finding exists. WARNING and INFO never fail.
+      - name: Block the merge on ERROR findings
+        run: node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif

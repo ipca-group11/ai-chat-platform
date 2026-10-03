@@ -131,7 +131,38 @@ scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgre
 - A `nosemgrep` comment must sit on the line directly above the finding, so the reason goes on its own line above it.
 - SARIF keeps suppressed findings and marks them as suppressed, so our summary script skips those entries.
 
-### US4 · …
+### US4 · SAST on every PR, high findings block the merge ([AICHAT-86](https://ipca-grupo11.atlassian.net/browse/AICHAT-86))
+
+**What and why.** We added a `sast` job to `.github/workflows/security.yml`, next to `secret-scan` and with the same triggers (every pull request, and pushes to `main` and `integration/testing-epics`). It runs `scripts/ci/semgrep.sh`, then `scripts/ci/sast-summary.mjs`, which reads the SARIF, ignores findings suppressed with `nosemgrep` and exits 1 when an ERROR is left. WARNING and INFO never fail the job. We read the SARIF instead of using `semgrep --error` because the SARIF output is the only one that keeps WARNINGs for the summary and marks suppressed findings.
+
+**Files.**
+- `.github/workflows/security.yml`: new `sast` job (`sast (semgrep)`).
+- `scripts/ci/sast-summary.mjs` (new): reads the SARIF, prints the table, sets the exit code.
+- `scripts/ci/sast-summary.test.mjs` (new): `node --test` unit tests.
+- `docs/AICHAT-27/evidence/03-unit-tests.*`, `04-expected-failure.*`
+
+**How to run.**
+
+```sh
+node --test scripts/ci/sast-summary.test.mjs
+scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif; echo $?
+```
+
+**How to repeat it manually.**
+
+1. Create `tmp-sast-proof/bad.ts` with `export const apiToken = process.env.API_TOKEN ?? "super-secret-fallback";`.
+2. Run the second command above.
+3. Expected output: one ERROR (`aichat.secret-env-fallback-literal`, `tmp-sast-proof/bad.ts:1`) and exit code 1. Delete the file and the exit code goes back to 0.
+
+**Result.** The unit tests pass, and the throw-away file made the gate fail (exit 1). We deleted the file afterwards. The GitHub run on a real PR is pending: "pending PR run".
+
+Required check: the owner sets `sast (semgrep)` as a required status check on `integration/testing-epics` (Settings > Branches > branch protection > Require status checks). The same check is added to `main` after the final PR. We did not change any GitHub setting.
+
+![Unit tests](evidence/03-unit-tests.png)
+
+![Expected failure](evidence/04-expected-failure.png)
+
+**Problems and fixes.** Calling `semgrep --error` hides suppressed-vs-open information and drops WARNINGs from the report when combined with `--severity ERROR`, so the gate lives in the Node script.
 
 ### US5 · …
 
