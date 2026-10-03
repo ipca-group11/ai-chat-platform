@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { renderWithClient } from "@platform/test-utils";
+import { jsonResponse } from "../../../test/utils";
 import type { Message } from "../../../shared/types";
 import { MessageQueue } from "./MessageQueue";
 
@@ -27,9 +28,7 @@ describe("MessageQueue (AC-57, AC-58)", () => {
 
   it("AC-57: shows only queued messages in a distinct queued section", () => {
     vi.stubGlobal("fetch", vi.fn());
-    render(<MessageQueue chatId="chat-1" messages={[sentMessage, queuedMessage]} />, {
-      wrapper: withQueryClient(),
-    });
+    renderWithClient(<MessageQueue chatId="chat-1" messages={[sentMessage, queuedMessage]} />);
 
     expect(screen.getByText("Queued (1)")).toBeInTheDocument();
     expect(screen.getByText("Second question")).toBeInTheDocument();
@@ -38,16 +37,14 @@ describe("MessageQueue (AC-57, AC-58)", () => {
 
   it("renders nothing when the queue is empty", () => {
     vi.stubGlobal("fetch", vi.fn());
-    const { container } = render(<MessageQueue chatId="chat-1" messages={[sentMessage]} />, {
-      wrapper: withQueryClient(),
-    });
+    const { container } = renderWithClient(<MessageQueue chatId="chat-1" messages={[sentMessage]} />);
 
     expect(container).toBeEmptyDOMElement();
   });
 
   it("AC-58: cancels a queued message before it is processed", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 204 })));
-    render(<MessageQueue chatId="chat-1" messages={[queuedMessage]} />, { wrapper: withQueryClient() });
+    renderWithClient(<MessageQueue chatId="chat-1" messages={[queuedMessage]} />);
 
     await userEvent.click(screen.getByLabelText("Cancel Second question"));
 
@@ -61,7 +58,7 @@ describe("MessageQueue (AC-57, AC-58)", () => {
 
   it("cancels the edit form without saving", async () => {
     vi.stubGlobal("fetch", vi.fn());
-    render(<MessageQueue chatId="chat-1" messages={[queuedMessage]} />, { wrapper: withQueryClient() });
+    renderWithClient(<MessageQueue chatId="chat-1" messages={[queuedMessage]} />);
 
     await userEvent.click(screen.getByLabelText("Edit Second question"));
     expect(screen.getByLabelText("Edit queued message")).toBeInTheDocument();
@@ -75,7 +72,7 @@ describe("MessageQueue (AC-57, AC-58)", () => {
   it("AC-58: edits a queued message's content before it is processed", async () => {
     const edited = { ...queuedMessage, content: "Edited question" };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(edited)));
-    render(<MessageQueue chatId="chat-1" messages={[queuedMessage]} />, { wrapper: withQueryClient() });
+    renderWithClient(<MessageQueue chatId="chat-1" messages={[queuedMessage]} />);
 
     await userEvent.click(screen.getByLabelText("Edit Second question"));
     const textarea = screen.getByLabelText("Edit queued message");
@@ -94,7 +91,7 @@ describe("MessageQueue (AC-57, AC-58)", () => {
   it("another member's queued message is shown with its author but cannot be edited or canceled", () => {
     vi.stubGlobal("fetch", vi.fn());
     const theirs: Message = { ...queuedMessage, authorId: "guest", authorEmail: "guest@example.com" };
-    render(<MessageQueue chatId="chat-1" messages={[theirs]} currentUserId="me" />, { wrapper: withQueryClient() });
+    renderWithClient(<MessageQueue chatId="chat-1" messages={[theirs]} currentUserId="me" />);
 
     expect(screen.getByText("guest@example.com")).toBeInTheDocument();
     expect(screen.queryByLabelText("Edit Second question")).not.toBeInTheDocument();

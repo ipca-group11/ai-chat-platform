@@ -1,16 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { installFakeEventSource, renderWithClient } from "@platform/test-utils";
+import { jsonResponse } from "../../../test/utils";
 import type { Chat, Message } from "../../../shared/types";
 import { __resetShowReasoningForTests } from "../model/show-reasoning";
 import { ChatView } from "./ChatView";
-
-class FakeEventSource {
-  constructor(_url: string) {}
-  addEventListener() {}
-  close() {}
-}
 
 const chat: Chat = {
   id: "chat-1",
@@ -35,7 +30,7 @@ const message: Message = {
 describe("ChatView (AC-46, AC-51..AC-55)", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.stubGlobal("EventSource", FakeEventSource);
+    installFakeEventSource();
   });
 
   it("renders chat header, history and the composer once loaded", async () => {
@@ -47,7 +42,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
       })
     );
 
-    render(<ChatView chatId="chat-1" userId="user-1" />, { wrapper: withQueryClient() });
+    renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
     expect(await screen.findByText("My chat")).toBeInTheDocument();
     expect(await screen.findByText("Hi")).toBeInTheDocument();
@@ -70,7 +65,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<ChatView chatId="chat-1" userId="user-1" />, { wrapper: withQueryClient() });
+    renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
     await userEvent.click(await screen.findByText("Stop"));
     await waitFor(() =>
@@ -92,7 +87,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
   it("AC-46: shows a clear not-found state instead of any chat data on a 403/404", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ message: "Forbidden" }, 403)));
 
-    render(<ChatView chatId="chat-owned-by-another-user" userId="user-1" />, { wrapper: withQueryClient() });
+    renderWithClient(<ChatView chatId="chat-owned-by-another-user" userId="user-1" />);
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/not found/i);
     expect(screen.queryByLabelText("Message")).not.toBeInTheDocument();
@@ -115,7 +110,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
 
     it("lets the owner turn reasoning on for a model that supports it", async () => {
       const fetchMock = stubFetch(reasoningChat);
-      render(<ChatView chatId="chat-1" userId="user-1" />, { wrapper: withQueryClient() });
+      renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
       const toggle = await screen.findByRole("button", { name: "Reasoning" });
       expect(toggle).toHaveAttribute("aria-pressed", "false");
@@ -132,7 +127,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
 
     it("shows members the setting without letting them change it", async () => {
       stubFetch({ ...reasoningChat, reasoning: true });
-      render(<ChatView chatId="chat-1" userId="someone-else" />, { wrapper: withQueryClient() });
+      renderWithClient(<ChatView chatId="chat-1" userId="someone-else" />);
 
       const toggle = await screen.findByRole("button", { name: "Reasoning" });
       expect(toggle).toHaveAttribute("aria-pressed", "true");
@@ -141,7 +136,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
 
     it("is hidden for models that can't reason", async () => {
       stubFetch(chat);
-      render(<ChatView chatId="chat-1" userId="user-1" />, { wrapper: withQueryClient() });
+      renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
       expect(await screen.findByText("My chat")).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "Reasoning" })).not.toBeInTheDocument();
@@ -163,7 +158,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
           return Promise.resolve(jsonResponse({ ...chat, model: "claude-sonnet-5-5", reasoning: true }));
         })
       );
-      render(<ChatView chatId="chat-1" userId="user-1" />, { wrapper: withQueryClient() });
+      renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
       expect(await screen.findByRole("button", { name: "Thinking" })).toBeInTheDocument();
       const toggle = screen.getByRole("button", { name: "Show thinking" });
@@ -189,7 +184,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
         return Promise.resolve(jsonResponse(claudeChat));
       });
       vi.stubGlobal("fetch", fetchMock);
-      render(<ChatView chatId="chat-1" userId="user-1" />, { wrapper: withQueryClient() });
+      renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
       const toggle = await screen.findByRole("button", { name: "Web fetch" });
       expect(toggle).toHaveAttribute("aria-pressed", "false");
@@ -209,14 +204,14 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
         "fetch",
         vi.fn((url: string) => Promise.resolve(jsonResponse(url.includes("/messages") ? [] : { ...claudeChat, webFetch: true })))
       );
-      const { unmount } = render(<ChatView chatId="chat-1" userId="someone-else" />, { wrapper: withQueryClient() });
+      const { unmount } = renderWithClient(<ChatView chatId="chat-1" userId="someone-else" />);
       const toggle = await screen.findByRole("button", { name: "Web fetch" });
       expect(toggle).toHaveAttribute("aria-pressed", "true");
       expect(toggle).toBeDisabled();
       unmount();
 
       vi.stubGlobal("fetch", vi.fn((url: string) => Promise.resolve(jsonResponse(url.includes("/messages") ? [] : chat))));
-      render(<ChatView chatId="chat-1" userId="user-1" />, { wrapper: withQueryClient() });
+      renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
       expect(await screen.findByText("My chat")).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "Web fetch" })).not.toBeInTheDocument();
     });
@@ -232,7 +227,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
       return Promise.resolve(jsonResponse({ ...chat, provider: "anthropic", model: "claude-opus-5-5" }));
     });
     vi.stubGlobal("fetch", fetchMock);
-    render(<ChatView chatId="chat-1" userId="user-1" />, { wrapper: withQueryClient() });
+    renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
     await userEvent.click(await screen.findByRole("button", { name: "Retry" }));
 

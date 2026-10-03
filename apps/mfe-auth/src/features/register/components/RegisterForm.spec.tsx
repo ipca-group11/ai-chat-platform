@@ -1,7 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { renderWithQueryClient } from "../../../shared/test/render";
+import { renderWithClient } from "@platform/test-utils";
 import { RegisterForm } from "./RegisterForm";
 
 const navigateMock = vi.fn();
@@ -28,7 +28,7 @@ describe("RegisterForm", () => {
   });
 
   it("AC-30: renders the registration form's email and password fields", () => {
-    renderWithQueryClient(<RegisterForm />);
+    renderWithClient(<RegisterForm />);
 
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("RegisterForm", () => {
 
   it("AC-30: client validation blocks submit on an invalid email, without calling the API", async () => {
     const user = userEvent.setup();
-    renderWithQueryClient(<RegisterForm />);
+    renderWithClient(<RegisterForm />);
 
     await user.type(screen.getByLabelText("Email"), "not-an-email");
     await user.type(screen.getByLabelText("Password"), "goodpass1");
@@ -49,7 +49,7 @@ describe("RegisterForm", () => {
 
   it("AC-32: client validation blocks submit on a password that fails the policy, without calling the API", async () => {
     const user = userEvent.setup();
-    renderWithQueryClient(<RegisterForm />);
+    renderWithClient(<RegisterForm />);
 
     await user.type(screen.getByLabelText("Email"), "user@example.com");
     await user.type(screen.getByLabelText("Password"), "short1");
@@ -62,7 +62,7 @@ describe("RegisterForm", () => {
   it("AC-31: displays the server's duplicate-email error and does not navigate away", async () => {
     vi.mocked(fetch).mockResolvedValue(jsonResponse({ error: "Email already registered" }, 409));
     const user = userEvent.setup();
-    renderWithQueryClient(<RegisterForm />);
+    renderWithClient(<RegisterForm />);
 
     await user.type(screen.getByLabelText("Email"), "user@example.com");
     await user.type(screen.getByLabelText("Password"), "goodpass1");
@@ -77,7 +77,7 @@ describe("RegisterForm", () => {
       jsonResponse({ id: "1", email: "user@example.com" }, 201),
     );
     const user = userEvent.setup();
-    renderWithQueryClient(<RegisterForm />);
+    renderWithClient(<RegisterForm />);
 
     await user.type(screen.getByLabelText("Email"), "user@example.com");
     await user.type(screen.getByLabelText("Password"), "goodpass1");

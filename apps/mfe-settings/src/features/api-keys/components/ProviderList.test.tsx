@@ -1,7 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { renderWithQueryClient } from "../../../shared/test/render";
+import { renderWithClient } from "@platform/test-utils";
 import { ProviderList } from "./ProviderList";
 
 const useCurrentUserIdMock = vi.fn();
@@ -18,14 +18,14 @@ describe("ProviderList", () => {
   });
 
   it("AC-76: renders an editable key field + Save for OpenAI and Anthropic", () => {
-    renderWithQueryClient(<ProviderList />);
+    renderWithClient(<ProviderList />);
 
     expect(screen.getByLabelText("OpenAI API key")).toBeInTheDocument();
     expect(screen.getByLabelText("Anthropic API key")).toBeInTheDocument();
   });
 
   it("lists only key-based providers (no keyless/local provider)", () => {
-    renderWithQueryClient(<ProviderList />);
+    renderWithClient(<ProviderList />);
 
     expect(screen.queryByText(/no api key is required/i)).not.toBeInTheDocument();
     expect(screen.queryByText("Ollama")).not.toBeInTheDocument();
@@ -33,7 +33,7 @@ describe("ProviderList", () => {
 
   it("AC-76: saving a key for a provider updates its masked display", async () => {
     const user = userEvent.setup();
-    renderWithQueryClient(<ProviderList />);
+    renderWithClient(<ProviderList />);
 
     const openaiForm = screen.getByRole("form", { name: "OpenAI API key form" });
     await user.type(screen.getByLabelText("OpenAI API key"), "sk-abcd1234");
@@ -44,14 +44,14 @@ describe("ProviderList", () => {
 
   it("shows a loading message while the current user is being resolved", () => {
     useCurrentUserIdMock.mockReturnValue({ userId: undefined, isLoading: true, isError: false });
-    renderWithQueryClient(<ProviderList />);
+    renderWithClient(<ProviderList />);
 
     expect(screen.getByText(/loading your account/i)).toBeInTheDocument();
   });
 
   it("AC-87: removing a saved key clears its masked display", async () => {
     const user = userEvent.setup();
-    renderWithQueryClient(<ProviderList />);
+    renderWithClient(<ProviderList />);
 
     const openaiForm = screen.getByRole("form", { name: "OpenAI API key form" });
     await user.type(screen.getByLabelText("OpenAI API key"), "sk-abcd1234");
@@ -65,7 +65,7 @@ describe("ProviderList", () => {
 
   it("shows a sign-in message and no provider forms when there is no current user", () => {
     useCurrentUserIdMock.mockReturnValue({ userId: undefined, isLoading: false, isError: true });
-    renderWithQueryClient(<ProviderList />);
+    renderWithClient(<ProviderList />);
 
     expect(screen.getByRole("alert")).toHaveTextContent(/sign in/i);
     expect(screen.queryByLabelText("OpenAI API key")).not.toBeInTheDocument();
@@ -73,7 +73,7 @@ describe("ProviderList", () => {
 
   it("AC-80: a different user id never shows the first user's saved key", async () => {
     const user = userEvent.setup();
-    const { rerender } = renderWithQueryClient(<ProviderList />);
+    const { rerender } = renderWithClient(<ProviderList />);
 
     const openaiForm = screen.getByRole("form", { name: "OpenAI API key form" });
     await user.type(screen.getByLabelText("OpenAI API key"), "sk-user-one-1111");
@@ -91,7 +91,7 @@ describe("ProviderList", () => {
       "llm-api-key:user-1:anthropic",
       JSON.stringify({ provider: "anthropic", last4: "abcd", createdAt: new Date().toISOString() })
     );
-    renderWithQueryClient(<ProviderList />);
+    renderWithClient(<ProviderList />);
 
     expect(screen.getByText("Re-enter key")).toBeInTheDocument();
     expect(screen.getByText(/only kept for this browser tab session/i)).toBeInTheDocument();

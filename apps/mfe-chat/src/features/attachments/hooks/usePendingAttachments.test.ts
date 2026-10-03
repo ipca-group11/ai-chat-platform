@@ -1,6 +1,7 @@
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { act, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { renderHookWithClient } from "@platform/test-utils";
+import { jsonResponse } from "../../../test/utils";
 import type { Attachment } from "../../../shared/types";
 import { usePendingAttachments } from "./usePendingAttachments";
 
@@ -22,9 +23,7 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
     };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(attachment)));
 
-    const { result } = renderHook(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"), {
-      wrapper: withQueryClient(),
-    });
+    const { result } = renderHookWithClient(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"));
 
     act(() => result.current.addFiles([makeFile("notes.txt", "text/plain")]));
 
@@ -36,9 +35,7 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    const { result } = renderHook(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"), {
-      wrapper: withQueryClient(),
-    });
+    const { result } = renderHookWithClient(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"));
 
     act(() => result.current.addFiles([makeFile("big.txt", "text/plain", 11 * 1024 * 1024)]));
 
@@ -51,9 +48,7 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    const { result } = renderHook(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"), {
-      wrapper: withQueryClient(),
-    });
+    const { result } = renderHookWithClient(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"));
 
     act(() => result.current.addFiles([makeFile("photo.png", "image/png")]));
 
@@ -64,9 +59,7 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
 
   it("removePending removes a staged attachment", () => {
     vi.stubGlobal("fetch", vi.fn());
-    const { result } = renderHook(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"), {
-      wrapper: withQueryClient(),
-    });
+    const { result } = renderHookWithClient(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"));
 
     act(() => result.current.addFiles([makeFile("big.txt", "text/plain", 11 * 1024 * 1024)]));
     const id = result.current.pending[0]!.id;

@@ -2,7 +2,7 @@ import { LLM_API_KEY_HEADER } from "@app/shared-types/api-keys";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { renderWithQueryClient } from "../../../shared/test/render";
+import { renderWithClient } from "@platform/test-utils";
 import { TestConnectionButton } from "./TestConnectionButton";
 
 function jsonResponse(body: unknown, status = 200) {
@@ -22,7 +22,7 @@ describe("TestConnectionButton", () => {
   });
 
   it("AC-85: is disabled when there is no key to test", () => {
-    renderWithQueryClient(
+    renderWithClient(
       <TestConnectionButton provider="openai" apiKey="" providerLabel="OpenAI" />,
     );
 
@@ -33,7 +33,7 @@ describe("TestConnectionButton", () => {
     vi.mocked(fetch).mockResolvedValue(jsonResponse({ success: true }));
     const user = userEvent.setup();
 
-    renderWithQueryClient(
+    renderWithClient(
       <TestConnectionButton provider="openai" apiKey="sk-my-key" providerLabel="OpenAI" />,
     );
 
@@ -49,7 +49,7 @@ describe("TestConnectionButton", () => {
     vi.mocked(fetch).mockResolvedValue(jsonResponse({ message: "Invalid API key" }, 401));
     const user = userEvent.setup();
 
-    renderWithQueryClient(
+    renderWithClient(
       <TestConnectionButton provider="anthropic" apiKey="bad-key" providerLabel="Anthropic" />,
     );
 
@@ -62,7 +62,7 @@ describe("TestConnectionButton", () => {
     vi.mocked(fetch).mockRejectedValue(new TypeError("Failed to fetch"));
     const user = userEvent.setup();
 
-    renderWithQueryClient(
+    renderWithClient(
       <TestConnectionButton provider="openai" apiKey="sk-my-key" providerLabel="OpenAI" />,
     );
 
@@ -75,7 +75,7 @@ describe("TestConnectionButton", () => {
     vi.mocked(fetch).mockResolvedValue(jsonResponse({ success: false }));
     const user = userEvent.setup();
 
-    renderWithQueryClient(
+    renderWithClient(
       <TestConnectionButton provider="openai" apiKey="sk-my-key" providerLabel="OpenAI" />,
     );
 
@@ -93,7 +93,7 @@ describe("TestConnectionButton", () => {
     );
     const user = userEvent.setup();
 
-    renderWithQueryClient(
+    renderWithClient(
       <TestConnectionButton provider="openai" apiKey="sk-my-key" providerLabel="OpenAI" />,
     );
 
@@ -111,7 +111,7 @@ describe("TestConnectionButton", () => {
     const { TestConnectionButton: PatchedButton } = await import("./TestConnectionButton");
     const user = userEvent.setup();
 
-    renderWithQueryClient(
+    renderWithClient(
       <PatchedButton provider="openai" apiKey="sk-my-key" providerLabel="OpenAI" />,
     );
 

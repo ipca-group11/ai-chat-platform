@@ -1,7 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { renderWithQueryClient } from "../../../shared/test/render";
+import { renderWithClient } from "@platform/test-utils";
 import { LoginForm } from "./LoginForm";
 
 const navigateMock = vi.fn();
@@ -28,7 +28,7 @@ describe("LoginForm", () => {
   });
 
   it("AC-35: renders the login form's email and password fields", () => {
-    renderWithQueryClient(<LoginForm />);
+    renderWithClient(<LoginForm />);
 
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
@@ -40,7 +40,7 @@ describe("LoginForm", () => {
       jsonResponse({ id: "1", email: "user@example.com" }, 200),
     );
     const user = userEvent.setup();
-    renderWithQueryClient(<LoginForm />);
+    renderWithClient(<LoginForm />);
 
     await user.type(screen.getByLabelText("Email"), "user@example.com");
     await user.type(screen.getByLabelText("Password"), "correct-password");
@@ -54,7 +54,7 @@ describe("LoginForm", () => {
       jsonResponse({ error: "Invalid email or password" }, 401),
     );
     const user = userEvent.setup();
-    renderWithQueryClient(<LoginForm />);
+    renderWithClient(<LoginForm />);
 
     await user.type(screen.getByLabelText("Email"), "user@example.com");
     await user.type(screen.getByLabelText("Password"), "wrong-password");
@@ -69,7 +69,7 @@ describe("LoginForm", () => {
       jsonResponse({ error: "Invalid email or password" }, 401),
     );
     const user = userEvent.setup();
-    renderWithQueryClient(<LoginForm />);
+    renderWithClient(<LoginForm />);
 
     await user.type(screen.getByLabelText("Email"), "unknown@example.com");
     await user.type(screen.getByLabelText("Password"), "whatever1");
@@ -80,7 +80,7 @@ describe("LoginForm", () => {
 
   it("blocks submit client-side when a field is empty, without calling the API", async () => {
     const user = userEvent.setup();
-    renderWithQueryClient(<LoginForm />);
+    renderWithClient(<LoginForm />);
 
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 

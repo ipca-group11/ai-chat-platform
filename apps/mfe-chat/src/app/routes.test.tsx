@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   RouterProvider,
@@ -7,16 +7,11 @@ import {
   createRouter,
 } from "@tanstack/react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../test/utils";
+import { installFakeEventSource, renderWithClient } from "@platform/test-utils";
+import { jsonResponse } from "../test/utils";
 import type { Chat, Message } from "../shared/types";
 import { CurrentUserProvider } from "./auth-context";
 import { createChatRoutes } from "./routes";
-
-class FakeEventSource {
-  constructor(_url: string) {}
-  addEventListener() {}
-  close() {}
-}
 
 const chat: Chat = {
   id: "chat-1",
@@ -39,18 +34,16 @@ function renderChatRoutes(initialPath: string) {
     history: createMemoryHistory({ initialEntries: [initialPath] }),
   });
 
-  return render(
+  return renderWithClient(
     <CurrentUserProvider userId="user-1">
       <RouterProvider router={router} />
-    </CurrentUserProvider>,
-    { wrapper: withQueryClient() }
-  );
+    </CurrentUserProvider>);
 }
 
 describe("createChatRoutes (FE-1)", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.stubGlobal("EventSource", FakeEventSource);
+    installFakeEventSource();
     window.localStorage.clear();
   });
 

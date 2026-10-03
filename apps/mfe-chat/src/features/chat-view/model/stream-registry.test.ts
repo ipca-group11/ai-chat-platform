@@ -1,43 +1,12 @@
-import { QueryClient } from "@tanstack/react-query";
+import { createTestQueryClient, FakeEventSource, installFakeEventSource } from "@platform/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { queryKeys } from "../../../shared/query-keys";
 import type { Message } from "../../../shared/types";
 import { __resetStreamRegistryForTests, closeChatStream, ensureChatStream, isChatStreaming } from "./stream-registry";
 
-class FakeEventSource {
-  static instances: FakeEventSource[] = [];
-  url: string;
-  closed = false;
-  onerror: ((e: Event) => void) | null = null;
-  private listeners: Record<string, Array<(e: MessageEvent) => void>> = {};
-
-  constructor(url: string) {
-    this.url = url;
-    FakeEventSource.instances.push(this);
-  }
-
-  addEventListener(type: string, cb: (e: MessageEvent) => void) {
-    (this.listeners[type] ??= []).push(cb);
-  }
-
-  close() {
-    this.closed = true;
-  }
-
-  emit(type: string, data: unknown) {
-    const evt = new MessageEvent(type, { data: JSON.stringify(data) });
-    this.listeners[type]?.forEach((cb) => cb(evt));
-  }
-}
-
-function makeClient() {
-  return new QueryClient({ defaultOptions: { queries: { retry: false } } });
-}
-
 describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", () => {
   beforeEach(() => {
-    FakeEventSource.instances = [];
-    vi.stubGlobal("EventSource", FakeEventSource);
+    installFakeEventSource();
   });
 
   afterEach(() => {
@@ -46,7 +15,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("AC-52: appends streamed tokens incrementally to the assistant message", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     const source = FakeEventSource.instances[0]!;
 
@@ -59,7 +28,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("AC-55/AC-59: on done, finalizes the message and invalidates so the next queued message can be reflected", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     const invalidateSpy = vi.spyOn(client, "invalidateQueries");
     ensureChatStream("chat-1", client);
     const source = FakeEventSource.instances[0]!;
@@ -73,7 +42,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("AC-72/AC-74: on a provider error, marks the message failed without throwing and refetches so the queue can proceed", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     const invalidateSpy = vi.spyOn(client, "invalidateQueries");
     ensureChatStream("chat-1", client);
     const source = FakeEventSource.instances[0]!;
@@ -88,7 +57,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("AC-55: finalizes a message on done even when no token event was seen first", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     const source = FakeEventSource.instances[0]!;
 
@@ -100,7 +69,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("AC-72: marks an already-streaming message failed on a later provider error", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     const source = FakeEventSource.instances[0]!;
 
@@ -113,7 +82,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("shows the assistant reply in its thinking state as soon as the server starts it, before any token", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     const source = FakeEventSource.instances[0]!;
 
@@ -125,20 +94,18 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("treats a transport-level error (no data) as a connection error, not a provider failure", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     const source = FakeEventSource.instances[0]!;
 
     source.emit("token", { messageId: "msg-assistant-1", token: "Hi" });
-    (source as unknown as { listeners: Record<string, Array<(e: Event) => void>> }).listeners.error?.forEach((cb) =>
-      cb(new Event("error"))
-    );
+    source.emitTransportError();
 
     expect(client.getQueryData<Message[]>(queryKeys.messages("chat-1"))?.[0]).toMatchObject({ status: "streaming" });
   });
 
   it("closeChatStream closes the connection and allows a fresh one to be opened later", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     expect(isChatStreaming("chat-1")).toBe(true);
 
@@ -152,7 +119,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("AC-60/AC-61: two chats stream independently, tokens for one never leak into the other", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     ensureChatStream("chat-2", client);
     const [sourceA, sourceB] = FakeEventSource.instances;
@@ -167,7 +134,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("AC-62: supports at least 5 chats streaming simultaneously, each tracked independently", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     const chatIds = ["chat-1", "chat-2", "chat-3", "chat-4", "chat-5"];
     chatIds.forEach((id) => ensureChatStream(id, client));
 
@@ -182,7 +149,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("is idempotent: calling ensureChatStream twice for the same chat opens only one connection", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     ensureChatStream("chat-1", client);
 
@@ -190,7 +157,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("appends streamed reasoning separately from the answer", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     const source = FakeEventSource.instances[0]!;
 
@@ -203,7 +170,7 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
   });
 
   it("tracks web fetch progress by fetch id", () => {
-    const client = makeClient();
+    const client = createTestQueryClient();
     ensureChatStream("chat-1", client);
     const source = FakeEventSource.instances[0]!;
 

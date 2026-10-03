@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { renderWithClient } from "@platform/test-utils";
+import { jsonResponse } from "../../../test/utils";
 import type { Chat } from "../../../shared/types";
 import { ChatList } from "./ChatList";
 
@@ -24,7 +25,7 @@ describe("ChatList (AC-42, AC-47)", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([chatA])));
     const onOpenChat = vi.fn();
 
-    render(<ChatList onOpenChat={onOpenChat} />, { wrapper: withQueryClient() });
+    renderWithClient(<ChatList onOpenChat={onOpenChat} />);
 
     await screen.findByText("First chat");
     await userEvent.click(screen.getByText("First chat"));
@@ -35,7 +36,7 @@ describe("ChatList (AC-42, AC-47)", () => {
   it("AC-47: shows an empty state rather than inventing chats when the server returns none", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([])));
 
-    render(<ChatList onOpenChat={vi.fn()} />, { wrapper: withQueryClient() });
+    renderWithClient(<ChatList onOpenChat={vi.fn()} />);
 
     await screen.findByText(/no chats yet/i);
   });
@@ -48,7 +49,7 @@ describe("ChatList (AC-42, AC-47)", () => {
     vi.stubGlobal("fetch", fetchMock);
     const onOpenChat = vi.fn();
 
-    render(<ChatList onOpenChat={onOpenChat} />, { wrapper: withQueryClient() });
+    renderWithClient(<ChatList onOpenChat={onOpenChat} />);
     await screen.findByText(/no chats yet/i);
 
     await userEvent.click(screen.getByText("New chat"));
@@ -61,7 +62,7 @@ describe("ChatList (AC-42, AC-47)", () => {
   it("shows an error state when the chats request fails", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ message: "boom" }, 500)));
 
-    render(<ChatList onOpenChat={vi.fn()} />, { wrapper: withQueryClient() });
+    renderWithClient(<ChatList onOpenChat={vi.fn()} />);
 
     await screen.findByRole("alert");
   });

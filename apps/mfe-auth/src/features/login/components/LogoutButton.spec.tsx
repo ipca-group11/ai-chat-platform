@@ -1,7 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { renderWithQueryClient } from "../../../shared/test/render";
+import { renderWithClient } from "@platform/test-utils";
 import { LogoutButton } from "./LogoutButton";
 
 const navigateMock = vi.fn();
@@ -30,7 +30,7 @@ describe("LogoutButton", () => {
   it("AC-38: clicking sign out calls POST /auth/logout, clears query cache and redirects to /login", async () => {
     vi.mocked(fetch).mockResolvedValue(jsonResponse(undefined, 204));
     const user = userEvent.setup();
-    const { queryClient } = renderWithQueryClient(<LogoutButton />);
+    const { queryClient } = renderWithClient(<LogoutButton />);
     const clearSpy = vi.spyOn(queryClient, "clear");
 
     await user.click(screen.getByRole("button", { name: /sign out/i }));
@@ -46,7 +46,7 @@ describe("LogoutButton", () => {
   it("AC-38: redirects to /login and clears the cache even if the logout request fails", async () => {
     vi.mocked(fetch).mockResolvedValue(jsonResponse({ error: "Server error" }, 500));
     const user = userEvent.setup();
-    const { queryClient } = renderWithQueryClient(<LogoutButton />);
+    const { queryClient } = renderWithClient(<LogoutButton />);
     const clearSpy = vi.spyOn(queryClient, "clear");
 
     await user.click(screen.getByRole("button", { name: /sign out/i }));

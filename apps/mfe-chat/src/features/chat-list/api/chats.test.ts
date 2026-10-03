@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { createTestQueryClient, renderHookWithClient, withQueryClient } from "@platform/test-utils";
+import { jsonResponse } from "../../../test/utils";
 import { useChat, useChats, useCreateChat, useDeleteChat, useUpdateChat } from "./chats";
 import type { Chat } from "../../../shared/types";
 
@@ -22,7 +23,7 @@ describe("useChats (AC-42, AC-47)", () => {
   it("AC-42: lists the current user's chats", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([chatA])));
 
-    const { result } = renderHook(() => useChats(), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChats());
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([chatA]);
@@ -31,7 +32,7 @@ describe("useChats (AC-42, AC-47)", () => {
   it("AC-47: never fabricates chats beyond what the server returns (empty list stays empty)", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([])));
 
-    const { result } = renderHook(() => useChats(), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChats());
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([]);
@@ -46,7 +47,7 @@ describe("useChat (AC-43, AC-46)", () => {
   it("AC-43: fetches a single chat so it can be restored after reload/relogin", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(chatA)));
 
-    const { result } = renderHook(() => useChat("chat-1"), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChat("chat-1"));
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(chatA);
@@ -55,7 +56,7 @@ describe("useChat (AC-43, AC-46)", () => {
   it("AC-46: surfaces a 403 without retrying so the UI can show a clear not-found/error state", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ message: "Forbidden" }, 403)));
 
-    const { result } = renderHook(() => useChat("chat-owned-by-another-user"), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChat("chat-owned-by-another-user"));
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error?.status).toBe(403);
@@ -65,7 +66,7 @@ describe("useChat (AC-43, AC-46)", () => {
   it("AC-46: surfaces a 404 without retrying", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ message: "Not found" }, 404)));
 
-    const { result } = renderHook(() => useChat("missing-chat"), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChat("missing-chat"));
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error?.status).toBe(404);
@@ -106,7 +107,7 @@ describe("useUpdateChat (AC-42, AC-48, AC-49)", () => {
     const renamed: Chat = { ...chatA, title: "Renamed" };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(renamed)));
 
-    const client = (await import("../../../test/utils")).createTestQueryClient();
+    const client = createTestQueryClient();
     client.setQueryData(["chats"], [chatA]);
     const wrapper = withQueryClient(client);
 
@@ -128,7 +129,7 @@ describe("useDeleteChat (AC-44)", () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
     vi.stubGlobal("fetch", fetchMock);
 
-    const client = (await import("../../../test/utils")).createTestQueryClient();
+    const client = createTestQueryClient();
     client.setQueryData(["chats"], [chatA]);
     client.setQueryData(["chats", chatA.id], chatA);
 

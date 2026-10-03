@@ -1,6 +1,5 @@
-import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { withQueryClient } from "../../../test/utils";
+import { renderHookWithClient } from "@platform/test-utils";
 import { useComposer } from "./useComposer";
 
 vi.mock("../../chat-view/model/stream-registry", () => ({
@@ -14,9 +13,7 @@ describe("useComposer", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    const { result } = renderHook(() => useComposer({ chatId: "chat-1", userId: "user-1", provider: "anthropic", model: "claude-3-5-haiku-latest" }), {
-      wrapper: withQueryClient(),
-    });
+    const { result } = renderHookWithClient(() => useComposer({ chatId: "chat-1", userId: "user-1", provider: "anthropic", model: "claude-3-5-haiku-latest" }));
 
     expect(result.current.canSend).toBe(false);
     result.current.send();

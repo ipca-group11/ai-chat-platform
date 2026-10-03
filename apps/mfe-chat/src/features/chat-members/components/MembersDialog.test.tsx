@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { renderWithClient } from "@platform/test-utils";
+import { jsonResponse } from "../../../test/utils";
 import type { ChatMember } from "../../../shared/types";
 import { MembersDialog } from "./MembersDialog";
 
@@ -9,10 +10,8 @@ const owner: ChatMember = { email: "owner@example.com", role: "owner", addedAt: 
 const guest: ChatMember = { email: "guest@example.com", role: "member", addedAt: "2026-01-02T00:00:00.000Z" };
 
 function renderDialog(props: Partial<Parameters<typeof MembersDialog>[0]> = {}) {
-  return render(
-    <MembersDialog chatId="chat-1" chatTitle="Trip" isOwner open onClose={vi.fn()} {...props} />,
-    { wrapper: withQueryClient() }
-  );
+  return renderWithClient(
+    <MembersDialog chatId="chat-1" chatTitle="Trip" isOwner open onClose={vi.fn()} {...props} />);
 }
 
 describe("MembersDialog", () => {

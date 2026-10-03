@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { createTestQueryClient, renderHookWithClient, withQueryClient } from "@platform/test-utils";
+import { jsonResponse } from "../../../test/utils";
 import type { Message } from "../../../shared/types";
 import {
   useCancelQueuedMessage,
@@ -31,7 +32,7 @@ describe("useMessages (AC-51, AC-55)", () => {
   it("AC-55: fetches the persisted message history for a chat", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([userMessage])));
 
-    const { result } = renderHook(() => useMessages("chat-1"), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useMessages("chat-1"));
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([userMessage]);
@@ -45,7 +46,7 @@ describe("useSendMessage (AC-51, AC-60)", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(userMessage, 201)));
     const { ensureChatStream } = await import("../model/stream-registry");
 
-    const { result } = renderHook(() => useSendMessage(), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useSendMessage());
     result.current.mutate({ chatId: "chat-1", content: "Hello", userId: "user-1", provider: "anthropic" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -61,7 +62,7 @@ describe("useStopMessage (AC-54)", () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
     vi.stubGlobal("fetch", fetchMock);
 
-    const { result } = renderHook(() => useStopMessage(), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useStopMessage());
     result.current.mutate({ chatId: "chat-1", messageId: "msg-assistant-1" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -79,7 +80,7 @@ describe("useRetryMessage (AC-73)", () => {
     const retried: Message = { ...userMessage, id: "msg-assistant-1", role: "assistant", status: "streaming" };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(retried)));
 
-    const client = (await import("../../../test/utils")).createTestQueryClient();
+    const client = createTestQueryClient();
     client.setQueryData(["chats", "chat-1", "messages"], [{ ...retried, status: "failed" }]);
     const wrapper = withQueryClient(client);
 
@@ -98,7 +99,7 @@ describe("useEditQueuedMessage / useCancelQueuedMessage (AC-58)", () => {
     const edited: Message = { ...userMessage, status: "queued", content: "Updated" };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(edited)));
 
-    const client = (await import("../../../test/utils")).createTestQueryClient();
+    const client = createTestQueryClient();
     client.setQueryData(["chats", "chat-1", "messages"], [{ ...userMessage, status: "queued" }]);
     const wrapper = withQueryClient(client);
 
@@ -112,7 +113,7 @@ describe("useEditQueuedMessage / useCancelQueuedMessage (AC-58)", () => {
   it("AC-58: cancels a queued message before it is processed", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 204 })));
 
-    const client = (await import("../../../test/utils")).createTestQueryClient();
+    const client = createTestQueryClient();
     client.setQueryData(["chats", "chat-1", "messages"], [{ ...userMessage, status: "queued" }]);
     const wrapper = withQueryClient(client);
 
