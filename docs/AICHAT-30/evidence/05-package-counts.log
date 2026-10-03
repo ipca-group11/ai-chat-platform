@@ -1,0 +1,16 @@
+$ cd sbom-results && for f in sbom-*.cdx.json; do jq -r --arg f $f '[.components[]|select(.purl!=null)|.purl|split(":")[1]|split("/")[0]] as $t | "\($f) \(.bomFormat) \(.specVersion) components=\(.components|length) apk=\([$t[]|select(.=="apk")]|length) deb=\([$t[]|select(.=="deb")]|length) npm=\([$t[]|select(.=="npm")]|length) golang=\([$t[]|select(.=="golang")]|length)"' $f; done | column -t
+sbom-alloy.cdx.json                 CycloneDX  1.7  components=4013  apk=0   deb=95  npm=0     golang=1046
+sbom-auth-service.cdx.json          CycloneDX  1.7  components=2623  apk=27  deb=0   npm=1223  golang=0
+sbom-caddy.cdx.json                 CycloneDX  1.7  components=406   apk=32  deb=0   npm=0     golang=148
+sbom-conversation-service.cdx.json  CycloneDX  1.7  components=2643  apk=27  deb=0   npm=1233  golang=0
+sbom-grafana.cdx.json               CycloneDX  1.7  components=2674  apk=33  deb=0   npm=4     golang=1710
+sbom-loki.cdx.json                  CycloneDX  1.7  components=1321  apk=0   deb=6   npm=0     golang=368
+sbom-mfe-auth.cdx.json              CycloneDX  1.7  components=2523  apk=18  deb=0   npm=1211  golang=0
+sbom-mfe-chat.cdx.json              CycloneDX  1.7  components=2725  apk=18  deb=0   npm=1312  golang=0
+sbom-mfe-settings.cdx.json          CycloneDX  1.7  components=2511  apk=18  deb=0   npm=1205  golang=0
+sbom-postgres.cdx.json              CycloneDX  1.7  components=870   apk=45  deb=0   npm=0     golang=4
+sbom-prometheus.cdx.json            CycloneDX  1.7  components=444   apk=0   deb=0   npm=0     golang=439
+sbom-shell.cdx.json                 CycloneDX  1.7  components=2571  apk=18  deb=0   npm=1235  golang=0
+sbom-source.cdx.json                CycloneDX  1.7  components=2323  apk=0   deb=0   npm=2295  golang=0
+
+[exit 0]

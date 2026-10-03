@@ -1,0 +1,21 @@
+$ docker run --rm -e SYFT_REGISTRY_INSECURE_USE_HTTP=true anchore/syft:latest registry:host.docker.internal:5055/ai-chat/auth-service:local --platform linux/arm64 -o table -q > /dev/stdout | awk 'NR==1 || $NF=="apk" || ($1=="express" && $NF=="npm") || $1=="@prisma/client"' | head -14; echo; echo 'source SBOM, packages by ecosystem:'; jq -r '.components[]|select(.purl!=null)|.purl|split(":")[1]|split("/")[0]' sbom-results/sbom-source.cdx.json | sort | uniq -c
+NAME                                                                            VERSION                                            TYPE                    
+@prisma/client                                                                  6.1.0                                              npm     (+1 duplicate)  
+alpine-baselayout                                                               3.7.2-r1                                           apk                     
+alpine-baselayout-data                                                          3.7.2-r1                                           apk                     
+alpine-keys                                                                     2.6-r0                                             apk                     
+alpine-release                                                                  3.24.2-r0                                          apk                     
+apk-tools                                                                       3.0.8-r0                                           apk                     
+busybox                                                                         1.37.0-r31                                         apk                     
+busybox-binsh                                                                   1.37.0-r31                                         apk                     
+ca-certificates-bundle                                                          20260909-r0                                        apk                     
+express                                                                         4.22.3                                             npm                     
+express                                                                         5.2.1                                              npm                     
+libapk                                                                          3.0.8-r0                                           apk                     
+libcrypto3                                                                      3.5.9-r0                                           apk                     
+
+source SBOM, packages by ecosystem:
+  19 github
+2295 npm
+
+[exit 0]

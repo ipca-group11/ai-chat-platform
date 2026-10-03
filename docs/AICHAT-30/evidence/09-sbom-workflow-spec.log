@@ -1,0 +1,8 @@
+$ pnpm --filter e2e exec vitest run src/ci/sbom-workflow.spec.ts 2>&1 | grep -v '^$' | tail -12
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/e2e
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  23:01:51
+   Duration  119ms (transform 53%, import 25%, tests 12%, worker 9%)
+
+[exit 0]
