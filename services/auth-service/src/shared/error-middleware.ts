@@ -65,7 +65,7 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
     return;
   }
 
-  logger.error(
+  (req.log ?? logger).error(
     { err, correlationId: req.correlationId, path: req.path },
     "Unhandled error",
   );

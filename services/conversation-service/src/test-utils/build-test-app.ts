@@ -3,7 +3,7 @@ import request from "supertest";
 import { createApp, type AppOverrides } from "../app.js";
 import type { Provider } from "../shared/contracts/chat.js";
 import { parseEnv } from "../shared/env.js";
-import { createLogger } from "../shared/logger.js";
+import { createLogger, type Logger } from "../shared/logger.js";
 import type { PrismaClient } from "../shared/prisma.js";
 import { cookieFor, TEST_JWT_SECRET } from "./auth-token.js";
 import { FakeAttachmentsRepository } from "./fake-attachments-repository.js";
@@ -18,6 +18,8 @@ export interface TestAppOptions {
   /** `MAX_UPLOAD_BYTES` for the app under test (default 10 MB). */
   maxUploadBytes?: number;
   overrides?: AppOverrides;
+  /** Replaces the silent logger, for tests that read the log lines. */
+  logger?: Logger;
 }
 
 /** The real `createApp` (real middleware order, routers and error handler) wired to
@@ -38,7 +40,7 @@ export function buildTestApp(options: TestAppOptions = {}) {
     LOG_LEVEL: "silent",
     ...(options.maxUploadBytes ? { MAX_UPLOAD_BYTES: String(options.maxUploadBytes) } : {}),
   });
-  const app: Express = createApp({} as PrismaClient, env, createLogger("silent"), { ...fakes, ...options.overrides });
+  const app: Express = createApp({} as PrismaClient, env, options.logger ?? createLogger("silent"), { ...fakes, ...options.overrides });
   return { app, ...fakes };
 }
 

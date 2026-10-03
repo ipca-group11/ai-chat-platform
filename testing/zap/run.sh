@@ -42,6 +42,7 @@ mkdir -p "$results"
 chmod 777 "$results" # the zap user of the image writes the reports
 cp "$rules" "$results/rules.tsv"
 cp testing/zap/openapi.yaml "$results/openapi.yaml" 2> /dev/null || true
+cp testing/zap/hooks.py "$results/hooks.py"
 
 zap_args=(-c rules.tsv -r "$name.html" -J "$name.json" -w "$name.md")
 if [ "$auth" = "1" ]; then
@@ -54,7 +55,10 @@ fi
 
 if [ "$mode" = "baseline" ]; then
   # -j AJAX spider (the shell is a React app), -I never fail on warnings inside ZAP itself.
-  cmd=(zap-baseline.py -t "$target" -j -m "${ZAP_MINUTES:-3}" -I "${zap_args[@]}")
+  # --hook: hooks.py requests the signed-in pages (ZAP_SEED_PATHS) before the spiders start, so the report does
+  # not depend on the spiders finding them. It makes zap-baseline.py use its classic mode instead of the plan.
+  if [ "$auth" = "1" ]; then docker_args+=(-e "ZAP_SEED_PATHS=${ZAP_EXPECT:-/chats,/settings,/api/chats}"); fi
+  cmd=(zap-baseline.py -t "$target" -j -m "${ZAP_MINUTES:-3}" -I --hook /zap/wrk/hooks.py "${zap_args[@]}")
 else
   cmd=(zap-api-scan.py -t /zap/wrk/openapi.yaml -f openapi -O "$base" -T "${ZAP_MINUTES:-10}" -I "${zap_args[@]}")
 fi
