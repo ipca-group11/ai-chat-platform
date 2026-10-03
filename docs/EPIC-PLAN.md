@@ -103,7 +103,7 @@ move to the next line. To resume an epic that was interrupted, use `continue AIC
 - [x] Hold the decision session (D1 to D11), record the answers in Jira
 
 **Wave 1: foundations**
-- [ ] `start AICHAT-34`
+- [x] `start AICHAT-34`
 - [ ] `start AICHAT-31`
 - [ ] `start AICHAT-27`
 - [ ] Merge `main` into `integration/testing-epics`

@@ -18,7 +18,8 @@
     "affected:typecheck": "nx affected -t typecheck",
     "affected:test": "nx affected -t test",
     "affected:build": "nx affected -t build",
-    "graph": "nx graph"
+    "graph": "nx graph",
+    "hooks:install": "sh scripts/git-hooks/install.sh"
   },
   "devDependencies": {
     "@nx/eslint": "23.2.1",

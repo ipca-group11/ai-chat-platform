@@ -1,0 +1,18 @@
+$ sh scripts/git-hooks/demo.sh
+== 1. commit with a staged fake key
+commit exit code: 1
+== 2. clean commit
+ create mode 100644 clean.txt
+commit exit code: 0
+== 3. gitleaks missing
+hook exit code: 0
+12:26PM INF 0 commits scanned.
+12:26PM INF scanned ~41 bytes (41 bytes) in 29.2ms
+12:26PM WRN leaks found: 1
+12:26PM INF 0 commits scanned.
+12:26PM INF scanned ~6 bytes (6 bytes) in 23.8ms
+12:26PM INF no leaks found
+pre-commit: gitleaks is not installed, secret scan SKIPPED.
+  macOS: brew install gitleaks   Linux: see https://github.com/gitleaks/gitleaks#installing
+
+[exit 0]

@@ -1,0 +1,8 @@
+$ R=/tmp/gl-hist.json; gitleaks git . --redact --no-banner --log-opts='--all -m' -f json -r $R; echo "commits on all refs: $(git rev-list --all | wc -l)"; node -e "const f=JSON.parse(require(\"fs\").readFileSync(process.argv[1]));for(const x of f)console.log([x.RuleID,x.File+\":\"+x.StartLine,x.Commit?x.Commit.slice(0,7):\"-\",x.Date||\"-\",\"secret=\"+x.Secret].join(\"  \"));console.log(f.length+\" finding(s)\")" $R; rm -f $R
+commits on all refs:       45
+0 finding(s)
+12:23PM INF 43 commits scanned.
+12:23PM INF scanned ~2849805 bytes (2.85 MB) in 262ms
+12:23PM INF no leaks found
+
+[exit 0]
