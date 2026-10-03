@@ -150,6 +150,39 @@ pnpm nx run shell:test --skip-nx-cache   # also ui, mfe-auth, e2e
 
 **Problems and fixes.** Nothing failed. The numbers are identical to the US1 measurement, so moving to the preset did not change what is counted. The `html` reporter used by these projects was replaced by the shared `text` + `lcov` + `json-summary` set.
 
+### US6 · Narrow coverage excludes ([AICHAT-139](https://ipca-grupo11.atlassian.net/browse/AICHAT-139))
+
+**What and why.** `apps/mfe-chat` excluded the whole `src/app/**` folder, which holds routes, pages, `ChatWorkspace`, `auth-context`, `use-media-query` and the `split-panes` logic. A broad exclude hides untested logic (`split-panes.ts` has a test that did not count). We narrowed it to the one real bootstrap file, `src/app/remote-entry.tsx` (Module Federation mount, no logic of its own).
+
+**Files.**
+- `apps/mfe-chat/vite.config.ts`
+
+**How to run.**
+```sh
+pnpm nx run mfe-chat:test --skip-nx-cache
+```
+
+**How to repeat it manually.**
+1. Clean checkout of the branch, `pnpm install`.
+2. In `apps/mfe-chat/vite.config.ts` the exclude list is `["src/test/**", "**/index.ts", "src/app/remote-entry.tsx"]`.
+3. Run the command above. Expected: 122 tests pass, exit 0, and `app` appears as a row in the coverage table.
+
+**Result.**
+
+| Metric | Before (`src/app/**` excluded) | After (only `remote-entry.tsx` excluded) | Threshold |
+|---|---|---|---|
+| Statements | 93.45 | 89.87 | 80 |
+| Branches | 87.11 | 85.21 | 75 |
+| Functions | 91.02 | 89.71 | 80 |
+| Lines | 95.20 | 91.86 | 80 |
+
+The `src/app` folder alone is at 82.92 % lines, 80.11 % branches and 84.84 % functions, so no threshold had to be lowered.
+
+![before](evidence/12-before-mfe-chat.png)
+![after](evidence/13-after-mfe-chat.png)
+
+**Problems and fixes.** None; the project stays above its thresholds. The `**/index.ts` exclude is still in place (barrel files); we left it because the story only covers `src/app/**`.
+
 ## 4. How to run everything
 
 ```sh
