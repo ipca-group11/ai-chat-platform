@@ -1,0 +1,111 @@
+$ pnpm exec nx affected -t lint typecheck test build --base=origin/integration/testing-epics
+
+ NX   Running targets lint, typecheck, test, build for 17 projects and 2 tasks they depend on:
+
+- mfe-chat
+- workspace-config
+- eslint-config
+- conversation-service
+- mock-server
+- test-utils
+- mfe-settings
+- mfe-auth
+- shell
+- observability
+- auth-service
+- shared-types
+- pact-config
+- test-config
+- ui
+- e2e
+- k6
+
+
+✔  nx run eslint-config:build  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:prisma-generate  [existing outputs match the cache, left as is]
+✔  nx run auth-service:prisma-generate  [existing outputs match the cache, left as is]
+✔  nx run eslint-config:test  [existing outputs match the cache, left as is]
+✔  nx run eslint-config:lint  [existing outputs match the cache, left as is]
+✔  nx run eslint-config:typecheck  [existing outputs match the cache, left as is]
+✔  nx run test-config:lint  [existing outputs match the cache, left as is]
+✔  nx run shared-types:lint  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:lint  [existing outputs match the cache, left as is]
+✔  nx run mock-server:lint  [existing outputs match the cache, left as is]
+✔  nx run test-utils:lint  [existing outputs match the cache, left as is]
+✔  nx run ui:lint  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:lint  [existing outputs match the cache, left as is]
+✔  nx run workspace-config:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:lint  [existing outputs match the cache, left as is]
+✔  nx run mfe-auth:lint  [existing outputs match the cache, left as is]
+✔  nx run shell:lint  [existing outputs match the cache, left as is]
+✔  nx run auth-service:lint  [existing outputs match the cache, left as is]
+✔  nx run workspace-config:lint  [existing outputs match the cache, left as is]
+✔  nx run e2e:lint  [existing outputs match the cache, left as is]
+✔  nx run observability:lint  [existing outputs match the cache, left as is]
+✔  nx run pact-config:lint  [existing outputs match the cache, left as is]
+✔  nx run k6:typecheck  [existing outputs match the cache, left as is]
+✔  nx run k6:test  [existing outputs match the cache, left as is]
+✔  nx run test-config:build  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:build  [existing outputs match the cache, left as is]
+✔  nx run test-config:typecheck  [existing outputs match the cache, left as is]
+✔  nx run test-config:test  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:test  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:typecheck  [existing outputs match the cache, left as is]
+✔  nx run auth-service:test  [existing outputs match the cache, left as is]
+✔  nx run auth-service:build  [existing outputs match the cache, left as is]
+✔  nx run auth-service:typecheck  [existing outputs match the cache, left as is]
+✔  nx run shared-types:build  [existing outputs match the cache, left as is]
+✔  nx run ui:build  [existing outputs match the cache, left as is]
+✔  nx run shared-types:test  [local cache]
+✔  nx run shared-types:typecheck  [existing outputs match the cache, left as is]
+✔  nx run ui:test  [existing outputs match the cache, left as is]
+✔  nx run ui:typecheck  [existing outputs match the cache, left as is]
+✔  nx run e2e:typecheck  [existing outputs match the cache, left as is]
+✔  nx run pact-config:test  [existing outputs match the cache, left as is]
+✔  nx run e2e:test  [existing outputs match the cache, left as is]
+✔  nx run observability:test  [existing outputs match the cache, left as is]
+✔  nx run pact-config:build  [existing outputs match the cache, left as is]
+✔  nx run pact-config:typecheck  [existing outputs match the cache, left as is]
+✔  nx run observability:build  [existing outputs match the cache, left as is]
+✔  nx run observability:typecheck  [existing outputs match the cache, left as is]
+✔  nx run mock-server:build  [existing outputs match the cache, left as is]
+✔  nx run mock-server:test  [existing outputs match the cache, left as is]
+✔  nx run mock-server:typecheck  [existing outputs match the cache, left as is]
+✔  nx run test-utils:build  [existing outputs match the cache, left as is]
+✔  nx run test-utils:test  [existing outputs match the cache, left as is]
+✔  nx run test-utils:typecheck  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:build  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:typecheck  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:build  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-auth:test  [existing outputs match the cache, left as is]
+✔  nx run shell:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-auth:build  [existing outputs match the cache, left as is]
+✔  nx run shell:typecheck  [existing outputs match the cache, left as is]
+✔  nx run shell:build  [existing outputs match the cache, left as is]
+✔  nx run mfe-auth:typecheck  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:typecheck  [existing outputs match the cache, left as is]
+✔  nx run workspace-config:typecheck  [existing outputs match the cache, left as is]
+
+
+
+ NX   Successfully ran targets lint, typecheck, test, build for 17 projects and 2 tasks they depend on
+
+Nx read the output from the cache instead of running the command for 66 out of 66 tasks.
+
+Output of 66 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      189ms
+  Cache:             66/66 hit (100%)
+  Critical path:     43ms (6 tasks)
+  Recoverable time:  <1ms
+
+ NX   Nx detected a flaky task
+
+  mock-server:test
+
+Flaky tasks can disrupt your CI pipeline. Automatically retry them with Nx Cloud. Learn more at https://nx.dev/ci/features/flaky-tasks
+
+
+[exit 0]

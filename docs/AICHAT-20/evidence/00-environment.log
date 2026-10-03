@@ -1,4 +1,5 @@
-$ sh -c node -v; pnpm -v
+$ node -v; pnpm -v
+v24.21.0
 10.4.0
 
 [exit 0]
