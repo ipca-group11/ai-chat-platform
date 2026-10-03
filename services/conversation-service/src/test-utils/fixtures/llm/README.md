@@ -26,3 +26,12 @@ sidecar `<file>.source.txt` that starts with `hand-written from <doc URL>`.
 
 Manual only, never in CI. See `docs/AICHAT-25/WORKLOG.md` (US1) for the commands and for
 recording against the real APIs with keys. Review the git diff before committing.
+
+## Known defects the replay shows
+
+The tests assert today's behaviour and carry an `it.todo` for the expected one.
+
+| Ticket | Defect | Fixtures |
+|---|---|---|
+| [AICHAT-211](https://ipca-grupo11.atlassian.net/browse/AICHAT-211) | OpenAI mid-stream errors are swallowed, a failed answer looks complete | `openai/error-midstream.sse` |
+| [AICHAT-212](https://ipca-grupo11.atlassian.net/browse/AICHAT-212) | `max_tokens` / `length` truncation is not surfaced | `anthropic/max-tokens.sse`, `openai/max-tokens.sse` |
