@@ -79,6 +79,38 @@ Only `apps/shell` is below target, so it is the only project that gets a ratchet
 
 **Problems and fixes.** The `e2e` number covers only the two helper files listed in its `include`, not the whole package; we kept that scope. The shell run leaves a `.vitest/` report folder that is not committed.
 
+### US2 · Shared coverage preset in every project ([AICHAT-81](https://ipca-grupo11.atlassian.net/browse/AICHAT-81))
+
+**What and why.** Only `@platform/test-config` itself used the shared preset; the other 13 projects copied `80` by hand, so changing the policy meant editing 13 files. We extended the preset and moved every Node test project to it, keeping only project-specific `include`/`exclude` locally.
+
+**Files.**
+- `packages/test-config/coverage-thresholds.ts`, `vitest.preset.ts`, `index.ts`, specs and README: `thresholds` override option, `appCoverageThresholds` (branches 75), `e2eCoverageThresholds` (branches 70), reporters `text` + `lcov` + `json-summary`.
+- `packages/test-config/package.json`: `main`/`exports` now point to the built `dist/`, because Node loads Vite configs natively and cannot resolve `.js` imports to `.ts` sources.
+- `vite.config.ts` / `vitest.config.ts` of `apps/shell`, `apps/mfe-auth`, `apps/mfe-chat`, `apps/mfe-settings`, `packages/ui`, `packages/shared-types`, `packages/observability`, `packages/pact-config`, `packages/eslint-config`, `packages/workspace-config`, `services/auth-service`, `services/conversation-service`, `e2e`.
+- Each of those `package.json` files (devDependency `@platform/test-config: workspace:*`) and `pnpm-lock.yaml`.
+- `packages/eslint-config/project.json` (`build` no longer depends on `^build`), `packages/test-config/eslint.config.js`.
+
+**How to run.**
+```sh
+pnpm nx run-many -t test --skip-nx-cache
+```
+
+**How to repeat it manually.**
+1. Clean checkout of the branch, `pnpm install`.
+2. `grep -l '@platform/test-config' apps/*/vite.config.ts packages/*/vit*.config.ts services/*/vitest.config.ts e2e/vitest.config.ts | wc -l`. Expected: `13` (the 14th project, `test-config`, defines the preset and imports it relatively).
+3. `grep -lE "provider: .v8.|thresholds: \{" ...` on the same files. Expected: no output.
+4. `pnpm nx run-many -t test --skip-nx-cache`. Expected: all 15 projects pass.
+
+**Result.** 13 configs import the preset, none keeps a hand-written `provider`/`thresholds` block, and all 15 test targets pass. `testing/k6` has no coverage by design.
+
+![imports](evidence/05-shared-preset-imports.png)
+![nx test](evidence/06-nx-test-after-preset.png)
+
+**Problems and fixes.**
+- Vite loads the config natively and the package exported `index.ts` with `.js` import suffixes, so it failed with `ERR_MODULE_NOT_FOUND`. We export the compiled `dist/` instead; the `test` target already builds dependencies first (`dependsOn: ^build`).
+- `eslint-config` and `test-config` now depend on each other, which made Nx report a circular task graph. We set the no-op `eslint-config:build` to `dependsOn: []` and switched off the circular-dependency lint rule for `test-config/eslint.config.js` only.
+- Lowered branch threshold for `apps/mfe-chat` and `apps/mfe-settings` from 80 to 75 follows the agreed app group. Their measured values still pass.
+
 ## 4. How to run everything
 
 ```sh
