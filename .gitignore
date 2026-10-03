@@ -6,6 +6,8 @@ coverage/
 .nx/workspace-data/
 *.log
 .env
+# Real credentials for the deployed environment (see docs/CREDENTIALS.md). Never commit.
+.env.credentials
 .DS_Store
 data/uploads/
 .vite/
