@@ -2,10 +2,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Express } from "express";
 import helmet from "helmet";
-import { createAttachmentsRepository, createAttachmentsRouter, createFileSystemStorage, AttachmentsService, createAttachmentAwareContextBuilder } from "./features/attachments/index.js";
-import { createChatsRepository, createChatsRouter, ChatsService } from "./features/chats/index.js";
-import { createProviderRegistry } from "./features/llm-adapters/index.js";
-import { createMessageProcessor, createMessagesRepository, createMessagesRouter, MessagesService } from "./features/messages/index.js";
+import { createAttachmentsRepository, createAttachmentsRouter, createFileSystemStorage, AttachmentsService, createAttachmentAwareContextBuilder, type AttachmentsRepository, type AttachmentStorage } from "./features/attachments/index.js";
+import { createChatsRepository, createChatsRouter, ChatsService, type ChatsRepository } from "./features/chats/index.js";
+import { createProviderRegistry, type ProviderRegistry } from "./features/llm-adapters/index.js";
+import { createMessageProcessor, createMessagesRepository, createMessagesRouter, MessagesService, type MessagesRepository } from "./features/messages/index.js";
 import { QueueManager } from "./features/queue/index.js";
 import { ChatEventBus, createStreamingRouter } from "./features/streaming/index.js";
 import type { Env } from "./shared/env.js";
@@ -16,11 +16,31 @@ import { createLogger, type Logger } from "./shared/logger.js";
 import { createMetrics } from "./shared/metrics.js";
 import type { PrismaClient } from "./shared/prisma.js";
 
+/** Optional replacements for the pieces `createApp` builds itself (testability seam,
+ * plan decision D3). Every field defaults to the real implementation, so production
+ * behaviour is unchanged; integration tests pass in-memory fakes to run the whole app
+ * (real middleware order and routes) with no database, disk or network. */
+export interface AppOverrides {
+  chatsRepo?: ChatsRepository;
+  messagesRepo?: MessagesRepository;
+  attachmentsRepo?: AttachmentsRepository;
+  storage?: AttachmentStorage;
+  providerRegistry?: ProviderRegistry;
+  /** Replaces the queue (and the message processor that feeds it). */
+  queueManager?: QueueManager;
+  bus?: ChatEventBus;
+}
+
 /** Builds the Express app + all its wiring (ARCHITECTURE.md §5). Takes the Prisma
  * client and env as parameters (rather than importing the singletons directly) so
  * `server.ts` is the only place that touches real process env/DB, keeping this factory
  * usable from integration tests too. */
-export function createApp(prisma: PrismaClient, env: Env, logger: Logger = createLogger(env.LOG_LEVEL)): Express {
+export function createApp(
+  prisma: PrismaClient,
+  env: Env,
+  logger: Logger = createLogger(env.LOG_LEVEL),
+  overrides: AppOverrides = {},
+): Express {
   const app = express();
 
   app.use(helmet());
@@ -35,27 +55,25 @@ export function createApp(prisma: PrismaClient, env: Env, logger: Logger = creat
   app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
   // --- wiring (ARCHITECTURE.md §5: chats -> messages/queue/streaming -> attachments) --
-  const chatsRepo = createChatsRepository(prisma);
+  const chatsRepo = overrides.chatsRepo ?? createChatsRepository(prisma);
   const chatsService = new ChatsService(chatsRepo);
 
-  const messagesRepo = createMessagesRepository(prisma);
-  const bus = new ChatEventBus();
-  const providerRegistry = createProviderRegistry();
+  const messagesRepo = overrides.messagesRepo ?? createMessagesRepository(prisma);
+  const bus = overrides.bus ?? new ChatEventBus();
+  const providerRegistry = overrides.providerRegistry ?? createProviderRegistry();
 
-  const attachmentsRepo = createAttachmentsRepository(prisma);
-  const storage = createFileSystemStorage(env.UPLOAD_DIR);
+  const attachmentsRepo = overrides.attachmentsRepo ?? createAttachmentsRepository(prisma);
+  const storage = overrides.storage ?? createFileSystemStorage(env.UPLOAD_DIR);
   const buildLlmMessages = createAttachmentAwareContextBuilder(attachmentsRepo, storage);
 
-  const processor = createMessageProcessor({
-    messagesRepo,
-    chatsService,
-    providerRegistry,
-    bus,
-    buildLlmMessages,
-  });
-  const queueManager = new QueueManager(processor, (chatId, entry, error) => {
-    logger.error({ chatId, messageId: entry.messageId, err: error }, "queue processor threw unexpectedly");
-  });
+  const queueManager =
+    overrides.queueManager ??
+    new QueueManager(
+      createMessageProcessor({ messagesRepo, chatsService, providerRegistry, bus, buildLlmMessages }),
+      (chatId, entry, error) => {
+        logger.error({ chatId, messageId: entry.messageId, err: error }, "queue processor threw unexpectedly");
+      },
+    );
 
   const messagesService = new MessagesService(messagesRepo, chatsService, queueManager, bus);
   const attachmentsService = new AttachmentsService(
