@@ -1,10 +1,14 @@
-import { screen, waitFor } from "@testing-library/react";
+import { configure, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithClient } from "@platform/test-utils";
 import { http, HttpResponse, recordRequests, server } from "@platform/test-utils/msw";
 import type { ChatMember } from "../../../shared/types";
 import { MembersDialog } from "./MembersDialog";
+
+// Every findBy/waitFor here waits for an MSW response. The default 1s was not enough when nx ran
+// several projects in parallel; a longer limit costs nothing when the response arrives quickly.
+configure({ asyncUtilTimeout: 5000 });
 
 const owner: ChatMember = { email: "owner@example.com", role: "owner", addedAt: "2026-01-01T00:00:00.000Z" };
 const guest: ChatMember = { email: "guest@example.com", role: "member", addedAt: "2026-01-02T00:00:00.000Z" };
