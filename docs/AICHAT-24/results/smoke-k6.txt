@@ -1,0 +1,92 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: /scripts/load.ts
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1 max VUs, 1m30s max duration (incl. graceful stop):
+              * smoke: 1 iterations for each of 1 VUs (maxDuration: 1m0s, exec: smoke, gracefulStop: 30s)
+
+
+running (0m01.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+smoke   [   0% ] 1 VUs  0m01.0s/1m0s  0/1 iters, 1 per VU
+
+running (0m02.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+smoke   [   0% ] 1 VUs  0m02.0s/1m0s  0/1 iters, 1 per VU
+
+running (0m03.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+smoke   [   0% ] 1 VUs  0m03.0s/1m0s  0/1 iters, 1 per VU
+
+running (0m04.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+smoke   [   0% ] 1 VUs  0m04.0s/1m0s  0/1 iters, 1 per VU
+
+running (0m05.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+smoke   [   0% ] 1 VUs  0m05.0s/1m0s  0/1 iters, 1 per VU
+
+running (0m06.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+smoke   [   0% ] 1 VUs  0m06.0s/1m0s  0/1 iters, 1 per VU
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{kind:rest}
+    ✓ 'p(95)<1000' p(95)=31.43ms
+
+    http_req_failed{kind:rest}
+    ✓ 'rate<0.01' rate=0.00%
+
+    stream_success_rate
+    ✓ 'rate>0.99' rate=100.00%
+
+    time_to_first_token
+    ✓ 'p(95)<1500' p(95)=678ms
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 5       0.784137/s
+    checks_succeeded...: 100.00% 5 out of 5
+    checks_failed......: 0.00%   0 out of 5
+
+    ✓ register: 201 or 409
+    ✓ login: 200
+    ✓ create chat: 201
+    ✓ stream: status 200
+    ✓ list chats: 200
+
+    CUSTOM
+    sse_event......................: 202     31.679139/s
+    stream_duration................: avg=5.11s    min=5.11s   med=5.11s   p(90)=5.11s    p(95)=5.11s   max=5.11s  
+    stream_success_rate............: 100.00% 1 out of 1
+    time_to_first_token............: avg=678ms    min=678ms   med=678ms   p(90)=678ms    p(95)=678ms   max=678ms  
+    tokens_received................: 200     31.365484/s
+
+    HTTP
+    http_req_duration..............: avg=1.06s    min=10.53ms med=30.52ms p(90)=3.13s    p(95)=4.1s    max=5.08s  
+      { expected_response:true }...: avg=314.33ms min=10.53ms med=26.97ms p(90)=844.78ms p(95)=1.01s   max=1.19s  
+      { kind:rest }................: avg=21.49ms  min=10.53ms med=21.39ms p(90)=30.31ms  p(95)=31.43ms max=32.54ms
+    http_req_failed................: 20.00%  1 out of 5
+      { kind:rest }................: 0.00%   0 out of 3
+    http_reqs......................: 6       0.940965/s
+
+    EXECUTION
+    iteration_duration.............: avg=6.37s    min=6.37s   med=6.37s   p(90)=6.37s    p(95)=6.37s   max=6.37s  
+    iterations.....................: 1       0.156827/s
+    vus............................: 1       min=1       max=1
+    vus_max........................: 1       min=1       max=1
+
+    NETWORK
+    data_received..................: 29 kB   4.6 kB/s
+    data_sent......................: 2.3 kB  366 B/s
+
+
+
+
+running (0m06.4s), 0/1 VUs, 1 complete and 0 interrupted iterations
+smoke ✓ [ 100% ] 1 VUs  0m06.4s/1m0s  1/1 iters, 1 per VU
