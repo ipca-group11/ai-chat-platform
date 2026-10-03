@@ -11,7 +11,7 @@ title: "AICHAT-18 · Component testing: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-18-component-testing` |
 | Started / finished | 2026-10-03 / 2026-10-03 |
-| Pull requests | #… |
+| Pull requests | [#14](https://github.com/ipca-group11/ai-chat-platform/pull/14) |
 | Status | Ready for review |
 
 ## 1. DoR review
