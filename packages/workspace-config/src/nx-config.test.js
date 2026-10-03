@@ -6,7 +6,7 @@ describe("AC-2: Nx workspace is configured with a project graph covering every a
   it(
     "AC-2: `nx show projects` resolves without error and lists every project.json in the workspace",
     () => {
-      const out = execFileSync("pnpm", ["exec", "nx", "show", "projects"], {
+      const out = execFileSync("pnpm", ["exec", "nx", "show", "projects", "--json"], {
         cwd: repoRoot,
         encoding: "utf8",
       });
