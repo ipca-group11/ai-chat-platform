@@ -29,7 +29,7 @@ describe("admin endpoints", () => {
   });
 
   it("GET /__admin/scenarios is empty while no mock registers a scenario", async () => {
-    const { app } = createApp(config());
+    const { app } = createApp(config(), []);
     const res = await request(app).get("/__admin/scenarios");
     expect(res.body).toEqual({ scenarios: [] });
   });
