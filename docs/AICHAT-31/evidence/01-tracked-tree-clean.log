@@ -1,0 +1,6 @@
+$ D=$(mktemp -d) && git archive HEAD | tar -x -C $D && gitleaks dir $D --config .gitleaks.toml --redact --no-banner; echo "tracked files at HEAD: $(git ls-files | wc -l)"; rm -rf $D
+tracked files at HEAD:      811
+12:23PM INF scanned ~1905534 bytes (1.91 MB) in 163ms
+12:23PM INF no leaks found
+
+[exit 0]
