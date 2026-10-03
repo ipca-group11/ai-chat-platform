@@ -26,6 +26,10 @@ jobs:
       E2E_SHELL_HEALTH_URL: http://localhost:8000/
       E2E_AUTH_HEALTH_URL: http://localhost:4001/health
       E2E_CONVERSATION_HEALTH_URL: http://localhost:4002/health
+      # The stack runs with the `llm` compose profile: conversation-service calls the LLM mock
+      # (compose.mock.yaml), so the chat flows need no provider account. The mock accepts any
+      # key; this value is a placeholder, not a secret.
+      ANTHROPIC_API_KEY: mock-key-not-a-secret
     steps:
       # Building every app image fills the runner's ~14 GB free disk; drop preinstalled
       # SDKs this job never uses.
@@ -47,19 +51,18 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm --filter e2e exec playwright install --with-deps chromium
 
-      # Brings up the full stack. Specs that need a real LLM reply run only when the
-      # ANTHROPIC_API_KEY secret is set; otherwise they are skipped.
-      - name: Start docker compose stack
-        run: docker compose up -d --build
+      # Brings up the full stack plus the mock server (profile `llm`): the providers are
+      # the mock, never a real API.
+      - name: Start docker compose stack (profile llm)
+        run: pnpm mock:up
 
       - name: Wait for the stack to become healthy
         run: pnpm --filter e2e run wait-for-stack
 
-      - name: Run Playwright E2E suite (UC1-UC8)
+      - name: Run Playwright E2E suite (UC1-UC8 and the chat flows against the mock)
         run: pnpm exec nx run e2e:e2e
         env:
           CI: "true"
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Upload Playwright report
         if: failure()
@@ -73,4 +76,4 @@ jobs:
 
       - name: Tear down docker compose stack
         if: always()
-        run: docker compose down -v
+        run: pnpm mock:down
