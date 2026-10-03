@@ -1,0 +1,25 @@
+$ tr '\r' '\n' < docs/AICHAT-24/results/soak-k6.txt | sed -n '/THRESHOLDS/,$p' | grep -E '✓|✗|stream_|time_to|dropped|iterations|kind:rest|http_req_duration'
+    http_req_duration{kind:rest}
+    ✓ 'p(95)<1000' p(95)=149.06ms
+    http_req_failed{kind:rest}
+    ✓ 'rate<0.01' rate=0.00%
+    stream_success_rate
+    ✓ 'rate>0.99' rate=100.00%
+    time_to_first_token
+    ✓ 'p(95)<1500' p(95)=922.49ms
+    ✓ login: 200
+    ✓ create chat: 201
+    ✓ stream: status 200
+    ✓ list chats: 200
+    stream_duration................: avg=5.04s    min=4.9s   med=4.99s   p(90)=5.17s  p(95)=5.31s    max=6.05s  
+    stream_success_rate............: 100.00% 5931 out of 5931
+    time_to_first_token............: avg=679.63ms min=612ms  med=636ms   p(90)=784ms  p(95)=922.49ms max=1.67s  
+    http_req_duration..............: avg=1.67s    min=2.47ms med=15.93ms p(90)=5.01s  p(95)=5.06s    max=5.59s  
+      { kind:rest }................: avg=29.96ms  min=2.47ms med=8.32ms  p(90)=72.2ms p(95)=149.06ms max=786.3ms
+      { kind:rest }................: 0.00%   0 out of 11982
+    dropped_iterations.............: 70      0.199315/s
+    iterations.....................: 5931    16.887653/s
+running (5m51.2s), 000/120 VUs, 5931 complete and 0 interrupted iterations
+soak ✓ [ 100% ] 000/120 VUs  5m0s  20.00 iters/s
+
+[exit 0]

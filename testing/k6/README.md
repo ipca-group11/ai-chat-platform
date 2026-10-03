@@ -40,11 +40,11 @@ If a port is taken (4001, 4002, 3300, 9090), set `AUTH_SERVICE_PORT`, `CONVERSAT
 |---|---|---|
 | `SCENARIO` | `smoke` | Set by `run.sh <scenario>` |
 | `BASE_URL` | `http://shell:3000` | Entry point; `/auth` and `/api` go through the shell |
-| `USER_LEVELS` | `25,50,100,150,200` | Virtual users per level of `users_ramp` |
-| `STREAM_LEVELS` | `1,2,4,6,8` | New streams per second per level of `streams_ramp` |
+| `USER_LEVELS` | `100,200,400,700,1000` | Virtual users per level of `users_ramp` |
+| `STREAM_LEVELS` | `20,30,40,50,60` | New streams per second per level of `streams_ramp` |
 | `STAGE_SECONDS` / `RAMP_SECONDS` | `60` / `10` | Length of a level / the ramp inside it |
-| `SOAK_RATE` / `SOAK_DURATION` | `2` / `30m` | Streams per second and length of `soak` |
-| `MAX_VUS` | `400` | Upper bound of the arrival-rate scenarios |
+| `SOAK_RATE` / `SOAK_DURATION` | `20` / `30m` | Streams per second and length of `soak` |
+| `MAX_VUS` | `600` | Upper bound of the arrival-rate scenarios |
 | `REST_P95_MS` / `TTFT_P95_MS` | `1000` / `1500` | Saturation thresholds |
 | `STREAM_TIMEOUT_MS` | `60000` | A stream not done by then counts as failed |
 | `K6_PROM_RW` | `0` | `1` also sends the k6 metrics to Prometheus (Grafana dashboard "Load test") |

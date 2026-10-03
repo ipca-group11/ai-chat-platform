@@ -12,7 +12,7 @@ describe("readSettings", () => {
 
   it("reads levels from a comma list and ignores bad entries", () => {
     expect(readSettings({ USER_LEVELS: "10, 20,x,-3,40" }).userLevels).toEqual([10, 20, 40]);
-    expect(readSettings({ USER_LEVELS: "nope" }).userLevels).toEqual([25, 50, 100, 150, 200]);
+    expect(readSettings({ USER_LEVELS: "nope" }).userLevels).toEqual([100, 200, 400, 700, 1000]);
   });
 
   it("makes the soak duration configurable and 30 minutes by default", () => {
@@ -22,6 +22,12 @@ describe("readSettings", () => {
 });
 
 describe("scenarios", () => {
+  it("seed registers one account per virtual user of the later runs", () => {
+    expect(buildScenarios(readSettings({ SCENARIO: "seed", SEED_USERS: "120" }))).toMatchObject({
+      seed: { executor: "shared-iterations", iterations: 120, exec: "seed" },
+    });
+  });
+
   it("smoke is one user and one iteration", () => {
     expect(buildScenarios(readSettings({ SCENARIO: "smoke" }))).toMatchObject({
       smoke: { executor: "per-vu-iterations", vus: 1, iterations: 1 },
@@ -40,7 +46,7 @@ describe("scenarios", () => {
 
   it("streams_ramp climbs with ramping-arrival-rate", () => {
     const scenarios = buildScenarios(readSettings({ SCENARIO: "streams_ramp", STREAM_LEVELS: "1,3" }));
-    expect(scenarios).toMatchObject({ streams_ramp: { executor: "ramping-arrival-rate", maxVUs: 400 } });
+    expect(scenarios).toMatchObject({ streams_ramp: { executor: "ramping-arrival-rate", maxVUs: 600 } });
   });
 
   it("soak holds a constant arrival rate", () => {

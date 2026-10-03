@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs one load scenario with k6 + xk6-sse in Docker, on the network of the compose stack.
 #
-#   bash testing/k6/run.sh <smoke|users_ramp|streams_ramp|soak>
+#   bash testing/k6/run.sh <seed|smoke|users_ramp|streams_ramp|soak>
 #
 # The stack must be up (LOAD=1 bash scripts/mock-compose.sh up llm). The k6 image is built on the
 # first run (testing/k6/Dockerfile). Output: docs/AICHAT-24/results/<scenario>-summary.json and
@@ -10,6 +10,8 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 scenario="${1:-smoke}"
+# RUN_NAME names the output files when one scenario is run with different settings.
+name="${RUN_NAME:-$scenario}"
 image="${K6_IMAGE:-ai-chat-k6-sse}"
 network="${K6_NETWORK:-llm-chat_llm-chat}"
 results="docs/AICHAT-24/results"
@@ -20,9 +22,9 @@ if ! docker image inspect "$image" > /dev/null 2>&1; then
 fi
 
 env_args=(-e "SCENARIO=$scenario" -e "BASE_URL=${BASE_URL:-http://shell:3000}")
-for name in USER_LEVELS STREAM_LEVELS STAGE_SECONDS RAMP_SECONDS SOAK_RATE SOAK_DURATION MAX_VUS \
+for var in USER_LEVELS STREAM_LEVELS STAGE_SECONDS RAMP_SECONDS SOAK_RATE SOAK_DURATION MAX_VUS SEED_USERS POOL_USERS \
   REST_P95_MS TTFT_P95_MS STREAM_TIMEOUT_MS LLM_MODEL LLM_API_KEY K6_PASSWORD; do
-  if [ -n "${!name:-}" ]; then env_args+=(-e "$name=${!name}"); fi
+  if [ -n "${!var:-}" ]; then env_args+=(-e "$var=${!var}"); fi
 done
 
 # K6_PROM_RW=1 also sends the k6 metrics to Prometheus (Grafana dashboard "Load test").
@@ -31,8 +33,21 @@ if [ "${K6_PROM_RW:-0}" = "1" ]; then
   set -- "$@" -o experimental-prometheus-rw
 fi
 
+# The CPU and memory of every container go to <scenario>-docker-stats.csv while k6 runs
+# (SAMPLE=0 turns it off; needs node, see scripts/load/docker-stats-sampler.ts).
+sampler=""
+if [ "${SAMPLE:-1}" = "1" ] && command -v node > /dev/null 2>&1 && [ "$scenario" != "seed" ]; then
+  node scripts/load/docker-stats-sampler.ts --out "$results/$name-docker-stats.csv" --interval "${SAMPLE_INTERVAL:-5}" --serve "${SAMPLER_PORT:-9105}" &
+  sampler=$!
+  trap '[ -n "$sampler" ] && kill -TERM "$sampler" 2> /dev/null || true' EXIT
+fi
+
 docker run --rm --user "$(id -u):$(id -g)" --network "$network" \
   -v "$PWD/testing/k6:/scripts:ro" -v "$PWD/$results:/results" \
   "${env_args[@]}" "$image" run /scripts/load.ts \
-  --summary-export "/results/$scenario-summary.json" "${@:2}" 2>&1 | tee "$results/$scenario-k6.txt"
-exit "${PIPESTATUS[0]}"
+  --summary-export "/results/$name-summary.json" "${@:2}" 2>&1 | tee "$results/$name-k6.txt" || status=$?
+# The summary holds the value returned by setup(), which is the sessions of the shared accounts.
+if [ -f "$results/$name-summary.json" ] && command -v node > /dev/null 2>&1; then
+  node -e 'const f=process.argv[1],fs=require("fs"),j=JSON.parse(fs.readFileSync(f,"utf8"));delete j.setup_data;fs.writeFileSync(f,JSON.stringify(j,null,2)+"\n")' "$results/$name-summary.json"
+fi
+exit "${status:-0}"

@@ -7,8 +7,8 @@
  * the first level whose threshold fails is the saturation point.
  */
 
-export type ScenarioName = "smoke" | "users_ramp" | "streams_ramp" | "soak";
-export const SCENARIO_NAMES: readonly ScenarioName[] = ["smoke", "users_ramp", "streams_ramp", "soak"];
+export type ScenarioName = "seed" | "smoke" | "users_ramp" | "streams_ramp" | "soak";
+export const SCENARIO_NAMES: readonly ScenarioName[] = ["seed", "smoke", "users_ramp", "streams_ramp", "soak"];
 
 export type Env = Record<string, string | undefined>;
 
@@ -25,6 +25,8 @@ export interface Settings {
   soakDuration: string;
   /** Upper bound on the virtual users of the arrival-rate scenarios. */
   maxVus: number;
+  /** Accounts the seed scenario registers (one per virtual user of the later runs). */
+  seedUsers: number;
   /** Per-level thresholds, in ms. */
   restP95Ms: number;
   ttftP95Ms: number;
@@ -51,13 +53,14 @@ export function readSettings(env: Env): Settings {
   }
   return {
     scenario: name,
-    userLevels: numbers(env["USER_LEVELS"], [25, 50, 100, 150, 200]),
-    streamLevels: numbers(env["STREAM_LEVELS"], [1, 2, 4, 6, 8]),
+    userLevels: numbers(env["USER_LEVELS"], [100, 200, 400, 700, 1000]),
+    streamLevels: numbers(env["STREAM_LEVELS"], [20, 30, 40, 50, 60]),
     stageSeconds: number(env["STAGE_SECONDS"], 60),
     rampSeconds: number(env["RAMP_SECONDS"], 10),
-    soakRate: number(env["SOAK_RATE"], 2),
+    soakRate: number(env["SOAK_RATE"], 20),
     soakDuration: env["SOAK_DURATION"] || "30m",
-    maxVus: number(env["MAX_VUS"], 400),
+    maxVus: number(env["MAX_VUS"], 600),
+    seedUsers: number(env["SEED_USERS"], 40),
     restP95Ms: number(env["REST_P95_MS"], 1000),
     ttftP95Ms: number(env["TTFT_P95_MS"], 1500),
   };
@@ -88,6 +91,16 @@ function stages(levels: number[], settings: Settings): Array<{ duration: string;
 
 export function buildScenarios(settings: Settings): Record<string, object> {
   switch (settings.scenario) {
+    case "seed":
+      return {
+        seed: {
+          executor: "shared-iterations",
+          vus: 10,
+          iterations: settings.seedUsers,
+          maxDuration: "5m",
+          exec: "seed",
+        },
+      };
     case "smoke":
       return {
         smoke: { executor: "per-vu-iterations", vus: 1, iterations: 1, maxDuration: "1m", exec: "smoke" },
@@ -154,6 +167,8 @@ export function buildThresholds(settings: Settings): Thresholds {
     if (settings.scenario === "streams_ramp") {
       thresholds[`time_to_first_token{level:${level}}`] = [ttft];
       thresholds[`stream_success_rate{level:${level}}`] = ["rate>0.99"];
+      // Always true: only makes k6 report the stream duration of each level in the summary.
+      thresholds[`stream_duration{level:${level}}`] = ["max>=0"];
     }
   }
   return thresholds;

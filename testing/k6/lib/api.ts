@@ -31,46 +31,85 @@ export const tokensReceived = new Counter("tokens_received");
 
 const jsonHeaders = { "Content-Type": "application/json" };
 
+/** Accounts shared by the virtual users: auth-service allows 300 requests per 15 minutes per address. */
+const POOL_USERS = Number(__ENV["POOL_USERS"] ?? 40);
+
 /** State of one virtual user; k6 keeps module variables per VU between iterations. */
-const vu: { signedIn: boolean; chatId: string | undefined } = { signedIn: false, chatId: undefined };
+const vu: { cookie: string | undefined; chatId: string | undefined } = { cookie: undefined, chatId: undefined };
+
+/** An empty jar: the session is sent as an explicit Cookie header, so the VU's own jar stays unused. */
+const unusedJar = new http.CookieJar();
 
 type Tags = { level: string };
 
 const restTags = (name: string, tags: Tags) => ({ kind: "rest", name, level: tags.level });
 
-function signIn(): boolean {
-  const email = `k6-vu${__VU}@${EMAIL_DOMAIN}`;
-  const body = JSON.stringify({ email, password: PASSWORD });
-  const registered = http.post(`${BASE_URL}/auth/register`, body, {
+function credentials(userNumber: number): string {
+  return JSON.stringify({ email: `k6-user${userNumber}@${EMAIL_DOMAIN}`, password: PASSWORD });
+}
+
+/** Creates the account of a user; 409 means a previous run left it. */
+export function register(userNumber: number): boolean {
+  const res = http.post(`${BASE_URL}/auth/register`, credentials(userNumber), {
     headers: jsonHeaders,
+    jar: unusedJar,
     tags: { kind: "auth", name: "register" },
   });
-  // 201 = new account, 409 = left by a previous run; both lead to a login.
-  check(registered, { "register: 201 or 409": (r) => r.status === 201 || r.status === 409 });
-  const login = http.post(`${BASE_URL}/auth/login`, body, { headers: jsonHeaders, tags: { kind: "auth", name: "login" } });
-  vu.signedIn = check(login, { "login: 200": (r) => r.status === 200 });
-  return vu.signedIn;
+  return check(res, { "register: 201 or 409": (r) => r.status === 201 || r.status === 409 });
 }
 
-function ensureSession(): boolean {
-  return vu.signedIn || signIn();
+/** Signs in as user number `userNumber` (creating the account when it is missing); returns the Cookie header. */
+export function login(userNumber: number): string | undefined {
+  const send = () =>
+    http.post(`${BASE_URL}/auth/login`, credentials(userNumber), {
+      headers: jsonHeaders,
+      jar: unusedJar,
+      tags: { kind: "auth", name: "login" },
+    });
+  let res = send();
+  if (res.status === 401 && register(userNumber)) res = send();
+  if (!check(res, { "login: 200": (r) => r.status === 200 })) return undefined;
+  return Object.entries(res.cookies)
+    .map(([name, values]) => `${name}=${values[0]?.value ?? ""}`)
+    .join("; ");
 }
 
-/** A REST call; a 401 (expired access token in a long soak run) signs in again once. */
-function rest(method: "GET" | "POST", path: string, name: string, tags: Tags, body?: object, headers: Record<string, string> = {}) {
+/**
+ * Signs in POOL_USERS accounts once, before the load starts (`setup`). auth-service allows 300
+ * requests per 15 minutes per client address and hashes passwords on every sign-in, so signing
+ * in is kept out of the measured run. Virtual user N uses account ((N - 1) mod pool) + 1.
+ */
+export function signInPool(count = POOL_USERS): string[] {
+  const cookies: string[] = [];
+  for (let user = 1; user <= count; user++) cookies.push(login(user) ?? "");
+  return cookies;
+}
+
+/** The access token expires after 15 minutes; a 401 in a long run signs the account in again. */
+function sessionOf(pool: string[]): string | undefined {
+  vu.cookie ??= pool[(__VU - 1) % Math.max(1, pool.length)] || undefined;
+  return vu.cookie;
+}
+
+/** A REST call with the session of this virtual user. */
+function rest(pool: string[], method: "GET" | "POST", path: string, name: string, tags: Tags, body?: object, headers: Record<string, string> = {}) {
   const send = () =>
     http.request(method, `${BASE_URL}${path}`, body ? JSON.stringify(body) : null, {
-      headers: { ...jsonHeaders, ...headers },
+      headers: { ...jsonHeaders, ...headers, Cookie: sessionOf(pool) ?? "" },
+      jar: unusedJar,
       tags: restTags(name, tags),
     });
   let res = send();
-  if (res.status === 401 && signIn()) res = send();
+  if (res.status === 401) {
+    vu.cookie = login(((__VU - 1) % Math.max(1, pool.length)) + 1);
+    if (vu.cookie) res = send();
+  }
   return res;
 }
 
-function ensureChat(tags: Tags): string | undefined {
+function ensureChat(pool: string[], tags: Tags): string | undefined {
   if (vu.chatId) return vu.chatId;
-  const res = rest("POST", "/api/chats", "create_chat", tags, {
+  const res = rest(pool, "POST", "/api/chats", "create_chat", tags, {
     title: `k6 chat ${__VU}`,
     provider: "anthropic",
     model: MODEL,
@@ -81,35 +120,28 @@ function ensureChat(tags: Tags): string | undefined {
   return vu.chatId;
 }
 
-/** Signs in and has a chat ready; false when either failed. */
-export function prepare(tags: Tags): string | undefined {
-  if (!ensureSession()) return undefined;
-  return ensureChat(tags);
+/** Has a chat ready for this virtual user; undefined when there is no session or the chat failed. */
+export function prepare(pool: string[], tags: Tags): string | undefined {
+  if (!sessionOf(pool)) return undefined;
+  return ensureChat(pool, tags);
 }
 
 /** What a user does when they open the app: the chat list, then one chat with its messages. */
-export function browseOnce(tags: Tags): void {
-  const chatId = prepare(tags);
-  const list = rest("GET", "/api/chats", "list_chats", tags);
+export function browseOnce(pool: string[], tags: Tags): void {
+  const chatId = prepare(pool, tags);
+  const list = rest(pool, "GET", "/api/chats", "list_chats", tags);
   check(list, { "list chats: 200": (r) => r.status === 200 });
   if (!chatId) return;
-  const messages = rest("GET", `/api/chats/${chatId}/messages`, "list_messages", tags);
+  const messages = rest(pool, "GET", `/api/chats/${chatId}/messages`, "list_messages", tags);
   check(messages, { "list messages: 200": (r) => r.status === 200 });
-}
-
-function cookieHeader(): string {
-  const jar = http.cookieJar().cookiesForURL(`${BASE_URL}/`);
-  return Object.entries(jar)
-    .map(([name, values]) => `${name}=${values[0] ?? ""}`)
-    .join("; ");
 }
 
 /**
  * Sends one message, opens the chat stream and reads events until `done`. The time to first
  * token runs from just before the message is sent to the first `token` event.
  */
-export function streamOnce(tags: Tags): boolean {
-  const chatId = prepare(tags);
+export function streamOnce(pool: string[], tags: Tags): boolean {
+  const chatId = prepare(pool, tags);
   if (!chatId) {
     streamSuccess.add(false, tags);
     return false;
@@ -127,10 +159,7 @@ export function streamOnce(tags: Tags): boolean {
   // token, which is time enough for the service to register the stream. A stream that comes too
   // late to see `done` times out and counts as failed, which is what overload looks like to a user.
   sentAt = Date.now();
-  const sent = http.post(`${BASE_URL}/api/chats/${chatId}/messages`, JSON.stringify({ content: "Tell me a short story about a lighthouse." }), {
-    headers: { ...jsonHeaders, "X-Llm-Api-Key": LLM_KEY },
-    tags: restTags("send_message", tags),
-  });
+  const sent = rest(pool, "POST", `/api/chats/${chatId}/messages`, "send_message", tags, { content: "Tell me a short story about a lighthouse." }, { "X-Llm-Api-Key": LLM_KEY });
   if (sent.status !== 201) {
     streamSuccess.add(false, tags);
     return false;
@@ -138,7 +167,7 @@ export function streamOnce(tags: Tags): boolean {
 
   const response = sse.open(
     `${BASE_URL}/api/chats/${chatId}/stream`,
-    { method: "GET", headers: { Accept: "text/event-stream", Cookie: cookieHeader() }, tags: { kind: "stream", name: "stream", level: tags.level } },
+    { method: "GET", headers: { Accept: "text/event-stream", Cookie: sessionOf(pool) ?? "" }, tags: { kind: "stream", name: "stream", level: tags.level } },
     (client) => {
       const timer = setTimeout(() => {
         failed = true;
@@ -179,7 +208,7 @@ export function streamOnce(tags: Tags): boolean {
 }
 
 /** A user checks the chat list once the answer is in (keeps the REST thresholds fed during stream runs). */
-export function listChats(tags: Tags): void {
-  const list = rest("GET", "/api/chats", "list_chats", tags);
+export function listChats(pool: string[], tags: Tags): void {
+  const list = rest(pool, "GET", "/api/chats", "list_chats", tags);
   check(list, { "list chats: 200": (r) => r.status === 200 });
 }
