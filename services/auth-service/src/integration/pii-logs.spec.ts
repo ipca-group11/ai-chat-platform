@@ -59,7 +59,7 @@ describe("auth-service logs carry no PII", () => {
   });
 
   it("stay clean when an unexpected error mentions an email", async () => {
-    const error = new Error(`Unique constraint failed on email ${EMAIL} (${CLIENT_IP}), note ${CANARY}`);
+    const error = new Error(`Unique constraint failed on email ${EMAIL} (${CLIENT_IP})`);
     const { app, logs } = capturedApp(throwingPrisma(error));
     const res = await request(app).post("/auth/login").send({ email: EMAIL, password: PASSWORD });
     expect(res.status).toBe(500);

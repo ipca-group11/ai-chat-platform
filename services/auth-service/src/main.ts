@@ -19,7 +19,8 @@ import { correlationIdMiddleware } from "./shared/correlation-id.js";
 import { env } from "./shared/env.js";
 import { errorMiddleware, notFoundMiddleware } from "./shared/error-middleware.js";
 import { httpMetricsMiddleware } from "./shared/http-metrics.js";
-import { logger as defaultLogger, type Logger } from "./shared/logger.js";
+import { serializeError } from "./shared/pii-scrub.js";
+import { logger as defaultLogger, serializeRequest, type Logger } from "./shared/logger.js";
 import { prisma as defaultPrisma } from "./shared/prisma.js";
 
 collectDefaultMetrics({ register: metricsRegister, prefix: "auth_service_" });
@@ -60,6 +61,7 @@ export function createApp(deps: AppDeps = {}): Express {
   app.use(
     pinoHttp({
       logger,
+      serializers: { req: serializeRequest, err: serializeError },
       genReqId: (req: Request) => req.correlationId,
       customProps: (req: Request) => ({ correlationId: req.correlationId }),
     }),
