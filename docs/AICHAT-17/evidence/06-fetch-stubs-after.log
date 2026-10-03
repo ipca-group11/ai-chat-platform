@@ -1,0 +1,10 @@
+$ echo 'stubGlobal(fetch) calls left:'; rtk proxy git grep -h 'stubGlobal("fetch"' -- apps packages e2e | wc -l; echo 'one-call spies left:'; rtk proxy git grep -n 'spyOn(globalThis, "fetch")' -- apps; echo 'test files using server.use:'; rtk proxy git grep -l 'server.use' -- apps | wc -l
+stubGlobal(fetch) calls left:
+       0
+one-call spies left:
+apps/mfe-chat/src/features/attachments/hooks/usePendingAttachments.test.ts:26:    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(Response.json({ attachment }, { status: 201 }));
+apps/mfe-settings/src/features/api-keys/components/TestConnectionButton.test.tsx:99:    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(undefined as unknown as Response);
+test files using server.use:
+      17
+
+[exit 0]
