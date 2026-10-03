@@ -12,17 +12,26 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 import { collectDefaultMetrics, register as metricsRegister } from "prom-client";
-import { registerRouter } from "./features/register/index.js";
-import { sessionRouter } from "./features/session/index.js";
+import type { PrismaClient } from "./generated/prisma-client/index.js";
+import { createRegisterRouter } from "./features/register/index.js";
+import { createSessionRouter } from "./features/session/index.js";
 import { correlationIdMiddleware } from "./shared/correlation-id.js";
 import { env } from "./shared/env.js";
 import { errorMiddleware, notFoundMiddleware } from "./shared/error-middleware.js";
 import { httpMetricsMiddleware } from "./shared/http-metrics.js";
 import { logger } from "./shared/logger.js";
+import { prisma as defaultPrisma } from "./shared/prisma.js";
 
 collectDefaultMetrics({ register: metricsRegister, prefix: "auth_service_" });
 
-export function createApp(): Express {
+/** Optional replacements for what `createApp` wires itself (testability seam, plan
+ * decision D3). Without them the app uses the real Prisma client, as before. */
+export interface AppDeps {
+  prisma?: PrismaClient;
+}
+
+export function createApp(deps: AppDeps = {}): Express {
+  const prisma = deps.prisma ?? defaultPrisma;
   const app = express();
 
   app.disable("x-powered-by");
@@ -62,8 +71,8 @@ export function createApp(): Express {
     res.send(await metricsRegister.metrics());
   });
 
-  app.use("/auth", registerRouter);
-  app.use("/auth", sessionRouter);
+  app.use("/auth", createRegisterRouter(prisma));
+  app.use("/auth", createSessionRouter(prisma));
 
   app.use(notFoundMiddleware);
   app.use(errorMiddleware);
