@@ -1,7 +1,8 @@
-import express, { Router, type Response } from "express";
+import { Router, type Response } from "express";
 import { auth } from "@app/shared-types";
 import { z } from "zod";
 import { accessTokenOf, currentUser, sessionsFor } from "../auth/sessions.js";
+import { jsonBody } from "../core/request-log.js";
 import { cors, errorHandler, HttpError, parseCookies } from "../backend/http.js";
 import { faultInjector, FAULT_SCENARIOS } from "../faults/faults.js";
 import type { MockContext, MockModule } from "../registry.js";
@@ -54,7 +55,7 @@ function createAuthRouter(ctx: MockContext): Router {
       onSessionExpired: clearSessionCookies,
     }),
   );
-  router.use(express.json());
+  router.use(jsonBody());
 
   router.post("/register", (req, res) => {
     const parsed = auth.registerRequestSchema.safeParse(req.body);

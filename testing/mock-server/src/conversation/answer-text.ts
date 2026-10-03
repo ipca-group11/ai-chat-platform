@@ -1,14 +1,5 @@
 import type { MockContext } from "../registry.js";
-
-const SENTENCES = [
-  "Here is a short summary of what you asked.",
-  "Streaming responses arrive token by token.",
-  "Let me break this down into three steps.",
-  "The result depends on the provider and the model.",
-  "You can attach a file and ask about its content.",
-  "That works, and here is a small example.",
-  "Both options are valid; the second is simpler to test.",
-];
+import { streamScenarioText } from "../llm/stream.js";
 
 /** Scenarios the conversation mock knows for a streamed answer. */
 export const ANSWER_SCENARIOS = ["ok", "long", "error"] as const;
@@ -19,15 +10,28 @@ export function isAnswerScenario(value: string | undefined): value is AnswerScen
 }
 
 /**
- * Tokens of a streamed answer. Local stand-in until the chat stream uses the LLM mock scenarios:
- * the text comes from the seeded generator, so the same SEED gives the same answer. `TOKENS`
- * sets the length; `long` is five times as long.
+ * The LLM mock scenario that supplies the text of each chat scenario. `error` reuses the `ok`
+ * text: the conversation engine ends it with a provider error after the second token.
  */
-export function answerText(scenario: string, ctx: Pick<MockContext, "config" | "rng">): string[] {
-  const count = scenario === "long" ? ctx.config.tokens * 5 : ctx.config.tokens;
-  const words: string[] = [];
-  while (words.length < count) {
-    words.push(...ctx.rng.pick(SENTENCES).split(" "));
+const LLM_SCENARIO: Record<AnswerScenario, string> = { ok: "ok", long: "long", error: "ok" };
+
+/** Name of the LLM scenario behind a chat scenario; fails with the list of valid names otherwise. */
+export function llmScenarioFor(scenario: string): string {
+  if (!isAnswerScenario(scenario)) {
+    throw new Error(`Unknown answer scenario "${scenario}". Available: ${ANSWER_SCENARIOS.join(", ")}`);
   }
-  return words.slice(0, count).map((word, index, all) => (index < all.length - 1 ? `${word} ` : word));
+  return LLM_SCENARIO[scenario];
+}
+
+/**
+ * Tokens of a streamed answer, paced by TTFT_MS and TOKEN_INTERVAL_MS. The text comes from the
+ * LLM mock (`streamScenarioText`), so the chat answers reuse its scenarios: the same SEED gives
+ * the same answer, and `long` is ten times TOKENS.
+ */
+export function answerStream(
+  scenario: string,
+  ctx: Pick<MockContext, "config">,
+  options: { signal?: AbortSignal } = {},
+): AsyncGenerator<string, void> {
+  return streamScenarioText(llmScenarioFor(scenario), ctx, options);
 }

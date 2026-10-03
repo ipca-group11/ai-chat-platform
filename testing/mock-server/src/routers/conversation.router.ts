@@ -1,6 +1,7 @@
 import express, { Router, type Request, type Response } from "express";
 import type { chat } from "@app/shared-types";
 import { currentUser } from "../auth/sessions.js";
+import { jsonBody } from "../core/request-log.js";
 import { cors, errorHandler, fieldErrorsOf, HttpError } from "../backend/http.js";
 import { isAnswerScenario, ANSWER_SCENARIOS } from "../conversation/answer-text.js";
 import {
@@ -74,7 +75,7 @@ function createConversationRouter(ctx: MockContext): Router {
 
   router.use(cors);
   router.use(faultInjector(ctx, { unauthenticated: "Missing or invalid access token", internal: "An unexpected error occurred" }));
-  router.use(express.json());
+  router.use(jsonBody());
 
   router.use((req, res, next) => {
     const user = currentUser(ctx, req);
@@ -375,7 +376,7 @@ export const conversationMock: MockModule = {
       name === "ok"
         ? "Streamed answer of TOKENS tokens (default)"
         : name === "long"
-          ? "Streamed answer five times as long"
+          ? "Streamed answer ten times as long (the LLM mock long scenario)"
           : "Answer fails after two tokens; the message ends as failed and can be retried",
     })),
   ],

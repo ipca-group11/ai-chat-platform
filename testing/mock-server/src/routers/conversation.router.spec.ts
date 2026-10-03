@@ -467,13 +467,13 @@ describe("queue: edit, cancel, stop and retry", () => {
     expect(res.body.error.code).toBe("MESSAGE_NOT_RETRYABLE");
   });
 
-  it("makes the long scenario five times as long", async () => {
+  it("makes the long scenario ten times as long", async () => {
     const { app } = setup();
     const { as } = await signIn(app);
     const id = await firstChatId(as);
     await as("post", `/chats/${id}/messages`).set("X-Mock-Scenario", "long").send({ content: "more" });
     const answer = (await settled(as, id)).at(-1) as MessageDto;
-    expect(answer.content.trim().split(" ")).toHaveLength(30);
+    expect(answer.content.trim().split(" ")).toHaveLength(60);
   });
 
   it("reset stops a running answer and restores the seeded history", async () => {
@@ -599,7 +599,9 @@ describe("errors", () => {
   it("registers the answer and fault scenarios", async () => {
     const { app } = setup();
     const res = await request(app).get("/__admin/scenarios");
-    const names = res.body.scenarios.map((s: { mock: string; name: string }) => `${s.mock}/${s.name}`);
+    const names = res.body.scenarios
+      .filter((s: { mock: string }) => s.mock === "auth" || s.mock === "conversation")
+      .map((s: { mock: string; name: string }) => `${s.mock}/${s.name}`);
     expect(names).toEqual([
       "auth/error-500",
       "auth/session-expired",

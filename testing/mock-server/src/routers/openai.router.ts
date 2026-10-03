@@ -1,4 +1,5 @@
-import express, { Router } from "express";
+import { Router, type ErrorRequestHandler } from "express";
+import { jsonBody } from "../core/request-log.js";
 import { providerError, requestId } from "../llm/errors.js";
 import { completionId, openAiCompletion, openAiReply, openAiStream } from "../llm/openai.js";
 import { isReplay } from "../llm/replay.js";
@@ -22,7 +23,7 @@ export const openaiMock: MockModule = {
   scenarios: scenarioDefinitions("openai"),
   createRouter(ctx) {
     const router = Router();
-    router.use(express.json({ limit: "10mb" }));
+    router.use(jsonBody("10mb"));
 
     router.post("/v1/chat/completions", async (req, res) => {
       const body: unknown = req.body;
@@ -72,6 +73,10 @@ export const openaiMock: MockModule = {
       if (reply.dropped) await dropConnection(res);
       else res.end();
     });
+
+    router.use(((_err, _req, res, _next) => {
+      res.status(400).json(errorBody("Request body is not valid JSON"));
+    }) as ErrorRequestHandler);
 
     return router;
   },

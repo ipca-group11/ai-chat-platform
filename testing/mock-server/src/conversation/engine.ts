@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import type { MockContext } from "../registry.js";
-import { answerText, type AnswerScenario } from "./answer-text.js";
+import { answerStream, type AnswerScenario } from "./answer-text.js";
 import type { SseEvent } from "./contract.js";
 import { findChat, findMessage, nextId, nowIso, type StoredMessage } from "./records.js";
 
@@ -13,8 +13,8 @@ export interface QueueEntry {
 
 interface Run {
   aborted: boolean;
-  /** Ends the wait of the current pause, so a stop or reset is felt at once. */
-  wake?: () => void;
+  /** Ends the token stream of the answer when the run is stopped or reset. */
+  abort: AbortController;
 }
 
 interface ChatRuntime {
@@ -27,7 +27,7 @@ export const PROVIDER_ERROR_MESSAGE = "Mock provider error: the model is overloa
 /**
  * Answers the messages of each chat one at a time, like the real queue: a message sent while
  * another one is streaming waits as `queued` and can still be edited or canceled. Tokens come
- * from `answerText` and reach the stream subscribers of the chat.
+ * from `answerStream` (the LLM mock scenarios) and reach the stream subscribers of the chat.
  */
 export class ConversationEngine {
   private readonly bus = new EventEmitter();
@@ -77,7 +77,7 @@ export class ConversationEngine {
     const run = this.chats.get(chatId)?.run;
     if (!run) return false;
     run.aborted = true;
-    run.wake?.();
+    run.abort.abort();
     return true;
   }
 
@@ -91,7 +91,7 @@ export class ConversationEngine {
     for (const runtime of this.chats.values()) {
       if (runtime.run) {
         runtime.run.aborted = true;
-        runtime.run.wake?.();
+        runtime.run.abort.abort();
       }
     }
     this.chats.clear();
@@ -111,7 +111,7 @@ export class ConversationEngine {
     if (runtime.run) return;
     const entry = runtime.queue.shift();
     if (!entry) return;
-    const run: Run = { aborted: false };
+    const run: Run = { aborted: false, abort: new AbortController() };
     runtime.run = run;
     try {
       await this.answer(chatId, entry, run);
@@ -122,17 +122,6 @@ export class ConversationEngine {
         void this.drain(chatId);
       }
     }
-  }
-
-  private pause(ms: number, run: Run): Promise<void> {
-    if (ms <= 0 || run.aborted) return Promise.resolve();
-    return new Promise((resolve) => {
-      const timer = setTimeout(resolve, ms);
-      run.wake = () => {
-        clearTimeout(timer);
-        resolve();
-      };
-    });
   }
 
   private async answer(chatId: string, entry: QueueEntry, run: Run): Promise<void> {
@@ -162,10 +151,6 @@ export class ConversationEngine {
     }
     this.publish(chatId, { type: "started", messageId: reply.id });
 
-    const tokens = answerText(entry.scenario, ctx);
-    const { ttftMs, tokenIntervalMs } = ctx.config;
-    await this.pause(ttftMs, run);
-
     if (chat.reasoning && !run.aborted) {
       reply.reasoning = "";
       for (const token of ["Thinking about ", "the question, ", "then answering."]) {
@@ -181,7 +166,9 @@ export class ConversationEngine {
       this.publish(chatId, { type: "web_fetch", messageId: reply.id, fetch: done });
     }
 
-    for (const [index, token] of tokens.entries()) {
+    let index = -1;
+    for await (const token of answerStream(entry.scenario, ctx, { signal: run.abort.signal })) {
+      index += 1;
       if (run.aborted) break;
       reply.content += token;
       this.publish(chatId, { type: "token", messageId: reply.id, token });
@@ -191,7 +178,6 @@ export class ConversationEngine {
         this.publish(chatId, { type: "error", messageId: reply.id, message: PROVIDER_ERROR_MESSAGE, retryable: true });
         return;
       }
-      await this.pause(tokenIntervalMs, run);
     }
 
     // A reset replaced the records while this answer was running: nothing left to finish.

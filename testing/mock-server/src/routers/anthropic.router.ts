@@ -1,4 +1,5 @@
-import express, { Router } from "express";
+import { Router, type ErrorRequestHandler } from "express";
+import { jsonBody } from "../core/request-log.js";
 import { anthropicMessage, anthropicReply, anthropicStream, messageId } from "../llm/anthropic.js";
 import { providerError, requestId } from "../llm/errors.js";
 import { isReplay } from "../llm/replay.js";
@@ -20,7 +21,7 @@ export const anthropicMock: MockModule = {
   scenarios: scenarioDefinitions("anthropic"),
   createRouter(ctx) {
     const router = Router();
-    router.use(express.json({ limit: "10mb" }));
+    router.use(jsonBody("10mb"));
 
     router.post("/v1/messages", async (req, res) => {
       const body: unknown = req.body;
@@ -67,6 +68,10 @@ export const anthropicMock: MockModule = {
       if (reply.dropped) await dropConnection(res);
       else res.end();
     });
+
+    router.use(((_err, _req, res, _next) => {
+      res.status(400).json(errorBody("invalid_request_error", "Request body is not valid JSON"));
+    }) as ErrorRequestHandler);
 
     return router;
   },

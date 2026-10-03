@@ -75,11 +75,12 @@ describe("request log", () => {
     expect((await request(app).get("/__admin/requests")).body).toEqual({ count: 0, requests: [] });
   });
 
-  it("answers 400 for a body that is not valid JSON", async () => {
+  it("logs a body that is not valid JSON without a body and leaves the answer to the router", async () => {
     const app = makeApp();
-    const res = await request(app).post("/alpha/echo").set("Content-Type", "application/json").send("{nope");
-    expect(res.status).toBe(400);
-    expect(res.body.error.code).toBe("invalid_json");
+    await request(app).post("/alpha/echo").set("Content-Type", "application/json").send("{nope");
+    const entry = (await request(app).get("/__admin/requests")).body.requests[0];
+    expect(entry.path).toBe("/alpha/echo");
+    expect(entry.body).toBeUndefined();
   });
 
   it("keeps only the newest entries when the capacity is reached", async () => {

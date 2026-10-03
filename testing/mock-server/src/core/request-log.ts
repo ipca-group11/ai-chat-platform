@@ -1,5 +1,22 @@
 import express, { type RequestHandler } from "express";
 
+/** Set on the request when its body was not valid JSON; each router answers with its own error shape. */
+export const BODY_ERROR = Symbol("mock.bodyError");
+type WithBodyError = { [BODY_ERROR]?: unknown };
+
+/**
+ * Body parser for the routers. The request log has already read the body; when that failed, the
+ * parse error is passed on from here so the router's own error handler formats it.
+ */
+export const jsonBody = (limit = "5mb"): RequestHandler => {
+  const parse = express.json({ limit });
+  return (req, res, next) => {
+    const error = (req as WithBodyError)[BODY_ERROR];
+    if (error) next(error);
+    else parse(req, res, next);
+  };
+};
+
 export const MASK = "***";
 
 /** Headers whose value is never stored. */
@@ -58,8 +75,9 @@ export function createRequestLog(capacity = 1000): RequestLog {
     middleware: (mock) => (req, res, next) => {
       json(req, res, (err?: unknown) => {
         if (err) {
-          res.status(400).json({ error: { code: "invalid_json", message: "Request body is not valid JSON" } });
-          return;
+          // Lenient: log the request without a body and let the router answer in its own shape.
+          (req as WithBodyError)[BODY_ERROR] = err;
+          req.body = undefined;
         }
         const entry: LoggedRequest = {
           id: nextId++,

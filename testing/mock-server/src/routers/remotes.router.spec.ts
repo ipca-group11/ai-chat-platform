@@ -47,6 +47,8 @@ describe("remotes mock", () => {
 
   it("registers its four scenarios", async () => {
     const res = await request(app()).get("/__admin/scenarios");
-    expect(res.body.scenarios.map((s: { name: string }) => s.name)).toEqual(["404", "broken-js", "ok", "slow"]);
+    expect(
+      res.body.scenarios.filter((s: { mock: string }) => s.mock === "remotes").map((s: { name: string }) => s.name),
+    ).toEqual(["404", "broken-js", "ok", "slow"]);
   });
 });
