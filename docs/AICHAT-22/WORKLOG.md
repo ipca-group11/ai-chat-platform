@@ -10,9 +10,9 @@ title: "AICHAT-22 · Bundle size budget testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-22-bundle-size-budget-testing` |
-| Started / finished | 2026-10-03 / … |
-| Pull requests | #… |
-| Status | In Progress |
+| Started / finished | 2026-10-03 / 2026-10-03 |
+| Pull requests | not opened yet (branch not pushed) |
+| Status | Done on the branch, waiting for the pull request into `integration/testing-epics` |
 
 ## 1. DoR review
 
@@ -27,6 +27,10 @@ Date: 2026-10-03
 | Size limits agreed per remote | Met | README §5 proposal | Measured baseline + 10% for every group (rounded up to the next kB), with the README numbers as upper bounds: `remoteEntry.js` ≤ 8 KB gzip, shell own chunks ≤ 120 KB, auth and settings routes ≤ 40 KB, chat routes ≤ 80 KB. Limits are tightened after improvements, never loosened without a PR note | Team (owner delegated) |
 | Runtime-loaded vs all emitted | Met | Fallback chunks inflate totals | Both: strict limits on what loads at runtime, a looser total over all emitted JS | Team (owner delegated) |
 | Shared-once check (AICHAT-119) | Met | The browser e2e suite is disabled | One small local headless run that opens `/chats` against the mock stack and lists the JS requests (React, react-dom, router loaded once); the result is recorded in the work log, not run in CI | Team (owner delegated) |
+| Where the budget lives | Met | Config as `.ts` or JSON? | `apps/<app>/.size-limit.ts` per app (size-limit 14 reads a TypeScript config); no `.js` file | Team (owner delegated) |
+| "Target passes on `main`" | Met | `main` does not have the earlier epics yet, so its build differs from the branch | The check passes on the current base of the integration branch, which becomes `main`; limits were measured there | Team (owner delegated) |
+| PR size report | Met | PR comment or job summary? | Job summary (no token, no comment spam), compared with a build of the base branch; the step never fails the job | Team (owner delegated) |
+| Unit of size | Met | kB = 1000 or 1024 bytes? | 1 kB = 1000 bytes, as size-limit prints; limits use the same unit | Team (owner delegated) |
 
 Blockers: none
 
@@ -34,11 +38,14 @@ Blockers: none
 
 | Tool | Version | Install |
 |---|---|---|
-| macOS / Ubuntu | … | — |
-| Node | `node -v` → … | … |
-| pnpm | `pnpm -v` → … | `corepack enable` |
-| Docker | `docker --version` → … | … |
-| <tool for this epic> | … | … |
+| macOS | 26.3 | n/a |
+| Node | `node -v` → v24.21.0 | `nvm install` (reads `.nvmrc`) |
+| pnpm | `pnpm -v` → 10.4.0 | `corepack enable` |
+| Docker | `docker --version` → Docker version 29.4.0 | Docker Desktop or OrbStack (only for the US5 check) |
+| size-limit | `pnpm exec size-limit --version` → 14.1.0 | `pnpm install` (root dev dependency, with `@size-limit/file`) |
+| Chromium (Playwright 1.63.0) | headless, from the Playwright cache | `pnpm --filter e2e exec playwright install chromium` (US5 only) |
+
+![Environment](evidence/00-environment.png)
 
 ## 3. Steps
 
@@ -98,7 +105,7 @@ pnpm exec nx run-many -t build && for a in shell mfe-auth mfe-chat mfe-settings;
 
 ![Baseline measurement](evidence/01-baseline-measurement.png)
 
-**Problems and fixes.** The analysis gave a total of 241 KB gzip for the shell; our figure is 290 KB because the total here adds the gzip size of every file (each file is compressed on its own, which is what a browser downloads), and the analysis compressed the whole folder once. The measurement is repeatable, so the new figure is the baseline.
+**Problems and fixes.** The analysis gave 241 KB gzip as the total JS of the shell; our figure for the same folder is 290 kB. The two numbers were taken with different tools and a different way of adding (the total here is the sum of the gzip size of each file, which is what a browser downloads). The measurement is repeatable, so the new figure is the baseline and the analysis figure is not used for any limit.
 
 ### US2 · Nx size target for remoteEntry.js and chunks ([AICHAT-65](https://ipca-grupo11.atlassian.net/browse/AICHAT-65))
 
@@ -212,7 +219,7 @@ pnpm mock:down
 2. Open the browser developer tools, tab Network, filter `JS`, and load `http://localhost:8000/chats`.
 3. Look for file names with `prebuild` in them (the remotes' own copies of react-dom, the router and Query, hosts `localhost:3001` to `3003`): expected none. The libraries come once, from `localhost:8000`, in the `loadShare` chunks of the shell.
 
-**Result.** On `/chats` the browser requests 51 JavaScript files. React with react-dom, `@tanstack/react-query` and `@tanstack/react-router` are each in exactly one file, all three served by the shell (`localhost:8000`), and none of the 35 requests to the remotes (`localhost:3001` to `3003`) is a `prebuild` fallback: **the shared dependencies load once, no mismatch**. The remote `mfe-chat` asks only for the small `loadShare` wrappers that connect to the shell's copy. Two things that are not shared-library duplicates showed up and are worth a ticket for the platform owner:
+**Result.** On `/chats` the browser requests 51 JavaScript files. React with react-dom, `@tanstack/react-query` and `@tanstack/react-router` are each in exactly one file, all three served by the shell (`localhost:8000`), and none of the 29 requests to the remotes (`localhost:3001` to `3003`) is a `prebuild` fallback: **the shared dependencies load once, no mismatch**. The remote `mfe-chat` asks only for the small `loadShare` wrappers that connect to the shell's copy. Two things that are not shared-library duplicates showed up and are worth a ticket for the platform owner:
 
 - every container brings its own copy of the federation runtime helpers: `utils-*.js` (about 65 KB raw, 19 KB gzip) is downloaded four times (shell and the three remotes), plus `vite-preload-helper`, `rolldown-runtime` and `helpers` four times each, so about 57 KB gzip is downloaded twice or more;
 - `remoteEntry.js` of `mfe-auth` and `mfe-settings` (and their helpers) are fetched on `/chats` as well, because the shell registers all remotes at start-up, not only the one the route needs.
@@ -228,23 +235,45 @@ This also explains the budget: the "shared-library copies" group of the remotes 
 ## 4. How to run everything
 
 ```sh
-# all checks added by this epic, from the repo root
+pnpm exec nx run-many -t build size                                   # budgets of the four apps (US1, US2, US3)
+pnpm exec nx affected -t lint typecheck test build size --base=origin/integration/testing-epics   # what CI runs
+node scripts/ci/bundle-size.ts snapshot --out /tmp/head.json          # sizes per file; "report base.json head.json" compares two (US4)
+pnpm test:scripts && pnpm typecheck:scripts                           # unit tests of the scripts
+pnpm mock:up llm                                                      # US5: set the *_PORT variables if 4001, 4002, 3300, 9090 are busy
+CHECK_PASSWORD='<throw-away password>' node scripts/ci/shared-deps.ts --list
+pnpm mock:down
 ```
 
 ## 5. Results
 
 | Metric | Before | After |
 |---|---|---|
-| … | … | … |
+| Bundle budget | none | 20 limits (5 groups x 4 apps) in `apps/*/.size-limit.ts`, checked by the `size` Nx target |
+| CI on a bundle over its limit | green | `nx affected` fails (a deliberate 50 KB import took the chat route chunks from 63.07 kB to 102.28 kB, limit 70 kB) |
+| Size change on a pull request | not shown | per-app and per-file before/after table in the job summary |
+| `remoteEntry.js` (gzip) | about 6 kB, unchecked | 6.1 to 6.3 kB, limit 7 kB |
+| Application code (gzip) | unchecked | shell 51.5 kB, auth 24.8 kB, chat 63.1 kB, settings 25.8 kB |
+| Shared libraries on `/chats` | not verified | react + react-dom, Query and router each loaded once, from the shell; no remote fallback downloaded |
+| Federation runtime helpers on `/chats` | not noticed | `utils-*` (19 kB gzip) downloaded 4 times; to be ticketed |
 
 ## 6. DoD check
 
 | DoD item | Met | Evidence |
 |---|---|---|
-| … | ✅ | [link](evidence/…) |
+| Limits recorded with the measured baseline (AICHAT-47) | ✅ | table in US1, [measurement](evidence/01-baseline-measurement.png) |
+| size-limit config for shell and 3 remotes, target passes (AICHAT-65) | ✅ | [size target](evidence/02-size-target-passes.png) |
+| `size` in `nx affected`, a deliberate +50 KB import fails the job (AICHAT-83) | ✅ | [failing run](evidence/03-deliberate-over-limit-fails.png), [CI spec](evidence/04-ci-spec.png) |
+| Required check | ➖ | Not enforceable: branch protection is unavailable on this private free-plan repository. Team rule: no merge with a red `nx affected` job |
+| Before/after per file on each pull request (AICHAT-101) | ✅ | [summary](evidence/05-pr-size-summary.png), [tests](evidence/06-bundle-size-unit-tests.png); the CI step has not run on GitHub yet |
+| Network check on `/chats`, result recorded, mismatch reported (AICHAT-119) | ✅ | [result](evidence/07-shared-deps-once.png), [tests](evidence/08-shared-deps-unit-tests.png) |
+| Unit tests for new scripts | ✅ | evidence 06 and 08 |
+| Lint, typecheck, test, build, size of affected projects | ✅ | section 7 |
+| SAST and secret scan | ✅ | section 7 |
+| Documentation | ✅ | header of each `.size-limit.ts` and of the scripts, this log |
 
 ## 7. Notes for the report
 
-- What was found
-- What was fixed / waived
-- Lessons learned
+- **Checks before the pull request.** CHECKS_PLACEHOLDER
+- **Found.** The application code is small (25 to 63 kB gzip per app); the federation glue (114 to 123 kB) and the copies of the shared libraries (88 to 124 kB) are bigger than the application. The copies in the remotes are never downloaded while the shell provides the libraries (US5), so the budget keeps them in their own group. The federation runtime helpers are downloaded once per container (4 times `utils-*`, about 57 kB gzip of repeat downloads), and the shell registers all remotes at start-up, so `mfe-auth` and `mfe-settings` are fetched on `/chats` as well. Both are tickets for the platform owner, not changes of this epic.
+- **Not done.** The `Bundle size change` step and the new `size` target have not run on GitHub yet (the branch is not pushed), so a Linux-only difference can still show up in the first run; the base build in the second worktree adds the time of a second `pnpm install` and a build to pull request runs. The check on `/chats` is manual and not in CI. Gzip sizes differ by a few bytes between machines and zlib versions; the limits have a 10% margin for that.
+- **Lessons.** Measure by group, not in total: a total hides growth of the application behind the glue. Content hashes in file names have to be cut before two builds are compared. size-limit counts 1 kB as 1000 bytes. Look at the code of the responses, not at file names, to prove a library is loaded once.
