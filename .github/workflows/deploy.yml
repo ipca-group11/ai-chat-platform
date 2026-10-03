@@ -114,6 +114,30 @@ jobs:
           output-file: sbom-${{ matrix.name }}.cdx.json
           upload-artifact-retention: 90
 
+  # Reports known vulnerabilities found in the SBOMs. It does not fail the run: the
+  # severity threshold that blocks a deploy belongs to AICHAT-7 (see SBOM-INTERFACE.md).
+  scan-sbom:
+    needs: [build, sbom-third-party]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: sbom-*.cdx.json
+          path: sbom
+          merge-multiple: true
+
+      - uses: anchore/scan-action/download-grype@v6
+        id: grype
+
+      - name: Grype report (does not fail)
+        run: |
+          for f in sbom/sbom-*.cdx.json; do
+            echo "### $(basename "$f")" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            ${{ steps.grype.outputs.cmd }} "sbom:$f" -o table >> "$GITHUB_STEP_SUMMARY" || true
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          done
+
   deploy:
     needs: [build, sbom-third-party]
     runs-on: ubuntu-latest
