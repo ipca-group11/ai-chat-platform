@@ -10,8 +10,8 @@ title: "AICHAT-31 · Secret scanning: work log"
 | Analysis | [README.md](README.md) |
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-31-secret-scanning` |
-| Started / finished | 2026-10-03 / … |
-| Pull requests | #… |
+| Started / finished | 2026-10-03 / 2026-10-03 |
+| Pull requests | [#7](https://github.com/ipca-group11/ai-chat-platform/pull/7), [#8](https://github.com/ipca-group11/ai-chat-platform/pull/8) (failing-PR proof, closed) |
 | Status | In Progress |
 
 ## 1. DoR review
@@ -160,7 +160,9 @@ sh scripts/ci/secret-scan-proof.sh
 
 ![The commits of this branch pass](evidence/08-pr-range-clean.png)
 
-PR: #<to fill> (the proof on a real failing pull request is done by us later, together with making the check required on `main`).
+PR: [#8](https://github.com/ipca-group11/ai-chat-platform/pull/8), run [37119733470](https://github.com/ipca-group11/ai-chat-platform/actions/runs/37119733470). A random AKIA-style key was committed on a draft PR; the `secret-scan` job reported `leaks found: 1` and failed, while the same job passed on the epic PR #7. The PR was closed without merging.
+
+![The fake key fails the CI job](evidence/10-pr-fake-key-fails-ci.png)
 
 **Problems and fixes.** AWS documents example keys that gitleaks may allow-list, so the proof generates a random key on each run. We cannot run the GitHub workflow locally, so the workflow itself is checked only by this local proof until the PR run.
 
@@ -254,8 +256,8 @@ sh scripts/git-hooks/demo.sh                              # hook blocks a key, p
 | `.gitleaks.toml` with commented, narrow allow-list; tree scan clean | ✅ | [01](evidence/01-tracked-tree-clean.log), [02](evidence/02-working-tree-env-credentials.log) |
 | History scanned and triaged, summary without values | ✅ | [HISTORY-SCAN.md](HISTORY-SCAN.md), [03](evidence/03-history-scan.log) |
 | Rotation checklist per finding or "none found" | ✅ | [05](evidence/05-rotation-checklist.log) |
-| CI job added; a fake key fails | Partly: local proof done, pending PR run | [06](evidence/06-fake-key-fails.log) |
-| Check required on `main` | Pending PR run (repository setting, done by us) | — |
+| CI job added; a fake key fails | ✅ | [06](evidence/06-fake-key-fails.log), [10](evidence/10-pr-fake-key-fails-ci.log) |
+| Check required | Required on `integration/testing-epics` together with SAST (AICHAT-27, owner decision); on `main` it is added by the owner after the final PR | — |
 | GitHub secret scanning decision documented | ✅ | [09](evidence/09-github-secret-scanning.log) |
 | Pre-commit hook documented, works on macOS/Linux | ✅ (tested on macOS) | [07](evidence/07-pre-commit-hook.log) |
 
