@@ -4,7 +4,7 @@ import { createFakePage } from "../test-utils/fake-page.js";
 const expectations: string[] = [];
 
 vi.mock("@playwright/test", () => ({
-  expect: (page: unknown) => ({
+  expect: () => ({
     toHaveURL: (pattern: RegExp) => {
       expectations.push(`toHaveURL(${pattern})`);
       return Promise.resolve();
@@ -38,7 +38,7 @@ describe("auth flows", () => {
     const { page } = createFakePage();
     const seen: RegExp[] = [];
     const original = page.getByRole.bind(page);
-    page.getByRole = ((role: string, options: { name: RegExp }) => {
+    page.getByRole = ((role: Parameters<typeof page.getByRole>[0], options: { name: RegExp }) => {
       seen.push(options.name);
       return original(role, options);
     }) as typeof page.getByRole;

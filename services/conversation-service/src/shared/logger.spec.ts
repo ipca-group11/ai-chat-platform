@@ -1,4 +1,5 @@
 import { Writable } from "node:stream";
+import type * as PinoModule from "pino";
 import type { LoggerOptions } from "pino";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -7,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const captured = vi.hoisted(() => ({ options: undefined as LoggerOptions | undefined }));
 
 vi.mock("pino", async () => {
-  const actual = await vi.importActual<typeof import("pino")>("pino");
+  const actual = await vi.importActual<typeof PinoModule>("pino");
   const wrapped = ((options: LoggerOptions) => {
     captured.options = options;
     return actual.default(options);
@@ -16,7 +17,7 @@ vi.mock("pino", async () => {
 });
 
 const { createLogger } = await import("./logger.js");
-const realPino = (await vi.importActual<typeof import("pino")>("pino")).default;
+const realPino = (await vi.importActual<typeof PinoModule>("pino")).default;
 
 function logThroughProductionOptions(payload: Record<string, unknown>) {
   const lines: string[] = [];
@@ -27,7 +28,7 @@ function logThroughProductionOptions(payload: Record<string, unknown>) {
     },
   });
   realPino({ ...captured.options }, stream).info(payload);
-  return JSON.parse(lines[0] ?? "{}") as Record<string, any>;
+  return JSON.parse(lines[0] ?? "{}") as { req: { url: string; headers: Record<string, string> }; user: Record<string, string> };
 }
 
 describe("createLogger", () => {

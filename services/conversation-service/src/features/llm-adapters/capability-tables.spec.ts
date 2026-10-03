@@ -7,6 +7,12 @@ import { OpenAiProvider } from "./openai.provider.js";
 // methods and the request each model produces. First match wins in both tables, so the
 // cases around the overlapping prefixes (opus-5-5 vs opus-5, opus-4-6 vs opus-4) matter.
 
+interface RequestBody {
+  max_tokens: number;
+  thinking?: { type: string; budget_tokens?: number };
+  output_config?: { effort: string };
+}
+
 const anthropic = new AnthropicProvider();
 
 describe("VISION_MODEL_HINTS (anthropic)", () => {
@@ -85,7 +91,7 @@ describe("THINKING_STYLES", () => {
       // drain
     }
     const [, init] = fetchImpl.mock.calls[0] as [string, RequestInit];
-    return JSON.parse(init.body as string) as Record<string, any>;
+    return JSON.parse(init.body as string) as RequestBody;
   }
 
   type Style = "always-on" | "between-tools" | "adaptive" | "budget" | "none";
@@ -131,7 +137,7 @@ describe("THINKING_STYLES", () => {
         break;
       case "budget":
         expect(on.thinking).toMatchObject({ type: "enabled" });
-        expect(on.thinking.budget_tokens).toBeLessThan(on.max_tokens);
+        expect(on.thinking?.budget_tokens).toBeLessThan(on.max_tokens);
         expect(off.thinking).toBeUndefined();
         break;
       case "none":
