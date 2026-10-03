@@ -65,6 +65,24 @@ jobs:
       - name: Scan with Semgrep CE (pinned image)
         run: scripts/ci/semgrep.sh semgrep-results
 
-      # Fails the job when an unsuppressed ERROR finding exists. WARNING and INFO never fail.
-      - name: Block the merge on ERROR findings
-        run: node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif
+      # Writes the Markdown table to the job summary, then fails the job when an unsuppressed ERROR
+      # finding exists. WARNING and INFO are listed but never fail.
+      - name: Summary table and merge gate
+        run: |
+          set +e
+          node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif > semgrep-results/summary.md
+          code=$?
+          cat semgrep-results/summary.md
+          cat semgrep-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+          exit "$code"
+
+      - name: Upload SARIF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif
+          path: |
+            semgrep-results/semgrep.sarif
+            semgrep-results/summary.md
+          if-no-files-found: warn
+          retention-days: 14

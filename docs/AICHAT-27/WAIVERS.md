@@ -16,7 +16,7 @@ Every baseline finding was either fixed or listed here with a reason. Baseline: 
 
 | ID | Rule | Count | Reason |
 |---|---|---|---|
-| W6 | `github-actions-mutable-action-tag` | 15 (14 at baseline, +1 for the new job) | Actions are pinned to major tags (`actions/checkout@v4`). Pinning to commit SHAs is a supply-chain hardening for a later change. |
+| W6 | `github-actions-mutable-action-tag` | 16 (14 at baseline, +2 for the new job) | Actions are pinned to major tags (`actions/checkout@v4`). Pinning to commit SHAs is a supply-chain hardening for a later change. |
 | W7 | `node_insecure_random_generator` | 5 | `Math.random()` only builds correlation and temporary client ids. They are not secrets. |
 | W8 | `npm-missing-minimum-release-age`, `pnpm-block-exotic-sub-dependencies`, `pnpm-missing-minimum-release-age`, `pnpm-trust-policy` | 4 | Package manager hardening options. They belong to the dependency epic (SBOM / audit), not to code scanning. |
 | W9 | `good_helmet_checks.*` | 13 | INFO only: the rule confirms that helmet headers are set. Nothing to fix. |

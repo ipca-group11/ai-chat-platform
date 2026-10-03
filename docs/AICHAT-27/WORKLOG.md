@@ -164,28 +164,66 @@ Required check: the owner sets `sast (semgrep)` as a required status check on `i
 
 **Problems and fixes.** Calling `semgrep --error` hides suppressed-vs-open information and drops WARNINGs from the report when combined with `--severity ERROR`, so the gate lives in the Node script.
 
-### US5 · …
+### US5 · Readable SAST results in the PR ([AICHAT-103](https://ipca-grupo11.atlassian.net/browse/AICHAT-103))
+
+**What and why.** A red check with a long log is hard to read. The `sast` job now writes a Markdown table to the job summary (rule, severity, count, `file:line` locations, ERROR first) and uploads the SARIF as the artifact `semgrep-sarif` (14 days), also when the job fails. The table is built by `scripts/ci/sast-summary.mjs` from the SARIF. It has no dependencies, so it runs before any `pnpm install`.
+
+**Files.**
+- `.github/workflows/security.yml`: summary step (appends to `$GITHUB_STEP_SUMMARY`, then applies the gate) and `actions/upload-artifact@v4` step with `if: always()`.
+- `scripts/ci/sast-summary.mjs` and `scripts/ci/sast-summary.test.mjs` (from US4): table formatting and its tests.
+- `docs/AICHAT-27/evidence/05-summary-table.*`
+
+**How to run.**
+
+```sh
+scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif
+```
+
+**How to repeat it manually.**
+
+1. Open any PR and go to the Security workflow run, job `sast (semgrep)`.
+2. Open the run Summary page and the Artifacts section.
+3. Expected output: the table from the Result below, and the artifact `semgrep-sarif` containing `semgrep.sarif` and `summary.md`.
+
+**Result.** Locally the command prints the table below (0 ERROR, 25 WARNING, 13 INFO). The same text goes to the job summary in CI: pending PR run.
+
+![Summary table](evidence/05-summary-table.png)
+
+**Problems and fixes.** Long location lists made the table unreadable, so each row shows the first three locations and "+N more". The full list is in the SARIF.
 
 ## 4. How to run everything
 
 ```sh
-# all checks added by this epic, from the repo root
+# all checks added by this epic, from the repo root (Docker running)
+node --test scripts/ci/sast-summary.test.mjs
+scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif
 ```
 
 ## 5. Results
 
 | Metric | Before | After |
 |---|---|---|
-| … | … | … |
+| SAST tool in CI | none | Semgrep CE 1.140.0, job `sast (semgrep)` |
+| ERROR findings | 24 (baseline) | 0 (1 High waived: F1, AICHAT-210) |
+| WARNING findings | 34 | 25 (reported, accepted in `WAIVERS.md`) |
+| INFO findings | 13 | 13 (helmet checks, nothing to fix) |
+| Unit tests for the summary script | 0 | 4 |
+| Merge blocked on ERROR | no | yes (after the owner sets the required check) |
 
 ## 6. DoD check
 
 | DoD item | Met | Evidence |
 |---|---|---|
-| … | ✅ | [link](evidence/…) |
+| Decision recorded (Semgrep CE vs CodeQL, licensing) | ✅ | [SAST.md](SAST.md), [00-environment](evidence/00-environment.png) |
+| `.semgrep.yml` + `.semgrepignore`; local run documented | ✅ | [SAST.md](SAST.md), [01-baseline-scan](evidence/01-baseline-scan.png) |
+| All baseline findings fixed or waived with reasons; JWT default secret ticketed as High | ✅ | [WAIVERS.md](WAIVERS.md) (W5, AICHAT-210), [02-clean-scan](evidence/02-clean-scan.png) |
+| `security.yml` job; ERROR findings fail | ✅ locally; pending PR run on GitHub | [04-expected-failure](evidence/04-expected-failure.png) |
+| Required check on `main` | Documented in [SAST.md](SAST.md); the owner sets it on `integration/testing-epics` now and on `main` after the final PR | pending PR run |
+| Job summary table + SARIF artifact | ✅ locally; pending PR run on GitHub | [05-summary-table](evidence/05-summary-table.png) |
+| Unit tests for the summary script | ✅ | [03-unit-tests](evidence/03-unit-tests.png) |
 
 ## 7. Notes for the report
 
-- What was found
-- What was fixed / waived
-- Lessons learned
+- What was found: 24 ERROR, 34 WARNING and 13 INFO findings on the first scan. Only one ERROR was a real problem: the default `JWT_SECRET` in conversation-service (High). The 23 other ERRORs were fake test secrets, an HTTP header name, a dummy bcrypt hash and two Dockerfiles. The WARNINGs are mostly unpinned GitHub Actions and package manager hardening options.
+- What was fixed / waived: nothing needed a code fix. Test code is excluded by path, four one-line false positives carry a `nosemgrep` comment with a reason, and everything is listed in `WAIVERS.md`. F1 is waived as High and ticketed as AICHAT-210.
+- Lessons learned: `nosemgrep` matches the short rule id only and needs the comment right above the line; SARIF keeps suppressed findings, so the gate must skip them; the free engine plus a small script gave us a readable gate without GitHub Advanced Security. Semgrep's SARIF cannot go to the Security tab on a private repo, hence the artifact.
