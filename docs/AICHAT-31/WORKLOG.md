@@ -74,7 +74,64 @@ gitleaks dir . --config .gitleaks.toml --redact
 
 **Problems and fixes.** The test fixtures listed in the analysis did not trigger any default rule, so an allow-list for them would have been dead configuration. We left it empty and kept the policy and an example in comments, to keep the exceptions as narrow as possible.
 
-### US2 · …
+### US2 · One-off full git history scan ([AICHAT-55](https://ipca-grupo11.atlassian.net/browse/AICHAT-55))
+
+**What and why.** We scanned every commit reachable from any local or remote branch once, to know whether a secret was ever committed. The summary is in [HISTORY-SCAN.md](HISTORY-SCAN.md) and holds no secret values. We also checked that the git-ignored `.env.credentials` never entered the history.
+
+**Files.**
+- `docs/AICHAT-31/HISTORY-SCAN.md` (new): scope, result and triage table, without secret values.
+- `docs/AICHAT-31/evidence/03-history-scan.*`, `04-credentials-never-committed.*` (new): logs and screenshots.
+
+**How to run.**
+
+```sh
+gitleaks git . --config .gitleaks.toml --redact --log-opts='--all -m'
+```
+
+**How to repeat it manually.**
+
+1. Run the command above from the repo root. Write any JSON report (`-f json -r <path>`) outside the repository.
+2. Expected output: `43 commits scanned` and `no leaks found`.
+3. Run `git log --all --oneline -- .env.credentials`. Expected output: nothing.
+
+**Result.** 0 findings in the history, so there is nothing to triage. `.env.credentials` was never committed.
+
+![History scan](evidence/03-history-scan.png)
+
+![The credentials file was never committed](evidence/04-credentials-never-committed.png)
+
+**Problems and fixes.** By default gitleaks scanned 39 commits because it skips merge commits and only follows the current branch. We added `--log-opts='--all -m'` to cover all branches and merge diffs (43 of 45 commits; the other 2 have no textual diff).
+
+### US3 · Rotate every leaked secret ([AICHAT-73](https://ipca-grupo11.atlassian.net/browse/AICHAT-73))
+
+**What and why.** For each real finding we need a rotation checklist. The history scan found nothing, so there is nothing to rotate for the history. The working tree has 7 findings in the git-ignored `.env.credentials`. By owner decision we record them and do not rotate them or rewrite history.
+
+**Files.**
+- `docs/AICHAT-31/evidence/05-rotation-checklist.*` (new): log and screenshot of the checklist outcome.
+
+**How to run.**
+
+```sh
+gitleaks git . --config .gitleaks.toml --redact --log-opts='--all -m'
+gitleaks dir . --redact
+```
+
+**How to repeat it manually.**
+
+1. Run both commands and count the findings per scan.
+2. For every finding in the history, rotate the secret, then record it in the table below.
+3. Expected output: history 0 findings; working tree 7 findings in `.env.credentials`.
+
+**Result.**
+
+| Finding | Where | Rule | In history | Status |
+|---|---|---|---|---|
+| History scan | all refs | — | none found | none found, nothing to rotate |
+| 7 findings | `.env.credentials` lines 19, 20, 25, 29, 31, 33, 35 | `generic-api-key` | no (git-ignored, never committed) | recorded, rotation not done by owner decision |
+
+![Rotation checklist outcome](evidence/05-rotation-checklist.png)
+
+**Problems and fixes.** None. Rotation of the values in `.env.credentials` stays an open decision for the owner if the file is ever shared or committed by mistake.
 
 ## 4. How to run everything
 
