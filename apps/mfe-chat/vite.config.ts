@@ -44,7 +44,9 @@ export default defineConfig({
     testTimeout: 15000,
     coverage: coveragePreset({
       thresholds: appCoverageThresholds,
-      exclude: ["src/test/**", "**/index.ts", "src/app/**"],
+      // Only real bootstrap files stay out: the Module Federation mount entry has no logic of
+      // its own. Routes, pages, workspace, auth-context and split-panes now count.
+      exclude: ["src/test/**", "**/index.ts", "src/app/remote-entry.tsx"],
     }),
   },
 });
