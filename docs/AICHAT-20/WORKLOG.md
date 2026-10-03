@@ -11,7 +11,7 @@ title: "AICHAT-20 · Snapshot testing: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-20-snapshot-testing` |
 | Started / finished | 2026-10-03 / 2026-10-03 |
-| Pull requests | pending (opened after the CI run) |
+| Pull requests | [#16](https://github.com/ipca-group11/ai-chat-platform/pull/16) |
 | Status | In Progress |
 
 ## 1. DoR review
