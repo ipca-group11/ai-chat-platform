@@ -1,0 +1,53 @@
+$ pnpm --dir apps/mfe-chat exec vitest run src/shared/sse-drift.test.ts
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-chat
+
+ ❯ src/shared/sse-drift.test.ts (2 tests | 1 failed) 9ms
+   ❯ SSE event drift between mfe-chat and shared-types (2)
+     × pins today's drift: event names and fields that differ 5ms
+
+  Snapshots  1 failed
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  17:28:39
+   Duration  687ms (environment 58%, setup 19%, transform 14%, import 6%, tests 1%, worker 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/shared/sse-drift.test.ts > SSE event drift between mfe-chat and shared-types > pins today's drift: event names and fields that differ
+Error: Snapshot `SSE event drift between mfe-chat and shared-types > pins today's drift: event names and fields that differ 1` mismatched
+
+- Expected
++ Received
+
+@@ -4,16 +4,10 @@
+        "onlyInMfeChat": [
+          "stopped",
+        ],
+        "onlyInSharedTypes": [],
+      },
+-     "error": {
+-       "onlyInMfeChat": [
+-         "retryable",
+-       ],
+-       "onlyInSharedTypes": [],
+-     },
+      "queued": {
+        "onlyInMfeChat": [],
+        "onlyInSharedTypes": [
+          "position",
+        ],
+
+ ❯ src/shared/sse-drift.test.ts:68:57
+     66|
+     67|   it("pins today's drift: event names and fields that differ", () => {
+     68|     expect(compare(mfeChatFields, sharedTypesFields())).toMatchInlineS…
+       |                                                         ^
+     69|       {
+     70|         "fieldDifferences": {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]
