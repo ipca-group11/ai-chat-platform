@@ -83,8 +83,39 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
 
+      # Downloadable CycloneDX SBOM of the image just pushed (AICHAT-70), one artifact per
+      # image, named sbom-<name>.cdx.json. Format and hand-off: docs/AICHAT-30/SBOM-INTERFACE.md.
+      - name: SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.IMAGE_PREFIX }}/${{ matrix.name }}:${{ env.SHA }}
+          format: cyclonedx-json
+          artifact-name: sbom-${{ matrix.name }}.cdx.json
+          output-file: sbom-${{ matrix.name }}.cdx.json
+          upload-artifact-retention: 90
+
+  # The two images we run but do not build. They get the same SBOM artifact name pattern.
+  sbom-third-party:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: postgres, image: "postgres:16-alpine" }
+          - { name: caddy, image: "caddy:2-alpine" }
+    steps:
+      - name: SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ matrix.image }}
+          format: cyclonedx-json
+          artifact-name: sbom-${{ matrix.name }}.cdx.json
+          output-file: sbom-${{ matrix.name }}.cdx.json
+          upload-artifact-retention: 90
+
   deploy:
-    needs: build
+    needs: [build, sbom-third-party]
     runs-on: ubuntu-latest
     environment:
       name: production
