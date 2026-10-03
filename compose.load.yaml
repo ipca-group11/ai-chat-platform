@@ -37,6 +37,8 @@ services:
     mem_limit: 64m
   prometheus:
     # Accepts the k6 remote write (testing/k6/run.sh with K6_PROM_RW=1).
+    # The sampler (scripts/load/docker-stats-sampler.ts --serve) runs on the host.
+    extra_hosts: ["host.docker.internal:host-gateway"]
     command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--web.enable-remote-write-receiver"]
     cpus: 0.05
     mem_limit: 256m
@@ -61,18 +63,3 @@ services:
       TTFT_MS: ${MOCK_TTFT_MS:-600}
       TOKEN_INTERVAL_MS: ${MOCK_TOKEN_INTERVAL_MS:-20}
       TOKENS: ${MOCK_TOKENS:-200}
-
-  # Outside the VM budget: container metrics for the Grafana panels (observability/prometheus.yml).
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
-    profiles: [llm]
-    restart: unless-stopped
-    privileged: true
-    command: ["--housekeeping_interval=5s", "--docker_only=true", "--store_container_labels=false", "--whitelisted_container_labels=com.docker.compose.service"]
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    networks:
-      - llm-chat
