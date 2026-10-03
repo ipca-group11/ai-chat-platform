@@ -48,7 +48,7 @@ try {
 }
 
 const reports: Report[] = readdirSync(join(results, 'lhci'))
-  .filter((f) => /^lhr-.*\.json$/.test(f))
+  .filter((f) => /\.report\.json$/.test(f))
   .map((f) => JSON.parse(readFileSync(join(results, 'lhci', f), 'utf8')) as { finalUrl: string; audits: Record<string, { numericValue: number }> })
   .map((lhr) => ({
     finalUrl: lhr.finalUrl,

@@ -39,8 +39,7 @@
     },
     "upload": {
       "target": "filesystem",
-      "outputDir": "lighthouse-results/lhci",
-      "reportFilenamePattern": "%%PATHNAME%%-%%DATETIME%%-report.%%EXTENSION%%"
+      "outputDir": "lighthouse-results/lhci"
     }
   }
 }
