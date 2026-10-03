@@ -10,8 +10,8 @@ title: "AICHAT-27 · SAST: work log"
 | Analysis | [README.md](README.md) |
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-27-sast` |
-| Started / finished | 2026-10-03 / … |
-| Pull requests | #… |
+| Started / finished | 2026-10-03 / 2026-10-03 |
+| Pull requests | [#9](https://github.com/ipca-group11/ai-chat-platform/pull/9), [#10](https://github.com/ipca-group11/ai-chat-platform/pull/10) (failing-PR proof, closed) |
 | Status | In Progress |
 
 ## 1. DoR review
@@ -154,7 +154,9 @@ scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgre
 2. Run the second command above.
 3. Expected output: one ERROR (`aichat.secret-env-fallback-literal`, `tmp-sast-proof/bad.ts:1`) and exit code 1. Delete the file and the exit code goes back to 0.
 
-**Result.** The unit tests pass, and the throw-away file made the gate fail (exit 1). We deleted the file afterwards. The GitHub run on a real PR is pending: "pending PR run".
+**Result.** The unit tests pass, and the throw-away file made the gate fail (exit 1). We deleted the file afterwards. On GitHub, the `sast` job passed on the epic PR [#9](https://github.com/ipca-group11/ai-chat-platform/pull/9). In the draft PR [#10](https://github.com/ipca-group11/ai-chat-platform/pull/10) we added a secret with a literal fallback; the job reported `1 ERROR finding(s): the merge is blocked.` and failed (run [37120343074](https://github.com/ipca-group11/ai-chat-platform/actions/runs/37120343074)). The PR was closed without merging.
+
+![The ERROR finding fails the CI job](evidence/06-pr-error-finding-fails-ci.png)
 
 Required check: the owner sets `sast (semgrep)` as a required status check on `integration/testing-epics` (Settings > Branches > branch protection > Require status checks). The same check is added to `main` after the final PR. We did not change any GitHub setting.
 
@@ -185,7 +187,7 @@ scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgre
 2. Open the run Summary page and the Artifacts section.
 3. Expected output: the table from the Result below, and the artifact `semgrep-sarif` containing `semgrep.sarif` and `summary.md`.
 
-**Result.** Locally the command prints the table below (0 ERROR, 25 WARNING, 13 INFO). The same text goes to the job summary in CI: pending PR run.
+**Result.** Locally the command prints the table below (0 ERROR, 25 WARNING, 13 INFO). The same text is written to the job summary in CI (see the PR #9 run), and the SARIF file is uploaded as the `semgrep-sarif` artifact.
 
 ![Summary table](evidence/05-summary-table.png)
 
@@ -217,9 +219,9 @@ scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgre
 | Decision recorded (Semgrep CE vs CodeQL, licensing) | ✅ | [SAST.md](SAST.md), [00-environment](evidence/00-environment.png) |
 | `.semgrep.yml` + `.semgrepignore`; local run documented | ✅ | [SAST.md](SAST.md), [01-baseline-scan](evidence/01-baseline-scan.png) |
 | All baseline findings fixed or waived with reasons; JWT default secret ticketed as High | ✅ | [WAIVERS.md](WAIVERS.md) (W5, AICHAT-210), [02-clean-scan](evidence/02-clean-scan.png) |
-| `security.yml` job; ERROR findings fail | ✅ locally; pending PR run on GitHub | [04-expected-failure](evidence/04-expected-failure.png) |
-| Required check on `main` | Documented in [SAST.md](SAST.md); the owner sets it on `integration/testing-epics` now and on `main` after the final PR | pending PR run |
-| Job summary table + SARIF artifact | ✅ locally; pending PR run on GitHub | [05-summary-table](evidence/05-summary-table.png) |
+| `security.yml` job; ERROR findings fail | ✅ | [04-expected-failure](evidence/04-expected-failure.png), [06-pr-error-finding-fails-ci](evidence/06-pr-error-finding-fails-ci.png) |
+| Required check on `main` | Not possible on this plan: branch protection and rulesets return HTTP 403 on a private repository without GitHub Pro/Team. The failing check is shown on every PR and the team rule is not to merge a red `sast` or `secret-scan` check. Setting documented in [SAST.md](SAST.md) for when the plan allows it | [07-branch-protection-unavailable](evidence/07-branch-protection-unavailable.png) |
+| Job summary table + SARIF artifact | ✅ | [05-summary-table](evidence/05-summary-table.png), [06-pr-error-finding-fails-ci](evidence/06-pr-error-finding-fails-ci.png) |
 | Unit tests for the summary script | ✅ | [03-unit-tests](evidence/03-unit-tests.png) |
 
 ## 7. Notes for the report

@@ -1,0 +1,7 @@
+$ gh run view 37120343074 --log-failed | cut -f3- | sed 's/\x1b\[[0-9;]*m//g' | grep -iE 'aichat\.|ERROR|blocking|fallback.ts|exit code' | head -12
+2026-10-03T11:39:57.4234731Z **1 ERROR finding(s): the merge is blocked.**
+2026-10-03T11:39:57.4235338Z ERROR: 1, WARNING: 25, INFO: 13. Only ERROR blocks; the rest is reported.
+2026-10-03T11:39:57.4237726Z | `aichat.secret-env-fallback-literal` | ERROR | 1 | `services/conversation-service/src/proof/fallback.ts:1` |
+2026-10-03T11:39:57.4271714Z ##[error]Process completed with exit code 1.
+
+[exit 0]
