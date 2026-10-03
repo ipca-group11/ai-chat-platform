@@ -21,7 +21,15 @@ describe("e2e CI workflow (AC-100)", () => {
   });
 
   it("AC-100: brings up the full docker-compose stack before testing", () => {
-    expect(workflow).toMatch(/docker compose up -d/);
+    // `pnpm mock:up` is `docker compose --profile llm up -d --build` (scripts/mock-compose.sh).
+    expect(workflow).toMatch(/pnpm mock:up/);
+  });
+
+  it("AICHAT-153: runs the stack with the llm profile, so the chat flows hit the mock and need no real key", () => {
+    expect(workflow).toContain("profile llm");
+    expect(workflow).not.toMatch(/secrets\.ANTHROPIC_API_KEY/);
+    const script = readFileSync(fileURLToPath(new URL("../../../scripts/mock-compose.sh", import.meta.url)), "utf-8");
+    expect(script).toMatch(/docker compose --profile "\$profile" up -d --build/);
   });
 
   it("AC-100: waits for the stack to become healthy before running specs", () => {
@@ -39,6 +47,6 @@ describe("e2e CI workflow (AC-100)", () => {
 
   it("AC-100: tears the stack down even if the job fails", () => {
     expect(workflow).toMatch(/if:\s*always\(\)/);
-    expect(workflow).toMatch(/docker compose down/);
+    expect(workflow).toMatch(/pnpm mock:down/);
   });
 });
