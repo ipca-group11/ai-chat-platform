@@ -62,7 +62,7 @@ no "Generated with" line in commits or PRs — the owner's instruction overrides
 4. Anything still blocked → flag Impediment, comment what is missing, tell the owner, stop this epic.
 
 ### 3. Setup (main thread)
-`git switch main && git pull && git switch -c <branch from epic skill>`; `mkdir -p docs/AICHAT-<n>/evidence`;
+`git fetch origin && git switch <branch from epic skill> && git merge origin/integration/testing-epics` (epic branches already exist on origin, cut from `integration/testing-epics`); `mkdir -p docs/AICHAT-<n>/evidence`;
 capture versions: `term-shot … --name 00-environment -- "node -v; pnpm -v; docker --version"`.
 
 ### 4. Story loop (subagents)
@@ -70,7 +70,7 @@ For each story (order from the epic skill; parallel where independent):
 1. Main: transition story `21`.
 2. Main: spawn the agent with the prompt template.
 3. Agent: implement, run, capture evidence, write its WORKLOG section, commit. Returns the short report.
-4. Main: tick acceptance criteria in Jira (ADF), transition `31`. Push / PR only after the owner agrees. `41` after merge.
+4. Main: tick acceptance criteria in Jira (ADF), transition `31`. Push / PR (base `integration/testing-epics`, never `main`) only after the owner agrees. `41` after merge.
 5. If the agent reports an unsettled decision: ask the owner (AskUserQuestion), then SendMessage the answer to the same agent.
 
 #### Agent prompt template (keep it this short)
