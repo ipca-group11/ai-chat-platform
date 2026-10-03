@@ -24,7 +24,7 @@ Date: 2026-10-03
 | Scope agreed | Met | Which files? | Shell and the 3 remotes (mfe-auth, mfe-chat, mfe-settings): each `remoteEntry.js`, the exposed-module chunk graph and a total guard rail that includes the shared fallbacks | Team (owner delegated) |
 | Tooling agreed | Met | Which tool? | size-limit with `@size-limit/file` (gzip) as an Nx `size` target per app, config in TypeScript where size-limit allows it; globs for hashed chunk names | Team (owner delegated) |
 | Target environment available | Met | Where does it run? | The production build output (`nx build`) locally and in the CI `nx affected` job; no stack needed | Team (owner delegated) |
-| Size limits agreed per remote | Met | README §5 proposal | Measured baseline + 10% for every group (rounded up to the next KB), with the README numbers as upper bounds: `remoteEntry.js` ≤ 8 KB gzip, shell own chunks ≤ 120 KB, auth and settings routes ≤ 40 KB, chat routes ≤ 80 KB. Limits are tightened after improvements, never loosened without a PR note | Team (owner delegated) |
+| Size limits agreed per remote | Met | README §5 proposal | Measured baseline + 10% for every group (rounded up to the next kB), with the README numbers as upper bounds: `remoteEntry.js` ≤ 8 KB gzip, shell own chunks ≤ 120 KB, auth and settings routes ≤ 40 KB, chat routes ≤ 80 KB. Limits are tightened after improvements, never loosened without a PR note | Team (owner delegated) |
 | Runtime-loaded vs all emitted | Met | Fallback chunks inflate totals | Both: strict limits on what loads at runtime, a looser total over all emitted JS | Team (owner delegated) |
 | Shared-once check (AICHAT-119) | Met | The browser e2e suite is disabled | One small local headless run that opens `/chats` against the mock stack and lists the JS requests (React, react-dom, router loaded once); the result is recorded in the work log, not run in CI | Team (owner delegated) |
 
@@ -52,30 +52,30 @@ Blockers: none
 - shared-library copies: `*prebuild*` (fallbacks in a remote) and `*loadShare*` (the shell's own copies of react, react-dom, router, query and `@app/ui`).
 - all emitted JS: a guard rail over everything.
 
-The rule of the DoR review is: limit = measured baseline + 10%, rounded up to the next KB (1 KB = 1024 bytes, as size-limit counts), never above the upper bounds of the analysis (`remoteEntry.js` 8 KB, shell 120 KB, auth and settings routes 40 KB, chat routes 80 KB). Sizes are gzip, summed per group from the per-file gzip size, measured on 2026-10-03 on Node 24.21.0.
+The rule of the DoR review is: limit = measured baseline + 10%, rounded up to the next kB (1 kB = 1000 bytes, as size-limit counts), never above the upper bounds of the analysis (`remoteEntry.js` 8 KB, shell 120 KB, auth and settings routes 40 KB, chat routes 80 KB). Sizes are gzip, summed per group from the per-file gzip size, measured on 2026-10-03 on Node 24.21.0.
 
-| App | Group | Baseline (KB) | Limit (KB) | Upper bound of the analysis |
+| App | Group | Baseline (kB) | Limit (kB) | Upper bound of the analysis |
 |---|---|---|---|---|
-| shell | `remoteEntry.js` | 6.00 | 7 | 8 |
-| shell | application chunks | 50.33 | 56 | 120 |
-| shell | federation glue | 114.85 | 127 | none |
-| shell | shared-library copies | 118.51 | 131 | none |
-| shell | all emitted JS | 289.69 | 319 | none |
-| mfe-auth | `remoteEntry.js` | 6.08 | 7 | 8 |
-| mfe-auth | route chunks | 24.17 | 27 | 40 |
-| mfe-auth | federation glue | 114.20 | 126 | none |
-| mfe-auth | shared-library copies | 120.80 | 133 | none |
-| mfe-auth | all emitted JS | 265.24 | 292 | none |
-| mfe-chat | `remoteEntry.js` | 6.11 | 7 | 8 |
-| mfe-chat | route chunks | 61.59 | 68 | 80 |
-| mfe-chat | federation glue | 120.20 | 133 | none |
-| mfe-chat | shared-library copies | 120.84 | 133 | none |
-| mfe-chat | all emitted JS | 308.74 | 340 | none |
-| mfe-settings | `remoteEntry.js` | 6.07 | 7 | 8 |
-| mfe-settings | route chunks | 25.24 | 28 | 40 |
-| mfe-settings | federation glue | 113.82 | 126 | none |
-| mfe-settings | shared-library copies | 87.53 | 97 | none |
-| mfe-settings | all emitted JS | 232.66 | 256 | none |
+| shell | `remoteEntry.js` | 6.15 | 7 | 8 |
+| shell | application chunks | 51.54 | 57 | 120 |
+| shell | federation glue | 117.60 | 130 | none |
+| shell | shared-library copies | 121.36 | 134 | none |
+| shell | all emitted JS | 296.64 | 327 | none |
+| mfe-auth | `remoteEntry.js` | 6.22 | 7 | 8 |
+| mfe-auth | route chunks | 24.75 | 28 | 40 |
+| mfe-auth | federation glue | 116.94 | 129 | none |
+| mfe-auth | shared-library copies | 123.70 | 137 | none |
+| mfe-auth | all emitted JS | 271.61 | 299 | none |
+| mfe-chat | `remoteEntry.js` | 6.26 | 7 | 8 |
+| mfe-chat | route chunks | 63.07 | 70 | 80 |
+| mfe-chat | federation glue | 123.08 | 136 | none |
+| mfe-chat | shared-library copies | 123.75 | 137 | none |
+| mfe-chat | all emitted JS | 316.15 | 348 | none |
+| mfe-settings | `remoteEntry.js` | 6.22 | 7 | 8 |
+| mfe-settings | route chunks | 25.84 | 29 | 40 |
+| mfe-settings | federation glue | 116.55 | 129 | none |
+| mfe-settings | shared-library copies | 89.64 | 99 | none |
+| mfe-settings | all emitted JS | 238.25 | 263 | none |
 
 Limits are tightened after improvements and never raised without a reason in the pull request.
 
@@ -100,7 +100,36 @@ pnpm exec nx run-many -t build && for a in shell mfe-auth mfe-chat mfe-settings;
 
 **Problems and fixes.** The analysis gave a total of 241 KB gzip for the shell; our figure is 290 KB because the total here adds the gzip size of every file (each file is compressed on its own, which is what a browser downloads), and the analysis compressed the whole folder once. The measurement is repeatable, so the new figure is the baseline.
 
-### US2 · …
+### US2 · Nx size target for remoteEntry.js and chunks ([AICHAT-65](https://ipca-grupo11.atlassian.net/browse/AICHAT-65))
+
+**What and why.** We added `size-limit` with the `@size-limit/file` plugin as root dev dependencies (`pnpm add -D size-limit @size-limit/file -w`) and one configuration per app, `apps/<app>/.size-limit.ts` (size-limit 14 reads TypeScript configuration, so there is no `.js` file). Each file lists the five groups of US1 with their limits and `gzip: true`; the groups are globs over `dist/` (the application chunks are "all `assets/*.js` except the glue and the shared-library copies", so a new chunk lands in the budget without a config change). Every app has a `size` Nx target (`size-limit`, cwd the app) and `nx.json` gives the target its defaults: `dependsOn: ["build"]` (the check always measures a fresh build) and caching. The limits are the ones of US1.
+
+**Files.**
+- `apps/shell/.size-limit.ts`, `apps/mfe-auth/.size-limit.ts`, `apps/mfe-chat/.size-limit.ts`, `apps/mfe-settings/.size-limit.ts` (new): groups and limits.
+- `apps/*/project.json`: `size` target.
+- `nx.json`: `size` in `targetDefaults`.
+- `package.json`, `pnpm-lock.yaml`: `size-limit`, `@size-limit/file`.
+
+**How to run.**
+
+```sh
+pnpm exec nx run-many -t size        # builds what is missing, then checks the four apps
+pnpm exec nx run mfe-chat:size       # one app
+```
+
+**How to repeat it manually.**
+
+1. `pnpm install` (the lockfile has the two packages).
+2. `pnpm exec nx run-many -t size`.
+3. Expected output: for every group "Size limit: N kB" above "Size: M kB gzipped" with M smaller than N, and exit code 0.
+
+**Result.** All 20 checks (5 groups, 4 apps) pass on the current base of the integration branch, which is the code that becomes `main`; `main` itself still lacks the earlier epics (unit-test, DAST and so on), so its build is not the one we measured.
+
+![size target passes](evidence/02-size-target-passes.png)
+
+**Problems and fixes.** size-limit counts 1 kB as 1000 bytes, not 1024, so the first limits (computed with 1024) were wrong by about 2.4% and were recomputed; the table of US1 has the final figures. The shell and the remotes name the shared-library copies differently (`*loadShare*` in the shell, `*prebuild*` and `*loadShare*` in remotes), so the group takes both patterns.
+
+### US3 · …
 
 ## 4. How to run everything
 
