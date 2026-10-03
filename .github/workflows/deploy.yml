@@ -101,6 +101,8 @@ jobs:
           ssh azureuser@${{ vars.DOMAIN }} 'mkdir -p ~/ai-chat'
           scp deploy/azure/docker-compose.yml deploy/azure/Caddyfile azureuser@${{ vars.DOMAIN }}:ai-chat/
 
+      # Caddy's container doesn't change when only the Caddyfile does, so `up` leaves it
+      # running the old routes; reload it explicitly.
       - name: Pull and restart
         run: |
           ssh azureuser@${{ vars.DOMAIN }} \
@@ -108,7 +110,8 @@ jobs:
             && cd ~/ai-chat \
             && export IMAGE_PREFIX='${{ env.IMAGE_PREFIX }}' IMAGE_TAG='${{ env.SHA }}' \
             && docker compose pull --quiet \
-            && docker compose up -d --remove-orphans --wait --wait-timeout 300; \
+            && docker compose up -d --remove-orphans --wait --wait-timeout 300 \
+            && docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile; \
             status=\$?; docker logout ghcr.io; docker image prune -f >/dev/null; exit \$status"
 
       - name: Smoke test
