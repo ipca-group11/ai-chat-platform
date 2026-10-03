@@ -19,7 +19,7 @@ import { correlationIdMiddleware } from "./shared/correlation-id.js";
 import { env } from "./shared/env.js";
 import { errorMiddleware, notFoundMiddleware } from "./shared/error-middleware.js";
 import { httpMetricsMiddleware } from "./shared/http-metrics.js";
-import { logger } from "./shared/logger.js";
+import { logger as defaultLogger, type Logger } from "./shared/logger.js";
 import { prisma as defaultPrisma } from "./shared/prisma.js";
 
 collectDefaultMetrics({ register: metricsRegister, prefix: "auth_service_" });
@@ -28,10 +28,13 @@ collectDefaultMetrics({ register: metricsRegister, prefix: "auth_service_" });
  * decision D3). Without them the app uses the real Prisma client, as before. */
 export interface AppDeps {
   prisma?: PrismaClient;
+  /** Where request and error logs go; tests pass one that writes to memory. */
+  logger?: Logger;
 }
 
 export function createApp(deps: AppDeps = {}): Express {
   const prisma = deps.prisma ?? defaultPrisma;
+  const logger = deps.logger ?? defaultLogger;
   const app = express();
 
   app.disable("x-powered-by");
@@ -84,7 +87,7 @@ export function createApp(deps: AppDeps = {}): Express {
 if (process.env.VITEST === undefined) {
   const app = createApp();
   app.listen(env.PORT, () => {
-    logger.info({ port: env.PORT }, "auth-service listening");
+    defaultLogger.info({ port: env.PORT }, "auth-service listening");
   });
 }
 /* c8 ignore stop */

@@ -798,6 +798,9 @@ importers:
       '@platform/test-config':
         specifier: workspace:*
         version: link:../../packages/test-config
+      '@platform/test-utils':
+        specifier: workspace:*
+        version: link:../../packages/test-utils
       '@types/bcrypt':
         specifier: ^6.0.0
         version: 6.0.0
@@ -889,6 +892,9 @@ importers:
       '@platform/test-config':
         specifier: workspace:*
         version: link:../../packages/test-config
+      '@platform/test-utils':
+        specifier: workspace:*
+        version: link:../../packages/test-utils
       '@types/cookie-parser':
         specifier: ^1.4.10
         version: 1.4.10(@types/express@4.17.25)
@@ -2516,7 +2522,6 @@ packages:
   '@pact-foundation/pact-core@20.2.0':
     resolution: {integrity: sha512-AKPJomBRHmQ8ilOkCaT2ZpvL2j/GM9CeE3K81w57zy3gwOnN6ZdMyw38ddqIHudTgS6eNQLqBKLbrRsOOKwwtg==}
     engines: {node: '>=22'}
-    cpu: [x64, ia32, arm64]
     os: [darwin, linux, win32]
 
   '@pact-foundation/pact@17.1.4':

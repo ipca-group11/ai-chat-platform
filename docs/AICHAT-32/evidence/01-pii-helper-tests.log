@@ -1,0 +1,12 @@
+$ pnpm --filter @platform/test-utils exec vitest run src/pii.test.ts
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/test-utils
+
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  21:21:44
+   Duration  625ms (environment 65%, setup 22%, transform 10%, tests 1%, worker 1%)
+
+
+[exit 0]
