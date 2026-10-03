@@ -38,6 +38,30 @@ describe("AC-12: CI runs `nx affected` for lint, typecheck, test, and build on e
   });
 });
 
+describe("AICHAT-83: CI fails when a bundle exceeds its size-limit budget", () => {
+  it("runs the `size` target in the same `nx affected` step as build", () => {
+    expect(ci.env.NX_AFFECTED_TARGETS.split(" ")).toContain("size");
+    expect(ci.env.NX_AFFECTED_TARGETS.split(" ").indexOf("size")).toBeGreaterThan(
+      ci.env.NX_AFFECTED_TARGETS.split(" ").indexOf("build"),
+    );
+  });
+
+  it("every app defines a `size` target and a size-limit config next to it", () => {
+    for (const app of ["shell", "mfe-auth", "mfe-chat", "mfe-settings"]) {
+      expect(readRepoJson(`apps/${app}/project.json`).targets.size.options.command).toBe("size-limit");
+      expect(readRepoFile(`apps/${app}/.size-limit.ts`)).toMatch(/limit: '\d+ KB'/);
+    }
+  });
+
+  it("nx.json makes `size` depend on `build`, so the budget is checked on a fresh build", () => {
+    expect(readRepoJson("nx.json").targetDefaults.size.dependsOn).toContain("build");
+  });
+
+  it("is mirrored in .factory/commands.json", () => {
+    expect(readRepoJson(".factory/commands.json").test).toContain(" size ");
+  });
+});
+
 describe("AC-13: CI fails the build if any project reports a lint or typecheck error", () => {
   it("AC-13: the `nx affected` step is a normal (non-continue-on-error) step", () => {
     const nxStep = ci.jobs.affected.steps.find(

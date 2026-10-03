@@ -129,7 +129,38 @@ pnpm exec nx run mfe-chat:size       # one app
 
 **Problems and fixes.** size-limit counts 1 kB as 1000 bytes, not 1024, so the first limits (computed with 1024) were wrong by about 2.4% and were recomputed; the table of US1 has the final figures. The shell and the remotes name the shared-library copies differently (`*loadShare*` in the shell, `*prebuild*` and `*loadShare*` in remotes), so the group takes both patterns.
 
-### US3 · …
+### US3 · Fail CI when a bundle exceeds its limit ([AICHAT-83](https://ipca-grupo11.atlassian.net/browse/AICHAT-83))
+
+**What and why.** The `nx affected` step of `ci.yml` now runs `lint typecheck test build size`. `size` depends on `build` (set in `nx.json`), and size-limit exits with code 1 when a group is over its limit, so Nx marks the task failed and the job and the pull request go red. Only affected apps run the check: a change in `packages/ui` runs it for every app that uses it, a change in one remote runs it for that remote. `.factory/commands.json` (the `test` command that the CI spec compares with the workflow) has the same target list. The CI structural test `packages/workspace-config/src/ci.test.ts` checks the new target list, the `size` target and config of the four apps, and the dependency on `build`.
+
+**Files.**
+- `.github/workflows/ci.yml`: `size` in `NX_AFFECTED_TARGETS`, job name and comment.
+- `.factory/commands.json`: `size` in the `test` command.
+- `packages/workspace-config/src/ci.test.ts`: four new tests.
+
+**How to run.**
+
+```sh
+pnpm exec nx affected -t lint typecheck test build size --base=origin/integration/testing-epics
+pnpm --filter @platform/workspace-config exec vitest run src/ci.test.ts
+```
+
+**How to repeat it manually.**
+
+1. Create `apps/mfe-chat/src/app/heavy-demo.ts` with an exported string of 50 KB of random characters.
+2. Import it in `apps/mfe-chat/src/app/ChatListPage.tsx` and use it (`console.debug(heavy.length)`) so the bundler keeps it.
+3. `pnpm exec nx run mfe-chat:size`.
+4. Expected output: "Package size limit has exceeded" for `mfe-chat route chunks` and exit code 1. Delete the file and restore `ChatListPage.tsx`.
+
+**Result.** The deliberate import of a 50 KB file (random text, which gzip cannot shrink) takes the chat route chunks from 63.07 kB to 102.28 kB against a limit of 70 kB, the `all emitted JS` group goes over as well, and `nx` exits with 1. Nothing of the test is committed: the script of the evidence adds the file and removes it at the end (`git status` is clean afterwards).
+
+![Deliberate over-limit import fails](evidence/03-deliberate-over-limit-fails.png)
+
+![CI spec](evidence/04-ci-spec.png)
+
+**Problems and fixes.** A first idea was a separate CI job for the size check; it would build the apps a second time and `ci.test.ts` asserts that the workflow has one job, so the target stays in the same `nx affected` run, where the Nx cache already has the build. Branch protection is not available on this private repository (as noted in AICHAT-28), so the rule "no merge with a red `nx affected` job" remains a team rule.
+
+### US4 · …
 
 ## 4. How to run everything
 

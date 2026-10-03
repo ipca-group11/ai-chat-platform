@@ -12,11 +12,11 @@ concurrency:
 
 env:
   # Matches `.factory/commands.json`'s `test` command exactly.
-  NX_AFFECTED_TARGETS: lint typecheck test build
+  NX_AFFECTED_TARGETS: lint typecheck test build size
 
 jobs:
   affected:
-    name: nx affected (lint, typecheck, test, build)
+    name: nx affected (lint, typecheck, test, build, size)
     runs-on: ubuntu-latest
     steps:
       # Full history so `nx affected` can diff against origin/main (AC-12, AC-13).
@@ -64,6 +64,8 @@ jobs:
           echo "NX_HEAD=HEAD" >> "$GITHUB_ENV"
 
       # Fails the job (and PR) on any lint/typecheck/test/build error (AC-12, AC-13).
+      # `size` (size-limit, gzip budgets per app, apps/*/.size-limit.ts) runs after the app's build and
+      # fails the job when a bundle goes over its limit (AICHAT-83).
       # Vitest coverage thresholds (STACK.md decision #6) are enforced per-project as
       # part of each project's own `test` target, so a coverage regression fails this
       # step too without any separate CI step.
