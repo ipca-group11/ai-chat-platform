@@ -40,6 +40,12 @@ This is **discovery only**: no application code was changed. Source documents: [
 
 All stories were created in Jira on 2026-10-03 as children of their epic, assigned to JP, label `testing`. Each story has its own Jira key (listed in the **Jira** column of every epic README); `AICHAT-<epic>-US<n>` is only the reference inside the analysis docs. The way each epic is worked is described in [EPIC-WORKFLOW.md](EPIC-WORKFLOW.md).
 
+## Delivery status
+
+| Epic | Status | Work log | Pull requests |
+|---|---|---|---|
+| AICHAT-34 | Review (merged into the integration branch) | [WORKLOG](AICHAT-34/WORKLOG.md) | #4 |
+
 ## Suggested order
 
 Ordered by value, how blocked each epic is, and dependencies between them. The binding order, with waves and start

@@ -1,0 +1,10 @@
+$ gh run view 37119414408 --log-failed | grep -E 'shared-types:test|ERROR: Coverage|Failed tasks' | cut -f3- | sed 's/\x1b\[[0-9;]*m//g'
+2026-10-03T11:22:40.3968540Z ##[group]❌ > nx run shared-types:test
+2026-10-03T11:22:40.4366397Z ERROR: Coverage for lines (54.9%) does not meet global threshold (80%)
+2026-10-03T11:22:40.4377252Z ERROR: Coverage for functions (31.57%) does not meet global threshold (80%)
+2026-10-03T11:22:40.4381563Z ERROR: Coverage for statements (54.9%) does not meet global threshold (80%)
+2026-10-03T11:22:40.4384594Z ERROR: Coverage for branches (41.46%) does not meet global threshold (80%)
+2026-10-03T11:23:18.9556206Z Failed tasks:
+2026-10-03T11:23:18.9557154Z - shared-types:test
+
+[exit 0]

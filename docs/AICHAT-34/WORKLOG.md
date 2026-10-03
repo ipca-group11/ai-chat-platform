@@ -10,9 +10,9 @@ title: "AICHAT-34 · Coverage thresholds: work log"
 | Analysis | [README.md](README.md) |
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-34-coverage-thresholds` |
-| Started / finished | 2026-10-03 / … |
-| Pull requests | #… |
-| Status | In Progress |
+| Started / finished | 2026-10-03 / 2026-10-03 |
+| Pull requests | [#4](https://github.com/ipca-group11/ai-chat-platform/pull/4) (merged), [#6](https://github.com/ipca-group11/ai-chat-platform/pull/6) (failing-PR proof, closed) |
+| Status | Review |
 
 ## 1. DoR review
 
@@ -214,7 +214,9 @@ node --test scripts/ci/coverage-summary.test.mjs
 4. Wait for CI. The `nx affected` step must fail on the coverage threshold, and the `Coverage summary` step must still show the table in the job summary.
 5. Link the failed run here, then close the PR without merging and delete the branch.
 
-PR: #<to fill>
+PR: [#6](https://github.com/ipca-group11/ai-chat-platform/pull/6), run [37119414408](https://github.com/ipca-group11/ai-chat-platform/actions/runs/37119414408). We removed two `shared-types` test files; the `nx affected` job failed on `shared-types:test` (lines 54.9 % against 80 %) and the `Coverage summary` step still ran. The PR was closed without merging.
+
+![](evidence/22-coverage-drop-fails-ci.png)
 
 ### US6 · Narrow coverage excludes ([AICHAT-139](https://ipca-grupo11.atlassian.net/browse/AICHAT-139))
 
@@ -289,13 +291,13 @@ Other results: 12 Node test configs use `@platform/test-config` (plus `test-conf
 
 | DoD item | Met | Evidence |
 |---|---|---|
-| Runs in CI, passes on main, failure blocks the merge | Pending PR run (the `Coverage summary` step and the `nx affected` job are in `ci.yml`; green run and blocked-merge proof need GitHub) | [local full run](evidence/21-pnpm-test-all.png), [summary script](evidence/20-coverage-summary-local.png) |
+| Runs in CI, passes on main, failure blocks the merge | ✅ `nx affected` green on [#4](https://github.com/ipca-group11/ai-chat-platform/pull/4); the drop in [#6](https://github.com/ipca-group11/ai-chat-platform/pull/6) failed the job. The e2e workflow fails on `main` too (out-of-date selectors, AICHAT-4/5) | [CI drop proof](evidence/22-coverage-drop-fails-ci.png), [local full run](evidence/21-pnpm-test-all.png) |
 | Run instructions documented | ✅ | Section 4 of this log, `packages/test-config/README.md` |
 | Vitest coverage thresholds set in every project | ✅ (12 via the shared preset, `eslint-config` inline with identical values, `testing/k6` exempt) | [imports](evidence/05-shared-preset-imports.png), [guard](evidence/15-guard-passes.png), [after: shell](evidence/07-after-shell.png), [ui](evidence/08-after-ui.png), [mfe-auth](evidence/09-after-mfe-auth.png), [e2e](evidence/10-after-e2e.png) |
-| Going below the threshold fails CI | Locally ✅, in CI pending PR run | [guard on a broken case](evidence/16-guard-fails-on-broken-case.png); failing-PR proof in US5 |
+| Going below the threshold fails CI | ✅ | [CI drop proof](evidence/22-coverage-drop-fails-ci.png), [guard on a broken case](evidence/16-guard-fails-on-broken-case.png) |
 
 ## 7. Notes for the report
 
 - **What we found.** 4 of 15 test projects did not enforce coverage (shell, ui, mfe-auth, e2e); only 1 of 15 used the shared preset, so the policy lived in 13 hand-copied files; `apps/shell` was below its target (70.51 % lines, 60.97 % branches); `apps/mfe-chat` excluded all of `src/app/**`; the `mfe-auth` package script still ran without `--coverage` after its Nx target was fixed, and the new guard test caught it.
-- **What we fixed or waived.** All Node test projects use the shared preset except `eslint-config` (inline, identical values, to avoid a dependency cycle). `shell` is ratcheted to 70/60/62/68 with dated TODOs for AICHAT-17. The `mfe-chat` exclude is narrowed to `remote-entry.tsx`. `testing/k6` is exempt. A CI summary shows the per-project table. Proof of a failing PR is still to run on GitHub.
+- **What we fixed or waived.** All Node test projects use the shared preset except `eslint-config` (inline, identical values, to avoid a dependency cycle). `shell` is ratcheted to 70/60/62/68 with dated TODOs for AICHAT-17. The `mfe-chat` exclude is narrowed to `remote-entry.tsx`. `testing/k6` is exempt. A CI summary shows the per-project table. A failing PR (#6) proved that a coverage drop fails CI.
 - **Lessons learned.** Measure before enforcing, otherwise CI breaks on day one. Check config and scripts together: the same command lives in `project.json` and `package.json`. Vite loads configs with Node, so a shared config package must ship compiled JavaScript. Shared tooling packages that depend on each other in both directions create Nx cycles, so keep the lowest-level package free of the shared preset.
