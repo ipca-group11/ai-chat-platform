@@ -10,9 +10,9 @@ title: "AICHAT-32 · PII masking testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-32-pii-masking-testing` |
-| Started / finished | 2026-10-03 / … |
-| Pull requests | #… |
-| Status | In Progress |
+| Started / finished | 2026-10-03 / 2026-10-03 |
+| Pull requests | [#19](https://github.com/ipca-group11/ai-chat-platform/pull/19) |
+| Status | Done, merged into `integration/testing-epics` |
 
 ## 1. DoR review
 
