@@ -1,0 +1,21 @@
+$ curl -si localhost:4110/remotes/broken-js/remoteEntry.js; echo; echo '--- node parses it:'; curl -s localhost:4110/remotes/broken-js/remoteEntry.js | node --check --input-type=module 2>&1 | head -5
+HTTP/1.1 200 OK
+Content-Type: application/javascript; charset=utf-8
+Content-Length: 130
+ETag: W/"82-0bzvGmN/h15zJqUAvPyEjUW2P0U"
+Date: Sat, 03 Oct 2026 12:11:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+// mock remote container with a syntax error (mock-server)
+const get = (module => {
+  return ;;; this is not valid javascript }}}
+
+--- node parses it:
+[stdin]:3
+  return ;;; this is not valid javascript }}}
+                  ^^
+
+SyntaxError: Unexpected identifier 'is'
+
+[exit 0]

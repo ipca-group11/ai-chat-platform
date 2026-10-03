@@ -1,0 +1,20 @@
+$ curl -s -X POST localhost:4110/remotes/ok/remoteEntry.js -H 'authorization: Bearer sk-secret' -H 'x-api-key: sk-ant-123' -H 'cookie: session=abc' -H 'content-type: application/json' -d '{"user":"ana","password":"hunter2","apiKey":"sk-live"}' -o /dev/null; curl -s 'localhost:4110/__admin/requests?mock=remotes' | node -e 'const r=JSON.parse(require("fs").readFileSync(0,"utf8")).requests.at(-1);console.log(JSON.stringify({mock:r.mock,path:r.path,headers:{authorization:r.headers.authorization,"x-api-key":r.headers["x-api-key"],cookie:r.headers.cookie},body:r.body},null,2))'; echo '--- reset:'; curl -s -X POST localhost:4110/__admin/reset; echo; curl -s localhost:4110/__admin/requests; echo
+{
+  "mock": "remotes",
+  "path": "/remotes/ok/remoteEntry.js",
+  "headers": {
+    "authorization": "***",
+    "x-api-key": "***",
+    "cookie": "***"
+  },
+  "body": {
+    "user": "ana",
+    "password": "***",
+    "apiKey": "***"
+  }
+}
+--- reset:
+{"status":"reset"}
+{"count":0,"requests":[]}
+
+[exit 0]
