@@ -19,6 +19,13 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Ports compose.yaml publishes (shell on APP_PORT 8000, APIs on 4001/4002); the
+    # fixtures' fallbacks target a different local setup.
+    env:
+      BASE_URL: http://localhost:8000
+      E2E_SHELL_HEALTH_URL: http://localhost:8000/
+      E2E_AUTH_HEALTH_URL: http://localhost:4001/health
+      E2E_CONVERSATION_HEALTH_URL: http://localhost:4002/health
     steps:
       # Building every app image fills the runner's ~14 GB free disk; drop preinstalled
       # SDKs this job never uses.
