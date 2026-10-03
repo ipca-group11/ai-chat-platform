@@ -1,0 +1,61 @@
+$ ./.evidence-tmp/34-faults.sh
+$ curl -s -c cookies.txt -X POST localhost:4010/auth/login -H content-type: application/json -d {"email":"alice@mock.test","password":"Mock-pass-1234"}
+{"id":"user_00001","email":"alice@mock.test"}
+# one request, by header
+$ curl -si -b cookies.txt -H X-Mock-Scenario: error-500 localhost:4010/api/chats
+HTTP/1.1 500 Internal Server Error
+X-Mock-Fault: error-500
+Content-Type: application/json; charset=utf-8
+Content-Length: 131
+ETag: W/"83-qXacEwXKYsofzbRqyX0NXwzK5QI"
+Date: Sat, 03 Oct 2026 12:18:27 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"418a7ee9-0926-464a-b8f2-e2c5aebd11bc"}
+# per route, with the admin endpoint (session-expired on the next /auth/me only)
+$ curl -s -X POST localhost:4010/__admin/faults -H content-type: application/json -d {"route":"GET /auth/me","scenario":"session-expired","times":1}
+{"faults":[{"route":"GET /auth/me","scenario":"session-expired","times":1}]}
+$ curl -si -b cookies.txt localhost:4010/auth/me
+HTTP/1.1 401 Unauthorized
+X-Mock-Fault: session-expired
+Set-Cookie: access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax
+Set-Cookie: refresh_token=; Path=/auth; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax
+Content-Type: application/json; charset=utf-8
+Content-Length: 121
+ETag: W/"79-k0UeyHH6d8LqD70Zx1MnzyH4dDY"
+Date: Sat, 03 Oct 2026 12:18:27 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":{"code":"UNAUTHENTICATED","message":"Not authenticated"},"correlationId":"0e556fcc-b113-4fec-9a77-81094299dd15"}
+$ curl -s -b cookies.txt localhost:4010/auth/me
+{"id":"user_00001","email":"alice@mock.test"}
+# slow
+$ curl -s -X POST localhost:4010/__admin/faults -H content-type: application/json -d {"route":"GET /api/chats","scenario":"slow","delayMs":1500}
+{"faults":[{"route":"GET /api/chats","scenario":"slow","delayMs":1500}]}
+$ curl -s -o /dev/null -w status %{http_code} in %{time_total}s\n -b cookies.txt localhost:4010/api/chats
+status 200 in 1.516417s
+
+# a stream that drops after 3 events
+$ curl -s -X POST localhost:4010/__admin/faults -H content-type: application/json -d {"route":"GET /api/chats/:id/stream","scenario":"stream-drop"}
+{"faults":[{"route":"GET /api/chats","scenario":"slow","delayMs":1500},{"route":"GET /api/chats/:id/stream","scenario":"stream-drop"}]}
+event: message
+data: {"type":"message","message":{"id":"msg_00011","chatId":"chat_00001","authorId":"user_00001","authorEmail":"alice@mock.test","role":"user","content":"drop me","reasoning":null,"webFetches":[],"attachments":[],"status":"sent","error":null,"createdAt":"2026-10-03T12:18:29.480Z"}}
+
+event: started
+data: {"type":"started","messageId":"msg_00012"}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"Here "}
+
+(the stream above ended by itself: curl exit code 18)
+
+$ curl -s localhost:4010/__admin/faults
+{"faults":[{"route":"GET /api/chats","scenario":"slow","delayMs":1500},{"route":"GET /api/chats/:id/stream","scenario":"stream-drop"}],"scenarios":["session-expired","error-500","slow","stream-drop"]}
+$ curl -s -X POST localhost:4010/__admin/reset
+{"status":"reset"}
+$ curl -s localhost:4010/__admin/faults
+{"faults":[],"scenarios":["session-expired","error-500","slow","stream-drop"]}
+
+[exit 0]

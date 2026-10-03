@@ -29,7 +29,7 @@ export function findTestProjects() {
       if (entry.isDirectory()) dirs.push(`${group}/${entry.name}`);
     }
   }
-  dirs.push("e2e", "testing/k6");
+  dirs.push("e2e", "testing/k6", "testing/mock-server");
   return dirs.filter((dir) => {
     if (!existsSync(join(repoRoot, dir, "project.json"))) return false;
     return Boolean(readRepoJson(`${dir}/project.json`).targets?.test);

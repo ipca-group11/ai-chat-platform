@@ -1,0 +1,44 @@
+$ ./.evidence-tmp/31-auth.sh
+$ curl -si -X POST localhost:4010/auth/register -H content-type: application/json -d {"email":"New@Mock.test","password":"abcdef12"}
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Content-Length: 43
+ETag: W/"2b-RGlwHkDLlsIGExcVNHlPmaxMJmU"
+Date: Sat, 03 Oct 2026 12:18:03 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":"user_00003","email":"new@mock.test"}
+$ curl -s -X POST localhost:4010/auth/register -H content-type: application/json -d {"email":"bad","password":"short"}
+{"error":{"code":"VALIDATION_ERROR","message":"Invalid registration details","fieldErrors":{"email":["Invalid email address"],"password":["Password must be at least 8 characters long","Password must contain at least one number"]}},"correlationId":"84a61843-9d21-4bb1-83b9-f03b0103a02f"}
+$ curl -s -X POST localhost:4010/auth/register -H content-type: application/json -d {"email":"alice@mock.test","password":"abcdef12"}
+{"error":{"code":"EMAIL_TAKEN","message":"An account with this email already exists","fieldErrors":{"email":["An account with this email already exists"]}},"correlationId":"62fa1643-874b-4ce2-be6d-f946bdf36801"}
+$ curl -s -X POST localhost:4010/auth/login -H content-type: application/json -d {"email":"alice@mock.test","password":"wrong-pass1"}
+{"error":{"code":"INVALID_CREDENTIALS","message":"Invalid email or password"},"correlationId":"88e0d286-d213-4035-8da6-90af5fc27496"}
+$ curl -si -c cookies.txt -X POST localhost:4010/auth/login -H content-type: application/json -d {"email":"alice@mock.test","password":"Mock-pass-1234"}
+HTTP/1.1 200 OK
+Set-Cookie: access_token=mock-session-1-18jhyb6; Max-Age=900; Path=/; Expires=Sat, 03 Oct 2026 12:33:03 GMT; HttpOnly; SameSite=Lax
+Set-Cookie: refresh_token=mock-session-1-18jhyb6; Max-Age=604800; Path=/auth; Expires=Sat, 10 Oct 2026 12:18:03 GMT; HttpOnly; SameSite=Lax
+Content-Type: application/json; charset=utf-8
+Content-Length: 45
+ETag: W/"2d-c5Z15u4k5l/lisLGE+OF0L7Yc5Q"
+Date: Sat, 03 Oct 2026 12:18:03 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":"user_00001","email":"alice@mock.test"}
+$ curl -s -b cookies.txt localhost:4010/auth/me
+{"id":"user_00001","email":"alice@mock.test"}
+$ curl -si -b cookies.txt -c cookies.txt -X POST localhost:4010/auth/logout
+HTTP/1.1 204 No Content
+Set-Cookie: access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax
+Set-Cookie: refresh_token=; Path=/auth; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax
+Date: Sat, 03 Oct 2026 12:18:03 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -s -b cookies.txt localhost:4010/auth/me
+{"error":{"code":"UNAUTHENTICATED","message":"Not authenticated"},"correlationId":"e893bb45-2c5c-4d15-ad1a-8373a651045d"}
+
+[exit 0]

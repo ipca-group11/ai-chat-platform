@@ -25,6 +25,8 @@ scripts/ci/semgrep.sh                                      # writes semgrep-resu
 node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif   # table; exit 1 when an ERROR is left
 ```
 
+Both steps in one command, the same gate as CI: `pnpm sast`. `semgrep.sh` alone always exits 0; only the summary step fails on an ERROR finding.
+
 `.semgrep.yml` holds our own rules. The registry packs (`p/typescript`, `p/react`, `p/expressjs`, `p/nodejsscan`, `p/jwt`, `p/secrets`, `p/github-actions`, `p/dockerfile`, `p/owasp-top-ten`) are listed in `scripts/ci/semgrep.sh`. To use another image version: `SEMGREP_IMAGE=semgrep/semgrep:<tag> scripts/ci/semgrep.sh`.
 
 ## Waive a finding

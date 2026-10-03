@@ -1,0 +1,74 @@
+$ pnpm exec nx test mock-server --skip-nx-cache --output-style=static
+
+ NX   Running target test for project mock-server and 3 tasks it depends on:
+
+
+
+> nx run eslint-config:build
+
+> echo 'eslint-config is plain JS; nothing to build'
+
+eslint-config is plain JS; nothing to build
+
+> nx run test-config:build
+
+> echo 'test-config ships plain JavaScript with .d.ts files; nothing to build'
+
+test-config ships plain JavaScript with .d.ts files; nothing to build
+
+> nx run shared-types:build
+
+> tsc -p tsconfig.build.json
+
+
+> nx run mock-server:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/.claude/worktrees/agent-aa517675a98a1d0bc/testing/mock-server
+      Coverage enabled with v8
+
+
+ Test Files  10 passed (10)
+      Tests  139 passed (139)
+   Start at  13:17:53
+   Duration  2.20s (tests 45%, import 29%, transform 23%, worker 3%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   98.93 |    92.81 |   99.09 |   99.46 |                   
+ src/backend       |   97.67 |    89.28 |     100 |   97.61 |                   
+  http.ts          |   97.67 |    89.28 |     100 |   97.61 | 63                
+ src/conversation  |   98.45 |    89.89 |   98.14 |     100 |                   
+  engine.ts        |   98.19 |    88.23 |     100 |     100 | 54-70,92,142,210  
+  records.ts       |   98.27 |    90.47 |   96.42 |     100 | 28-35,104,120     
+ src/data          |   99.02 |     93.1 |     100 |     100 |                   
+  datasets.ts      |   98.52 |       80 |     100 |     100 | 40,92             
+ src/faults        |   98.85 |    93.61 |     100 |   98.59 |                   
+  faults.ts        |   98.85 |    93.61 |     100 |   98.59 | 136               
+ src/routers       |   98.96 |    93.75 |   98.52 |   99.24 |                   
+  auth.router.ts   |    98.5 |      100 |     100 |     100 |                   
+  ...ion.router.ts |   99.06 |     92.7 |   97.91 |   98.98 | 316,319           
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 98.93% ( 834/843 )
+Branches     : 92.81% ( 323/348 )
+Functions    : 99.09% ( 218/220 )
+Lines        : 99.46% ( 743/747 )
+================================================================================
+
+
+
+ NX   Successfully ran target test for project mock-server and 3 tasks it depends on
+
+
+  Run duration:      3.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.0s (4 tasks)
+  Recoverable time:  <1ms
+
+[exit 0]

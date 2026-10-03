@@ -1,0 +1,125 @@
+$ pnpm exec nx run-many -t lint typecheck test build -p mock-server --skip-nx-cache --output-style=static
+
+ NX   Running targets lint, typecheck, test, build for project mock-server and 5 tasks it depends on:
+
+- mock-server
+
+
+
+> nx run eslint-config:build
+
+> echo 'eslint-config is plain JS; nothing to build'
+
+eslint-config is plain JS; nothing to build
+
+> nx run test-config:build
+
+> echo 'test-config ships plain JavaScript with .d.ts files; nothing to build'
+
+test-config ships plain JavaScript with .d.ts files; nothing to build
+
+> nx run shared-types:build
+
+> tsc -p tsconfig.build.json
+
+
+> nx run conversation-service:prisma-generate
+
+> prisma generate
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.1.0) to ./src/generated/prisma-client in 57ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
+
+
+> nx run mock-server:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run conversation-service:build
+
+> tsc -p tsconfig.json
+
+
+> nx run mock-server:build
+
+> node scripts/build.mjs
+
+
+  dist/main.cjs      1.9mb ⚠️
+  dist/main.cjs.map  3.2mb
+
+⚡ Done in 123ms
+
+> nx run mock-server:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run mock-server:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/testing/mock-server
+      Coverage enabled with v8
+
+
+ Test Files  21 passed (21)
+      Tests  253 passed (253)
+   Start at  13:27:43
+   Duration  10.95s (tests 72%, import 14%, transform 13%, worker 1%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   98.36 |    92.81 |   98.98 |   99.26 |                   
+ src/backend       |   97.67 |    89.28 |     100 |   97.61 |                   
+  http.ts          |   97.67 |    89.28 |     100 |   97.61 | 63                
+ src/conversation  |   97.81 |    88.29 |   98.03 |   99.36 |                   
+  answer-text.ts   |   85.71 |       80 |     100 |   85.71 | 21                
+  engine.ts        |   98.03 |    87.23 |     100 |     100 | 54-70,92,131,196  
+  records.ts       |   98.27 |    90.47 |   96.42 |     100 | 28-35,104,120     
+ src/core          |     100 |    95.45 |     100 |     100 |                   
+  request-log.ts   |     100 |    95.45 |     100 |     100 | 87                
+ src/data          |   99.02 |     93.1 |     100 |     100 |                   
+  datasets.ts      |   98.52 |       80 |     100 |     100 | 40,92             
+ src/faults        |   98.85 |    93.61 |     100 |   98.59 |                   
+  faults.ts        |   98.85 |    93.61 |     100 |   98.59 | 136               
+ src/llm           |   97.82 |    93.96 |     100 |     100 |                   
+  anthropic.ts     |   96.87 |    94.11 |     100 |     100 | 129,161           
+  openai.ts        |   96.55 |    91.66 |     100 |     100 | 93                
+  serve-replay.ts  |   91.66 |     87.5 |     100 |     100 | 30                
+  sse.ts           |   94.44 |    66.66 |     100 |     100 | 17-24             
+  stream.ts        |     100 |    88.88 |     100 |     100 | 29                
+ src/routers       |      98 |    93.02 |   97.43 |   98.65 |                   
+  ...pic.router.ts |    90.9 |     87.5 |      75 |   92.68 | 60-61,73          
+  auth.router.ts   |    98.5 |      100 |     100 |     100 |                   
+  ...ion.router.ts |   99.53 |     92.7 |     100 |   99.49 | 317               
+  openai.router.ts |   95.45 |     92.3 |      75 |   97.56 | 78                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 98.36% ( 1202/1222 )
+Branches     : 92.81% ( 504/543 )
+Functions    : 98.98% ( 293/296 )
+Lines        : 99.26% ( 1075/1083 )
+================================================================================
+
+
+
+ NX   Successfully ran targets lint, typecheck, test, build for project mock-server and 5 tasks it depends on
+
+
+  Run duration:      13.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     13.2s (3 tasks)
+  Recoverable time:  <1ms
+
+[exit 0]

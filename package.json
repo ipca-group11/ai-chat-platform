@@ -9,6 +9,9 @@
   "packageManager": "pnpm@10.4.0",
   "scripts": {
     "dev": "bash scripts/dev.sh",
+    "dev:mock": "bash scripts/dev-mock.sh",
+    "mock:up": "bash scripts/mock-compose.sh up",
+    "mock:down": "bash scripts/mock-compose.sh down",
     "nx": "nx",
     "lint": "nx run-many -t lint",
     "typecheck": "nx run-many -t typecheck",
@@ -19,7 +22,8 @@
     "affected:test": "nx affected -t test",
     "affected:build": "nx affected -t build",
     "graph": "nx graph",
-    "hooks:install": "sh scripts/git-hooks/install.sh"
+    "hooks:install": "sh scripts/git-hooks/install.sh",
+    "sast": "bash scripts/ci/semgrep.sh semgrep-results && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif"
   },
   "devDependencies": {
     "@nx/eslint": "23.2.1",

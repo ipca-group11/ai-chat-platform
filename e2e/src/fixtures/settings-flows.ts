@@ -21,7 +21,7 @@ export async function saveApiKey(page: Page, provider: string, key: string): Pro
     .click();
 }
 
-/** Real Anthropic key for specs that need an actual LLM reply (no local model ships). */
+/** Key for specs that need an LLM reply: a real one, or any text when the stack runs against the LLM mock (profile `llm`). */
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY ?? "";
 
 /**
@@ -32,7 +32,10 @@ const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY ?? "";
 export async function configureAnthropicKey(page: Page): Promise<void> {
   test.skip(!ANTHROPIC_API_KEY, "Needs a real LLM reply: set ANTHROPIC_API_KEY to run.");
   await openSettings(page);
-  await saveApiKey(page, "Anthropic", ANTHROPIC_API_KEY);
+  // Its own locators: the label regex of `apiKeyField` also matches the form, so it is ambiguous.
+  const form = page.getByRole("form", { name: /anthropic api key form/i });
+  await form.getByRole("textbox", { name: /anthropic api key/i }).fill(ANTHROPIC_API_KEY);
+  await form.getByRole("button", { name: /save key|update key/i }).click();
 }
 
 export async function removeApiKey(page: Page, provider: string): Promise<void> {

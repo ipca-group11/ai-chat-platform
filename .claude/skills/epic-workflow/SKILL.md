@@ -88,7 +88,10 @@ Do:
 3. Write section "### US<k> · <summary>" in docs/<epic>/WORKLOG.md §3 using the template headings (What and why, Files,
    How to run, How to repeat it manually, Result with ![](evidence/…) images, Problems and fixes). Team voice; never
    mention AI, assistants or tools that wrote the text.
-4. If a decision is missing, stop and report it instead of guessing.
+4. Before finishing run the same gates as CI: `pnpm exec nx affected -t lint typecheck test build --base=origin/integration/testing-epics`,
+   `pnpm sast` (exit 1 = ERROR finding; `semgrep.sh` alone always exits 0) and
+   `gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD`. Use Node 24.21 (`~/.nvm/versions/node/v24.21.0/bin`).
+5. If a decision is missing, stop and report it instead of guessing.
 Report back in ≤10 lines: status (done/blocked), commits, files, evidence files, open question (if any).
 ```
 

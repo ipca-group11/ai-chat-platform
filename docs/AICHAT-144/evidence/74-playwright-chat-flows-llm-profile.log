@@ -1,0 +1,12 @@
+$ cd e2e && BASE_URL=http://localhost:8000 ANTHROPIC_API_KEY=mock-key PLAYWRIGHT_JUNIT_OUTPUT_FILE=/tmp/e2e.xml pnpm exec playwright test chat-mock.spec.ts --reporter=list
+
+Running 4 tests using 1 worker
+
+  ✓  1 [chromium] › src/tests/chat-mock.spec.ts:36:3 › chat flows against the LLM mock › send and stream: the answer arrives token by token and is saved (7.5s)
+  ✓  2 [chromium] › src/tests/chat-mock.spec.ts:50:3 › chat flows against the LLM mock › cancel: Stop keeps the part that was already written (14.9s)
+  ✓  3 [chromium] › src/tests/chat-mock.spec.ts:65:3 › chat flows against the LLM mock › cancel: a queued message can be removed before it is answered (5.2s)
+  ✓  4 [chromium] › src/tests/chat-mock.spec.ts:77:3 › chat flows against the LLM mock › provider error and retry: the failure is shown and Retry gets an answer (6.3s)
+
+  4 passed (34.7s)
+
+[exit 0]

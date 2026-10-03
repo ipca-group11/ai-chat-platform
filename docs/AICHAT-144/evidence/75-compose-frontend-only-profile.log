@@ -1,0 +1,32 @@
+$ COMPOSE_FILE=compose.yaml:compose.mock.yaml docker compose --profile frontend-only ps --format 'table {{.Service}}\t{{.Status}}' && curl -s localhost:4010/__admin/health && echo && bash scripts/ci/mock-chat-smoke.sh ok
+SERVICE               STATUS
+mfe-auth              Up 32 seconds (healthy)
+mfe-chat              Up 32 seconds (healthy)
+mfe-settings          Up 32 seconds (healthy)
+mock-server           Up 32 seconds (healthy)
+shell-frontend-only   Up 20 seconds (healthy)
+{"status":"ok"}
+== register and sign in as smoke.1791033210@mock.test
+{"id":"user_00003","email":"smoke.1791033210@mock.test"}
+== create a chat (model claude-sonnet-4-5@ok)
+{"chat":{"id":"chat_00005","ownerId":"user_00003","title":"Smoke","provider":"anthropic","model":"claude-sonnet-4-5@ok","reasoning":false,"webFetch":false,"createdAt":"2026-10-03T13:13:30.448Z","updatedAt":"2026-10-03T13:13:30.448Z","ownerEmail":"smoke.1791033210@mock.test"}}
+== open the stream and send a message
+{"message":{"id":"msg_00011","chatId":"chat_00005","authorId":"user_00003","authorEmail":"smoke.1791033210@mock.test","role":"user","content":"Say hello","reasoning":null,"webFetches":[],"attachments":[],"status":"sent","error":null,"createdAt":"2026-10-03T13:13:31.496Z"}}
+== stream events
+data: {"type":"message","message":{"id":"msg_00011","chatId":"chat_00005","authorId":"user_00003","authorEmail":"smoke.1791033210@mock.test","role":"user","cont
+data: {"type":"started","messageId":"msg_00012"}
+data: {"type":"token","messageId":"msg_00012","token":"As "}
+data: {"type":"token","messageId":"msg_00012","token":"arrives "}
+data: {"type":"token","messageId":"msg_00012","token":"tests "}
+data: {"type":"token","messageId":"msg_00012","token":"is "}
+data: {"type":"token","messageId":"msg_00012","token":"repeatable "}
+data: {"type":"token","messageId":"msg_00012","token":"can "}
+data: {"type":"token","messageId":"msg_00012","token":"that "}
+data: {"type":"token","messageId":"msg_00012","token":"change "}
+data: {"type":"token","messageId":"msg_00012","token":"picked "}
+data: {"type":"token","messageId":"msg_00012","token":"seed "}
+...
+token events: 40
+done event received
+
+[exit 0]
