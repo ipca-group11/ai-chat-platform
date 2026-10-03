@@ -1,0 +1,139 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`auth-service error bodies > HttpError 400 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "BAD_REQUEST",
+      "message": "message for BAD_REQUEST",
+    },
+  },
+  "status": 400,
+}
+`;
+
+exports[`auth-service error bodies > HttpError 401 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "INVALID_CREDENTIALS",
+      "message": "message for INVALID_CREDENTIALS",
+    },
+  },
+  "status": 401,
+}
+`;
+
+exports[`auth-service error bodies > HttpError 403 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "FORBIDDEN",
+      "message": "message for FORBIDDEN",
+    },
+  },
+  "status": 403,
+}
+`;
+
+exports[`auth-service error bodies > HttpError 404 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "USER_NOT_FOUND",
+      "message": "message for USER_NOT_FOUND",
+    },
+  },
+  "status": 404,
+}
+`;
+
+exports[`auth-service error bodies > HttpError 409 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "EMAIL_TAKEN",
+      "message": "message for EMAIL_TAKEN",
+    },
+  },
+  "status": 409,
+}
+`;
+
+exports[`auth-service error bodies > HttpError 422 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "UNPROCESSABLE",
+      "message": "message for UNPROCESSABLE",
+    },
+  },
+  "status": 422,
+}
+`;
+
+exports[`auth-service error bodies > HttpError 500 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "INTERNAL_ERROR",
+      "message": "message for INTERNAL_ERROR",
+    },
+  },
+  "status": 500,
+}
+`;
+
+exports[`auth-service error bodies > unexpected error is redacted to a 500 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "INTERNAL_ERROR",
+      "message": "Internal server error",
+    },
+  },
+  "status": 500,
+}
+`;
+
+exports[`auth-service error bodies > unknown route 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "NOT_FOUND",
+      "message": "Not found",
+    },
+  },
+  "status": 404,
+}
+`;
+
+exports[`auth-service error bodies > validation error carries the field errors 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "fieldErrors": {
+        "email": [
+          "Invalid email address",
+        ],
+        "password": [
+          "Too small: expected string to have >=8 characters",
+        ],
+      },
+      "message": "Invalid request",
+    },
+  },
+  "status": 400,
+}
+`;

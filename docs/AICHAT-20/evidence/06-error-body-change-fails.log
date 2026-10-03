@@ -1,0 +1,47 @@
+$ pnpm --dir services/auth-service exec vitest run error-middleware.snapshot
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+ ❯ src/shared/error-middleware.snapshot.spec.ts (10 tests | 1 failed) 9ms
+   ❯ auth-service error bodies (10)
+     × unexpected error is redacted to a 500 4ms
+
+  Snapshots  1 failed
+ Test Files  1 failed (1)
+      Tests  1 failed | 9 passed (10)
+   Start at  17:26:45
+   Duration  176ms (import 47%, transform 26%, worker 18%, tests 9%, setup 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > unexpected error is redacted to a 500
+Error: Snapshot `auth-service error bodies > unexpected error is redacted to a 500 1` mismatched
+
+- Expected
++ Received
+
+  {
+    "body": {
+      "correlationId": "<uuid>",
+      "error": {
+        "code": "INTERNAL_ERROR",
+-       "message": "Internal server error",
++       "message": "Something went wrong",
+      },
+    },
+    "status": 500,
+  }
+
+ ❯ src/shared/error-middleware.snapshot.spec.ts:53:62
+     51|
+     52|   it("unexpected error is redacted to a 500", () => {
+     53|     expect(handle(new Error("db connection string leaked"))).toMatchSn…
+       |                                                              ^
+     54|   });
+     55|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

@@ -1,0 +1,41 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SSE frames > writes one frame per event type 1`] = `
+[
+  "event: queued
+data: {"type":"queued","messageId":"<uuid>"}
+
+",
+  "event: started
+data: {"type":"started","messageId":"<uuid>"}
+
+",
+  "event: token
+data: {"type":"token","messageId":"<uuid>","token":"Hel"}
+
+",
+  "event: reasoning
+data: {"type":"reasoning","messageId":"<uuid>","token":"Thinking"}
+
+",
+  "event: web_fetch
+data: {"type":"web_fetch","messageId":"<uuid>","fetch":{"id":"<uuid>","url":"https://example.com","status":"fetching"}}
+
+",
+  "event: done
+data: {"type":"done","messageId":"<uuid>","stopped":true}
+
+",
+  "event: error
+data: {"type":"error","messageId":"<uuid>","message":"provider timeout","retryable":true}
+
+",
+]
+`;
+
+exports[`SSE frames > writes the message event with the full message DTO 1`] = `
+"event: message
+data: {"type":"message","message":{"id":"<uuid>","chatId":"<uuid>","authorId":"<uuid>","authorEmail":"ana@example.com","role":"user","content":"Hello","reasoning":null,"webFetches":[],"attachments":[],"status":"sent","createdAt":"<date>"}}
+
+"
+`;
