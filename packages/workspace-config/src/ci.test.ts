@@ -62,6 +62,23 @@ describe("AICHAT-83: CI fails when a bundle exceeds its size-limit budget", () =
   });
 });
 
+describe("AICHAT-101: pull requests show the bundle size change in the job summary", () => {
+  const step = ci.jobs.affected.steps.find((s: { name?: string }) => s.name === "Bundle size change");
+
+  it("has a step that runs only on pull requests and never fails the job", () => {
+    expect(step).toBeDefined();
+    expect(step.if).toContain("pull_request");
+    expect(step["continue-on-error"]).toBe(true);
+  });
+
+  it("snapshots head and base builds and reports the difference with scripts/ci/bundle-size.ts", () => {
+    expect(step.run).toMatch(/bundle-size\.ts snapshot .*head-sizes\.json/);
+    expect(step.run).toMatch(/bundle-size\.ts snapshot --root .*base-sizes\.json/);
+    expect(step.run).toMatch(/bundle-size\.ts report .*base-sizes\.json.* .*head-sizes\.json/);
+    expect(step.run).toContain("$NX_BASE");
+  });
+});
+
 describe("AC-13: CI fails the build if any project reports a lint or typecheck error", () => {
   it("AC-13: the `nx affected` step is a normal (non-continue-on-error) step", () => {
     const nxStep = ci.jobs.affected.steps.find(

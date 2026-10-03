@@ -160,7 +160,38 @@ pnpm --filter @platform/workspace-config exec vitest run src/ci.test.ts
 
 **Problems and fixes.** A first idea was a separate CI job for the size check; it would build the apps a second time and `ci.test.ts` asserts that the workflow has one job, so the target stays in the same `nx affected` run, where the Nx cache already has the build. Branch protection is not available on this private repository (as noted in AICHAT-28), so the rule "no merge with a red `nx affected` job" remains a team rule.
 
-### US4 · …
+### US4 · Show bundle size change on each PR ([AICHAT-101](https://ipca-grupo11.atlassian.net/browse/AICHAT-101))
+
+**What and why.** A reviewer should see what a pull request does to the bundles without reading build logs. We chose the job summary of `ci.yml` (no token, no comment spam, nothing to maintain) over a PR comment. `scripts/ci/bundle-size.ts` has two commands: `snapshot` writes the gzip size of every `.js` and `.css` file in `apps/*/dist` to a JSON file, and `report` compares two snapshots and prints a Markdown table: one line per app with the total before and after, then one line per file that is new, removed or different, with before, after and change (bytes below 1 kB, kB above). File names carry a content hash, so the hash is cut (`index-BCMqHVD7.js` becomes `index.js`) to find the same chunk on both sides. In CI, the new step `Bundle size change` runs on pull requests only: it snapshots the `dist` folders of this run, checks out the base branch in a second worktree, builds the four apps there, snapshots them and appends the report to `$GITHUB_STEP_SUMMARY`. Apps that were not affected have no `dist` in this run and are left out of the comparison. The step has `continue-on-error: true`: it informs, the budget is enforced by the `size` target (US3).
+
+**Files.**
+- `scripts/ci/bundle-size.ts`, `scripts/ci/bundle-size.test.ts` (new): snapshot, compare, report; 8 tests (name normalisation, snapshot of a temporary `dist`, new/removed/changed files, unchanged files left out, apps without a base build, bytes for small changes).
+- `.github/workflows/ci.yml`: step `Bundle size change`.
+- `packages/workspace-config/src/ci.test.ts`: two tests for the step.
+
+**How to run.**
+
+```sh
+node scripts/ci/bundle-size.ts snapshot --out /tmp/head.json           # after a build
+node scripts/ci/bundle-size.ts report /tmp/base.json /tmp/head.json    # base.json from the base branch
+pnpm test:scripts && pnpm typecheck:scripts
+```
+
+**How to repeat it manually.**
+
+1. `pnpm exec nx run-many -t build` and `node scripts/ci/bundle-size.ts snapshot --out /tmp/base.json`.
+2. Add a 6 KB import to `apps/mfe-chat/src/app/ChatListPage.tsx` (as in US3), build again and write `/tmp/head.json`.
+3. `node scripts/ci/bundle-size.ts report /tmp/base.json /tmp/head.json`. Expected output: `assets/routes.js` of `mfe-chat` about +5 kB, the app total +5 kB, other apps 0. Undo the change.
+
+**Result.** With the 6 KB import the report shows `mfe-chat` growing from 316.15 kB to 321.43 kB (+1.7%) and, per file, `assets/routes.js` from 60.97 kB to 66.24 kB (+8.7%); the few-byte changes of the entry files come from the hashes of other chunks written into them. The test file passes and the scripts typecheck. The step has not run on GitHub yet: the branch is not pushed.
+
+![Summary table for a deliberate +6 KB import](evidence/05-pr-size-summary.png)
+
+![Unit tests of the script](evidence/06-bundle-size-unit-tests.png)
+
+**Problems and fixes.** The first version printed `+0.00 kB` for changes of a few bytes, which reads as no change; sizes below 1 kB now show in bytes. The base build needs its own `pnpm install` in the second worktree, which adds about a minute to pull request runs; it is the price of an exact before and after, and Nx and pnpm caches of the runner keep it low.
+
+### US5 · …
 
 ## 4. How to run everything
 
