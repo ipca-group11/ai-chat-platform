@@ -1,6 +1,6 @@
 import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
-import { readRepoFile } from "./repo.js";
+import { readRepoFile } from "./repo.ts";
 
 const compose = parse(readRepoFile("docker-compose.yml"));
 
@@ -47,14 +47,14 @@ describe("AC-6: Docker Compose also starts Prometheus and Grafana pre-wired to s
 
   it("AC-6: prometheus mounts observability/prometheus.yml as its scrape config", () => {
     const volumes = compose.services.prometheus.volumes ?? [];
-    expect(volumes.some((v) => v.startsWith("./observability/prometheus.yml:"))).toBe(true);
+    expect(volumes.some((v: string) => v.startsWith("./observability/prometheus.yml:"))).toBe(true);
   });
 
   it("AC-6: prometheus.yml scrapes auth-service and conversation-service /metrics", () => {
     const prometheusConfig = parse(readRepoFile("observability/prometheus.yml"));
-    const jobNames = prometheusConfig.scrape_configs.map((c) => c.job_name);
+    const jobNames = prometheusConfig.scrape_configs.map((c: { job_name: string }) => c.job_name);
     expect(jobNames).toEqual(expect.arrayContaining(["auth-service", "conversation-service"]));
-    for (const job of prometheusConfig.scrape_configs.filter((c) =>
+    for (const job of prometheusConfig.scrape_configs.filter((c: { job_name: string }) =>
       ["auth-service", "conversation-service"].includes(c.job_name),
     )) {
       expect(job.metrics_path).toBe("/metrics");
@@ -64,12 +64,12 @@ describe("AC-6: Docker Compose also starts Prometheus and Grafana pre-wired to s
   it("AC-6: grafana is pre-wired with a provisioned Prometheus datasource", () => {
     expect(compose.services.grafana).toBeDefined();
     const volumes = compose.services.grafana.volumes ?? [];
-    expect(volumes.some((v) => v.includes("observability/grafana/provisioning"))).toBe(true);
+    expect(volumes.some((v: string) => v.includes("observability/grafana/provisioning"))).toBe(true);
 
     const datasource = parse(
       readRepoFile("observability/grafana/provisioning/datasources/datasource.yml"),
     );
     const datasources = datasource.datasources ?? [];
-    expect(datasources.some((d) => d.type === "prometheus")).toBe(true);
+    expect(datasources.some((d: { type: string }) => d.type === "prometheus")).toBe(true);
   });
 });

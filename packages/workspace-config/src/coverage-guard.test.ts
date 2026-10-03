@@ -5,7 +5,7 @@ import {
   findTestProjects,
   loadProject,
   PRESET_IMPORT_EXEMPT,
-} from "./coverage-guard.js";
+} from "./coverage-guard.ts";
 
 const good = {
   dir: "services/demo",
@@ -68,12 +68,12 @@ describe("AICHAT-118: checkProject reports the cases that skip coverage", () => 
   });
 
   it("skips exempt projects", () => {
-    const k6 = { dir: "testing/k6", command: "vitest run", config: "export default {};" };
+    const k6 = { dir: "testing/k6", command: "vitest run", scriptCommand: undefined, config: "export default {};" };
     expect(checkProject(k6)).toEqual([]);
   });
 
   it("allows the preset package to import itself relatively", () => {
-    const self = { ...good, dir: "packages/test-config", config: 'import "./vitest.preset.js";' };
+    const self = { ...good, dir: "packages/test-config", config: 'import "./vitest.preset.ts";' };
     expect(checkProject(self)).toEqual([]);
   });
 });

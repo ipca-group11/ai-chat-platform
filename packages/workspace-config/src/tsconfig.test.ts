@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { readRepoJson, repoRoot } from "./repo.js";
+import { readRepoJson, repoRoot } from "./repo.ts";
 
 // `packages/tsconfig/node.json` sets `"types": ["node"]`, which needs `@types/node` to be
 // resolvable via TS's ambient `typeRoots` lookup. The throwaway project below lives
@@ -38,7 +38,7 @@ describe("AC-10: packages/tsconfig provides shared tsconfig bases used by every 
 });
 
 describe("AC-10: `tsc --noEmit` passes on a project extending each shared tsconfig base", () => {
-  let dir;
+  let dir: string | undefined;
 
   afterEach(() => {
     if (dir) rmSync(dir, { recursive: true, force: true });
@@ -47,19 +47,20 @@ describe("AC-10: `tsc --noEmit` passes on a project extending each shared tsconf
   it.each(["base.json", "react.json", "node.json"])(
     "AC-10: a project extending packages/tsconfig/%s typechecks cleanly",
     (base) => {
-      dir = mkdtempSync(join(tmpdir(), "tsconfig-smoke-"));
+      const tmp = mkdtempSync(join(tmpdir(), "tsconfig-smoke-"));
+      dir = tmp;
       writeFileSync(
-        join(dir, "tsconfig.json"),
+        join(tmp, "tsconfig.json"),
         JSON.stringify({
           extends: join(repoRoot, "packages", "tsconfig", base),
-          compilerOptions: { rootDir: dir, typeRoots: [typesRoot] },
+          compilerOptions: { rootDir: tmp, typeRoots: [typesRoot] },
           include: ["sample.ts"],
         }),
       );
-      writeFileSync(join(dir, "sample.ts"), "export const answer: number = 42;\n");
+      writeFileSync(join(tmp, "sample.ts"), "export const answer: number = 42;\n");
 
       expect(() =>
-        execFileSync("pnpm", ["exec", "tsc", "--noEmit", "-p", join(dir, "tsconfig.json")], {
+        execFileSync("pnpm", ["exec", "tsc", "--noEmit", "-p", join(tmp, "tsconfig.json")], {
           cwd: repoRoot,
           stdio: "pipe",
         }),

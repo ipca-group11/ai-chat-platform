@@ -1,10 +1,10 @@
 import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
-import { readRepoFile } from "./repo.js";
+import { readRepoFile } from "./repo.ts";
 
 /** Parses a dotenv-style file (KEY=value per line, `#` comments, blank lines) into a map. */
-function parseDotenv(content) {
-  const vars = {};
+function parseDotenv(content: string) {
+  const vars: Record<string, string> = {};
   for (const rawLine of content.split("\n")) {
     const line = rawLine.trim();
     if (!line || line.startsWith("#")) continue;
@@ -16,8 +16,8 @@ function parseDotenv(content) {
 }
 
 /** Every `${VAR:-default}` / `${VAR}` interpolation referenced anywhere in a string. */
-function referencedEnvVars(content) {
-  return [...content.matchAll(/\$\{([A-Z_][A-Z0-9_]*)(:-[^}]*)?\}/g)].map((m) => m[1]);
+function referencedEnvVars(content: string) {
+  return [...content.matchAll(/\$\{([A-Z_][A-Z0-9_]*)(:-[^}]*)?\}/g)].map((m) => m[1] as string);
 }
 
 describe("AC-7: .env.example lists every environment variable needed by every service, with safe local defaults", () => {
@@ -32,8 +32,8 @@ describe("AC-7: .env.example lists every environment variable needed by every se
   });
 
   it("AC-7: every ${VAR:-default} referenced from docker-compose.yml is documented in .env.example", () => {
-    const referenced = new Set();
-    for (const service of Object.values(compose.services)) {
+    const referenced = new Set<string>();
+    for (const service of Object.values<{ environment?: Record<string, unknown>; ports?: unknown[] }>(compose.services)) {
       for (const value of Object.values(service.environment ?? {})) {
         if (typeof value === "string") {
           referencedEnvVars(value).forEach((v) => referenced.add(v));

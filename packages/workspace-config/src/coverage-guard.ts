@@ -1,29 +1,36 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { readRepoFile, readRepoJson, repoRoot } from "./repo.js";
+import { readRepoFile, readRepoJson, repoRoot } from "./repo.ts";
 
 /**
  * Projects whose `test` target is allowed to skip coverage (AICHAT-34, README §5).
  * Add a project here only with a written reason; everything else must enforce coverage.
  */
-export const COVERAGE_EXEMPT = {
+export const COVERAGE_EXEMPT: Record<string, string> = {
   "testing/k6": "k6 runtime, not Node: the suite only asserts on the script text, there is no Node source to instrument",
 };
 
 /**
  * Projects that are allowed to not import `@platform/test-config` in their Vitest config.
  */
-export const PRESET_IMPORT_EXEMPT = {
+export const PRESET_IMPORT_EXEMPT: Record<string, string> = {
   "packages/test-config": "defines the preset, so it imports it relatively",
   "packages/eslint-config":
     "would create a dependency cycle with @platform/test-config; keeps identical thresholds inline",
 };
 
+export interface ProjectInfo {
+  dir: string;
+  command: string | undefined;
+  scriptCommand: string | undefined;
+  config: string | undefined;
+}
+
 const CONFIG_FILES = ["vitest.config.ts", "vite.config.ts"];
 
 /** Project directories of the pnpm workspace that define a Nx `test` target. */
 export function findTestProjects() {
-  const dirs = [];
+  const dirs: string[] = [];
   for (const group of ["apps", "services", "packages"]) {
     for (const entry of readdirSync(join(repoRoot, group), { withFileTypes: true })) {
       if (entry.isDirectory()) dirs.push(`${group}/${entry.name}`);
@@ -42,10 +49,10 @@ export function findTestProjects() {
  * command, `scriptCommand` the `package.json` `test` script (may be undefined) and `config`
  * the text of the Vitest config (may be undefined).
  */
-export function checkProject(project, { coverageExempt = COVERAGE_EXEMPT, importExempt = PRESET_IMPORT_EXEMPT } = {}) {
+export function checkProject(project: ProjectInfo, { coverageExempt = COVERAGE_EXEMPT, importExempt = PRESET_IMPORT_EXEMPT } = {}) {
   const { dir, command, scriptCommand, config } = project;
   if (dir in coverageExempt) return [];
-  const problems = [];
+  const problems: string[] = [];
   if (!command?.includes("--coverage")) {
     problems.push(`${dir}: the Nx test target "${command}" does not run with --coverage`);
   }
@@ -61,7 +68,7 @@ export function checkProject(project, { coverageExempt = COVERAGE_EXEMPT, import
 }
 
 /** Reads the real project files from the repo for the given directory. */
-export function loadProject(dir) {
+export function loadProject(dir: string) {
   const projectJson = readRepoJson(`${dir}/project.json`);
   const pkgPath = `${dir}/package.json`;
   const scriptCommand = existsSync(join(repoRoot, pkgPath))

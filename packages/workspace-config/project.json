@@ -3,12 +3,22 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/workspace-config/src",
   "projectType": "library",
-  "tags": ["type:package", "scope:shared"],
+  "tags": [
+    "type:package",
+    "scope:shared"
+  ],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",
       "options": {
         "command": "eslint src --max-warnings=0",
+        "cwd": "packages/workspace-config"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.json --noEmit",
         "cwd": "packages/workspace-config"
       }
     },

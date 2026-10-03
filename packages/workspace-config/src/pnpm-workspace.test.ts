@@ -1,6 +1,6 @@
 import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
-import { readRepoFile } from "./repo.js";
+import { readRepoFile } from "./repo.ts";
 
 describe("AC-1: pnpm-workspace.yaml defines apps/, services/, and packages/ as workspace packages", () => {
   const workspace = parse(readRepoFile("pnpm-workspace.yaml"));

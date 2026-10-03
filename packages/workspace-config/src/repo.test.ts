@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readRepoFile, readRepoJson, repoRoot } from "./repo.js";
+import { readRepoFile, readRepoJson, repoRoot } from "./repo.ts";
 
 describe("repo helpers", () => {
   it("resolves repoRoot to the directory containing pnpm-workspace.yaml", () => {

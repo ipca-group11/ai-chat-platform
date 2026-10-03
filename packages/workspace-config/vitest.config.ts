@@ -17,7 +17,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["src/**/*.test.{js,ts}"],
-    coverage: coveragePreset({ include: ["src/**/*.{js,ts}"] }),
+    include: ["src/**/*.test.ts"],
+    coverage: coveragePreset({ include: ["src/**/*.ts"] }),
   },
 });

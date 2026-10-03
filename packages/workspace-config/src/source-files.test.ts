@@ -11,7 +11,7 @@ import {
   loadExempt,
   untestedFiles,
   validateExempt,
-} from "./source-files";
+} from "./source-files.ts";
 
 // The guard (AICHAT-138): every source file under the unit-test policy has a test next to it
 // or an entry in unit-test-exempt.json, and every exempt entry still points at a file that needs it.
@@ -25,7 +25,7 @@ describe("unit-test guard on this repository", () => {
     expect(files.length).toBeGreaterThan(100);
     expect(files).toContain("apps/mfe-chat/src/shared/model-capabilities.ts");
     expect(files).not.toContain("apps/mfe-chat/src/shared/model-capabilities.test.ts");
-    expect(files.filter((f) => f.endsWith(".d.ts") || f.includes("/generated/"))).toEqual([]);
+    expect(files.filter((f: string) => f.endsWith(".d.ts") || f.includes("/generated/"))).toEqual([]);
   });
 });
 

@@ -1,10 +1,10 @@
 // Which source files fall under the unit-test policy (docs/AICHAT-17/UNIT-TEST-POLICY.md), which of
 // them have a co-located test, and which are exempt (packages/workspace-config/unit-test-exempt.json).
-// Used by the guard test (source-files.test.js) and by scripts/unit-test/source-files.mjs.
+// Used by the guard test (source-files.test.ts) and by scripts/unit-test/source-files.ts.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { repoRoot } from "./repo.js";
+import { repoRoot } from "./repo.ts";
 
 export const EXEMPT_FILE = "packages/workspace-config/unit-test-exempt.json";
 export const CATEGORIES: readonly string[] = ["bootstrap", "barrel", "type-only"];
@@ -16,19 +16,19 @@ export interface ExemptEntry {
 }
 
 const IN_SCOPE = /^(apps\/[^/]+\/src\/|packages\/[^/]+\/|services\/[^/]+\/src\/|e2e\/src\/)/;
-const EXTENSION = /\.(ts|tsx|js)$/;
+const EXTENSION = /\.(ts|tsx)$/;
 const NOT_SOURCE = [
-  /\.(test|spec)\.(ts|tsx|js)$/, // the tests themselves
+  /\.(test|spec)\.(ts|tsx)$/, // the tests themselves
   /\.d\.ts$/,
   /\.stories\.tsx?$/,
   /(^|\/)routeTree\.gen\.ts$/, // generated
   /(^|\/)@mf-types\//,
   /\/generated\//,
   /(^|\/)\.storybook\//,
-  /(^|\/)(vitest|vite|eslint|tailwind|postcss)\.config\.(ts|js)$/, // tool configs
+  /(^|\/)(vitest|vite|eslint|tailwind|postcss)\.config\.ts$/, // tool configs
   /(^|\/)(test|test-utils)\//, // test helpers
   /(^|\/)(test-setup|test-fakes|setup|setup-env|setup-no-network)\.ts$/,
-  /^packages\/workspace-config\/src\/repo\.js$/, // helper of the repo-structure tests
+  /^packages\/workspace-config\/src\/repo\.ts$/, // helper of the repo-structure tests
   /^packages\/test-utils\//, // the shared test helpers are test code themselves (tested, not listed)
   /(^|\/)dist\//, // build output
 ];
@@ -50,8 +50,8 @@ export function listSourceFiles(root: string = repoRoot): string[] {
 
 /** Test files that sit next to `file` (same base name, `.test`/`.spec`). */
 export function colocatedTests(file: string, root: string = repoRoot): string[] {
-  const base = file.replace(/\.(ts|tsx|js)$/, "");
-  return [".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx", ".test.js", ".spec.js"]
+  const base = file.replace(/\.(ts|tsx)$/, "");
+  return [".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"]
     .map((ext) => base + ext)
     .filter((f) => existsSync(join(root, f)));
 }

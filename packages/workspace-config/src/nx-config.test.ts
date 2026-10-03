@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
-import { readRepoFile, readRepoJson, repoRoot } from "./repo.js";
+import { readRepoFile, readRepoJson, repoRoot } from "./repo.ts";
 
 describe("AC-2: Nx workspace is configured with a project graph covering every app, service, and package", () => {
   it(
@@ -58,7 +58,7 @@ describe("AC-3: every project defines Nx targets for lint, typecheck, test, and 
 });
 
 describe("AC-4: Nx tags enforce module boundaries (apps depend on packages/*, never on another app)", () => {
-  const eslintBaseSrc = readRepoFile("packages/eslint-config/src/base.js");
+  const eslintBaseSrc = readRepoFile("packages/eslint-config/src/base.ts");
 
   it("AC-4: base eslint preset wires up @nx/enforce-module-boundaries", () => {
     expect(eslintBaseSrc).toMatch(/@nx\/enforce-module-boundaries/);

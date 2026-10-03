@@ -26,6 +26,6 @@ describe("AC-9: packages/eslint-config provides a flat ESLint config with typesc
   it("AC-9: react preset adds React/JSX rules for apps/shell, apps/mfe-*, and packages/ui", () => {
     const reactCfg = react.find((cfg) => cfg.plugins && cfg.plugins.react);
     expect(reactCfg).toBeDefined();
-    expect(reactCfg.plugins["react-hooks"]).toBeDefined();
+    expect(reactCfg?.plugins?.["react-hooks"]).toBeDefined();
   });
 });
