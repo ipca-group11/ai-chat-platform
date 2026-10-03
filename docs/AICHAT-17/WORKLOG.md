@@ -194,6 +194,14 @@ Foundation stories only (US1 to US3); the per-project stories add their rows.
 | `vi.stubGlobal("fetch", ...)` calls in the MFE tests | 54 in 19 files | 0 (two one-call spies with a reason) |
 | Hand-made `QueryClient` / `EventSource` helpers in the MFEs | 3 render helpers, 3 fake `EventSource` classes | 1 package, `@platform/test-utils` |
 
+Gates run before the foundation stories were handed over (all green):
+
+![nx affected: lint, typecheck, test, build](evidence/09-nx-affected.png)
+
+![pnpm sast](evidence/10-sast.png)
+
+![gitleaks](evidence/11-gitleaks.png)
+
 ## 6. DoD check
 
 | DoD item | Met | Evidence |
