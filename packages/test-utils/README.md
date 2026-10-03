@@ -30,6 +30,24 @@ ensureChatStream("chat-1", client);
 Source.last.emit("token", { messageId: "m1", token: "Hi" });
 ```
 
+## PII detector: `@platform/test-utils/pii`
+
+For the telemetry tests of AICHAT-32 (service logs, `/metrics`, Faro). Node only, no DOM.
+
+| Export | What it does |
+|---|---|
+| `findPii(text, { canaries?, ignore? })` | Matches `{ kind, value, index }` for emails, IPv4/IPv6 addresses, tokens (JWT, `Bearer`, session cookie values, `sk-` API keys) and your canaries. Percent-encoded text is scanned decoded too. `[REDACTED]` never matches. |
+| `findPiiInLines(lines, options?)` | The same over many lines; each match has its `line`. |
+| `describePii(matches)` | One readable line per match, for the assertion message. |
+| `createLogCapture()` | A pino destination that keeps the lines: `lines()`, `records()`, `clear()`. |
+
+```ts
+const logs = createLogCapture();
+const app = createApp({ ...deps, logger: pino(options, logs) });
+// ...drive the routes...
+expect(describePii(findPiiInLines(logs.lines(), { canaries: [CANARY] }))).toBe("");
+```
+
 ## HTTP mocking with MSW: `@platform/test-utils/msw` and `/setup`
 
 Add the setup file to the Vitest config of the project, after its own setup file:
