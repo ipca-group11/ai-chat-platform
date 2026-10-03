@@ -11,7 +11,7 @@ title: "AICHAT-17 · Unit testing: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-17-unit-testing` |
 | Started / finished | 2026-10-03 / 2026-10-03 |
-| Pull requests | #… |
+| Pull requests | [#13](https://github.com/ipca-group11/ai-chat-platform/pull/13) |
 | Status | In Progress |
 
 ## 1. DoR review
@@ -607,6 +607,6 @@ The repository had grown 52 JavaScript files next to the TypeScript code: the ES
 - **Scripts** (`scripts/**`, `testing/mock-server/scripts/build.ts`) run as `node file.ts` on Node 24 type stripping, so they only use erasable syntax. `tsconfig.scripts.json` (`erasableSyntaxOnly`, `verbatimModuleSyntax`, `noEmit`) checks them: `pnpm typecheck:scripts`. The script tests keep `node:test` and run with `pnpm test:scripts`. CI runs both before `nx affected`, and the `sast` job now sets up the pinned Node so `sast-summary.ts` runs there.
 - **`packages/ui/postcss.config.ts`** is read by `postcss-load-config`; the library and the apps build as before.
 - **`testing/k6/streaming-load.ts`**: k6 runs TypeScript natively (checked with `k6 inspect`), types come from `@types/k6`, and the project has a `typecheck` target.
-- **Rules that look at file names** (the unit-test inventory, the coverage guard, `nx.json` inputs, `.semgrepignore`) and every command in the docs and in the epic skills now use the `.ts` names.
+- **Rules that look at file names** (the unit-test inventory, the coverage guard, `nx.json` inputs, `.semgrepignore`) and every command in the docs now use the `.ts` names.
 
 Problems we hit: `tsc` rejected the `.ts` import specifiers in projects that do not extend the base config (fixed per project, see above), and ESLint 9 in `packages/ui` refused the old `jiti` 1.
