@@ -1,0 +1,29 @@
+$ pnpm --filter @app/mfe-chat exec vitest run src/features -t "accessibility"; pnpm --filter @app/mfe-settings exec vitest run -t "accessibility"
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-chat
+
+
+ Test Files  2 passed | 27 skipped (29)
+      Tests  2 passed | 216 skipped (218)
+   Start at  16:18:48
+   Duration  6.58s (environment 43%, import 33%, setup 16%, transform 6%, tests 1%)
+
+Environment  jsdom was created 29 times · 16.79s total, 43% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-settings
+
+
+ Test Files  1 passed | 10 skipped (11)
+      Tests  2 passed | 57 skipped (59)
+   Start at  16:18:55
+   Duration  2.20s (environment 43%, import 25%, setup 17%, transform 12%, tests 2%)
+
+Environment  jsdom was created 11 times · 5.35s total, 43% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+
+[exit 0]
