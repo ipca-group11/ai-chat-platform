@@ -1,6 +1,6 @@
 ---
 name: epic-workflow
-description: Orchestrate an AICHAT testing epic (AICHAT-17..34, AICHAT-144) — move it to In Progress in Jira, run the Definition of Ready review by asking the owner questions, then delegate each story to a small-context subagent that implements it, captures evidence (screenshots/logs) and writes its WORKLOG section. Use for "start epic AICHAT-NN", "next epic", "continue AICHAT-NN", "/epic-workflow". Each epic also has its own skill `aichat-<n>-<slug>` with the epic-specific facts.
+description: Orchestrate an AICHAT testing epic (AICHAT-8..34, AICHAT-144) — move it to In Progress in Jira, run the Definition of Ready review by asking the owner questions, then delegate each story to a small-context subagent that implements it, captures evidence (screenshots/logs) and writes its WORKLOG section. Use for "start epic AICHAT-NN", "next epic", "continue AICHAT-NN", "/epic-workflow". Each epic also has its own skill `aichat-<n>-<slug>` with the epic-specific facts.
 ---
 
 # Epic workflow — orchestrator
@@ -32,7 +32,8 @@ of code and all implementation happens in subagents that get **only** what they 
 
 ## Fixed facts
 
-- Jira cloudId `436aa6ed-4a2a-4c54-b40f-3490773ebd63`, project `AICHAT`, owner accountId `5b83bde0332df52a5d945bc3`.
+- Jira cloudId `436aa6ed-4a2a-4c54-b40f-3490773ebd63`, project `AICHAT`, owner accountId `5b83bde0332df52a5d945bc3`
+  (JP, AICHAT-17..34 and AICHAT-144). Epics AICHAT-8..16 belong to João Vieira: their epic skill gives the owner accountId; use it.
 - Transitions: `21` In Progress, `31` Review, `41` Done, `11` back to TODO.
 - Impediment flag: `editJiraIssue` fields `{"customfield_10021":[{"value":"Impediment"}]}`.
 - Evidence helper: `node scripts/evidence/term-shot.mjs --out docs/AICHAT-<n>/evidence --name <nn>-<what> -- <cmd>`
@@ -76,7 +77,7 @@ For each story (order from the epic skill; parallel where independent):
 #### Agent prompt template (keep it this short)
 
 ```
-Repo: /Users/truezone/Projects/ai-chat-platform (branch <branch>). Story <JIRA-KEY> (<epic>-US<k>): <summary>.
+Repo: <absolute path of the repo root on this machine> (branch <branch>). Story <JIRA-KEY> (<epic>-US<k>): <summary>.
 Acceptance criteria:
 <verbatim from epic skill>
 Decisions that apply: <1–5 lines from WORKLOG §1>
