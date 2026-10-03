@@ -1,0 +1,16 @@
+$ bash /private/tmp/claude-501/-Users-truezone-Projects-ai-chat-platform/eef7d68d-8a8c-448c-9b92-df26c0f970df/scratchpad/e40.sh
+
+ RUN  v5.0.1 /private/tmp/claude-501/u17-chat/apps/mfe-chat
+
+
+ Test Files  11 passed (11)
+      Tests  69 passed (69)
+   Start at  15:18:01
+   Duration  6.38s (environment 61%, setup 12%, transform 10%, import 10%, tests 5%)
+
+Environment  jsdom was created 11 times · 22.24s total, 61% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+
+[exit 0]
