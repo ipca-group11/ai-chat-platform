@@ -55,3 +55,34 @@ jobs:
             if [ "$code" -eq 0 ]; then echo "Result: no leaks found."; else echo "Result: **leaks found** (values are redacted in the log). The merge is blocked."; fi
           } >> "$GITHUB_STEP_SUMMARY"
           exit "$code"
+
+  sast:
+    name: sast (semgrep)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan with Semgrep CE (pinned image)
+        run: scripts/ci/semgrep.sh semgrep-results
+
+      # Writes the Markdown table to the job summary, then fails the job when an unsuppressed ERROR
+      # finding exists. WARNING and INFO are listed but never fail.
+      - name: Summary table and merge gate
+        run: |
+          set +e
+          node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif > semgrep-results/summary.md
+          code=$?
+          cat semgrep-results/summary.md
+          cat semgrep-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+          exit "$code"
+
+      - name: Upload SARIF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif
+          path: |
+            semgrep-results/semgrep.sarif
+            semgrep-results/summary.md
+          if-no-files-found: warn
+          retention-days: 14

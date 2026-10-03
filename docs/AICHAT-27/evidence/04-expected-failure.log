@@ -1,0 +1,13 @@
+$ scripts/ci/semgrep.sh 2>/dev/null; node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif > semgrep-results/s.md; code=$?; cut -c1-170 semgrep-results/s.md | head -8; echo "gate exit code: $code"; exit $code
+semgrep exit code: 0 (results in semgrep-results/)
+### SAST (Semgrep CE)
+**1 ERROR finding(s): the merge is blocked.**
+ERROR: 1, WARNING: 24, INFO: 13. Only ERROR blocks; the rest is reported.
+
+| Rule | Severity | Count | Locations |
+|---|---|---|---|
+| `aichat.secret-env-fallback-literal` | ERROR | 1 | `tmp-sast-proof/bad.ts:1` |
+| `yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag` | WARNING | 15 | `.github/workflows/ci.yml:23`, `.github/workflows/ci
+gate exit code: 1
+
+[exit 1]

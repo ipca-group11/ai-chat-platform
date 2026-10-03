@@ -4,6 +4,8 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4002),
   DATABASE_URL: z.string().min(1).default("postgresql://postgres:postgres@localhost:5432/conversation?schema=public"),
+  // Known High bug: the default secret is not fixed in this epic (AICHAT-210, WAIVERS.md W5).
+  // nosemgrep: aichat.secret-with-literal-default-zod
   JWT_SECRET: z.string().min(1).default("change-me-in-every-environment"),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
   UPLOAD_DIR: z.string().default("./data/uploads"),

@@ -21,3 +21,4 @@ apps/*/.mf/
 
 # local git worktrees
 .claude/worktrees/
+semgrep-results/

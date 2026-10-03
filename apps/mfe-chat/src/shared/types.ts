@@ -124,4 +124,6 @@ export const CORRELATION_HEADER = "X-Correlation-Id";
  * persists it. Exact header name/format to be confirmed with the settings pod
  * (flagged as an integration risk in docs/pods/chat/PLAN.md §7).
  */
+// HTTP header name, not a secret (WAIVERS.md W2)
+// nosemgrep: node_api_key
 export const LLM_API_KEY_HEADER = "X-Llm-Api-Key";

@@ -15,4 +15,6 @@ export type ProviderSelection = z.infer<typeof providerSelectionSchema>;
  * Header carrying the user's per-request provider API key (FR19). Read once by the
  * adapter, never logged or persisted (redacted in `pino` serializers).
  */
+// HTTP header name, not a secret (WAIVERS.md W2)
+// nosemgrep: node_api_key
 export const LLM_API_KEY_HEADER = "X-Llm-Api-Key";

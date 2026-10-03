@@ -1,0 +1,15 @@
+$ node --test scripts/ci/sast-summary.test.mjs
+✔ collects findings, resolves severity from the rule and skips suppressed ones (1.015292ms)
+✔ table groups by rule, lists ERROR first and shows file:line (0.22575ms)
+✔ long location lists are cut (0.108ms)
+✔ summary says blocked with ERROR and clean without (0.097125ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 50.502667
+
+[exit 0]

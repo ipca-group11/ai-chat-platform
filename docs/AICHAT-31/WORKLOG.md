@@ -257,7 +257,7 @@ sh scripts/git-hooks/demo.sh                              # hook blocks a key, p
 | History scanned and triaged, summary without values | ✅ | [HISTORY-SCAN.md](HISTORY-SCAN.md), [03](evidence/03-history-scan.log) |
 | Rotation checklist per finding or "none found" | ✅ | [05](evidence/05-rotation-checklist.log) |
 | CI job added; a fake key fails | ✅ | [06](evidence/06-fake-key-fails.log), [10](evidence/10-pr-fake-key-fails-ci.log) |
-| Check required | Required on `integration/testing-epics` together with SAST (AICHAT-27, owner decision); on `main` it is added by the owner after the final PR | — |
+| Check required | Not possible on this plan (branch protection returns HTTP 403 on a private repository without GitHub Pro/Team, see AICHAT-27 evidence 07). The failing check is shown on every PR and the team rule is not to merge a red check | [AICHAT-27 07](../AICHAT-27/evidence/07-branch-protection-unavailable.png) |
 | GitHub secret scanning decision documented | ✅ | [09](evidence/09-github-secret-scanning.log) |
 | Pre-commit hook documented, works on macOS/Linux | ✅ (tested on macOS) | [07](evidence/07-pre-commit-hook.log) |
 
