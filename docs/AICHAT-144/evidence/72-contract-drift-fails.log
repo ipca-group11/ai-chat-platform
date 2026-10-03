@@ -1,0 +1,47 @@
+$ cd testing/mock-server && pnpm exec vitest run src/contract/backend
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/testing/mock-server
+
+ ❯ src/contract/backend.contract.spec.ts (5 tests | 1 failed) 257ms
+   ❯ backend mock responses (4)
+     × differ from @platform/shared-types only where DRIFT says so 7ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  13:28:12
+   Duration  817ms (tests 35%, transform 34%, import 31%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/contract/backend.contract.spec.ts > backend mock responses > differ from @platform/shared-types only where DRIFT says so
+AssertionError: expected { 'auth.register': [ …(3) ], …(7) } to deeply equal { 'auth.register': [ …(3) ], …(7) }
+
+- Expected
++ Received
+
+@@ -22,10 +22,11 @@
+      "extra id",
+      "user: invalid_type",
+    ],
+    "chat": [
+      "extra ownerEmail",
++     "pinned: invalid_type",
+    ],
+    "error": [],
+    "member": [],
+    "message": [
+      "extra attachments",
+
+ ❯ src/contract/backend.contract.spec.ts:271:19
+    269|       found[kind] = [...diffs].sort();
+    270|     }
+    271|     expect(found).toEqual(Object.fromEntries(Object.keys(sharedTypes).…
+       |                   ^
+    272|   });
+    273|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

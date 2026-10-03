@@ -1,0 +1,42 @@
+$ cd testing/mock-server && pnpm exec vitest run src/contract --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/testing/mock-server
+
+ ✓ src/contract/backend.contract.spec.ts > backend mock responses > collected a sample of every kind of response 1ms
+ ✓ src/contract/backend.contract.spec.ts > backend mock responses > match the schemas of the real services, with no missing and no extra field 5ms
+ ✓ src/contract/backend.contract.spec.ts > backend mock responses > differ from @platform/shared-types only where DRIFT says so 3ms
+ ✓ src/contract/backend.contract.spec.ts > backend mock responses > send stream events that differ from the shared-types events only where STREAM_DRIFT says so 1ms
+ ✓ src/contract/backend.contract.spec.ts > what shared-types accepts as a request > is accepted by the mock 16ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > has an expectation for every scenario the mock registers 1ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "ok" scenario 21ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "long" scenario 7ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "max-tokens" scenario 3ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "slow" scenario 5006ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "thinking" scenario 8ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "web-fetch" scenario 5ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "pause-turn" scenario 5ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "drop" scenario 5ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "error-401" scenario 3ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "error-429" scenario 1ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "error-500" scenario 1ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses the "error-529" scenario 1ms
+ ✓ src/contract/llm.contract.spec.ts > anthropic adapter against the LLM mock > parses every recorded fixture the replay scenario serves 16ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > has an expectation for every scenario the mock registers 0ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses the "ok" scenario 2ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses the "long" scenario 2ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses the "max-tokens" scenario 1ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses the "slow" scenario 5003ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses the "drop" scenario 3ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses the "error-401" scenario 2ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses the "error-429" scenario 2ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses the "error-500" scenario 2ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses the "error-503" scenario 3ms
+ ✓ src/contract/llm.contract.spec.ts > openai adapter against the LLM mock > parses every recorded fixture the replay scenario serves 7ms
+
+ Test Files  2 passed (2)
+      Tests  30 passed (30)
+   Start at  13:27:58
+   Duration  11.01s (tests 89%, import 5%, transform 5%)
+
+
+[exit 0]
