@@ -4,9 +4,11 @@ const initializeFaro = vi.fn(() => ({}) as never);
 vi.mock('@grafana/faro-web-sdk', () => ({
   initializeFaro,
   getWebInstrumentations: vi.fn(() => []),
+  LogLevel: { TRACE: 'trace', DEBUG: 'debug', LOG: 'log', INFO: 'info', WARN: 'warn', ERROR: 'error' },
 }));
 
 const { initFaro, FARO_APP_NAME } = await import('./faro');
+const { scrubTransportItem } = await import('./faro-scrub');
 
 describe('initFaro', () => {
   afterEach(() => initializeFaro.mockClear());
@@ -30,6 +32,16 @@ describe('initFaro', () => {
     initFaro({ url: 'https://example.test/collect' });
     expect(initializeFaro).toHaveBeenCalledWith(
       expect.objectContaining({ app: expect.objectContaining({ version: 'dev' }) }),
+    );
+  });
+
+  it('scrubs every item before it is sent and captures only warnings and errors from the console', () => {
+    initFaro({ url: 'https://example.test/collect' });
+    expect(initializeFaro).toHaveBeenCalledWith(
+      expect.objectContaining({
+        beforeSend: scrubTransportItem,
+        consoleInstrumentation: { disabledLevels: ['trace', 'debug', 'log', 'info'] },
+      }),
     );
   });
 });
