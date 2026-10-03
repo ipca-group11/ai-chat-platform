@@ -1,0 +1,22 @@
+# gitleaks configuration for ai-chat-platform (AICHAT-31).
+# Extends the built-in rule set; we only add exceptions, never new rules.
+title = "ai-chat-platform gitleaks config"
+
+[extend]
+useDefault = true
+
+# Allow-list policy: only test fixtures and example files may be listed, each
+# entry must carry a comment saying why, and each must be as narrow as possible
+# (an exact path or an exact regex, never a broad glob).
+#
+# Current state: the default rules report nothing in tracked files or in the git
+# history, so no exception is needed and the list is empty on purpose. The fake
+# keys in *.test.ts / *.spec.ts and the dev defaults in .env.example and
+# compose.yaml do not match any default rule.
+#
+# Add an entry here only when a scan reports a false positive, for example:
+#
+# [[allowlists]]
+# description = "Fake provider key used as a fixture in the settings tests"
+# paths = ['''^apps/mfe-settings/src/features/api-keys/hooks/useApiKeys\.test\.tsx$''']
+# regexes = ['''sk-ant-test-[A-Za-z0-9]+''']
