@@ -162,7 +162,7 @@ sh scripts/ci/secret-scan-proof.sh
 
 PR: #<to fill> (the proof on a real failing pull request is done by us later, together with making the check required on `main`).
 
-**Problems and fixes.** The first fake key we tried is not a problem in itself, but AWS documents example keys that gitleaks may skip, so we generate a random one each run. We cannot run the GitHub workflow locally, so the workflow itself is checked only by this local proof until the PR run.
+**Problems and fixes.** AWS documents example keys that gitleaks may allow-list, so the proof generates a random key on each run. We cannot run the GitHub workflow locally, so the workflow itself is checked only by this local proof until the PR run.
 
 ### US5 · Decide on GitHub secret scanning ([AICHAT-109](https://ipca-grupo11.atlassian.net/browse/AICHAT-109))
 
