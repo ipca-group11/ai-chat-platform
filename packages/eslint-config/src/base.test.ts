@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest";
-import base from "./base.js";
-import { lintRuleIds } from "./test-utils/lint.js";
+import base from "./base.ts";
+import { lintRuleIds } from "./test-utils/lint.ts";
 
-const ruleConfig = (name) => base.find((entry) => entry.rules?.[name])?.rules[name];
+const ruleConfig = (name: string): unknown => base.find((entry) => entry.rules?.[name])?.rules?.[name];
+
+type NxBoundaries = [string, { depConstraints: Array<{ sourceTag: string; onlyDependOnLibsWithTags: string[] }> }];
 
 describe("base preset", () => {
   it("is a flat config array that registers the nx and local platform plugins", () => {
     expect(Array.isArray(base)).toBe(true);
     const plugins = base.find((entry) => entry.plugins?.platform)?.plugins;
-    expect(Object.keys(plugins)).toEqual(expect.arrayContaining(["@nx", "platform"]));
+    expect(Object.keys(plugins ?? {})).toEqual(expect.arrayContaining(["@nx", "platform"]));
   });
 
   it("ignores build output and dependency folders", () => {
@@ -19,7 +21,7 @@ describe("base preset", () => {
   });
 
   it("enforces module boundaries between apps, services and packages", () => {
-    const [severity, options] = ruleConfig("@nx/enforce-module-boundaries");
+    const [severity, options] = ruleConfig("@nx/enforce-module-boundaries") as NxBoundaries;
     expect(severity).toBe("error");
     const constraints = Object.fromEntries(options.depConstraints.map((c) => [c.sourceTag, c.onlyDependOnLibsWithTags]));
     expect(constraints).toEqual({

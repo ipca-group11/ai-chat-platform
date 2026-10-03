@@ -1,12 +1,13 @@
 import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
-import base from "./base.js";
+import type { ConfigArray } from "typescript-eslint";
+import base from "./base.ts";
 
 /**
  * Preset for React frontend projects (`apps/shell`, `apps/mfe-*`, `packages/ui`):
  * base + React/JSX + hooks rules.
  */
-const react = [
+const react: ConfigArray = [
   ...base,
   {
     files: ["**/*.{jsx,tsx}"],
@@ -27,7 +28,7 @@ const react = [
       react: { version: "19.3.0" },
     },
     rules: {
-      ...reactPlugin.configs.flat.recommended.rules,
+      ...reactPlugin.configs.flat.recommended?.rules,
       ...reactHooksPlugin.configs["recommended-latest"].rules,
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",

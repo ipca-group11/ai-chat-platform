@@ -1,4 +1,5 @@
 import path from "node:path";
+import type { Rule } from "eslint";
 
 /**
  * Enforces the feature-folder convention from SPEC.md §3.3 / ARCHITECTURE.md §3:
@@ -15,8 +16,7 @@ import path from "node:path";
  * Deep-importing another feature's internals (`features/b/hooks/useThing`) is rejected.
  */
 
-/** @type {import('eslint').Rule.RuleModule} */
-const featureFolderBoundaries = {
+const featureFolderBoundaries: Rule.RuleModule = {
   meta: {
     type: "problem",
     docs: {
@@ -30,7 +30,7 @@ const featureFolderBoundaries = {
     },
   },
   create(context) {
-    const filename = context.filename ?? context.getFilename();
+    const filename = context.filename;
     const normalized = filename.split(path.sep).join("/");
     const currentFeatureMatch = normalized.match(/\/src\/features\/([^/]+)\//);
 
@@ -40,7 +40,7 @@ const featureFolderBoundaries = {
 
     const currentFeature = currentFeatureMatch[1];
 
-    function checkImport(node, importPath) {
+    function checkImport(node: Rule.Node, importPath: string): void {
       if (!importPath.startsWith(".")) {
         // Bare specifier (npm package, workspace package via tsconfig paths) — out of scope.
         return;
@@ -77,16 +77,16 @@ const featureFolderBoundaries = {
 
     return {
       ImportDeclaration(node) {
-        checkImport(node, node.source.value);
+        checkImport(node, String(node.source.value));
       },
       ExportNamedDeclaration(node) {
         if (node.source) {
-          checkImport(node, node.source.value);
+          checkImport(node, String(node.source.value));
         }
       },
       ExportAllDeclaration(node) {
         if (node.source) {
-          checkImport(node, node.source.value);
+          checkImport(node, String(node.source.value));
         }
       },
       ImportExpression(node) {

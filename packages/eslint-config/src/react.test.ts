@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import base from "./base.js";
-import react from "./react.js";
-import { lintRuleIds } from "./test-utils/lint.js";
+import base from "./base.ts";
+import react from "./react.ts";
+import { lintRuleIds } from "./test-utils/lint.ts";
 
 describe("react preset", () => {
   it("starts with every base entry and adds one JSX entry", () => {
@@ -11,13 +11,13 @@ describe("react preset", () => {
 
   it("scopes the React rules to jsx and tsx files and pins the React version", () => {
     const entry = react.at(-1);
-    expect(entry.files).toEqual(["**/*.{jsx,tsx}"]);
-    expect(entry.settings.react.version).toBe("19.3.0");
-    expect(entry.languageOptions.parserOptions.ecmaFeatures.jsx).toBe(true);
+    expect(entry?.files).toEqual(["**/*.{jsx,tsx}"]);
+    expect(entry?.settings).toMatchObject({ react: { version: "19.3.0" } });
+    expect(entry?.languageOptions?.parserOptions).toMatchObject({ ecmaFeatures: { jsx: true } });
   });
 
   it("switches off the rules a modern React setup does not need", () => {
-    const { rules } = react.at(-1);
+    const rules = react.at(-1)?.rules ?? {};
     expect(rules["react/react-in-jsx-scope"]).toBe("off");
     expect(rules["react/prop-types"]).toBe("off");
   });

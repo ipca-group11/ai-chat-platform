@@ -1,4 +1,4 @@
-import featureFolderBoundaries from "./rules/feature-folder-boundaries.js";
+import featureFolderBoundaries from "./rules/feature-folder-boundaries.ts";
 
 /**
  * A tiny local ESLint plugin exposing this workspace's custom rule(s), so they can be

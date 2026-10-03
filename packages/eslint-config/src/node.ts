@@ -1,10 +1,11 @@
-import base from "./base.js";
+import type { ConfigArray } from "typescript-eslint";
+import base from "./base.ts";
 
 /**
  * Preset for Node backend projects (`services/*`): base + a couple of Node-specific
  * tweaks (no DOM globals assumed, console allowed for structured logging setup files).
  */
-const node = [
+const node: ConfigArray = [
   ...base,
   {
     languageOptions: {

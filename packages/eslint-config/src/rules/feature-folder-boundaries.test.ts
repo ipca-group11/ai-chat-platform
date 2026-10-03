@@ -1,6 +1,6 @@
 import { RuleTester } from "eslint";
 import { afterAll, describe, it } from "vitest";
-import featureFolderBoundaries from "./feature-folder-boundaries.js";
+import featureFolderBoundaries from "./feature-folder-boundaries.ts";
 
 // Bridge ESLint's RuleTester (Mocha-shaped) onto Vitest's globals so `pnpm test` covers
 // this rule the same way it covers every other unit under this pod.
@@ -110,7 +110,8 @@ describe("feature-folder-boundaries (AC-11: feature folders only import from sha
 });
 
 afterAll(() => {
-  delete RuleTester.describe;
-  delete RuleTester.it;
-  delete RuleTester.itOnly;
+  const globals = RuleTester as unknown as Record<string, unknown>;
+  delete globals.describe;
+  delete globals.it;
+  delete globals.itOnly;
 });

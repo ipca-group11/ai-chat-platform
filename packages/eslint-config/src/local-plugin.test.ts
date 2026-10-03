@@ -1,7 +1,7 @@
 import { RuleTester } from "eslint";
 import { describe, expect, it } from "vitest";
-import localPlugin from "./local-plugin.js";
-import featureFolderBoundaries from "./rules/feature-folder-boundaries.js";
+import localPlugin from "./local-plugin.ts";
+import featureFolderBoundaries from "./rules/feature-folder-boundaries.ts";
 
 RuleTester.describe = describe;
 RuleTester.it = it;

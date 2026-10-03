@@ -1,7 +1,8 @@
 import js from "@eslint/js";
 import nxPlugin from "@nx/eslint-plugin";
 import tseslint from "typescript-eslint";
-import localPlugin from "./local-plugin.js";
+import type { ConfigArray } from "typescript-eslint";
+import localPlugin from "./local-plugin.ts";
 
 // NOTE: `typescript-eslint`/`@nx/eslint-plugin` do not yet support the TS 7.0 native
 // compiler API (STACK.md mandates TypeScript 7.0.2 for building/typechecking every
@@ -23,7 +24,7 @@ import localPlugin from "./local-plugin.js";
  * Consumers extend this via `packages/eslint-config`'s `react` or `node` preset, which
  * both spread `base` first.
  */
-const base = tseslint.config(
+const base: ConfigArray = tseslint.config(
   {
     ignores: [
       "**/dist/**",

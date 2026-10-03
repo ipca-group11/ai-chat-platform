@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import base from "./base.js";
-import node from "./node.js";
-import { lintRuleIds } from "./test-utils/lint.js";
+import base from "./base.ts";
+import node from "./node.ts";
+import { lintRuleIds } from "./test-utils/lint.ts";
 
 describe("node preset", () => {
   it("starts with every base entry, in order", () => {
@@ -10,7 +10,7 @@ describe("node preset", () => {
   });
 
   it("declares the Node globals as read-only", () => {
-    const { globals } = node.at(-1).languageOptions;
+    const { globals } = node.at(-1)?.languageOptions ?? {};
     expect(globals).toEqual({ process: "readonly", __dirname: "readonly", __filename: "readonly" });
   });
 
