@@ -75,6 +75,8 @@ export function scrub(text, apiKey) {
     .replace(/"(id|request_id)":"[^"]*"/g, '"$1":"REDACTED"')
     .replace(/"created(_at)?":\d+/g, '"created$1":0')
     .replace(/"system_fingerprint":"[^"]*"/g, '"system_fingerprint":"fp_REDACTED"')
+    // Input and cache counts depend on the server's prompt cache, so they change between runs.
+    .replace(/"(input_tokens|cache_read_input_tokens)":\d+/g, '"$1":0')
     .replace(/"service_tier":"[^"]*"/g, '"service_tier":"REDACTED"');
   if (apiKey && apiKey.length > 6) out = out.split(apiKey).join("REDACTED_KEY");
   return out;
