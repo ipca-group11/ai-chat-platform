@@ -39,4 +39,17 @@ describe("unexpected errors", () => {
       .attach("file", Buffer.from("x"), { filename: "n.txt", contentType: "text/plain" });
     expectSafe500(res);
   });
+
+  // Pinned current behaviour (defect, WORKLOG §7): a body that is not valid JSON makes
+  // express.json() raise a 400-class SyntaxError, which the error handler does not know,
+  // so the client gets a 500 instead of a 400. Fixing it needs a new branch in the handler.
+  it("a body that is not valid JSON returns 500 (pinned: should be 400) and still leaks nothing", async () => {
+    const { app } = buildTestApp();
+    const res = await request(app)
+      .post("/chats")
+      .set("Cookie", cookieFor("user-1"))
+      .set("Content-Type", "application/json")
+      .send("{not json");
+    expectSafe500(res);
+  });
 });
