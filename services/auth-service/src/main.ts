@@ -17,6 +17,7 @@ import { sessionRouter } from "./features/session/index.js";
 import { correlationIdMiddleware } from "./shared/correlation-id.js";
 import { env } from "./shared/env.js";
 import { errorMiddleware, notFoundMiddleware } from "./shared/error-middleware.js";
+import { httpMetricsMiddleware } from "./shared/http-metrics.js";
 import { logger } from "./shared/logger.js";
 
 collectDefaultMetrics({ register: metricsRegister, prefix: "auth_service_" });
@@ -26,6 +27,7 @@ export function createApp(): Express {
 
   app.disable("x-powered-by");
   app.use(helmet());
+  app.use(httpMetricsMiddleware);
   app.use(
     cors({
       origin: env.CORS_ORIGINS,

@@ -4,7 +4,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import request from "supertest";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { authMiddleware } from "../../shared/auth-middleware.js";
 import { errorHandler, notFoundHandler } from "../../shared/error-handler.js";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
@@ -89,6 +89,41 @@ describe("streaming routes", () => {
 
       expect(firstChunk).toContain("event: token");
       expect(firstChunk).toContain('"token":"hi"');
+    } finally {
+      server.close();
+    }
+  });
+
+  it("tracks the open connection in the stream counter until the client disconnects", async () => {
+    const { chatsService } = buildApp();
+    const bus = new ChatEventBus();
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const token = tokenFor("user-1");
+    let open = 0;
+    const counter = { inc: () => void open++, dec: () => void open-- };
+
+    const streamApp = express();
+    streamApp.use(cookieParser());
+    streamApp.use(authMiddleware(JWT_SECRET));
+    streamApp.use("/chats", createStreamingRouter(chatsService, bus, counter));
+
+    const server = streamApp.listen(0);
+    try {
+      const port = (server.address() as AddressInfo).port;
+      const req = await new Promise<http.ClientRequest>((resolve, reject) => {
+        const r = http.get(
+          { port, path: `/chats/${chat.id}/stream`, headers: { Cookie: `access_token=${token}` } },
+          () => resolve(r),
+        );
+        r.on("error", (err) => {
+          if (!(err as NodeJS.ErrnoException).code?.includes("ECONNRESET")) reject(err);
+        });
+      });
+
+      expect(open).toBe(1);
+
+      req.destroy();
+      await vi.waitFor(() => expect(open).toBe(0));
     } finally {
       server.close();
     }

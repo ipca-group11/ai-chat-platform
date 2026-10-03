@@ -27,6 +27,18 @@ describe("app bootstrap (PLAN.md B1)", () => {
     expect(res.text).toContain("auth_service_");
   });
 
+  it("counts HTTP requests by route template and status in http_requests_total", async () => {
+    const app = createApp();
+    await request(app).post("/auth/register").send({ email: "not-an-email", password: "short" });
+    await request(app).get("/does-not-exist");
+
+    const res = await request(app).get("/metrics");
+
+    expect(res.text).toMatch(/http_requests_total\{method="POST",route="\/auth\/register",status="400"\} \d+/);
+    expect(res.text).toMatch(/http_requests_total\{method="GET",route="unmatched",status="404"\} \d+/);
+    expect(res.text).toContain("http_request_duration_seconds_bucket");
+  });
+
   it("sets security headers via helmet", async () => {
     const res = await request(createApp()).get("/health");
 

@@ -3,7 +3,8 @@
 # runs `docker compose pull && docker compose up -d`. Nothing is built on the VM.
 #
 # Only Caddy is published (80/443 + 3001-3003 over TLS); Grafana is served by Caddy at
-# /grafana. Prometheus stays on the VM's loopback; reach it over an SSH tunnel. Secrets come from ~/ai-chat/.env on
+# /grafana and Alloy's Faro receiver at /collect. Prometheus stays on the VM's loopback;
+# reach it over an SSH tunnel. Secrets come from ~/ai-chat/.env on
 # the VM (see README.md); IMAGE_PREFIX and IMAGE_TAG are set by the deploy job.
 
 name: llm-chat
@@ -20,6 +21,7 @@ volumes:
   grafana-data:
   uploads-data:
   caddy-data:
+  loki-data:
 
 services:
   postgres:
@@ -163,4 +165,17 @@ services:
       - grafana-data:/var/lib/grafana
     ports:
       - "127.0.0.1:3300:3000"
-    depends_on: [prometheus]
+    depends_on: [prometheus, loki]
+
+  # Grafana Faro: the shell posts browser telemetry to https://$DOMAIN/collect, which
+  # Caddy forwards to Alloy's faro.receiver; Alloy writes it to Loki.
+  loki:
+    <<: *app
+    image: ${IMAGE_PREFIX}/loki:${IMAGE_TAG:-latest}
+    volumes:
+      - loki-data:/loki
+
+  alloy:
+    <<: *app
+    image: ${IMAGE_PREFIX}/alloy:${IMAGE_TAG:-latest}
+    depends_on: [loki]

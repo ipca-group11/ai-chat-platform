@@ -4,6 +4,10 @@ interface ImportMetaEnv {
   readonly VITE_MFE_AUTH_URL?: string;
   readonly VITE_MFE_CHAT_URL?: string;
   readonly VITE_MFE_SETTINGS_URL?: string;
+  /** Grafana Alloy faro.receiver endpoint; Faro is off when unset. */
+  readonly VITE_FARO_URL?: string;
+  /** Build identifier (commit SHA) reported with every Faro signal. */
+  readonly VITE_APP_VERSION?: string;
 }
 
 interface ImportMeta {

@@ -23,9 +23,15 @@ COPY . .
 ARG VITE_MFE_AUTH_URL=http://localhost:3001
 ARG VITE_MFE_CHAT_URL=http://localhost:3002
 ARG VITE_MFE_SETTINGS_URL=http://localhost:3003
+# Grafana Faro collector URL (empty = Faro off) and the build's version, both baked into
+# the bundle; see src/shared/observability/faro.ts.
+ARG VITE_FARO_URL=
+ARG VITE_APP_VERSION=dev
 ENV VITE_MFE_AUTH_URL=${VITE_MFE_AUTH_URL} \
     VITE_MFE_CHAT_URL=${VITE_MFE_CHAT_URL} \
-    VITE_MFE_SETTINGS_URL=${VITE_MFE_SETTINGS_URL}
+    VITE_MFE_SETTINGS_URL=${VITE_MFE_SETTINGS_URL} \
+    VITE_FARO_URL=${VITE_FARO_URL} \
+    VITE_APP_VERSION=${VITE_APP_VERSION}
 RUN pnpm --filter @app/ui run build
 RUN pnpm --filter @app/shell run build
 

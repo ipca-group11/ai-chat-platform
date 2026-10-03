@@ -29,7 +29,7 @@ export function createApp(prisma: PrismaClient, env: Env, logger: Logger = creat
   app.use(cookieParser());
   app.use(correlationMiddleware(logger));
 
-  const { metricsMiddleware, metricsHandler } = createMetrics();
+  const { metricsMiddleware, metricsHandler, activeStreams } = createMetrics();
   app.use(metricsMiddleware);
   app.get("/metrics", metricsHandler);
   app.get("/health", (_req, res) => res.json({ status: "ok" }));
@@ -70,7 +70,7 @@ export function createApp(prisma: PrismaClient, env: Env, logger: Logger = creat
   app.use(authMiddleware(env.JWT_SECRET));
   app.use("/chats", createChatsRouter(chatsService));
   app.use("/chats", createMessagesRouter(messagesService));
-  app.use("/chats", createStreamingRouter(chatsService, bus));
+  app.use("/chats", createStreamingRouter(chatsService, bus, activeStreams));
   app.use("/chats", createAttachmentsRouter(attachmentsService, env.MAX_UPLOAD_BYTES * 2));
 
   app.use(notFoundHandler);

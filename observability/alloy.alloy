@@ -1,0 +1,40 @@
+// Grafana Alloy: receives Grafana Faro telemetry from the browser (apps/shell) and writes
+// it to Loki. Faro sends errors, logs, events and web-vitals measurements as logfmt
+// lines; `kind` and `app_name` are promoted to labels so dashboards can filter cheaply.
+
+faro.receiver "frontend" {
+  server {
+    listen_address           = "0.0.0.0"
+    listen_port              = 12347
+    // The browser posts same-origin through Caddy, so CORS is only for local dev.
+    cors_allowed_origins     = ["*"]
+    max_allowed_payload_size = "5MiB"
+
+    rate_limiting {
+      rate       = 50
+      burst_size = 100
+    }
+  }
+
+  output {
+    logs = [loki.process.faro.receiver]
+  }
+}
+
+loki.process "faro" {
+  stage.logfmt {
+    mapping = { "kind" = "", "app_name" = "" }
+  }
+
+  stage.labels {
+    values = { "kind" = "", "app_name" = "" }
+  }
+
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
