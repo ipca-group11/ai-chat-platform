@@ -1,0 +1,7 @@
+$ echo 'configs importing @platform/test-config (12; test-config defines it, eslint-config is exempt):'; grep -lE "from .@platform/test-config." apps/*/vite.config.ts packages/*/vit*.config.ts services/*/vitest.config.ts e2e/vitest.config.ts | wc -l; echo 'configs with a hand-written coverage provider (eslint-config only, exempt):'; grep -l 'provider: .v8.' apps/*/vite.config.ts packages/*/vit*.config.ts services/*/vitest.config.ts e2e/vitest.config.ts || echo none
+configs importing @platform/test-config (12; test-config defines it, eslint-config is exempt):
+      12
+configs with a hand-written coverage provider (eslint-config only, exempt):
+packages/eslint-config/vitest.config.ts
+
+[exit 0]

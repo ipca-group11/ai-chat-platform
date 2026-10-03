@@ -1,0 +1,67 @@
+$ pnpm nx run-many -t test --skip-nx-cache
+
+> llm-chat-workspace@1.0.0 nx /Users/truezone/Projects/ai-chat-platform
+> nx run-many -t test --skip-nx-cache
+
+
+ NX   Running target test for 15 projects and 6 tasks they depend on:
+
+- conversation-service
+- workspace-config
+- eslint-config
+- observability
+- auth-service
+- shared-types
+- pact-config
+- test-config
+- mfe-settings
+- mfe-auth
+- mfe-chat
+- ui
+- k6
+- shell
+- e2e
+
+
+✔  nx run eslint-config:build
+✔  nx run test-config:build
+✔  nx run auth-service:prisma-generate
+✔  nx run conversation-service:prisma-generate
+✔  nx run shared-types:build
+✔  nx run eslint-config:test
+✔  nx run test-config:test
+✔  nx run ui:build
+✔  nx run shared-types:test
+✔  nx run mfe-settings:test
+✔  nx run ui:test
+✔  nx run workspace-config:test
+✔  nx run mfe-chat:test
+✔  nx run mfe-auth:test
+✔  nx run auth-service:test
+✔  nx run shell:test
+✔  nx run conversation-service:test
+✔  nx run pact-config:test
+✔  nx run observability:test
+✔  nx run k6:test
+✔  nx run e2e:test
+
+
+
+ NX   Successfully ran target test for 15 projects and 6 tasks they depend on
+
+
+Output of 21 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      28.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     22.7s (4 tasks)
+  Recoverable time:  6.3s (22% of the run)
+
+ NX   Nx detected a flaky task
+
+  conversation-service:test
+
+Flaky tasks can disrupt your CI pipeline. Automatically retry them with Nx Cloud. Learn more at https://nx.dev/ci/features/flaky-tasks
+
+
+[exit 0]

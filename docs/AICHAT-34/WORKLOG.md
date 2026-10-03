@@ -34,7 +34,7 @@ Blockers: none
 | Tool | Version | Install |
 |---|---|---|
 | macOS | Darwin 25.3 | — |
-| Node | `node -v` → v24.9.0 | `.nvmrc` |
+| Node | `node -v` → v24.21.0 (24.9 fails the engines check of a dependency) | `nvm install 24 && nvm use 24` |
 | pnpm | `pnpm -v` → 10.4.0 | `corepack enable` |
 | Docker | `docker --version` → 29.4.0 | Docker Desktop |
 
@@ -81,14 +81,14 @@ Only `apps/shell` is below target, so it is the only project that gets a ratchet
 
 ### US2 · Shared coverage preset in every project ([AICHAT-81](https://ipca-grupo11.atlassian.net/browse/AICHAT-81))
 
-**What and why.** Only `@platform/test-config` itself used the shared preset; the other 13 projects copied `80` by hand, so changing the policy meant editing 13 files. We extended the preset and moved every Node test project to it, keeping only project-specific `include`/`exclude` locally.
+**What and why.** Only `@platform/test-config` itself used the shared preset; the other 13 projects copied `80` by hand, so changing the policy meant editing 13 files. We extended the preset and moved the Node test projects to it, keeping only project-specific `include`/`exclude` locally. `packages/eslint-config` is the one exception (see Problems and fixes).
 
 **Files.**
 - `packages/test-config/coverage-thresholds.ts`, `vitest.preset.ts`, `index.ts`, specs and README: `thresholds` override option, `appCoverageThresholds` (branches 75), `e2eCoverageThresholds` (branches 70), reporters `text` + `lcov` + `json-summary`.
 - `packages/test-config/package.json`: `main`/`exports` now point to the built `dist/`, because Node loads Vite configs natively and cannot resolve `.js` imports to `.ts` sources.
-- `vite.config.ts` / `vitest.config.ts` of `apps/shell`, `apps/mfe-auth`, `apps/mfe-chat`, `apps/mfe-settings`, `packages/ui`, `packages/shared-types`, `packages/observability`, `packages/pact-config`, `packages/eslint-config`, `packages/workspace-config`, `services/auth-service`, `services/conversation-service`, `e2e`.
+- `vite.config.ts` / `vitest.config.ts` of `apps/shell`, `apps/mfe-auth`, `apps/mfe-chat`, `apps/mfe-settings`, `packages/ui`, `packages/shared-types`, `packages/observability`, `packages/pact-config`, `packages/workspace-config`, `services/auth-service`, `services/conversation-service`, `e2e`.
 - Each of those `package.json` files (devDependency `@platform/test-config: workspace:*`) and `pnpm-lock.yaml`.
-- `packages/eslint-config/project.json` (`build` no longer depends on `^build`), `packages/test-config/eslint.config.js`.
+- `packages/eslint-config/vitest.config.ts`: its own inline coverage block with the same values as the preset (80/80/80/80, `text` + `lcov` + `json-summary`), because importing the preset would create a dependency cycle.
 
 **How to run.**
 ```sh
@@ -97,18 +97,18 @@ pnpm nx run-many -t test --skip-nx-cache
 
 **How to repeat it manually.**
 1. Clean checkout of the branch, `pnpm install`.
-2. `grep -l '@platform/test-config' apps/*/vite.config.ts packages/*/vit*.config.ts services/*/vitest.config.ts e2e/vitest.config.ts | wc -l`. Expected: `13` (the 14th project, `test-config`, defines the preset and imports it relatively).
-3. `grep -lE "provider: .v8.|thresholds: \{" ...` on the same files. Expected: no output.
+2. `grep -l '@platform/test-config' apps/*/vite.config.ts packages/*/vit*.config.ts services/*/vitest.config.ts e2e/vitest.config.ts | wc -l`. Expected: `12`. The other two Node projects are `test-config` (defines the preset and imports it relatively) and `eslint-config` (exempt, inline coverage).
+3. `grep -l 'provider: .v8.' ...` on the same files. Expected: only `packages/eslint-config/vitest.config.ts`.
 4. `pnpm nx run-many -t test --skip-nx-cache`. Expected: all 15 projects pass.
 
-**Result.** 13 configs import the preset, none keeps a hand-written `provider`/`thresholds` block, and all 15 test targets pass. `testing/k6` has no coverage by design.
+**Result.** 12 configs import the preset, plus `test-config` which defines it and `eslint-config` which is an exempt with a reason; no other config keeps a hand-written `provider` block, and all 15 test targets pass. `testing/k6` has no coverage by design.
 
 ![imports](evidence/05-shared-preset-imports.png)
 ![nx test](evidence/06-nx-test-after-preset.png)
 
 **Problems and fixes.**
 - Vite loads the config natively and the package exported `index.ts` with `.js` import suffixes, so it failed with `ERR_MODULE_NOT_FOUND`. We export the compiled `dist/` instead; the `test` target already builds dependencies first (`dependsOn: ^build`).
-- `eslint-config` and `test-config` now depend on each other, which made Nx report a circular task graph. We set the no-op `eslint-config:build` to `dependsOn: []` and switched off the circular-dependency lint rule for `test-config/eslint.config.js` only.
+- Making `eslint-config` import the preset created a cycle with `test-config` (which uses `eslint-config` for linting): Nx reported a circular task graph and a lint rule failed. We first worked around it with overrides, then removed the cycle: `eslint-config` keeps identical thresholds inline, is listed as an exempt in the guard (US4), and the overrides were reverted. `pnpm install` shows no cyclic warning and `nx graph` works.
 - Lowered branch threshold for `apps/mfe-chat` and `apps/mfe-settings` from 80 to 75 follows the agreed app group. Their measured values still pass.
 
 ### US3 · Enforce coverage in shell, ui, mfe-auth and e2e ([AICHAT-100](https://ipca-grupo11.atlassian.net/browse/AICHAT-100))
@@ -173,7 +173,7 @@ cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.js
 3. In `packages/ui/project.json` change the test command to `vitest run` (no `--coverage`) and run the guard again. Expected: 1 failure with `packages/ui: the Nx test target "vitest run" does not run with --coverage`.
 4. Revert the change (`git checkout packages/ui/project.json`) and run again. Expected: all green.
 
-**Result.** For each project with a `test` target the guard checks three things: the Nx command has `--coverage`, the `package.json` test script has `--coverage`, and the Vitest config imports `@platform/test-config`. The exempt list is `testing/k6` (k6 runtime, not Node, nothing to instrument) and, for the import check only, `packages/test-config` (it defines the preset). On its first run the guard failed on a real gap: the `apps/mfe-auth` `package.json` script still ran `vitest run` without `--coverage` (the Nx target was already fixed in US3).
+**Result.** For each project with a `test` target the guard checks three things: the Nx command has `--coverage`, the `package.json` test script has `--coverage`, and the Vitest config imports `@platform/test-config`. The exempt list is `testing/k6` (k6 runtime, not Node, nothing to instrument) and, for the import check only, `packages/test-config` (it defines the preset) and `packages/eslint-config` (would create a dependency cycle with `@platform/test-config`; keeps identical thresholds inline). On its first run the guard failed on a real gap: the `apps/mfe-auth` `package.json` script still ran `vitest run` without `--coverage` (the Nx target was already fixed in US3).
 
 ![guard finds mfe-auth](evidence/14-guard-finds-mfe-auth.png)
 ![guard passes](evidence/15-guard-passes.png)
@@ -251,8 +251,22 @@ The `src/app` folder alone is at 82.92 % lines, 80.11 % branches and 84.84 % fun
 ## 4. How to run everything
 
 ```sh
-# all checks added by this epic, from the repo root
+nvm use 24                                   # Node 24.21 or newer
+pnpm install
+
+pnpm test                                    # all 15 projects, with coverage and thresholds
+pnpm nx run mfe-chat:test --skip-nx-cache    # one project; coverage in apps/mfe-chat/coverage/
+pnpm lint && pnpm typecheck && pnpm build
+
+# guard: every test target runs --coverage and imports the shared preset
+cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.js
+
+# per-project coverage table (what CI writes to the job summary)
+node scripts/ci/coverage-summary.mjs
+node --test scripts/ci/coverage-summary.test.mjs
 ```
+
+Thresholds: see `docs/AICHAT-34/README.md` §5. Each project writes `coverage/coverage-summary.json`, `lcov.info` and a text table.
 
 ## 5. Results
 
@@ -266,18 +280,21 @@ Coverage in % (statements / branches / functions / lines). Before = measured on 
 | `e2e` | 80.95 / 77.77 / 81.25 / 82.05 | 80.95 / 77.77 / 81.25 / 82.05 | No | Yes, 80/70/80/80 |
 | `apps/mfe-chat` | 93.45 / 87.11 / 91.02 / 95.20 | 89.87 / 85.21 / 89.71 / 91.86 | Yes, `src/app/**` excluded | Yes, 80/75/80/80, only `remote-entry.tsx` excluded |
 
-Other results: 13 of 13 Node test configs use `@platform/test-config`; a guard test fails any project whose test target skips `--coverage`; `pnpm test` passes for all 15 projects.
+Other results: 12 Node test configs use `@platform/test-config` (plus `test-config` itself and the exempt `eslint-config`); a guard test fails any project whose test target skips `--coverage`; `pnpm test` passes for all 15 projects.
 
-![pnpm test](evidence/17-pnpm-test-all.png)
+![pnpm test](evidence/21-pnpm-test-all.png)
 
 ## 6. DoD check
 
 | DoD item | Met | Evidence |
 |---|---|---|
-| … | ✅ | [link](evidence/…) |
+| Runs in CI, passes on main, failure blocks the merge | Pending PR run (the `Coverage summary` step and the `nx affected` job are in `ci.yml`; green run and blocked-merge proof need GitHub) | [local full run](evidence/21-pnpm-test-all.png), [summary script](evidence/20-coverage-summary-local.png) |
+| Run instructions documented | ✅ | Section 4 of this log, `packages/test-config/README.md` |
+| Vitest coverage thresholds set in every project | ✅ (12 via the shared preset, `eslint-config` inline with identical values, `testing/k6` exempt) | [imports](evidence/05-shared-preset-imports.png), [guard](evidence/15-guard-passes.png), [after: shell](evidence/07-after-shell.png), [ui](evidence/08-after-ui.png), [mfe-auth](evidence/09-after-mfe-auth.png), [e2e](evidence/10-after-e2e.png) |
+| Going below the threshold fails CI | Locally ✅, in CI pending PR run | [guard on a broken case](evidence/16-guard-fails-on-broken-case.png); failing-PR proof in US5 |
 
 ## 7. Notes for the report
 
-- What was found
-- What was fixed / waived
-- Lessons learned
+- **What we found.** 4 of 15 test projects did not enforce coverage (shell, ui, mfe-auth, e2e); only 1 of 15 used the shared preset, so the policy lived in 13 hand-copied files; `apps/shell` was below its target (70.51 % lines, 60.97 % branches); `apps/mfe-chat` excluded all of `src/app/**`; the `mfe-auth` package script still ran without `--coverage` after its Nx target was fixed, and the new guard test caught it.
+- **What we fixed or waived.** All Node test projects use the shared preset except `eslint-config` (inline, identical values, to avoid a dependency cycle). `shell` is ratcheted to 70/60/62/68 with dated TODOs for AICHAT-17. The `mfe-chat` exclude is narrowed to `remote-entry.tsx`. `testing/k6` is exempt. A CI summary shows the per-project table. Proof of a failing PR is still to run on GitHub.
+- **Lessons learned.** Measure before enforcing, otherwise CI breaks on day one. Check config and scripts together: the same command lives in `project.json` and `package.json`. Vite loads configs with Node, so a shared config package must ship compiled JavaScript. Shared tooling packages that depend on each other in both directions create Nx cycles, so keep the lowest-level package free of the shared preset.

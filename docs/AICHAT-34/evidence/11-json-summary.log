@@ -1,0 +1,7 @@
+$ ls apps/shell/coverage/coverage-summary.json packages/ui/coverage/coverage-summary.json apps/mfe-auth/coverage/coverage-summary.json e2e/coverage/coverage-summary.json
+apps/mfe-auth/coverage/coverage-summary.json
+apps/shell/coverage/coverage-summary.json
+e2e/coverage/coverage-summary.json
+packages/ui/coverage/coverage-summary.json
+
+[exit 0]

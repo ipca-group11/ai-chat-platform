@@ -1,0 +1,64 @@
+$ pnpm nx run e2e:test --skip-nx-cache
+
+> llm-chat-workspace@1.0.0 nx /Users/truezone/Projects/ai-chat-platform
+> nx run e2e\:test --skip-nx-cache
+
+
+ NX   Running target test for project e2e and 2 tasks it depends on:
+
+
+✔  nx run eslint-config:build
+✔  nx run test-config:build
+
+> nx run e2e:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/e2e
+      Coverage enabled with v8
+
+
+ Test Files  3 passed (3)
+      Tests  18 passed (18)
+   Start at  11:25:48
+   Duration  500ms (import 68%, transform 17%, worker 8%, tests 7%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   80.95 |    77.77 |   81.25 |   82.05 |                   
+ a11y              |   57.14 |       40 |   85.71 |      50 |                   
+  axe-helper.ts    |   57.14 |       40 |   85.71 |      50 | 53-60             
+ fixtures          |   92.85 |    86.36 |   77.77 |   96.29 |                   
+  ...-for-stack.ts |   92.85 |    86.36 |   77.77 |   96.29 | 25                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 80.95% ( 34/42 )
+Branches     : 77.77% ( 21/27 )
+Functions    : 81.25% ( 13/16 )
+Lines        : 82.05% ( 32/39 )
+================================================================================
+
+
+
+ NX   Successfully ran target test for project e2e and 2 tasks it depends on
+
+
+Output of 2 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      1.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (3 tasks)
+  Recoverable time:  <1ms
+
+ NX   Nx detected a flaky task
+
+  e2e:test
+
+Flaky tasks can disrupt your CI pipeline. Automatically retry them with Nx Cloud. Learn more at https://nx.dev/ci/features/flaky-tasks
+
+
+[exit 0]
