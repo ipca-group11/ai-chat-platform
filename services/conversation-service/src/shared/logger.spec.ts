@@ -62,6 +62,12 @@ describe("createLogger", () => {
     expect(entry.user.password).toBe("[redacted]");
   });
 
+  it("redacts Set-Cookie wherever a response is logged", () => {
+    createLogger();
+    const entry = logThroughProductionOptions({ res: { headers: { "set-cookie": ["access_token=abc"] } } }) as unknown as { res: { headers: Record<string, string> } };
+    expect(entry.res.headers["set-cookie"]).toBe("[redacted]");
+  });
+
   it("leaves non-secret fields readable", () => {
     createLogger();
     const entry = logThroughProductionOptions({ req: { url: "/chats", headers: {} }, user: { name: "ana" } });

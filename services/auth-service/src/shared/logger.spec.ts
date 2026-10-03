@@ -1,7 +1,7 @@
 import { Writable } from "node:stream";
 import pino from "pino";
 import { describe, expect, it } from "vitest";
-import { buildLoggerOptions, createLogger, logger, serializeRequest } from "./logger.js";
+import { buildLoggerOptions, createLogger, logger, serializeRequest, serializeResponse } from "./logger.js";
 
 // Builds a logger from the app's real redact configuration (`buildLoggerOptions`), but
 // with an explicit "info" level (independent of `LOG_LEVEL`, which tests set to
@@ -46,6 +46,19 @@ describe("logger masking of personal data (AICHAT-32)", () => {
     testLogger.error({ path: 42 }, "not a string");
     await flush();
     expect(JSON.parse(lines[1] ?? "{}").path).toBe(42);
+  });
+
+  it("redacts Set-Cookie and the API key header wherever a response or request is logged", async () => {
+    const { testLogger, lines } = makeCapturingLogger();
+    testLogger.info({ res: { headers: { "set-cookie": ["access_token=abc"] } }, req: { headers: { "x-llm-api-key": "sk-secret" } } }, "x");
+    await flush();
+    const entry = JSON.parse(lines[0] ?? "{}");
+    expect(entry.res.headers["set-cookie"]).toBe("[REDACTED]");
+    expect(entry.req.headers["x-llm-api-key"]).toBe("[REDACTED]");
+  });
+
+  it("logs a response as its status code only", () => {
+    expect(serializeResponse({ statusCode: 204 })).toEqual({ statusCode: 204 });
   });
 
   it("logs a request as id, method and path only", () => {

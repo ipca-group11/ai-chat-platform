@@ -55,6 +55,10 @@ export const REDACT_PATHS: string[] = [
   "*.cookie",
   "req.headers.cookie",
   "headers.cookie",
+  'req.headers["x-llm-api-key"]',
+  'res.headers["set-cookie"]',
+  'headers["set-cookie"]',
+  '*.headers["set-cookie"]',
   ...DROPPED_KEYS.flatMap((key) => [key, `*.${key}`, `*.*.${key}`, `*.*.*.${key}`]),
 ];
 
@@ -63,6 +67,11 @@ export const SERIALIZERS = {
   path: (path: unknown) => (typeof path === "string" ? scrubUrl(path) : path),
   err: serializeError,
 };
+
+/** The response pino-http logs: the status code only. The headers carry `Set-Cookie` with the session tokens. */
+export function serializeResponse(res: { statusCode?: number }) {
+  return { statusCode: res.statusCode };
+}
 
 /** The request pino-http logs: id, method and path. No query string, headers or remote address. */
 export function serializeRequest(req: { id?: unknown; method?: string; originalUrl?: string; url?: string }) {

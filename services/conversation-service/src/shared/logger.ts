@@ -21,6 +21,8 @@ export function createLogger(level: string = "info", destination?: DestinationSt
         `req.headers["${LLM_API_KEY_HEADER.toLowerCase()}"]`,
         "req.headers.cookie",
         "req.headers.authorization",
+        'res.headers["set-cookie"]',
+        '*.headers["set-cookie"]',
         "*.apiKey",
         "*.password",
         ...DROPPED_KEYS.flatMap((key) => [key, `*.${key}`, `*.*.${key}`, `*.*.*.${key}`]),
