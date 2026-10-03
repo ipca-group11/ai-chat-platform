@@ -1,0 +1,9 @@
+{
+  "install": "pnpm install --frozen-lockfile",
+  "test": "pnpm exec nx affected -t lint typecheck test build --base=origin/main --head=HEAD",
+  "e2e": {
+    "image": "mcr.microsoft.com/playwright:v1.63.0-noble",
+    "command": "npm install && npx playwright test --reporter=junit",
+    "dir": "e2e"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "mfe-chat",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/mfe-chat/src",
+  "projectType": "application",
+  "tags": ["scope:chat", "type:app"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint src", "cwd": "apps/mfe-chat" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit", "cwd": "apps/mfe-chat" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cross-env NODE_ENV=test vitest run --coverage",
+        "cwd": "apps/mfe-chat"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit && vite build", "cwd": "apps/mfe-chat" },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vite", "cwd": "apps/mfe-chat" }
+    }
+  }
+}

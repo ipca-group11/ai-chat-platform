@@ -1,0 +1,17 @@
+**/node_modules
+**/dist
+**/build
+**/coverage
+**/storybook-static
+**/.vite
+.git
+.github
+.nx
+data
+*.log
+.env
+.DS_Store
+services/*/src/generated
+apps/*/.mf
+e2e
+testing

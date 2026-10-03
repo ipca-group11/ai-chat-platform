@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+coverage/
+.nx/cache/
+.nx/workspace-data/
+*.log
+.env
+.DS_Store
+data/uploads/
+.vite/
+storybook-static/
+services/*/src/generated/
+# stray .d.ts left behind in packages/shared-types/src by mfe-settings' Module
+# Federation dts generation (repo-rooted tsc pass, see apps/mfe-settings/vite.config.ts)
+packages/shared-types/src/**/*.d.ts
+apps/*/.mf/

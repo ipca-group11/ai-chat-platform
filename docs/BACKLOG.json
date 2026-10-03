@@ -1,0 +1,326 @@
+{
+  "pods": [
+    {
+      "id": "platform-foundation",
+      "domain": "Monorepo tooling, CI, Docker Compose, shared libraries and configuration",
+      "stories": [
+        {
+          "id": "US-1",
+          "title": "Monorepo setup with Nx and pnpm workspaces",
+          "acceptanceCriteria": [
+            { "id": "AC-1", "text": "pnpm-workspace.yaml defines apps/, services/, and packages/ as workspace packages" },
+            { "id": "AC-2", "text": "Nx workspace is configured with a project graph covering every app, service, and package" },
+            { "id": "AC-3", "text": "Every project (apps, services, packages) defines Nx targets for lint, typecheck, test, and build; frontends also define serve and packages/ui also defines storybook" },
+            { "id": "AC-4", "text": "Nx tags enforce module boundaries so an app can depend on packages/* but never on another app" }
+          ]
+        },
+        {
+          "id": "US-2",
+          "title": "Docker Compose local development environment",
+          "acceptanceCriteria": [
+            { "id": "AC-5", "text": "A single `docker compose up` starts shell, mfe-auth, mfe-chat, mfe-settings, auth-service, conversation-service, Postgres, and Ollama" },
+            { "id": "AC-6", "text": "Docker Compose also starts Prometheus and Grafana pre-wired to scrape the services" },
+            { "id": "AC-7", "text": "A .env.example file lists every environment variable needed by every service, with safe local defaults" }
+          ]
+        },
+        {
+          "id": "US-3",
+          "title": "Shared libraries: shared-types, eslint-config, tsconfig",
+          "acceptanceCriteria": [
+            { "id": "AC-8", "text": "packages/shared-types defines the API contracts and DTOs consumed by both frontends and services" },
+            { "id": "AC-9", "text": "packages/eslint-config provides a flat ESLint config with typescript-eslint used by every project" },
+            { "id": "AC-10", "text": "packages/tsconfig provides shared tsconfig bases used by every project, with `tsc --noEmit` passing on each" },
+            { "id": "AC-11", "text": "Every project's feature folders only import from shared/ and from other features' index.ts, never from feature internals" }
+          ]
+        },
+        {
+          "id": "US-4",
+          "title": "CI pipeline with nx affected",
+          "acceptanceCriteria": [
+            { "id": "AC-12", "text": "CI runs `nx affected` for lint, typecheck, test, and build on every pull request" },
+            { "id": "AC-13", "text": "CI fails the build if any project reports a lint or typecheck error" },
+            { "id": "AC-14", "text": "Nx task results are cached in CI to avoid re-running unaffected projects" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "design-system",
+      "domain": "Shared UI component library and design tokens (packages/ui)",
+      "stories": [
+        {
+          "id": "US-5",
+          "title": "Core component library on shadcn/ui + Base UI",
+          "acceptanceCriteria": [
+            { "id": "AC-15", "text": "packages/ui implements Button, Input, Textarea, Label, Form field, Card, Dialog, Dropdown menu, Select, Tabs, Toast, Badge, Avatar, Skeleton, Tooltip, and typography components on shadcn/ui using Base UI primitives (not Radix)" },
+            { "id": "AC-16", "text": "Components are themed with Tailwind design tokens for color, spacing, radius, and typography, and support both light and dark mode" },
+            { "id": "AC-17", "text": "Typography components and scale follow the shadcn Typeset" },
+            { "id": "AC-18", "text": "Every microfrontend (mfe-auth, mfe-chat, mfe-settings) uses only design-system components for UI primitives, with no ad-hoc primitive markup" }
+          ]
+        },
+        {
+          "id": "US-6",
+          "title": "Storybook documentation and accessibility checks",
+          "acceptanceCriteria": [
+            { "id": "AC-19", "text": "Every component in packages/ui has Storybook stories covering its variants and states" },
+            { "id": "AC-20", "text": "The Storybook accessibility (Axe) addon is enabled and reports zero violations for every story" },
+            { "id": "AC-21", "text": "The `storybook` Nx target builds and serves the design system's Storybook instance" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shell",
+      "domain": "Host application: layout, routing, module federation, auth guard, resilience",
+      "stories": [
+        {
+          "id": "US-7",
+          "title": "Host app with Module Federation and routing",
+          "acceptanceCriteria": [
+            { "id": "AC-22", "text": "The shell app is a Vite Module Federation host that lazy-loads mfe-auth, mfe-chat, and mfe-settings as remotes at runtime" },
+            { "id": "AC-23", "text": "Top-level TanStack Router routes are type-safe and file-based, defined in the shell" },
+            { "id": "AC-24", "text": "React, React DOM, TanStack Router, TanStack Query, and the design system are shared as singletons across host and remotes" }
+          ]
+        },
+        {
+          "id": "US-8",
+          "title": "Auth guard for protected routes",
+          "acceptanceCriteria": [
+            { "id": "AC-25", "text": "The shell exposes a shared TanStack Query client used by all remotes" },
+            { "id": "AC-26", "text": "Unauthenticated users navigating to any chat or configuration route are redirected to the login route (FR3)" }
+          ]
+        },
+        {
+          "id": "US-9",
+          "title": "Microfrontend failure isolation",
+          "acceptanceCriteria": [
+            { "id": "AC-27", "text": "If a remote (mfe-auth, mfe-chat, or mfe-settings) fails to load, the shell renders a scoped error state for that area only" },
+            { "id": "AC-28", "text": "The rest of the application (navigation, other loaded domains) continues to work when one remote fails" },
+            { "id": "AC-29", "text": "A test simulating a remote load failure verifies the shell degrades gracefully without a full-app crash" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "auth",
+      "domain": "Authentication: registration, login, logout, session/token validation",
+      "stories": [
+        {
+          "id": "US-10",
+          "title": "User registration (FR1, UC1)",
+          "acceptanceCriteria": [
+            { "id": "AC-30", "text": "Registration form collects email and password, validated on client and server" },
+            { "id": "AC-31", "text": "A duplicate email is rejected with a validation error and no account is created" },
+            { "id": "AC-32", "text": "An invalid password (not meeting the policy) is rejected with a validation error" },
+            { "id": "AC-33", "text": "Passwords are stored hashed in Postgres via Prisma; plaintext passwords are never persisted or logged" },
+            { "id": "AC-34", "text": "After successful registration the user can immediately log in with those credentials" }
+          ]
+        },
+        {
+          "id": "US-11",
+          "title": "Login and logout (FR2, UC2)",
+          "acceptanceCriteria": [
+            { "id": "AC-35", "text": "Valid credentials log the user in and land them on their chat list" },
+            { "id": "AC-36", "text": "Invalid credentials show one generic error message that does not reveal which field was wrong" },
+            { "id": "AC-37", "text": "Auth tokens are issued as httpOnly cookies, not accessible to client-side JavaScript" },
+            { "id": "AC-38", "text": "Logout invalidates the session so subsequent authenticated requests are rejected" }
+          ]
+        },
+        {
+          "id": "US-12",
+          "title": "Session validation on every protected request (FR3)",
+          "acceptanceCriteria": [
+            { "id": "AC-39", "text": "conversation-service validates the caller's token on every request and rejects missing/invalid tokens with 401" },
+            { "id": "AC-40", "text": "auth-service issues and validates tokens used by other services" },
+            { "id": "AC-41", "text": "The shell redirects the user to login when the frontend detects an expired or invalid session" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chat",
+      "domain": "Chats, streaming messaging, queueing, attachments, and LLM provider adapters",
+      "stories": [
+        {
+          "id": "US-13",
+          "title": "Chat CRUD and history persistence (FR4, FR8)",
+          "acceptanceCriteria": [
+            { "id": "AC-42", "text": "A user can create, list, rename, open, and delete chats" },
+            { "id": "AC-43", "text": "Chat history (messages) persists in Postgres and is restored after a page reload or a new login" },
+            { "id": "AC-44", "text": "Deleting a chat removes it and its messages so they no longer appear or load" }
+          ]
+        },
+        {
+          "id": "US-14",
+          "title": "Chat ownership isolation (FR5, UC7)",
+          "acceptanceCriteria": [
+            { "id": "AC-45", "text": "Every chat read, update, delete, and stream request is checked server-side against the authenticated user's ownership" },
+            { "id": "AC-46", "text": "User B requesting user A's chat ID (get, update, delete, or stream) receives 403 or 404" },
+            { "id": "AC-47", "text": "Chat list and search endpoints never return another user's chats" }
+          ]
+        },
+        {
+          "id": "US-15",
+          "title": "Provider and model selection per chat (FR6)",
+          "acceptanceCriteria": [
+            { "id": "AC-48", "text": "The user chooses an LLM provider (Ollama, OpenAI, or Anthropic) and a model when creating or editing a chat" },
+            { "id": "AC-49", "text": "The selected provider and model are persisted per chat" },
+            { "id": "AC-50", "text": "All subsequent messages in that chat use the persisted provider and model" }
+          ]
+        },
+        {
+          "id": "US-16",
+          "title": "Send message and streamed response (FR9, FR10, FR12, UC3)",
+          "acceptanceCriteria": [
+            { "id": "AC-51", "text": "A sent text message is persisted immediately and shown in the chat" },
+            { "id": "AC-52", "text": "The LLM response streams token by token (via SSE) and renders incrementally in the UI" },
+            { "id": "AC-53", "text": "The full conversation history of the chat is sent to the LLM as context on every request" },
+            { "id": "AC-54", "text": "The user can stop a response mid-stream, and the partial response is saved to history" },
+            { "id": "AC-55", "text": "The completed response is saved and reappears after a reload" }
+          ]
+        },
+        {
+          "id": "US-17",
+          "title": "Message queue (FR11, UC4)",
+          "acceptanceCriteria": [
+            { "id": "AC-56", "text": "Messages sent while a chat is waiting for or streaming a response are added to that chat's FIFO queue" },
+            { "id": "AC-57", "text": "Queued messages are shown in a distinct 'queued' UI state" },
+            { "id": "AC-58", "text": "The user can edit or cancel a queued message before its processing starts" },
+            { "id": "AC-59", "text": "Queued messages are processed one at a time, in order, after the current response finishes" }
+          ]
+        },
+        {
+          "id": "US-18",
+          "title": "Parallel chat sessions (FR7, UC6)",
+          "acceptanceCriteria": [
+            { "id": "AC-60", "text": "A user can have multiple chats generating responses at the same time" },
+            { "id": "AC-61", "text": "Switching between chats does not interrupt or lose any in-progress stream" },
+            { "id": "AC-62", "text": "The UI stays responsive with at least 5 chats streaming simultaneously" }
+          ]
+        },
+        {
+          "id": "US-19",
+          "title": "LLM provider adapter layer (FR6, Ollama/OpenAI/Anthropic)",
+          "acceptanceCriteria": [
+            { "id": "AC-63", "text": "A single common adapter interface is implemented for Ollama, OpenAI, and Anthropic" },
+            { "id": "AC-64", "text": "conversation-service selects the adapter implementation based on the chat's configured provider" },
+            { "id": "AC-65", "text": "Adding a new provider requires changes only inside the adapter layer, with no changes to controllers, queue, or other domains" }
+          ]
+        },
+        {
+          "id": "US-20",
+          "title": "File attachment upload and validation (FR13, FR14, FR15, UC5)",
+          "acceptanceCriteria": [
+            { "id": "AC-66", "text": "A user can attach one or more files to a message" },
+            { "id": "AC-67", "text": "Only .txt, .pdf, .png, and .jpeg/.jpg files are accepted; both file extension and MIME type are validated on the client and on the server" },
+            { "id": "AC-68", "text": "Files over 10 MB or of a disallowed type are rejected before upload with a clear, specific error message" }
+          ]
+        },
+        {
+          "id": "US-21",
+          "title": "Attachments passed to the LLM (FR16)",
+          "acceptanceCriteria": [
+            { "id": "AC-69", "text": "Text and PDF attachment content is extracted as text and included in the LLM request context" },
+            { "id": "AC-70", "text": "Image attachments (.png/.jpeg) are sent as image input for models that support vision" },
+            { "id": "AC-71", "text": "If the selected model cannot handle an attached file's type, the user is shown a clear message before or instead of sending" }
+          ]
+        },
+        {
+          "id": "US-22",
+          "title": "Provider error handling and retry (Reliability NFR)",
+          "acceptanceCriteria": [
+            { "id": "AC-72", "text": "Provider errors, timeouts, and rate limits are caught and surfaced to the user without crashing the chat" },
+            { "id": "AC-73", "text": "The user can retry a message that failed due to a provider error" },
+            { "id": "AC-74", "text": "A failed queued message is skipped/marked failed without blocking the rest of the queue from processing" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "configuration",
+      "domain": "Configuration microfrontend for browser-only LLM API key management",
+      "stories": [
+        {
+          "id": "US-23",
+          "title": "API key management UI (FR17, UC8)",
+          "acceptanceCriteria": [
+            { "id": "AC-75", "text": "The configuration page in mfe-settings is reachable from the app navigation" },
+            { "id": "AC-76", "text": "The user can enter, update, and remove an API key for each provider that needs one (OpenAI, Anthropic)" },
+            { "id": "AC-77", "text": "Ollama is shown as not requiring a key" }
+          ]
+        },
+        {
+          "id": "US-24",
+          "title": "Client-side-only key storage (FR18)",
+          "acceptanceCriteria": [
+            { "id": "AC-78", "text": "API keys are stored only in the browser (e.g. localStorage), scoped to the logged-in user" },
+            { "id": "AC-79", "text": "API keys are never sent to or stored in the database, on disk, or in server logs" },
+            { "id": "AC-80", "text": "Logging in as a different user does not expose a previously logged-in user's stored keys" }
+          ]
+        },
+        {
+          "id": "US-25",
+          "title": "Key usage on LLM-calling requests (FR19)",
+          "acceptanceCriteria": [
+            { "id": "AC-81", "text": "The browser sends the relevant provider's API key with each request that calls that provider's LLM (e.g. a request header)" },
+            { "id": "AC-82", "text": "conversation-service uses the key only for that single request and does not persist it" },
+            { "id": "AC-83", "text": "The key is redacted from any logs or error responses produced by conversation-service" }
+          ]
+        },
+        {
+          "id": "US-26",
+          "title": "Masked display, test connection, and missing-key messaging (FR20, UC8)",
+          "acceptanceCriteria": [
+            { "id": "AC-84", "text": "Saved keys are displayed masked (for example, sk-...a1b2), never in full" },
+            { "id": "AC-85", "text": "A 'Test connection' action validates the key against the provider and shows success or a clear failure reason" },
+            { "id": "AC-86", "text": "Sending a message to a provider with no configured key shows a clear message in the chat with a link to the configuration page" },
+            { "id": "AC-87", "text": "Removing a saved key causes that provider's chats to prompt for a key again on the next message" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quality-observability",
+      "domain": "Logging, metrics/dashboards, and the cross-cutting test suite",
+      "stories": [
+        {
+          "id": "US-27",
+          "title": "Structured logging with correlation IDs",
+          "acceptanceCriteria": [
+            { "id": "AC-88", "text": "Every request to auth-service and conversation-service is tagged with a correlation ID, generated or propagated from the caller" },
+            { "id": "AC-89", "text": "Logs are structured (JSON) and include the correlation ID on every log line for that request" },
+            { "id": "AC-90", "text": "API keys, passwords, and tokens are redacted from all log output" }
+          ]
+        },
+        {
+          "id": "US-28",
+          "title": "Metrics and Grafana dashboards",
+          "acceptanceCriteria": [
+            { "id": "AC-91", "text": "Prometheus scrapes request rate, latency, error rate, and active-stream metrics from auth-service and conversation-service" },
+            { "id": "AC-92", "text": "Grafana ships with a preconfigured dashboard visualizing these metrics" },
+            { "id": "AC-93", "text": "Prometheus and Grafana start automatically as part of `docker compose up`" }
+          ]
+        },
+        {
+          "id": "US-29",
+          "title": "Testing strategy: unit, contract, and performance tests",
+          "acceptanceCriteria": [
+            { "id": "AC-94", "text": "Vitest unit tests cover business logic and each LLM provider adapter with the LLMs mocked" },
+            { "id": "AC-95", "text": "Pact contract tests verify the API contracts between frontends and services" },
+            { "id": "AC-96", "text": "A K6 test validates first-token latency is about 1 second and the system stays responsive with at least 5 concurrent streaming chats" },
+            { "id": "AC-97", "text": "Coverage targets are documented and enforced as part of the CI pipeline" }
+          ]
+        },
+        {
+          "id": "US-30",
+          "title": "End-to-end coverage of UC1-UC8",
+          "acceptanceCriteria": [
+            { "id": "AC-98", "text": "Playwright end-to-end tests cover UC1 through UC8 against the docker-compose environment" },
+            { "id": "AC-99", "text": "Axe accessibility checks run as part of the e2e or Storybook CI pipeline with no critical violations" },
+            { "id": "AC-100", "text": "The e2e suite runs in CI and its results gate merges" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+# Local Docker deployment for the whole application (see docs/STACK.md, docs/DEPLOY.md).
+#
+# Entry point: `shell` (the Module Federation host) is the one service published in the
+# standard "127.0.0.1:${APP_PORT:-8000}:<container port>" form — open
+# http://127.0.0.1:${APP_PORT:-8000}/ in a browser once `docker compose up` reports it
+# healthy.
+#
+# This is a browser-rendered microfrontend architecture: `mfe-auth`/`mfe-chat`/
+# `mfe-settings` (Module Federation remotes) and `auth-service`/`conversation-service`
+# (REST/SSE APIs) are all called *directly by the browser*, not proxied through `shell`
+# (except `/api/*`, which `shell` proxies to `conversation-service` for `mfe-chat`'s
+# same-origin calls — see apps/shell/vite.config.ts). Each of those services therefore
+# also publishes its own fixed 127.0.0.1 port so the browser can reach it; their
+# Module-Federation-remote-entry / API base URLs are baked in at build time to match
+# those same ports (see each Dockerfile's `ARG VITE_*` and docs/DEPLOY.md). `postgres`
+# and `ollama` are internal-only (reached over the compose network, never published).
+#
+# No bind mounts: uploads use a named volume, and prometheus/grafana config is baked into
+# their images at build time (observability/*.Dockerfile) instead of mounted from disk.
+
+name: llm-chat
+
+networks:
+  llm-chat:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  ollama-data:
+  grafana-data:
+  uploads-data:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-llmchat}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-llmchat_local_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-llmchat}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-llmchat}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - llm-chat
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - llm-chat
+
+  # One-shot init job: pre-pulls the default local model (STACK.md decision #7) so this
+  # environment starts with a working model already available offline.
+  ollama-pull:
+    image: ollama/ollama:latest
+    restart: "no"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["sh", "-c"]
+    command: ["ollama pull ${OLLAMA_MODEL:-llama3.2:1b} || true"]
+    environment:
+      OLLAMA_HOST: ollama:11434
+    networks:
+      - llm-chat
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: "4001"
+      DATABASE_URL: ${AUTH_SERVICE_DATABASE_URL:-postgresql://llmchat:llmchat_local_dev@postgres:5432/llmchat?schema=auth}
+      JWT_SECRET: ${JWT_SECRET:-local-dev-only-change-me}
+      ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
+      REFRESH_TOKEN_TTL_SECONDS: ${REFRESH_TOKEN_TTL_SECONDS:-604800}
+      CORS_ORIGIN: http://localhost:${APP_PORT:-8000},http://127.0.0.1:${APP_PORT:-8000}
+      COOKIE_SECURE: "false"
+    ports:
+      - "127.0.0.1:${AUTH_SERVICE_PORT:-4001}:4001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - llm-chat
+
+  conversation-service:
+    build:
+      context: .
+      dockerfile: services/conversation-service/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: "4002"
+      DATABASE_URL: ${CONVERSATION_SERVICE_DATABASE_URL:-postgresql://llmchat:llmchat_local_dev@postgres:5432/llmchat?schema=conversation}
+      JWT_SECRET: ${JWT_SECRET:-local-dev-only-change-me}
+      UPLOAD_DIR: /data/uploads
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_DEFAULT_MODEL: ${OLLAMA_MODEL:-llama3.2:1b}
+      CORS_ORIGIN: http://localhost:${APP_PORT:-8000},http://127.0.0.1:${APP_PORT:-8000}
+    ports:
+      - "127.0.0.1:${CONVERSATION_SERVICE_PORT:-4002}:4002"
+    volumes:
+      - uploads-data:/data/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4002/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - llm-chat
+
+  mfe-auth:
+    build:
+      context: .
+      dockerfile: apps/mfe-auth/Dockerfile
+      args:
+        # Same-origin: the shell proxies /auth to auth-service, so the session cookies
+        # land on whatever host the browser used (localhost or 127.0.0.1).
+        VITE_AUTH_SERVICE_URL: ""
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MFE_AUTH_PORT:-3001}:3001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - llm-chat
+
+  mfe-chat:
+    build:
+      context: .
+      dockerfile: apps/mfe-chat/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MFE_CHAT_PORT:-3002}:3002"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3002/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - llm-chat
+
+  mfe-settings:
+    build:
+      context: .
+      dockerfile: apps/mfe-settings/Dockerfile
+      args:
+        # Same-origin via the shell's /auth and /api proxies (see apps/shell/vite.config.ts).
+        VITE_AUTH_SERVICE_URL: ""
+        VITE_CONVERSATION_SERVICE_URL: /api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MFE_SETTINGS_PORT:-3003}:3003"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3003/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - llm-chat
+
+  # HTTP entry point (.factory/deploy.json). Loads shell's own bundle plus the
+  # mfe-auth/mfe-chat/mfe-settings remotes and calls auth-service/conversation-service
+  # directly from the browser, all via their 127.0.0.1 ports above; proxies `/api/*` to
+  # conversation-service itself (see apps/shell/vite.config.ts) for mfe-chat.
+  shell:
+    build:
+      context: .
+      dockerfile: apps/shell/Dockerfile
+      args:
+        VITE_MFE_AUTH_URL: http://localhost:${MFE_AUTH_PORT:-3001}
+        VITE_MFE_CHAT_URL: http://localhost:${MFE_CHAT_PORT:-3002}
+        VITE_MFE_SETTINGS_URL: http://localhost:${MFE_SETTINGS_PORT:-3003}
+    restart: unless-stopped
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      conversation-service:
+        condition: service_healthy
+      mfe-auth:
+        condition: service_healthy
+      mfe-chat:
+        condition: service_healthy
+      mfe-settings:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      # Server-side target for shell's own `/api` -> conversation-service proxy; uses the
+      # internal compose network (unlike the browser-facing VITE_* build args above).
+      CONVERSATION_SERVICE_URL: http://conversation-service:4002
+    ports:
+      - "127.0.0.1:${APP_PORT:-8000}:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - llm-chat
+
+  prometheus:
+    build:
+      context: .
+      dockerfile: observability/prometheus.Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      - auth-service
+      - conversation-service
+    networks:
+      - llm-chat
+
+  grafana:
+    build:
+      context: .
+      dockerfile: observability/grafana.Dockerfile
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3300}:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - llm-chat

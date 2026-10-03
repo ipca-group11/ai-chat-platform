@@ -1,0 +1,87 @@
+{
+  "tasks": [
+    {
+      "id": "I1",
+      "title": "Add e2e/ and testing/k6/ to the pnpm workspace so they get linked node_modules",
+      "paths": ["pnpm-workspace.yaml"],
+      "verify": "pnpm install --frozen-lockfile && pnpm exec nx run-many -t lint typecheck test -p e2e,k6"
+    },
+    {
+      "id": "I2",
+      "title": "Declare the missing @platform/eslint-config workspace dependency in apps/mfe-auth, apps/mfe-chat, apps/mfe-settings, apps/shell and e2e (present only in auth-service/conversation-service/observability today), which currently makes ESLint crash with ERR_MODULE_NOT_FOUND for those five projects",
+      "paths": [
+        "apps/mfe-auth/package.json",
+        "apps/mfe-chat/package.json",
+        "apps/mfe-settings/package.json",
+        "apps/shell/package.json",
+        "e2e/package.json"
+      ],
+      "verify": "pnpm install --frozen-lockfile && pnpm exec nx run-many -t lint -p mfe-auth,mfe-chat,mfe-settings,shell,e2e"
+    },
+    {
+      "id": "I3",
+      "title": "Align typescript (currently split 6.0.3 vs 7.0.2) and @types/node (22/24/26 mixed) versions across every package.json in the workspace to one pair supported by typescript-eslint@8.70.1 (which does not support TS 7.0). This currently crashes shell:lint outright, causes duplicate vitest instances that break @testing-library/jest-dom matcher types in shell:typecheck (see I9), and breaks the Module Federation DTS build step",
+      "paths": [
+        "apps/*/package.json",
+        "services/*/package.json",
+        "packages/*/package.json",
+        "e2e/package.json",
+        "testing/k6/package.json"
+      ],
+      "verify": "pnpm install --frozen-lockfile && pnpm exec nx run-many -t lint typecheck build"
+    },
+    {
+      "id": "I4",
+      "title": "Fix @nx/enforce-module-boundaries 'Buildable libraries cannot import or export from non-buildable libraries' error in packages/pact-config and packages/test-config, caused by packages/eslint-config having no build target (non-buildable) while being imported by buildable libs",
+      "paths": ["packages/eslint-config/project.json", "packages/pact-config/project.json", "packages/test-config/project.json"],
+      "verify": "pnpm exec nx run-many -t lint -p pact-config,test-config"
+    },
+    {
+      "id": "I5",
+      "title": "Remove stray committed .d.ts files under packages/shared-types/src/api-keys/ (schema.d.ts, storage.d.ts, test-connection.d.ts, index.d.ts) that look like leftover build output checked into source and fail @typescript-eslint/consistent-type-imports",
+      "paths": ["packages/shared-types/src/api-keys/schema.d.ts", "packages/shared-types/src/api-keys/storage.d.ts", "packages/shared-types/src/api-keys/test-connection.d.ts", "packages/shared-types/src/api-keys/index.d.ts"],
+      "verify": "pnpm exec nx run shared-types:lint"
+    },
+    {
+      "id": "I6",
+      "title": "Fix ~35 ESLint platform/feature-folder-boundaries violations in conversation-service (deep imports into messages/service.js, llm-adapters/registry.js & types.js, chats/service.js, queue/queue-manager.js, streaming/sse.js internals from the attachments, messages and streaming features) plus 2 unused-var/unused-import errors, by importing from each feature's public index.ts instead",
+      "paths": [
+        "services/conversation-service/src/features/attachments",
+        "services/conversation-service/src/features/messages",
+        "services/conversation-service/src/features/streaming"
+      ],
+      "verify": "pnpm exec nx run conversation-service:lint"
+    },
+    {
+      "id": "I7",
+      "title": "Fix no-useless-escape ESLint error in packages/observability's dashboard spec",
+      "paths": ["packages/observability/src/dashboards/platform-overview-dashboard.spec.ts"],
+      "verify": "pnpm exec nx run observability:lint"
+    },
+    {
+      "id": "I8",
+      "title": "Add the missing Vite entry apps/mfe-chat/index.html (present in mfe-auth and mfe-settings but missing in mfe-chat), which makes mfe-chat:build fail with UNRESOLVED_ENTRY",
+      "paths": ["apps/mfe-chat/index.html"],
+      "verify": "pnpm exec nx run mfe-chat:build"
+    },
+    {
+      "id": "I9",
+      "title": "Once I3 lands, re-check apps/shell:typecheck; RequireAuth.test.tsx and RemoteErrorBoundary.test.tsx currently fail because duplicate vitest instances (from mismatched @types/node peers) make @testing-library/jest-dom's Assertion augmentation not match vitest's Assertion type. If errors persist after I3, align shell's own vitest/@testing-library/jest-dom versions with the rest of the workspace",
+      "paths": ["apps/shell/package.json", "apps/shell/tsconfig.spec.json"],
+      "verify": "pnpm exec nx run shell:typecheck",
+      "dependsOn": ["I3"]
+    },
+    {
+      "id": "I10",
+      "title": "Fix stale unit test in packages/workspace-config asserting the repo root directory name equals 'platform-foundation' (leftover from the pod's standalone working directory before merge, where the folder is now named 'repo')",
+      "paths": ["packages/workspace-config/src/repo.test.js"],
+      "verify": "pnpm exec nx run workspace-config:test"
+    },
+    {
+      "id": "I11",
+      "title": "mfe-settings' Module Federation DTS generation fails (logged error, build still exits 0) because the generated per-app tsconfig's rootDir excludes packages/shared-types/src, which mfe-settings imports directly via the @app/shared-types/* path mapping. Point the federation dts config/rootDir at the package boundary correctly so federated types are produced",
+      "paths": ["apps/mfe-settings/vite.config.ts", "apps/mfe-settings/tsconfig.json"],
+      "verify": "pnpm exec nx run mfe-settings:build"
+    }
+  ]
+}

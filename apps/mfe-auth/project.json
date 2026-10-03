@@ -1,0 +1,28 @@
+{
+  "name": "mfe-auth",
+  "sourceRoot": "apps/mfe-auth/src",
+  "projectType": "application",
+  "tags": ["scope:auth", "type:app"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint src", "cwd": "apps/mfe-auth" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit", "cwd": "apps/mfe-auth" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --coverage", "cwd": "apps/mfe-auth" }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vite build", "cwd": "apps/mfe-auth" }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vite", "cwd": "apps/mfe-auth" }
+    }
+  }
+}

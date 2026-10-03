@@ -1,0 +1,58 @@
+{
+  "name": "llm-chat-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "packageManager": "pnpm@10.4.0",
+  "scripts": {
+    "dev": "bash scripts/dev.sh",
+    "nx": "nx",
+    "lint": "nx run-many -t lint",
+    "typecheck": "nx run-many -t typecheck",
+    "test": "nx run-many -t test",
+    "build": "nx run-many -t build",
+    "affected:lint": "nx affected -t lint",
+    "affected:typecheck": "nx affected -t typecheck",
+    "affected:test": "nx affected -t test",
+    "affected:build": "nx affected -t build",
+    "graph": "nx graph"
+  },
+  "devDependencies": {
+    "@nx/eslint": "23.2.1",
+    "@nx/js": "23.2.1",
+    "@nx/workspace": "23.2.1",
+    "eslint": "^10.11.0",
+    "nx": "23.2.1",
+    "typescript": "6.0.3"
+  },
+  "pnpm": {
+    "supportedArchitectures": {
+      "os": [
+        "current",
+        "linux",
+        "darwin"
+      ],
+      "cpu": [
+        "current",
+        "x64",
+        "arm64"
+      ],
+      "libc": [
+        "current",
+        "glibc",
+        "musl"
+      ]
+    },
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "bcrypt",
+      "esbuild",
+      "nx",
+      "prisma"
+    ]
+  }
+}

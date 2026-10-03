@@ -1,0 +1,39 @@
+// auth-service Prisma schema (STACK.md: Postgres + Prisma).
+// Owns two tables: `User` (credentials) and `RefreshToken` (hashed, rotating refresh
+// tokens per ARCHITECTURE.md §4 / STACK.md decisions #1, #2).
+
+// `output` points inside this service's own source tree (not `node_modules/@prisma/client`)
+// so the generated client can't collide with `conversation-service`'s own Prisma schema:
+// pnpm dedupes identical `@prisma/client`/`prisma` version pairs to a single shared store
+// entry, so without a per-service `output`, whichever service last ran `prisma generate`
+// silently overwrites the other's generated client (see docs/RELEASE.md "Known gaps").
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  createdAt     DateTime       @default(now())
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  rotatedFrom String?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+}

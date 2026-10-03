@@ -1,0 +1,58 @@
+{
+  "name": "auth-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "services/auth-service/src",
+  "projectType": "application",
+  "tags": ["type:service", "scope:auth"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint src --max-warnings=0",
+        "cwd": "services/auth-service"
+      }
+    },
+    "prisma-generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma generate",
+        "cwd": "services/auth-service"
+      },
+      "outputs": ["{projectRoot}/src/generated"],
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["prisma-generate"],
+      "options": {
+        "command": "tsc -p tsconfig.json --noEmit",
+        "cwd": "services/auth-service"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["prisma-generate"],
+      "options": {
+        "command": "vitest run --coverage",
+        "cwd": "services/auth-service"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["prisma-generate"],
+      "options": {
+        "command": "tsc -p tsconfig.json",
+        "cwd": "services/auth-service"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx watch src/main.ts",
+        "cwd": "services/auth-service"
+      },
+      "cache": false
+    }
+  }
+}

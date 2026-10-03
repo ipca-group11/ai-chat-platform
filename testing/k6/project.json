@@ -1,0 +1,23 @@
+{
+  "name": "k6",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "testing/k6",
+  "projectType": "application",
+  "tags": ["type:perf", "scope:shared"],
+  "targets": {
+    "perf": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "k6 run testing/k6/streaming-load.js"
+      },
+      "cache": false
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run",
+        "cwd": "testing/k6"
+      }
+    }
+  }
+}

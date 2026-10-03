@@ -1,0 +1,10 @@
+{
+  "name": "@platform/tsconfig",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "files": ["base.json", "react.json", "node.json"],
+  "nx": {
+    "tags": ["type:package", "scope:shared"]
+  }
+}

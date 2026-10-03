@@ -1,0 +1,11 @@
+/**
+ * Resolves the current user's id for namespacing stored API keys (AC-78, AC-80). Not
+ * retried automatically — an unauthenticated user simply sees `userId: undefined`
+ * (the settings page is expected to be reached only via the shell's auth guard, per
+ * `docs/pods/configuration/PLAN.md` cross-pod dependencies).
+ */
+export declare function useCurrentUserId(): {
+    userId: string | undefined;
+    isLoading: boolean;
+    isError: boolean;
+};

@@ -1,0 +1,29 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2023"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noEmit": false,
+    "composite": false,
+    "paths": {
+      "@shared-types/*": ["./packages/shared-types/src/*"],
+      "@shared-types": ["./packages/shared-types/src/index.ts"],
+      "@ui/*": ["./packages/ui/src/*"],
+      "@ui": ["./packages/ui/src/index.ts"]
+    }
+  }
+}

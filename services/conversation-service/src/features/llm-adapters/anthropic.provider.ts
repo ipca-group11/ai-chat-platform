@@ -1,0 +1,349 @@
+import {
+  ProviderError,
+  type LlmProvider,
+  type LlmStreamChunk,
+  type LlmWebFetchChunk,
+  type SendMessageContext,
+  type SendMessageOptions,
+} from "./types.js";
+import { readSseData } from "./http-stream.js";
+
+const VISION_MODEL_HINTS = ["claude-3", "claude-4", "claude-opus", "claude-sonnet", "claude-haiku"];
+const ANTHROPIC_VERSION = "2023-06-01";
+const DEFAULT_MAX_TOKENS = 4096;
+/** Room for thinking plus the answer; `budget_tokens` must stay below `max_tokens`. */
+const REASONING_MAX_TOKENS = 16000;
+const REASONING_BUDGET_TOKENS = 8000;
+
+/**
+ * How each Claude generation turns thinking on and off (first match wins, so the more
+ * specific ids come first — e.g. `claude-opus-5-5` before `claude-opus-5`):
+ * - `always-on`: thinking can't be disabled (a `disabled` config is a 400); only its
+ *   depth is tunable, via `output_config.effort`.
+ * - `between-tools`: `adaptive` on; `disabled` is a 400, `between_tools` turns it off.
+ * - `adaptive`: `adaptive` on, `disabled` off.
+ * - `budget`: older models take a fixed `budget_tokens` and don't think by default.
+ */
+type ThinkingStyle = "always-on" | "between-tools" | "adaptive" | "budget";
+const THINKING_STYLES: ReadonlyArray<readonly [hint: string, style: ThinkingStyle]> = [
+  ["claude-fable", "always-on"],
+  ["claude-mythos", "always-on"],
+  ["claude-opus-5-5", "always-on"],
+  ["claude-sonnet-5-5", "between-tools"],
+  ["claude-opus-5", "adaptive"],
+  ["claude-sonnet-5", "adaptive"],
+  ["claude-opus-4-8", "adaptive"],
+  ["claude-opus-4-7", "adaptive"],
+  ["claude-opus-4-6", "adaptive"],
+  ["claude-sonnet-4-6", "adaptive"],
+  ["claude-opus-4", "budget"],
+  ["claude-sonnet-4", "budget"],
+  ["claude-haiku-4", "budget"],
+  ["claude-3-7-sonnet", "budget"],
+];
+
+/**
+ * Web fetch tool version per model (first match wins). `web_fetch_20260318` adds dynamic
+ * filtering (the model trims fetched pages with code before reading them) and needs
+ * Claude 4.6 or later; older models get the basic `web_fetch_20250910`.
+ */
+const WEB_FETCH_TOOLS: ReadonlyArray<readonly [hint: string, type: string]> = [
+  ["claude-fable", "web_fetch_20260318"],
+  ["claude-mythos", "web_fetch_20260318"],
+  ["claude-opus-5", "web_fetch_20260318"],
+  ["claude-sonnet-5", "web_fetch_20260318"],
+  ["claude-opus-4-8", "web_fetch_20260318"],
+  ["claude-opus-4-7", "web_fetch_20260318"],
+  ["claude-opus-4-6", "web_fetch_20260318"],
+  ["claude-sonnet-4-6", "web_fetch_20260318"],
+  ["claude-opus-4", "web_fetch_20250910"],
+  ["claude-sonnet-4", "web_fetch_20250910"],
+  ["claude-haiku-4", "web_fetch_20250910"],
+  ["claude-3-7-sonnet", "web_fetch_20250910"],
+];
+/** Caps per reply, so one message can't pull in dozens of pages. */
+const WEB_FETCH_MAX_USES = 5;
+const WEB_FETCH_MAX_CONTENT_TOKENS = 25000;
+/** Server tools run in a server-side loop that stops with `pause_turn` after a set number
+ * of steps; the turn is resumed by sending it back, at most this many times. */
+const MAX_PAUSE_CONTINUATIONS = 3;
+
+export interface AnthropicProviderConfig {
+  baseUrl?: string;
+  fetchImpl?: typeof fetch;
+}
+
+/** Anthropic adapter — POSTs to `/v1/messages` with `stream: true` and parses the SSE
+ * `content_block_delta` events Anthropic's Messages API emits. Requires a per-request
+ * API key (ARCHITECTURE.md §6). System messages are hoisted into the top-level `system`
+ * field per Anthropic's API shape. */
+export class AnthropicProvider implements LlmProvider {
+  readonly id = "anthropic" as const;
+  private readonly baseUrl: string;
+  private readonly fetchImpl: typeof fetch;
+
+  constructor(config: AnthropicProviderConfig = {}) {
+    this.baseUrl = config.baseUrl ?? "https://api.anthropic.com";
+    this.fetchImpl = config.fetchImpl ?? fetch;
+  }
+
+  supportsVision(model: string): boolean {
+    const lower = model.toLowerCase();
+    return VISION_MODEL_HINTS.some((hint) => lower.includes(hint));
+  }
+
+  supportsReasoning(model: string): boolean {
+    return thinkingStyle(model) !== undefined;
+  }
+
+  supportsWebFetch(model: string): boolean {
+    return webFetchToolType(model) !== undefined;
+  }
+
+  async *sendMessage(context: SendMessageContext, options: SendMessageOptions = {}): AsyncIterable<LlmStreamChunk> {
+    if (!context.apiKey) {
+      throw new ProviderError("anthropic", "Missing Anthropic API key", { retryable: false, statusCode: 401 });
+    }
+
+    const systemMessages = context.messages.filter((m) => m.role === "system").map((m) => m.content).join("\n");
+    const turnMessages = context.messages.filter((m) => m.role !== "system").map((m) => toAnthropicMessage(m));
+    const webFetchTool = context.webFetch ? webFetchToolType(context.model) : undefined;
+    const request = {
+      model: context.model,
+      stream: true,
+      ...reasoningParams(context.model, context.reasoning ?? false),
+      ...(systemMessages ? { system: systemMessages } : {}),
+      ...(webFetchTool
+        ? {
+            tools: [
+              {
+                type: webFetchTool,
+                name: "web_fetch",
+                max_uses: WEB_FETCH_MAX_USES,
+                max_content_tokens: WEB_FETCH_MAX_CONTENT_TOKENS,
+              },
+            ],
+          }
+        : {}),
+    };
+
+    // The reply so far, echoed back as the assistant turn when the API pauses it.
+    const replyBlocks: ContentBlock[] = [];
+    for (let continuation = 0; ; continuation++) {
+      const messages = replyBlocks.length > 0 ? [...turnMessages, { role: "assistant", content: replyBlocks }] : turnMessages;
+      const response = await this.post({ ...request, messages }, context.apiKey, options.signal);
+      const turn = yield* streamTurn(response);
+      replyBlocks.push(...turn.blocks);
+      if (turn.stopReason !== "pause_turn" || continuation >= MAX_PAUSE_CONTINUATIONS) return;
+    }
+  }
+
+  private async post(body: Record<string, unknown>, apiKey: string, signal?: AbortSignal): Promise<Response> {
+    let response: Response;
+    try {
+      response = await this.fetchImpl(`${this.baseUrl}/v1/messages`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": ANTHROPIC_VERSION,
+        },
+        signal,
+        body: JSON.stringify(body),
+      });
+    } catch (cause) {
+      if (cause instanceof Error && cause.name === "AbortError") throw cause;
+      throw new ProviderError("anthropic", "Failed to reach Anthropic", { retryable: true, cause });
+    }
+    if (!response.ok) {
+      throw await toResponseError(response);
+    }
+    return response;
+  }
+}
+
+/** A response content block as streamed: `content_block_start` carries the block, deltas
+ * fill in its text, thinking, signature or (for tool calls) JSON input. */
+type ContentBlock = Record<string, unknown> & { type: string };
+
+interface StreamEvent {
+  type?: string;
+  index?: number;
+  content_block?: ContentBlock;
+  delta?: {
+    type?: string;
+    text?: string;
+    thinking?: string;
+    signature?: string;
+    partial_json?: string;
+    citation?: unknown;
+    stop_reason?: string;
+  };
+  error?: { message?: string };
+}
+
+/**
+ * Streams one Messages API response: yields answer text, reasoning and web fetch progress
+ * as they arrive, and returns the complete content blocks plus the stop reason so a
+ * paused turn can be resumed.
+ */
+async function* streamTurn(
+  response: Response,
+): AsyncGenerator<LlmStreamChunk, { blocks: ContentBlock[]; stopReason?: string }> {
+  const blocks: ContentBlock[] = [];
+  const partialJson = new Map<number, string>();
+  // Fetch URLs by tool call id, to label the result (which only carries the URL on success).
+  const fetchUrls = new Map<string, string>();
+  let stopReason: string | undefined;
+
+  for await (const data of readSseData(response.body)) {
+    const event = JSON.parse(data) as StreamEvent;
+    const index = event.index ?? 0;
+    switch (event.type) {
+      case "error":
+        throw new ProviderError("anthropic", event.error?.message ?? "Anthropic stream error", { retryable: true });
+      case "content_block_start": {
+        const block = event.content_block;
+        if (!block) break;
+        blocks[index] = { ...block };
+        if (block.type === "web_fetch_tool_result") {
+          const result = webFetchResult(block, fetchUrls);
+          if (result) yield result;
+        }
+        break;
+      }
+      case "content_block_delta": {
+        const block = blocks[index];
+        const delta = event.delta;
+        if (!delta) break;
+        if (delta.type === "text_delta" && delta.text) {
+          if (block) block.text = String(block.text ?? "") + delta.text;
+          yield delta.text;
+        } else if (delta.type === "thinking_delta" && delta.thinking) {
+          if (block) block.thinking = String(block.thinking ?? "") + delta.thinking;
+          yield { type: "reasoning", text: delta.thinking };
+        } else if (delta.type === "signature_delta" && block) {
+          block.signature = delta.signature;
+        } else if (delta.type === "citations_delta" && block) {
+          block.citations = [...((block.citations as unknown[] | undefined) ?? []), delta.citation];
+        } else if (delta.type === "input_json_delta") {
+          partialJson.set(index, (partialJson.get(index) ?? "") + (delta.partial_json ?? ""));
+        }
+        break;
+      }
+      case "content_block_stop": {
+        const block = blocks[index];
+        const json = partialJson.get(index);
+        if (block && json) {
+          block.input = JSON.parse(json) as unknown;
+        }
+        if (block?.type === "server_tool_use" && block.name === "web_fetch") {
+          const url = (block.input as { url?: unknown } | undefined)?.url;
+          if (typeof url === "string") {
+            fetchUrls.set(String(block.id), url);
+            yield { type: "web_fetch", id: String(block.id), url, status: "fetching" };
+          }
+        }
+        break;
+      }
+      case "message_delta":
+        stopReason = event.delta?.stop_reason ?? stopReason;
+        break;
+      case "message_stop":
+        return { blocks: blocks.filter(isReplayable), stopReason };
+    }
+  }
+  return { blocks: blocks.filter(isReplayable), stopReason };
+}
+
+/** The API rejects empty text blocks, which a paused turn can end with. */
+function isReplayable(block: ContentBlock | undefined): block is ContentBlock {
+  return block !== undefined && !(block.type === "text" && !block.text);
+}
+
+function webFetchResult(block: ContentBlock, fetchUrls: Map<string, string>): LlmWebFetchChunk | undefined {
+  const id = String(block.tool_use_id);
+  const content = block.content as
+    | { type?: string; url?: string; error_code?: string; content?: { title?: string } }
+    | undefined;
+  const url = content?.url ?? fetchUrls.get(id);
+  if (!url) return undefined;
+  if (content?.type === "web_fetch_result") {
+    const title = content.content?.title;
+    return { type: "web_fetch", id, url, status: "done", ...(title ? { title } : {}) };
+  }
+  return { type: "web_fetch", id, url, status: "error", errorCode: content?.error_code ?? "unavailable" };
+}
+
+function webFetchToolType(model: string): string | undefined {
+  const lower = model.toLowerCase();
+  return WEB_FETCH_TOOLS.find(([hint]) => lower.includes(hint))?.[1];
+}
+
+function thinkingStyle(model: string): ThinkingStyle | undefined {
+  const lower = model.toLowerCase();
+  return THINKING_STYLES.find(([hint]) => lower.includes(hint))?.[1];
+}
+
+/** Adaptive thinking whose text is streamed back. Newer models return empty thinking
+ * text unless asked for a summary; the 4.6 models summarize by default. */
+function adaptiveThinking(model: string) {
+  return model.toLowerCase().includes("-4-6") ? { type: "adaptive" } : { type: "adaptive", display: "summarized" };
+}
+
+/** `max_tokens` plus the thinking settings for the chat's reasoning toggle. With reasoning
+ * off, models that can't stop thinking keep their (default, empty) thinking to themselves. */
+function reasoningParams(model: string, reasoning: boolean): Record<string, unknown> {
+  switch (thinkingStyle(model)) {
+    case "always-on":
+      return reasoning
+        ? { max_tokens: REASONING_MAX_TOKENS, thinking: adaptiveThinking(model), output_config: { effort: "high" } }
+        : { max_tokens: REASONING_MAX_TOKENS, output_config: { effort: "low" } };
+    case "between-tools":
+      return reasoning
+        ? { max_tokens: REASONING_MAX_TOKENS, thinking: adaptiveThinking(model) }
+        : { max_tokens: DEFAULT_MAX_TOKENS, thinking: { type: "between_tools" } };
+    case "adaptive":
+      return reasoning
+        ? { max_tokens: REASONING_MAX_TOKENS, thinking: adaptiveThinking(model) }
+        : { max_tokens: DEFAULT_MAX_TOKENS, thinking: { type: "disabled" } };
+    case "budget":
+      return reasoning
+        ? { max_tokens: REASONING_MAX_TOKENS, thinking: { type: "enabled", budget_tokens: REASONING_BUDGET_TOKENS } }
+        : { max_tokens: DEFAULT_MAX_TOKENS };
+    default:
+      return { max_tokens: DEFAULT_MAX_TOKENS };
+  }
+}
+
+/** Images are sent as multimodal `content` blocks (AC-70); text-only messages keep the
+ * plain string shape. */
+function toAnthropicMessage(message: SendMessageContext["messages"][number]) {
+  const images = (message.attachments ?? []).filter((a) => a.kind === "image");
+  if (images.length === 0) {
+    return { role: message.role, content: message.content };
+  }
+  return {
+    role: message.role,
+    content: [
+      { type: "text", text: message.content },
+      ...images.map((image) => ({
+        type: "image",
+        source: { type: "base64", media_type: image.mimeType, data: image.content },
+      })),
+    ],
+  };
+}
+
+async function toResponseError(response: Response): Promise<ProviderError> {
+  const status = response.status;
+  let message = `Anthropic request failed with status ${status}`;
+  try {
+    const body = (await response.json()) as { error?: { message?: string } };
+    if (body.error?.message) message = body.error.message;
+  } catch {
+    // ignore body parse failures, fall back to generic message
+  }
+  const retryable = status === 429 || status >= 500;
+  return new ProviderError("anthropic", message, { retryable, statusCode: status });
+}

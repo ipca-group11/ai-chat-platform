@@ -1,0 +1,124 @@
+// conversation-service Prisma schema (STACK.md: Postgres + Prisma).
+// Owns four tables: `Chat`, `ChatMember`, `Message`, `Attachment` (ARCHITECTURE.md §5).
+// Every row is scoped by `ownerId` from the validated JWT (FR5); a chat is also readable
+// by the users its owner invited (`ChatMember`, matched on the JWT `email` claim).
+// Deleting a `Chat` cascades to its members, `Message`s and their `Attachment`s (AC-44).
+
+// `output` points inside this service's own source tree (not `node_modules/@prisma/client`)
+// so the generated client can't collide with `auth-service`'s own Prisma schema: pnpm
+// dedupes identical `@prisma/client`/`prisma` version pairs to a single shared store
+// entry, so without a per-service `output`, whichever service last ran `prisma generate`
+// silently overwrites the other's generated client (see docs/RELEASE.md "Known gaps").
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ChatProvider {
+  ollama
+  openai
+  anthropic
+}
+
+enum MessageRole {
+  user
+  assistant
+  system
+}
+
+enum MessageStatus {
+  sent
+  queued
+  streaming
+  failed
+}
+
+enum AttachmentKind {
+  text
+  pdf
+  image
+}
+
+model Chat {
+  id         String       @id @default(cuid())
+  ownerId    String
+  // Nullable: chats created before sharing existed have no recorded owner email.
+  ownerEmail String?
+  title      String
+  provider   ChatProvider
+  model      String
+  /// Ask the model to reason before answering, for models that support it (see
+  /// `LlmProvider.supportsReasoning`); ignored for models that don't.
+  reasoning  Boolean      @default(false)
+  /// Let the model fetch the web pages behind URLs in the conversation, for models that
+  /// support it (see `LlmProvider.supportsWebFetch`); ignored for models that don't.
+  webFetch   Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  messages   Message[]
+  members    ChatMember[]
+
+  @@index([ownerId])
+}
+
+/// A user the chat's owner invited. Keyed by (lowercased) email rather than user id:
+/// this service has no user table, and matching on the JWT `email` claim means an
+/// invite also works for someone who has not registered yet.
+model ChatMember {
+  id        String   @id @default(cuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  email     String
+  invitedBy String
+  createdAt DateTime @default(now())
+
+  @@unique([chatId, email])
+  @@index([email])
+}
+
+model Message {
+  id          String        @id @default(cuid())
+  chatId      String
+  chat        Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  ownerId     String
+  // Nullable: messages created before sharing existed have no recorded author email.
+  authorEmail String?
+  role        MessageRole
+  content     String
+  /// The model's reasoning ("thinking") for an assistant reply, when the chat had
+  /// reasoning on and the provider returns it.
+  reasoning   String?
+  /// Pages the model fetched while writing an assistant reply (`WebFetchDto[]`), when
+  /// the chat had web fetch on.
+  webFetches  Json?
+  status      MessageStatus @default(sent)
+  error       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  attachments Attachment[]
+
+  @@index([chatId, createdAt])
+  @@index([ownerId])
+}
+
+model Attachment {
+  id            String         @id @default(cuid())
+  messageId     String
+  message       Message        @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  ownerId       String
+  filename      String
+  mimeType      String
+  size          Int
+  kind          AttachmentKind
+  storagePath   String
+  extractedText String?
+  createdAt     DateTime       @default(now())
+
+  @@index([messageId])
+  @@index([ownerId])
+}

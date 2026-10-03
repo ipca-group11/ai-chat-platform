@@ -1,0 +1,64 @@
+# Separate from platform-foundation's owned .github/workflows/ci.yml (per
+# docs/pods/quality-observability/PLAN.md task O8) so this pod never touches that
+# file's path. Runs the Playwright suite (e2e/**, covering UC1-UC8 + Axe checks,
+# AC-98/AC-99) against the full docker-compose stack.
+#
+# NOTE: per PLAN.md O8, this job is intended to be a required status check for
+# merges to main (AC-100). Actually enabling that in branch protection is a
+# repo-admin action outside any pod's file ownership - flagged for the
+# integration pass.
+name: e2e
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter e2e exec playwright install --with-deps chromium
+
+      # Brings up the full stack, including the ollama-pull init step that
+      # pre-pulls llama3.2:1b (STACK.md decision #7) so provider calls in the
+      # send-and-stream/queue/parallel-sessions specs don't need a live pull.
+      - name: Start docker compose stack
+        run: docker compose up -d --build
+
+      - name: Wait for the stack to become healthy
+        run: pnpm --filter e2e run wait-for-stack
+
+      - name: Run Playwright E2E suite (UC1-UC8)
+        run: pnpm exec nx run e2e:e2e
+        env:
+          CI: "true"
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          retention-days: 14
+
+      - name: Tear down docker compose stack
+        if: always()
+        run: docker compose down -v

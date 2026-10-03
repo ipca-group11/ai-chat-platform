@@ -1,0 +1,11 @@
+# Auto-provisions Prometheus as Grafana's default datasource for local docker-compose
+# (US-2 AC-6). See https://grafana.com/docs/grafana/latest/administration/provisioning/
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true

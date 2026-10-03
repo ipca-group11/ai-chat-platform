@@ -1,0 +1,28 @@
+{
+  "name": "mfe-settings",
+  "sourceRoot": "apps/mfe-settings/src",
+  "projectType": "application",
+  "tags": ["scope:configuration", "type:app"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint src", "cwd": "apps/mfe-settings" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit", "cwd": "apps/mfe-settings" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --coverage", "cwd": "apps/mfe-settings" }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vite build", "cwd": "apps/mfe-settings" }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vite", "cwd": "apps/mfe-settings" }
+    }
+  }
+}

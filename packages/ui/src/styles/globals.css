@@ -1,0 +1,134 @@
+/* shadcn Typeset (https://ui.shadcn.com/docs/typeset): prose styles for rendered text/markdown.
+   Inlined by Vite before PostCSS runs, so its `@layer components` joins Tailwind's layer. */
+@import './typeset.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens (AC-16)
+ * ---------------------
+ * All color tokens are HSL triplets (no `hsl()` wrapper) so Tailwind can compose them
+ * with opacity modifiers, e.g. `bg-primary/50`. Consumers of packages/ui must import
+ * this stylesheet once (e.g. `import '@app/ui/styles.css'` in the shell app's entry
+ * point) so every microfrontend shares one token set.
+ *
+ * Dark mode strategy: class-based. Add/remove the `dark` class on `<html>` (or any
+ * ancestor of the app root) to switch themes; there is no `prefers-color-scheme` media
+ * query fallback so the shell app can persist an explicit user preference. The
+ * Storybook preview (.storybook/preview.tsx) toggles this class via a toolbar control.
+ */
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 6%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 6%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --success: 142 71% 35%;
+    --success-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+/*
+ * Typeset bridge + presets
+ * ------------------------
+ * typeset.css reads Tailwind v4-style `--color-*` / `--font-heading` variables; this
+ * project's tokens are HSL triplets, so map them here (both themes follow automatically).
+ * Wrap prose with `typeset` plus a preset, e.g. `<div className="typeset typeset-chat">`.
+ */
+@layer components {
+  .typeset {
+    --color-foreground: hsl(var(--foreground));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+    --color-muted: hsl(var(--muted));
+    --color-border: hsl(var(--border));
+    --color-ring: hsl(var(--ring));
+    --color-primary: hsl(var(--primary));
+    --font-heading: var(--font-sans);
+  }
+
+  /* Chat bubbles: follows the surrounding text size, tighter rhythm. */
+  .typeset-chat {
+    --typeset-size: 0.875rem;
+    --typeset-leading: 1.6;
+    --typeset-flow: 0.75em;
+  }
+
+  /* Page intros / descriptive copy. */
+  .typeset-page {
+    --typeset-size: 0.9375rem;
+    --typeset-leading: 1.7;
+    --typeset-flow: 1em;
+  }
+}

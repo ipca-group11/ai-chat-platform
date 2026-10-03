@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    // Module Federation's DTS generation (see vite.config.ts) emits declarations for the
+    // exposed modules and needs `rootDir` to cover every source file that ends up in that
+    // program - including `@app/shared-types/*`, which this app imports directly from the
+    // sibling `packages/shared-types` workspace package (see the `paths` mapping below).
+    // Without this, dts-plugin infers `rootDir` as this app's own `src/`, and generation
+    // fails with TS6059 once it walks into the shared-types package. Anchoring `rootDir` at
+    // the repo root (the common ancestor of `apps/*` and `packages/*`) covers that package
+    // boundary; it's a no-op for normal `tsc --noEmit` type-checking since that doesn't
+    // enforce `rootDir`.
+    "rootDir": "../..",
+    "paths": {
+      "@app/shared-types/api-keys": ["../../packages/shared-types/src/api-keys/index.ts"]
+    },
+    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
+  },
+  "include": ["src"]
+}

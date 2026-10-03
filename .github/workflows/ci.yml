@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Matches `.factory/commands.json`'s `test` command exactly.
+  NX_AFFECTED_TARGETS: lint typecheck test build
+
+jobs:
+  affected:
+    name: nx affected (lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    steps:
+      # Full history so `nx affected` can diff against origin/main (AC-12, AC-13).
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Matches `.factory/commands.json`'s `install` command.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Nx Cloud isn't configured for this repo yet; a GitHub Actions cache keyed on
+      # nx.json + the lockfile stands in for it so unaffected projects are replayed
+      # from cache instead of re-run (AC-14).
+      - name: Cache Nx computation cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('nx.json', 'pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            nx-${{ runner.os }}-${{ hashFiles('nx.json', 'pnpm-lock.yaml') }}-
+            nx-${{ runner.os }}-
+
+      - name: Derive base/head for nx affected
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "NX_BASE=origin/${{ github.event.pull_request.base.ref }}" >> "$GITHUB_ENV"
+          else
+            echo "NX_BASE=${{ github.event.before }}" >> "$GITHUB_ENV"
+          fi
+          echo "NX_HEAD=HEAD" >> "$GITHUB_ENV"
+
+      # Fails the job (and PR) on any lint/typecheck/test/build error (AC-12, AC-13).
+      # Vitest coverage thresholds (STACK.md decision #6) are enforced per-project as
+      # part of each project's own `test` target, so a coverage regression fails this
+      # step too without any separate CI step.
+      - name: nx affected
+        run: >
+          pnpm exec nx affected
+          -t ${{ env.NX_AFFECTED_TARGETS }}
+          --base=${{ env.NX_BASE }}
+          --head=${{ env.NX_HEAD }}
