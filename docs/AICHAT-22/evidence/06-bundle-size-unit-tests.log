@@ -1,0 +1,19 @@
+$ node --test scripts/ci/bundle-size.test.ts
+✔ cuts the content hash from a chunk name (1.24225ms)
+✔ snapshot reads the gzip size of every js and css file of each built app (2.441959ms)
+✔ compare lists new, removed and changed files and skips unchanged ones (0.149417ms)
+✔ compare ignores apps that have no build on the base (0.065542ms)
+✔ report has before, after and change per file and a total per app (0.230584ms)
+✔ report marks new and removed files and says so when nothing changed (0.102583ms)
+✔ report names the apps that were not built on the base and handles an empty comparison (0.077333ms)
+✔ small changes are shown in bytes (0.069541ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 79.624084
+
+[exit 0]
