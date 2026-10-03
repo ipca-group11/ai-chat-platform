@@ -1,0 +1,5 @@
+$ curl -s -o /dev/null -w 'slow: HTTP %{http_code} in %{time_total}s\n' 'localhost:4110/remotes/slow/remoteEntry.js?delayMs=2000'; curl -s -o /dev/null -w 'ok:   HTTP %{http_code} in %{time_total}s\n' localhost:4110/remotes/ok/remoteEntry.js
+slow: HTTP 200 in 2.003810s
+ok:   HTTP 200 in 0.001676s
+
+[exit 0]
