@@ -42,30 +42,63 @@ Blockers: none
 
 ## 3. Steps
 
-### US1 · <story summary> ([AICHAT-<key>](https://ipca-grupo11.atlassian.net/browse/AICHAT-<key>))
+### US1 · Agree bundle size limits per remote ([AICHAT-47](https://ipca-grupo11.atlassian.net/browse/AICHAT-47))
 
-**What and why.** …
+**What and why.** The analysis only had rough numbers, and they mixed two different things: files the browser downloads and fallback copies of React, the router and Query that every remote emits but never uses while the shell provides them. We built the four apps (`pnpm exec nx run-many -t build`) and measured the gzip size of every emitted `.js` file, then split them into groups by file name:
+
+- `remoteEntry.js`: the federation manifest, the first file a host requests.
+- application chunks: everything that is not federation glue and not a shared-library copy (the exposed routes of a remote, the pages of the shell).
+- federation glue: the Module Federation runtime and loaders (`dist-*`, `utils-*`, `hostInit-*`, `mf-entry-bootstrap-*`, ...).
+- shared-library copies: `*prebuild*` (fallbacks in a remote) and `*loadShare*` (the shell's own copies of react, react-dom, router, query and `@app/ui`).
+- all emitted JS: a guard rail over everything.
+
+The rule of the DoR review is: limit = measured baseline + 10%, rounded up to the next KB (1 KB = 1024 bytes, as size-limit counts), never above the upper bounds of the analysis (`remoteEntry.js` 8 KB, shell 120 KB, auth and settings routes 40 KB, chat routes 80 KB). Sizes are gzip, summed per group from the per-file gzip size, measured on 2026-10-03 on Node 24.21.0.
+
+| App | Group | Baseline (KB) | Limit (KB) | Upper bound of the analysis |
+|---|---|---|---|---|
+| shell | `remoteEntry.js` | 6.00 | 7 | 8 |
+| shell | application chunks | 50.33 | 56 | 120 |
+| shell | federation glue | 114.85 | 127 | none |
+| shell | shared-library copies | 118.51 | 131 | none |
+| shell | all emitted JS | 289.69 | 319 | none |
+| mfe-auth | `remoteEntry.js` | 6.08 | 7 | 8 |
+| mfe-auth | route chunks | 24.17 | 27 | 40 |
+| mfe-auth | federation glue | 114.20 | 126 | none |
+| mfe-auth | shared-library copies | 120.80 | 133 | none |
+| mfe-auth | all emitted JS | 265.24 | 292 | none |
+| mfe-chat | `remoteEntry.js` | 6.11 | 7 | 8 |
+| mfe-chat | route chunks | 61.59 | 68 | 80 |
+| mfe-chat | federation glue | 120.20 | 133 | none |
+| mfe-chat | shared-library copies | 120.84 | 133 | none |
+| mfe-chat | all emitted JS | 308.74 | 340 | none |
+| mfe-settings | `remoteEntry.js` | 6.07 | 7 | 8 |
+| mfe-settings | route chunks | 25.24 | 28 | 40 |
+| mfe-settings | federation glue | 113.82 | 126 | none |
+| mfe-settings | shared-library copies | 87.53 | 97 | none |
+| mfe-settings | all emitted JS | 232.66 | 256 | none |
+
+Limits are tightened after improvements and never raised without a reason in the pull request.
 
 **Files.**
-- `path/to/file` (new): …
+- `docs/AICHAT-22/WORKLOG.md`: this table (the configuration that enforces it comes with US2).
 
 **How to run.**
 
 ```sh
-<one command from the repo root>
+pnpm exec nx run-many -t build && for a in shell mfe-auth mfe-chat mfe-settings; do (cd apps/$a && pnpm exec size-limit --json); done
 ```
 
 **How to repeat it manually.**
 
-1. …
-2. …
-3. Expected output: …
+1. Build the apps: `pnpm exec nx run-many -t build`.
+2. Run `gzip -9c apps/mfe-chat/dist/assets/routes-*.js | wc -c` for a single file, or the loop above for all groups (the group definitions are in `apps/<app>/.size-limit.ts`, added in US2).
+3. Expected output: the sizes of the table (they move by a few bytes with the file hash and the gzip level).
 
-**Result.** …
+**Result.** The remote entries are about 6 KB each. The application code is small (24 to 62 KB), while the federation glue (114 to 120 KB, mostly the 85 KB `dist-*` chunk that holds the federation runtime) and the shared-library copies weigh more than the application. That is why the budget separates the groups: a single "total" would hide a growth of the application behind the glue.
 
-![<caption>](evidence/01-<what>.png)
+![Baseline measurement](evidence/01-baseline-measurement.png)
 
-**Problems and fixes.** …
+**Problems and fixes.** The analysis gave a total of 241 KB gzip for the shell; our figure is 290 KB because the total here adds the gzip size of every file (each file is compressed on its own, which is what a browser downloads), and the analysis compressed the whole folder once. The measurement is repeatable, so the new figure is the baseline.
 
 ### US2 · …
 

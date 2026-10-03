@@ -1,0 +1,24 @@
+$ bash /private/tmp/claude-501/base.sh
+group | gzip bytes | KiB | baseline + 10% (KB, rounded up)
+shell remoteEntry.js                  6147    6.00 7
+shell own chunks                     51541   50.33 56
+shell federation glue               117602  114.85 127
+shell shared-library copies         121355  118.51 131
+shell all emitted JS                296645  289.69 319
+mfe-auth remoteEntry.js               6224    6.08 7
+mfe-auth route chunks                24745   24.17 27
+mfe-auth federation glue            116944  114.20 126
+mfe-auth shared-library copies      123697  120.80 133
+mfe-auth all emitted JS             271610  265.24 292
+mfe-chat remoteEntry.js               6260    6.11 7
+mfe-chat route chunks                63066   61.59 68
+mfe-chat federation glue            123080  120.20 133
+mfe-chat shared-library copies      123745  120.84 133
+mfe-chat all emitted JS             316151  308.74 340
+mfe-settings remoteEntry.js           6218    6.07 7
+mfe-settings route chunks            25842   25.24 28
+mfe-settings federation glue        116552  113.82 126
+mfe-settings shared-library copies   89635   87.53 97
+mfe-settings all emitted JS         238247  232.66 256
+
+[exit 0]
