@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "serve": "tsx src/main.ts",
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/build.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src --max-warnings=0",
     "test": "vitest run --coverage",

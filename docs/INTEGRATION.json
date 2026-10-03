@@ -74,7 +74,7 @@
     {
       "id": "I10",
       "title": "Fix stale unit test in packages/workspace-config asserting the repo root directory name equals 'platform-foundation' (leftover from the pod's standalone working directory before merge, where the folder is now named 'repo')",
-      "paths": ["packages/workspace-config/src/repo.test.js"],
+      "paths": ["packages/workspace-config/src/repo.test.ts"],
       "verify": "pnpm exec nx run workspace-config:test"
     },
     {

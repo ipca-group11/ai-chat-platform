@@ -1,0 +1,60 @@
+$ bash /private/tmp/claude-501/-Users-truezone-Projects-ai-chat-platform/eef7d68d-8a8c-448c-9b92-df26c0f970df/scratchpad/e42.sh
+ ✓ src/shared/model-capability-tables.test.ts > capability expectations > has an expectation for every anthropic model, and for no model that is gone 1ms
+ ✓ src/shared/model-capability-tables.test.ts > capability expectations > has an expectation for every openai model, and for no model that is gone 0ms
+ ✓ src/shared/model-capability-tables.test.ts > capability expectations > covers a non-trivial number of models 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-opus-5-5: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-sonnet-5-5: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-haiku-4-5: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-sonnet-latest: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-haiku-latest: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o-mini: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4.1: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-5-mini: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / o4-mini: reasoning matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-opus-5-5: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-sonnet-5-5: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-haiku-4-5: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-sonnet-latest: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-haiku-latest: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o-mini: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4.1: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-5-mini: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / o4-mini: web fetch matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-opus-5-5: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-sonnet-5-5: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-haiku-4-5: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-sonnet-latest: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-haiku-latest: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o-mini: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4.1: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-5-mini: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / o4-mini: image (vision) matches the expectation 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-opus-5-5: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-sonnet-5-5: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-haiku-4-5: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-sonnet-latest: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-haiku-latest: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o-mini: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4.1: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-5-mini: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / o4-mini: text attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-opus-5-5: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-sonnet-5-5: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-haiku-4-5: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-sonnet-latest: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > anthropic / claude-3-5-haiku-latest: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4o-mini: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-4.1: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-5-mini: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / o4-mini: pdf attachments are supported 0ms
+ ✓ src/shared/model-capability-tables.test.ts > models outside the tables > do not claim any capability that needs an allow-list 0ms
+ ✓ src/shared/model-capability-tables.test.ts > models outside the tables > still accept text and pdf, which every model can read as text 0ms
+ Test Files  1 passed (1)
+      Tests  55 passed (55)
+
+[exit 0]

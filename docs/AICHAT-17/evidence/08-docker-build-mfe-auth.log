@@ -1,0 +1,28 @@
+$ docker build --progress=plain -f apps/mfe-auth/Dockerfile -t tmp-aichat17-mfe-auth . 2>&1 | rtk proxy grep -E 'pnpm install|frozen|DONE|CACHED|naming|ERROR|writing image' | tail -25
+#3 DONE 0.0s
+#4 DONE 0.0s
+#5 DONE 0.1s
+#6 CACHED
+#7 CACHED
+#8 CACHED
+#9 DONE 0.3s
+#10 DONE 0.1s
+#11 DONE 0.1s
+#12 [deps 5/5] RUN pnpm install --frozen-lockfile
+#12 DONE 26.0s
+#13 DONE 1.2s
+#14 DONE 4.0s
+#15 DONE 10.7s
+#16 CACHED
+#17 DONE 7.0s
+#18 DONE 0.4s
+#19 DONE 0.1s
+#20 DONE 0.1s
+#21 DONE 0.1s
+#22 DONE 0.1s
+#23 DONE 4.7s
+#24 DONE 0.4s
+#25 naming to docker.io/library/tmp-aichat17-mfe-auth:latest done
+#25 DONE 83.8s
+
+[exit 0]

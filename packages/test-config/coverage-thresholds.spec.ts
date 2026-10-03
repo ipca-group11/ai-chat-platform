@@ -3,7 +3,7 @@ import {
   appCoverageThresholds,
   coverageThresholds,
   e2eCoverageThresholds,
-} from "./coverage-thresholds.js";
+} from "./coverage-thresholds.ts";
 
 describe("coverageThresholds", () => {
   it("AC-97: defines an 80% threshold for lines, statements, functions, and branches", () => {

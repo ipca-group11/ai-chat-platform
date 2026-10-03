@@ -110,8 +110,8 @@ move to the next line. To resume an epic that was interrupted, use `continue AIC
 
 **Wave 2: test infrastructure**
 - [x] `start AICHAT-25`
-- [ ] `start AICHAT-144`
-- [ ] Merge `main` into `integration/testing-epics`
+- [x] `start AICHAT-144`
+- [x] Merge `main` into `integration/testing-epics` (nothing new on `main`)
 
 **Wave 3: code quality**
 - [ ] `start AICHAT-17`

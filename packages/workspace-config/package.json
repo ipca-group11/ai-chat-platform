@@ -5,6 +5,9 @@
   "license": "UNLICENSED",
   "type": "module",
   "devDependencies": {
+    "@app/conversation-service": "workspace:*",
+    "@app/mfe-chat": "workspace:*",
+    "@app/shared-types": "workspace:*",
     "@platform/eslint-config": "workspace:*",
     "@platform/test-config": "workspace:*",
     "@types/node": "^24.13.6",

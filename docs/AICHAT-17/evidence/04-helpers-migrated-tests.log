@@ -1,0 +1,12 @@
+$ for d in 'apps/mfe-chat src/features/chat-view/model/stream-registry.test.ts src/features/chat-view/components/ChatView.test.tsx src/app/routes.test.tsx' 'apps/mfe-auth' 'apps/mfe-settings'; do set -- $d; dir=$1; shift; (cd $dir && pnpm exec vitest run "$@" 2>&1 | rtk proxy grep -E 'RUN|Test Files|Tests '); done
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-chat
+ Test Files  3 passed (3)
+      Tests  26 passed (26)
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-auth
+ Test Files  6 passed (6)
+      Tests  22 passed (22)
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-settings
+ Test Files  11 passed (11)
+      Tests  53 passed (53)
+
+[exit 0]

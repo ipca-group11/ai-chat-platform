@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { describe, expect, it, vi } from "vitest";
+import { renderWithClient } from "@platform/test-utils";
+import { http, HttpResponse, recordRequests, server } from "@platform/test-utils/msw";
 import type { Message } from "../../../shared/types";
 import { Composer } from "./Composer";
 
@@ -20,14 +21,10 @@ const sentMessage: Message = {
 };
 
 describe("Composer (AC-51, AC-66)", () => {
-  beforeEach(() => vi.restoreAllMocks());
-
   it("AC-51: sends a typed message and clears the input", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(sentMessage, 201)));
+    server.use(http.post("*/chats/:chatId/messages", () => HttpResponse.json({ message: sentMessage }, { status: 201 })));
 
-    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
-      wrapper: withQueryClient(),
-    });
+    renderWithClient(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />);
 
     const textbox = screen.getByLabelText("Message");
     await userEvent.type(textbox, "Hello");
@@ -37,20 +34,15 @@ describe("Composer (AC-51, AC-66)", () => {
   });
 
   it("the Send button is disabled while the message is empty and there are no attachments", () => {
-    vi.stubGlobal("fetch", vi.fn());
-    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
-      wrapper: withQueryClient(),
-    });
+    renderWithClient(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />);
 
     expect(screen.getByText("Send")).toBeDisabled();
   });
 
   it("AC-51: sends on Enter (without Shift) without inserting a newline", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(sentMessage, 201)));
+    server.use(http.post("*/chats/:chatId/messages", () => HttpResponse.json({ message: sentMessage }, { status: 201 })));
 
-    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
-      wrapper: withQueryClient(),
-    });
+    renderWithClient(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />);
 
     const textbox = screen.getByLabelText("Message");
     await userEvent.type(textbox, "Hello{Enter}");
@@ -59,11 +51,9 @@ describe("Composer (AC-51, AC-66)", () => {
   });
 
   it("shows the send error when the message fails to send", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ message: "Server error" }), { status: 500 })));
+    server.use(http.post("*/chats/:chatId/messages", () => HttpResponse.json({ message: "Server error" }, { status: 500 })));
 
-    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
-      wrapper: withQueryClient(),
-    });
+    renderWithClient(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />);
 
     await userEvent.type(screen.getByLabelText("Message"), "Hello");
     await userEvent.click(screen.getByText("Send"));
@@ -72,10 +62,8 @@ describe("Composer (AC-51, AC-66)", () => {
   });
 
   it("AC-68: a rejected attachment blocks sending until it is removed", async () => {
-    vi.stubGlobal("fetch", vi.fn());
-    render(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />, {
-      wrapper: withQueryClient(),
-    });
+    const requests = recordRequests();
+    renderWithClient(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />);
 
     await userEvent.type(screen.getByLabelText("Message"), "Hello");
     const file = new File([new Uint8Array(11 * 1024 * 1024)], "big.txt", { type: "text/plain" });
@@ -85,5 +73,6 @@ describe("Composer (AC-51, AC-66)", () => {
 
     await userEvent.click(screen.getByLabelText("Remove big.txt"));
     await waitFor(() => expect(screen.getByText("Send")).toBeEnabled());
+    expect(requests).toHaveLength(0);
   });
 });

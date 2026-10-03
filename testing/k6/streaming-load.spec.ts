@@ -3,14 +3,14 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 /**
- * `streaming-load.js` (O6, AC-96) runs under the k6 runtime, not Node, so it can't be
+ * `streaming-load.ts` (O6, AC-96) runs under the k6 runtime, not Node, so it can't be
  * imported and executed directly in Vitest. These are static, structural checks on the
  * script's source text pinning down the contract described in README.md: >=5 VUs, a
  * time-to-first-token trend thresholded around the ~1s NFR, and a 0%-dropped-stream rate
  * threshold across concurrent chats.
  */
 
-const scriptPath = fileURLToPath(new URL("./streaming-load.js", import.meta.url));
+const scriptPath = fileURLToPath(new URL("./streaming-load.ts", import.meta.url));
 const source = readFileSync(scriptPath, "utf-8");
 
 describe("K6 streaming load test (AC-96)", () => {

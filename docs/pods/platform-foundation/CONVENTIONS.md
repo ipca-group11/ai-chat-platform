@@ -119,7 +119,7 @@ reason; this is a monorepo-tooling-only exception; it does not change the mandat
 
 ## 4. ESLint (US-3 AC-9, AC-11)
 
-Each project's `eslint.config.js`:
+Each project's `eslint.config.ts`:
 
 ```js
 import { react } from "@platform/eslint-config"; // apps/*, packages/ui

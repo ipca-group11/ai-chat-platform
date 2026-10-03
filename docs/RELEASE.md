@@ -44,7 +44,7 @@ Fixed in this pass:
   `.d.ts` files next to `packages/shared-types/src/api-keys/*.ts` on some builds; these
   had crept back into the lint run (and had briefly been re-committed by I11's own
   commit after I5 had removed them). Deleted the stray files, added a project-local
-  ESLint `ignores: ["src/**/*.d.ts"]` in `packages/shared-types/eslint.config.js`, and
+  ESLint `ignores: ["src/**/*.d.ts"]` in `packages/shared-types/eslint.config.ts`, and
   added `packages/shared-types/src/**/*.d.ts` plus `apps/*/.mf/` to `.gitignore` so this
   build artifact can never break lint or get committed again, regardless of whether a
   given build run happens to regenerate it.

@@ -89,7 +89,7 @@ scripts/ci/semgrep.sh
 
 1. Start Docker and run the command from the repo root.
 2. Wait about 15 seconds (the first run pulls the image and the packs).
-3. Expected output: `semgrep exit code: 0` and the file `semgrep-results/semgrep.sarif`. Then `node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif` prints the table (the script is added in US5).
+3. Expected output: `semgrep exit code: 0` and the file `semgrep-results/semgrep.sarif`. Then `node scripts/ci/sast-summary.ts semgrep-results/semgrep.sarif` prints the table (the script is added in US5).
 
 **Result.** The first run is our baseline: 24 ERROR, 34 WARNING and 13 INFO findings. Both custom rules fire: `aichat.secret-with-literal-default-zod` finds the JWT default in `services/conversation-service/src/shared/env.ts:7`, and `aichat.secret-env-fallback-literal` finds a fallback in an e2e fixture.
 
@@ -113,7 +113,7 @@ scripts/ci/semgrep.sh
 **How to run.**
 
 ```sh
-scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif
+scripts/ci/semgrep.sh && node scripts/ci/sast-summary.ts semgrep-results/semgrep.sarif
 ```
 
 **How to repeat it manually.**
@@ -133,19 +133,19 @@ scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgre
 
 ### US4 · SAST on every PR, high findings block the merge ([AICHAT-86](https://ipca-grupo11.atlassian.net/browse/AICHAT-86))
 
-**What and why.** We added a `sast` job to `.github/workflows/security.yml`, next to `secret-scan` and with the same triggers (every pull request, and pushes to `main` and `integration/testing-epics`). It runs `scripts/ci/semgrep.sh`, then `scripts/ci/sast-summary.mjs`, which reads the SARIF, ignores findings suppressed with `nosemgrep` and exits 1 when an ERROR is left. WARNING and INFO never fail the job. We read the SARIF instead of using `semgrep --error` because the SARIF output is the only one that keeps WARNINGs for the summary and marks suppressed findings.
+**What and why.** We added a `sast` job to `.github/workflows/security.yml`, next to `secret-scan` and with the same triggers (every pull request, and pushes to `main` and `integration/testing-epics`). It runs `scripts/ci/semgrep.sh`, then `scripts/ci/sast-summary.ts`, which reads the SARIF, ignores findings suppressed with `nosemgrep` and exits 1 when an ERROR is left. WARNING and INFO never fail the job. We read the SARIF instead of using `semgrep --error` because the SARIF output is the only one that keeps WARNINGs for the summary and marks suppressed findings.
 
 **Files.**
 - `.github/workflows/security.yml`: new `sast` job (`sast (semgrep)`).
-- `scripts/ci/sast-summary.mjs` (new): reads the SARIF, prints the table, sets the exit code.
-- `scripts/ci/sast-summary.test.mjs` (new): `node --test` unit tests.
+- `scripts/ci/sast-summary.ts` (new): reads the SARIF, prints the table, sets the exit code.
+- `scripts/ci/sast-summary.test.ts` (new): `node --test` unit tests.
 - `docs/AICHAT-27/evidence/03-unit-tests.*`, `04-expected-failure.*`
 
 **How to run.**
 
 ```sh
-node --test scripts/ci/sast-summary.test.mjs
-scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif; echo $?
+node --test scripts/ci/sast-summary.test.ts
+scripts/ci/semgrep.sh && node scripts/ci/sast-summary.ts semgrep-results/semgrep.sarif; echo $?
 ```
 
 **How to repeat it manually.**
@@ -168,17 +168,17 @@ Required check: the owner sets `sast (semgrep)` as a required status check on `i
 
 ### US5 · Readable SAST results in the PR ([AICHAT-103](https://ipca-grupo11.atlassian.net/browse/AICHAT-103))
 
-**What and why.** A red check with a long log is hard to read. The `sast` job now writes a Markdown table to the job summary (rule, severity, count, `file:line` locations, ERROR first) and uploads the SARIF as the artifact `semgrep-sarif` (14 days), also when the job fails. The table is built by `scripts/ci/sast-summary.mjs` from the SARIF. It has no dependencies, so it runs before any `pnpm install`.
+**What and why.** A red check with a long log is hard to read. The `sast` job now writes a Markdown table to the job summary (rule, severity, count, `file:line` locations, ERROR first) and uploads the SARIF as the artifact `semgrep-sarif` (14 days), also when the job fails. The table is built by `scripts/ci/sast-summary.ts` from the SARIF. It has no dependencies, so it runs before any `pnpm install`.
 
 **Files.**
 - `.github/workflows/security.yml`: summary step (appends to `$GITHUB_STEP_SUMMARY`, then applies the gate) and `actions/upload-artifact@v4` step with `if: always()`.
-- `scripts/ci/sast-summary.mjs` and `scripts/ci/sast-summary.test.mjs` (from US4): table formatting and its tests.
+- `scripts/ci/sast-summary.ts` and `scripts/ci/sast-summary.test.ts` (from US4): table formatting and its tests.
 - `docs/AICHAT-27/evidence/05-summary-table.*`
 
 **How to run.**
 
 ```sh
-scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif
+scripts/ci/semgrep.sh && node scripts/ci/sast-summary.ts semgrep-results/semgrep.sarif
 ```
 
 **How to repeat it manually.**
@@ -197,8 +197,8 @@ scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgre
 
 ```sh
 # all checks added by this epic, from the repo root (Docker running)
-node --test scripts/ci/sast-summary.test.mjs
-scripts/ci/semgrep.sh && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif
+node --test scripts/ci/sast-summary.test.ts
+scripts/ci/semgrep.sh && node scripts/ci/sast-summary.ts semgrep-results/semgrep.sarif
 ```
 
 ## 5. Results

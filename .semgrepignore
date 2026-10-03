@@ -23,7 +23,5 @@ docs/
 *.spec.tsx
 *.test.ts
 *.test.tsx
-*.test.js
-*.test.mjs
 e2e/src/fixtures/
 services/*/src/shared/test/

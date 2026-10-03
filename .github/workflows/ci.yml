@@ -35,6 +35,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The repository scripts (scripts/**, mock-server build) are TypeScript run by Node directly:
+      # typecheck them and run their own tests.
+      - name: Typecheck and test the scripts
+        run: |
+          pnpm typecheck:scripts
+          pnpm test:scripts
+
       # Nx Cloud isn't configured for this repo yet; a GitHub Actions cache keyed on
       # nx.json + the lockfile stands in for it so unaffected projects are replayed
       # from cache instead of re-run (AC-14).
@@ -72,4 +79,4 @@ jobs:
       # still shows which project fell.
       - name: Coverage summary
         if: always()
-        run: node scripts/ci/coverage-summary.mjs
+        run: node scripts/ci/coverage-summary.ts

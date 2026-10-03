@@ -30,7 +30,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node scripts/build.mjs",
+        "command": "node scripts/build.ts",
         "cwd": "testing/mock-server"
       },
       "outputs": ["{projectRoot}/dist"]

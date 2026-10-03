@@ -1,6 +1,5 @@
-import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { withQueryClient } from "../../../test/utils";
+import { renderHookWithClient } from "@platform/test-utils";
 import { useMessageStream } from "./useMessageStream";
 
 vi.mock("../model/stream-registry", () => ({
@@ -12,14 +11,14 @@ describe("useMessageStream", () => {
 
   it("does not open a stream when there is no chat id yet", async () => {
     const { ensureChatStream } = await import("../model/stream-registry");
-    renderHook(() => useMessageStream(undefined), { wrapper: withQueryClient() });
+    renderHookWithClient(() => useMessageStream(undefined));
 
     expect(ensureChatStream).not.toHaveBeenCalled();
   });
 
   it("opens a stream once a chat id is available", async () => {
     const { ensureChatStream } = await import("../model/stream-registry");
-    renderHook(() => useMessageStream("chat-1"), { wrapper: withQueryClient() });
+    renderHookWithClient(() => useMessageStream("chat-1"));
 
     expect(ensureChatStream).toHaveBeenCalledWith("chat-1", expect.anything());
   });

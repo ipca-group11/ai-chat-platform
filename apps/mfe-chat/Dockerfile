@@ -15,6 +15,8 @@ FROM base AS deps
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages ./packages
 COPY apps/mfe-chat/package.json ./apps/mfe-chat/package.json
+# the test helpers (a dev dependency of the app) import the mock-server data factories
+COPY testing/mock-server/package.json ./testing/mock-server/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build

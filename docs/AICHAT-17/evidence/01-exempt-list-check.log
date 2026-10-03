@@ -1,0 +1,19 @@
+$ node scripts/unit-test/source-files.mjs --check && rtk proxy grep -c category packages/workspace-config/unit-test-exempt.json && rtk proxy grep -m3 -A3 '"path"' packages/workspace-config/unit-test-exempt.json
+245 source files, 50 exempt entries, 0 problems
+51
+      "path": "apps/mfe-auth/src/features/login/index.ts",
+      "category": "barrel",
+      "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
+    },
+--
+      "path": "apps/mfe-auth/src/features/register/index.ts",
+      "category": "barrel",
+      "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
+    },
+--
+      "path": "apps/mfe-auth/src/main.tsx",
+      "category": "bootstrap",
+      "reason": "Standalone dev entry: creates the root, router and QueryClient and renders. No logic of its own; the routes it mounts are tested in routes.test.tsx and the flow is covered by the e2e suite."
+    },
+
+[exit 0]

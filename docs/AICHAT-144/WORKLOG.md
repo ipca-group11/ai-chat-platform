@@ -10,9 +10,9 @@ title: "AICHAT-144 · Mock server: work log"
 | Analysis | [README.md](README.md) |
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-144-mock-server` |
-| Started / finished | 2026-10-03 / … |
-| Pull requests | #… |
-| Status | In Progress |
+| Started / finished | 2026-10-03 / 2026-10-03 |
+| Pull requests | [#12](https://github.com/ipca-group11/ai-chat-platform/pull/12) |
+| Status | Review |
 
 ## 1. DoR review
 
@@ -79,11 +79,11 @@ pnpm exec nx test conversation-service
 How a mock is added: create `src/routers/<name>.router.ts` that exports a `MockModule` (`name`, `mountPath`, optional `scenarios`, `createRouter(ctx)`) and add one import line and one list entry in `src/routers/index.ts`. `ctx.onReset(hook)` clears a mock's state on `/__admin/reset`.
 
 **Files.**
-- `testing/mock-server/project.json`, `package.json`, `tsconfig.json`, `eslint.config.js`, `vitest.config.ts` (new): lint, typecheck, test (with the shared `coveragePreset`, thresholds 80) and build targets.
+- `testing/mock-server/project.json`, `package.json`, `tsconfig.json`, `eslint.config.ts`, `vitest.config.ts` (new): lint, typecheck, test (with the shared `coveragePreset`, thresholds 80) and build targets.
 - `testing/mock-server/src/app.ts`, `main.ts`, `config.ts`, `prng.ts`, `middleware.ts`, `registry.ts` (new): the app, env parsing, seeded generator, latency and error middleware, mock and scenario registries.
 - `testing/mock-server/src/routers/*.router.ts`, `index.ts` (new): the six mock routers and the list of mounted mocks.
 - `testing/mock-server/src/admin/admin.router.ts` (new): the `/__admin` endpoints.
-- `testing/mock-server/scripts/build.mjs` (new): bundles the server into one file with esbuild.
+- `testing/mock-server/scripts/build.ts` (new): bundles the server into one file with esbuild.
 - `testing/mock-server/Dockerfile`, `.env.example` (new): multi-stage image running as a non-root user; documented variables.
 - `.dockerignore`, `pnpm-workspace.yaml`, `packages/workspace-config/src/coverage-guard.js`: the project is part of the workspace, sent to the Docker build, and checked by the coverage guard test.
 
@@ -668,15 +668,15 @@ gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD
 
 | DoD item | Met | Evidence |
 |---|---|---|
-| Mock server runs locally and in CI with one command; health check green | Locally yes (`pnpm mock:up`, health in the compose check); CI pending PR run | [73](evidence/73-compose-llm-profile.png) |
+| Mock server runs locally and in CI with one command; health check green | ✅ locally (`pnpm mock:up`) and in the PR #12 e2e run (mock-server container healthy) | [73](evidence/73-compose-llm-profile.png), [79](evidence/79-ci-chat-mock-flows.png) |
 | Both LLM adapters stream a full answer from the mock (contract tests pass) | Yes | [71](evidence/71-contract-tests.png) |
 | Shell + MFEs work end to end against the backend mock (`frontend-only`) with every named dataset | Partly: the profile starts and the chat flow works with the default dataset; the other datasets were checked through the API tests, not in the browser | [75](evidence/75-compose-frontend-only-profile.png) |
 | Backend mock responses validated against `@platform/shared-types` (no drift from the real services) | Yes for the mock; the drift of shared-types itself is listed (US15) and passed to AICHAT-20; new drift fails the test | [72](evidence/72-contract-drift-fails.png) |
 | Fault scenarios reproducible on demand | Yes (US6, US7, US11, US12) | see US sections |
-| E2E chat flows run in CI against the mock, no real key used | Locally yes; GitHub run pending PR run | [74](evidence/74-playwright-chat-flows-llm-profile.png) |
+| E2E chat flows run in CI against the mock, no real key used | ✅ all four chat-mock flows passed in the PR #12 run ([37126274589](https://github.com/ipca-group11/ai-chat-platform/actions/runs/37126274589)) | [74](evidence/74-playwright-chat-flows-llm-profile.png), [79](evidence/79-ci-chat-mock-flows.png) |
 | Run instructions and scenario list documented | Yes | [MOCK-SERVER.md](MOCK-SERVER.md) |
 | `nx affected` green, Semgrep and gitleaks clean | Yes | [76](evidence/76-affected-final.png), [77](evidence/77-semgrep.png), [78](evidence/78-gitleaks.png) |
-| e2e workflow green on GitHub | pending PR run | |
+| e2e workflow green on GitHub | Not green: the older specs owned by AICHAT-4/5 still fail and the job hit its 30-minute limit. Since 2026-10-03 the e2e workflow runs on demand only (team decision, too slow for every PR) | [79](evidence/79-ci-chat-mock-flows.png) |
 
 ## 7. Notes for the report
 

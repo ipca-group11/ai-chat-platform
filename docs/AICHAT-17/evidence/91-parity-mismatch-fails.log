@@ -1,0 +1,40 @@
+$ bash /private/tmp/claude-501/-Users-truezone-Projects-ai-chat-platform/eef7d68d-8a8c-448c-9b92-df26c0f970df/scratchpad/parity-mismatch.sh
+--- deliberate mismatch: the chat UI stops offering web fetch on claude-haiku-4-5 ---
+ apps/mfe-chat/src/shared/model-capabilities.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/workspace-config
+
+ ❯ src/model-capability-parity.test.ts (81 tests | 1 failed) 8ms
+   ❯ chat UI and server agree on (78)
+     × anthropic / claude-haiku-4-5: web fetch 3ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 80 passed (81)
+   Start at  15:27:56
+   Duration  130ms (transform 63%, import 19%, tests 15%, worker 4%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/model-capability-parity.test.ts > chat UI and server agree on > anthropic / claude-haiku-4-5: web fetch
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/model-capability-parity.test.ts:64:47
+     62|
+     63|   it.each(cases)("%s / %s: web fetch", (provider, model) => {
+     64|     expect(supportsWebFetch(provider, model)).toBe(backend[provider].s…
+       |                                               ^
+     65|   });
+     66|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

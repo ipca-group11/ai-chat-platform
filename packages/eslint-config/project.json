@@ -3,7 +3,10 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/eslint-config/src",
   "projectType": "library",
-  "tags": ["type:package", "scope:shared"],
+  "tags": [
+    "type:package",
+    "scope:shared"
+  ],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",
@@ -22,7 +25,14 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'eslint-config is plain JS; nothing to build'",
+        "command": "echo 'eslint-config ships TypeScript source; nothing to build'",
+        "cwd": "packages/eslint-config"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.json --noEmit",
         "cwd": "packages/eslint-config"
       }
     }

@@ -1,0 +1,7 @@
+$ cat /private/tmp/claude-501/e2e-chat-mock-ci.log
+2026-10-03T13:45:44.7928373Z   ✓   2 [chromium] › src/tests/chat-mock.spec.ts:36:3 › chat flows against the LLM mock › send and stream: the answer arrives token by token and is saved (10.6s)
+2026-10-03T13:46:00.7115095Z   ✓   3 [chromium] › src/tests/chat-mock.spec.ts:50:3 › chat flows against the LLM mock › cancel: Stop keeps the part that was already written (15.9s)
+2026-10-03T13:46:08.1025151Z   ✓   5 [chromium] › src/tests/chat-mock.spec.ts:65:3 › chat flows against the LLM mock › cancel: a queued message can be removed before it is answered (7.4s)
+2026-10-03T13:46:16.4113671Z   ✓   7 [chromium] › src/tests/chat-mock.spec.ts:77:3 › chat flows against the LLM mock › provider error and retry: the failure is shown and Retry gets an answer (8.3s)
+
+[exit 0]

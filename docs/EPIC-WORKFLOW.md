@@ -18,7 +18,7 @@ epics listed in [AICHAT-EPICS.md](AICHAT-EPICS.md).
 | Per-epic work log | `docs/AICHAT-<n>/WORKLOG.md` (what was done, how to run it, how to repeat it by hand, evidence) |
 | Evidence (screenshots, logs, reports) | `docs/AICHAT-<n>/evidence/` |
 | Work-log template | [templates/WORKLOG.md](templates/WORKLOG.md) |
-| Terminal screenshot helper | [`scripts/evidence/term-shot.mjs`](../scripts/evidence/term-shot.mjs) |
+| Terminal screenshot helper | [`scripts/evidence/term-shot.ts`](../scripts/evidence/term-shot.ts) |
 | Integration branch | `integration/testing-epics` (all epic branches merge here; one final PR to `main`) |
 | Epic branch | `test/AICHAT-<n>-<short-name>`, created from the integration branch |
 
@@ -97,7 +97,7 @@ For every story of the epic, in order (US1, US2, …):
 2. Do the work in small commits (`test(<scope>): …`, `ci(<scope>): …`, `docs(<scope>): …`; reference the story key
    in the body, e.g. `Refs: AICHAT-35`).
 3. **Run it** and capture evidence:
-   - Terminal output → `node scripts/evidence/term-shot.mjs --out docs/AICHAT-<n>/evidence --name <nn>-<what> -- <command>`
+   - Terminal output → `node scripts/evidence/term-shot.ts --out docs/AICHAT-<n>/evidence --name <nn>-<what> -- <command>`
      (writes `<name>.log` and a `<name>.png` screenshot; the exit code is kept, so failing runs can be captured too).
    - Browser pages (Grafana, GitHub Actions, Jira, the app) → screenshot saved as `docs/AICHAT-<n>/evidence/<nn>-<what>.png`
      (Chrome DevTools *Capture screenshot*, or Playwright `page.screenshot()`).

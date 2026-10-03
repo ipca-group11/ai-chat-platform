@@ -1,0 +1,65 @@
+$ cd apps/shell && pnpm exec vitest run --coverage
+
+ RUN  v5.0.1 /private/tmp/claude-501/u17-fe/apps/shell
+      Coverage enabled with v8
+
+
+ Test Files  20 passed (20)
+      Tests  83 passed (83)
+   Start at  15:14:01
+   Duration  14.16s (environment 44%, import 17%, setup 15%, tests 14%, transform 7%, worker 3%)
+
+Environment  jsdom was created 20 times · 36.21s total, 44% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   92.02 |     87.8 |   86.36 |   92.94 |                   
+ shell/src/routes  |   63.63 |    74.46 |      60 |   63.63 |                   
+  __root.tsx       |   33.33 |    85.71 |      50 |   33.33 | 11-18             
+  ...s.$chatId.tsx |   66.66 |       60 |      50 |   66.66 | 17                
+  chats.tsx        |   66.66 |       60 |      50 |   66.66 | 17                
+  index.tsx        |   66.66 |    85.71 |     100 |   66.66 | 8                 
+  login.tsx        |      75 |    71.42 |   66.66 |      75 | 20                
+  register.tsx     |   66.66 |    81.81 |      50 |   66.66 | 12                
+  settings.tsx     |   66.66 |       60 |      50 |   66.66 | 17                
+ .../observability |      80 |      100 |      50 |      75 |                   
+  faro.ts          |      80 |      100 |      50 |      75 | 33                
+ ...c/shared/theme |   86.66 |    81.25 |   84.61 |      92 |                   
+  theme.ts         |   86.66 |    81.25 |   84.61 |      92 | 19,52             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 92.02% ( 150/163 )
+Branches     : 87.8% ( 108/123 )
+Functions    : 86.36% ( 57/66 )
+Lines        : 92.94% ( 145/156 )
+================================================================================
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./module-federation.config" without a file extension (vite.config.ts:6:36). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+
+[exit 0]

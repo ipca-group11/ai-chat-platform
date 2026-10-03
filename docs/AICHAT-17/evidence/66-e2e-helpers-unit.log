@@ -1,0 +1,31 @@
+$ cd e2e && pnpm exec vitest run --coverage
+
+ RUN  v5.0.1 /private/tmp/claude-501/u17-backend/e2e
+      Coverage enabled with v8
+
+
+ Test Files  8 passed (8)
+      Tests  50 passed (50)
+   Start at  15:16:22
+   Duration  525ms (import 44%, transform 32%, worker 12%, tests 11%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   91.91 |    80.55 |    92.3 |    92.7 |                   
+ a11y              |   57.14 |       40 |   85.71 |      50 |                   
+  axe-helper.ts    |   57.14 |       40 |   85.71 |      50 | 53-60             
+ fixtures          |   97.64 |    87.09 |   93.75 |    98.8 |                   
+  ...ings-flows.ts |     100 |       50 |     100 |     100 | 25                
+  ...-for-stack.ts |   92.85 |    86.36 |   77.77 |   96.29 | 25                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 91.91% ( 91/99 )
+Branches     : 80.55% ( 29/36 )
+Functions    : 92.3% ( 36/39 )
+Lines        : 92.7% ( 89/96 )
+================================================================================
+
+[exit 0]

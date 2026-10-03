@@ -1,0 +1,64 @@
+$ pnpm exec nx run mfe-settings:test --skip-nx-cache
+
+ NX   Running target test for project mfe-settings and 8 tasks it depends on:
+
+
+✔  nx run eslint-config:build
+✔  nx run test-config:build
+✔  nx run shared-types:build
+✔  nx run conversation-service:prisma-generate
+✔  nx run conversation-service:build
+✔  nx run mock-server:build
+✔  nx run test-utils:build
+✔  nx run ui:build
+
+> nx run mfe-settings:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /private/tmp/claude-501/u17-backend/apps/mfe-settings
+      Coverage enabled with v8
+
+
+ Test Files  11 passed (11)
+      Tests  53 passed (53)
+   Start at  15:16:03
+   Duration  5.36s (environment 33%, setup 25%, import 15%, tests 14%, transform 11%, worker 2%)
+
+Environment  jsdom was created 11 times · 10.17s total, 33% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |    91.01 |     100 |     100 |                   
+ ...s/api-keys/api |     100 |       85 |     100 |     100 |                   
+  auth.ts          |     100 |    83.33 |     100 |     100 | 41                
+  ...Connection.ts |     100 |    85.71 |     100 |     100 | 69-75             
+ ...eys/components |     100 |    90.74 |     100 |     100 |                   
+  ProviderList.tsx |     100 |    79.16 |     100 |     100 | 45,54-59          
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 94/94 )
+Branches     : 91.01% ( 81/89 )
+Functions    : 100% ( 27/27 )
+Lines        : 100% ( 91/91 )
+================================================================================
+
+
+
+ NX   Successfully ran target test for project mfe-settings and 8 tasks it depends on
+
+
+Output of 8 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      9.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     9.0s (4 tasks)
+  Recoverable time:  <1ms
+
+[exit 0]

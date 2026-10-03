@@ -14,8 +14,7 @@
       "!{projectRoot}/**/*.spec.tsx",
       "!{projectRoot}/**/*.test.tsx",
       "!{projectRoot}/vitest.config.ts",
-      "!{projectRoot}/eslint.config.js",
-      "!{projectRoot}/eslint.config.mjs"
+      "!{projectRoot}/eslint.config.ts"
     ]
   },
   "targetDefaults": {

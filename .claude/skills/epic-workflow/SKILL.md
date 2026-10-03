@@ -35,7 +35,7 @@ of code and all implementation happens in subagents that get **only** what they 
 - Jira cloudId `436aa6ed-4a2a-4c54-b40f-3490773ebd63`, project `AICHAT`, owner accountId `5b83bde0332df52a5d945bc3`.
 - Transitions: `21` In Progress, `31` Review, `41` Done, `11` back to TODO.
 - Impediment flag: `editJiraIssue` fields `{"customfield_10021":[{"value":"Impediment"}]}`.
-- Evidence helper: `node scripts/evidence/term-shot.mjs --out docs/AICHAT-<n>/evidence --name <nn>-<what> -- <cmd>`
+- Evidence helper: `node scripts/evidence/term-shot.ts --out docs/AICHAT-<n>/evidence --name <nn>-<what> -- <cmd>`
   (writes `.log` + terminal-style `.png`, keeps the exit code). Browser evidence: chrome-devtools `take_screenshot`
   with `filePath` into the same folder.
 
@@ -82,8 +82,9 @@ Acceptance criteria:
 Decisions that apply: <1–5 lines from WORKLOG §1>
 Load only this context: <1–3 awk commands from the epic skill's context loaders>; then open only the files those sections reference.
 Do:
-1. Implement the story. Small commits, Conventional Commits, body "Refs: <JIRA-KEY>". No co-author/generated trailers.
-2. Run it. Capture evidence with: node scripts/evidence/term-shot.mjs --out docs/<epic>/evidence --name <nn>-<what> -- <cmd>
+1. Implement the story in TypeScript only (no new .js/.mjs: scripts run as `node script.ts`, tests are .ts, ESLint configs
+   are eslint.config.ts). Small commits, Conventional Commits, body "Refs: <JIRA-KEY>". No co-author/generated trailers.
+2. Run it. Capture evidence with: node scripts/evidence/term-shot.ts --out docs/<epic>/evidence --name <nn>-<what> -- <cmd>
    (also capture an expected failure if the story adds a gate).
 3. Write section "### US<k> · <summary>" in docs/<epic>/WORKLOG.md §3 using the template headings (What and why, Files,
    How to run, How to repeat it manually, Result with ![](evidence/…) images, Problems and fixes). Team voice; never

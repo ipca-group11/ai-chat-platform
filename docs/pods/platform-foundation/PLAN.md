@@ -88,7 +88,7 @@ Files:
   - `project.json` with `lint`, `typecheck`, `test`, `build` targets, tags
     `type:package`, `scope:shared`.
 - `packages/eslint-config/`:
-  - Flat config (`eslint.config.js`/`.mjs`) using `typescript-eslint`, React hooks rules
+  - Flat config (`eslint.config.ts`) using `typescript-eslint`, React hooks rules
     for frontend projects, `@nx/enforce-module-boundaries`, and a `boundaries`/custom
     rule enforcing "feature folders only import `shared/` or other features'
     `index.ts`" (AC-9, AC-11, SPEC §3.3).

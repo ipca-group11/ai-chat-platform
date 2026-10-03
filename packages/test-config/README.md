@@ -7,10 +7,10 @@ pod's own unit tests — that is each pod's own responsibility (see AC-94 below)
 
 ## What's in here
 
-- `coverage-thresholds.js` — the raw `{ lines, statements, functions, branches }: 80`
+- `coverage-thresholds.ts` — the raw `{ lines, statements, functions, branches }: 80`
   object, plus `appCoverageThresholds` (branches 75, for `apps/*`) and
   `e2eCoverageThresholds` (branches 70).
-- `vitest.preset.js` — `coveragePreset(options)` (a ready-to-use `test.coverage` fragment:
+- `vitest.preset.ts` — `coveragePreset(options)` (a ready-to-use `test.coverage` fragment:
   `v8` provider, `text`+`lcov`+`json-summary` reporters (the last writes
   `coverage/coverage-summary.json`), the shared thresholds (overridable with
   `thresholds`), and sane default excludes
@@ -20,9 +20,9 @@ pod's own unit tests — that is each pod's own responsibility (see AC-94 below)
 ## Which projects must apply the thresholds
 
 Every Node test project (AICHAT-34): `services/*`, `packages/*`, `apps/*` and `e2e`.
-`testing/k6` is exempt (k6 runtime, no Node source). The package is plain JavaScript with
-hand-written `.d.ts` files, so Vite configs load it straight from source and no build step is
-needed (a clean checkout without `dist/` works for `vite build` and the Dockerfiles).
+`testing/k6` is exempt (k6 runtime, no Node source). The package is TypeScript source
+(imports carry the `.ts` extension), and Node strips the types when a Vite config loads it, so no
+build step is needed (a clean checkout without `dist/` works for `vite build` and the Dockerfiles).
 
 ## How to opt a project's `test` target into failing on an unmet threshold
 
@@ -70,10 +70,10 @@ See also the "Testing strategy & coverage targets" section of
 
 ## Guard: no test target may skip coverage (AICHAT-118)
 
-`packages/workspace-config/src/coverage-guard.test.js` checks every project with a `test`
+`packages/workspace-config/src/coverage-guard.test.ts` checks every project with a `test`
 target: the Nx command and the `package.json` script must run `vitest run --coverage`, and the
 Vitest config must import `@platform/test-config`. The exempt lists live in
-`packages/workspace-config/src/coverage-guard.js`, each entry with a reason:
+`packages/workspace-config/src/coverage-guard.ts`, each entry with a reason:
 
 | Project | Exempt from | Reason |
 |---|---|---|

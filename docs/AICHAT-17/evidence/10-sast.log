@@ -1,0 +1,29 @@
+$ pnpm sast
+
+> llm-chat-workspace@1.0.0 sast /Users/truezone/Projects/ai-chat-platform
+> bash scripts/ci/semgrep.sh semgrep-results && node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif
+
+semgrep exit code: 0 (results in semgrep-results/)
+### SAST (Semgrep CE)
+No ERROR findings: nothing blocks the merge.
+ERROR: 0, WARNING: 26, INFO: 14. Only ERROR blocks; the rest is reported.
+
+| Rule | Severity | Count | Locations |
+|---|---|---|---|
+| `yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag` | WARNING | 16 | `.github/workflows/ci.yml:23`, `.github/workflows/ci.yml:27`, `.github/workflows/ci.yml:29` +13 more |
+| `ajinabraham.njsscan.crypto.crypto_node.node_insecure_random_generator` | WARNING | 5 | `apps/mfe-auth/src/shared/correlation.ts:16`, `apps/mfe-chat/src/features/attachments/hooks/usePendingAttachments.ts:29`, `apps/mfe-chat/src/shared/api-client.ts:27` +2 more |
+| `javascript.express.security.cors-misconfiguration.cors-misconfiguration` | WARNING | 1 | `testing/mock-server/src/backend/http.ts:82` |
+| `package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age` | WARNING | 1 | `.npmrc:1` |
+| `package_managers.pnpm.pnpm-block-exotic-sub-dependencies.pnpm-block-exotic-sub-dependencies` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `package_managers.pnpm.pnpm-missing-minimum-release-age.pnpm-minimum-release-age` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `package_managers.pnpm.pnpm-trust-policy.pnpm-trust-policy` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_x_powered_by` | INFO | 4 | `services/auth-service/src/main.ts:28`, `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` +1 more |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_dns_prefetch` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_hsts` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_ienoopen` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_nosniff` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_xss_filter` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+[00.12][WARNING]: Skipping unknown field 'pattern-not-sinks' in rule "ajinabraham.njsscan.database.nosql_find_injection.node_nosqli_injection"
+[00.57][WARNING]: Skipping unknown field 'pattern-not-sinks' in rule "ajinabraham.njsscan.database.nosql_find_injection.node_nosqli_injection"
+
+[exit 0]

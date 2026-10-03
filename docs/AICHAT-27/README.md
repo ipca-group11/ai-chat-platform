@@ -60,7 +60,7 @@ Severity mapping: Semgrep `ERROR` = "high" (blocks), `WARNING` = reported only.
 | `conversation-service` | **No rate limiting** (incl. LLM sends) | Medium |
 | Attachments `validators.ts` | MIME type comes from the client; no magic-byte check | Low/Medium |
 | `eval`, `new Function`, `dangerouslySetInnerHTML`, `innerHTML`, redirects | **None found** | — |
-| `child_process` | Only in tests (`packages/ui/src/storybook-build.test.ts`, `packages/workspace-config/src/*.test.js`) | Ignore (tests) |
+| `child_process` | Only in tests (`packages/ui/src/storybook-build.test.ts`, `packages/workspace-config/src/*.test.ts`) | Ignore (tests) |
 | Path traversal in uploads | Not possible: stored filename is `randomUUID()+ext`, ext is allow-listed | — |
 | Markdown | `react-markdown` without `rehype-raw` | — |
 | GitHub Actions `deploy.yml` | `GITHUB_TOKEN` echoed into an SSH command string for `docker login` on the VM, and `${{ }}` expressions interpolated into `run:` scripts | Medium (should be checked by `p/github-actions` rules) |
