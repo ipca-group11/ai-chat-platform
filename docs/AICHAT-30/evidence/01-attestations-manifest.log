@@ -1,0 +1,18 @@
+$ docker buildx imagetools inspect localhost:5055/ai-chat/auth-service:local | head -20
+Name:      localhost:5055/ai-chat/auth-service:local
+MediaType: application/vnd.oci.image.index.v1+json
+Digest:    sha256:9b0cd9994eb23c7d200d7c3b00526427a09c567e52dbc8b9ba1eb4a3d849f13c
+           
+Manifests: 
+  Name:        localhost:5055/ai-chat/auth-service:local@sha256:971bb95f77642dce394873dddc4d0afcf6661f806c4f67708569dc05f4de786a
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/arm64
+               
+  Name:        localhost:5055/ai-chat/auth-service:local@sha256:c6e98d7f863173dd2fc72b4fd67733ed61cfb688dab48d066fcba17ebfdbaf57
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    vnd.docker.reference.digest: sha256:971bb95f77642dce394873dddc4d0afcf6661f806c4f67708569dc05f4de786a
+    vnd.docker.reference.type:   attestation-manifest
+
+[exit 0]

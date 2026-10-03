@@ -46,8 +46,8 @@ describe("AC-13: CI fails the build if any project reports a lint or typecheck e
     expect(nxStep["continue-on-error"]).toBeFalsy();
   });
 
-  it("AC-13: the workflow has a single job so a lint/typecheck failure fails the whole run", () => {
-    expect(Object.keys(ci.jobs)).toEqual(["affected"]);
+  it("AC-13: the only job that checks code is `affected`; the other one only produces the source SBOM (AICHAT-108)", () => {
+    expect(Object.keys(ci.jobs)).toEqual(["affected", "source-sbom"]);
   });
 });
 

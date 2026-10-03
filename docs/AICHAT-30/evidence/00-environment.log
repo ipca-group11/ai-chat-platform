@@ -1,0 +1,7 @@
+$ node -v; pnpm -v; docker --version; docker buildx version
+v24.21.0
+10.4.0
+Docker version 29.4.0, build 9d7ad9f
+github.com/docker/buildx v0.33.0 f7897eba028583e0071642db3c011e860444f8cf
+
+[exit 0]

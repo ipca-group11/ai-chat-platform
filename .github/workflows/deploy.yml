@@ -75,11 +75,71 @@ jobs:
             VITE_MFE_SETTINGS_URL=https://${{ vars.DOMAIN }}:3003
             VITE_FARO_URL=https://${{ vars.DOMAIN }}/collect
             VITE_APP_VERSION=${{ env.SHA }}
+          # Attestations travel with the image in GHCR (AICHAT-53): the SPDX SBOM and the
+          # SLSA provenance. Check with `docker buildx imagetools inspect <image> --format
+          # '{{ json .SBOM }}'` (or `.Provenance`).
+          sbom: true
+          provenance: mode=max
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
 
+      # Downloadable CycloneDX SBOM of the image just pushed (AICHAT-70), one artifact per
+      # image, named sbom-<name>.cdx.json. Format and hand-off: docs/AICHAT-30/SBOM-INTERFACE.md.
+      - name: SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.IMAGE_PREFIX }}/${{ matrix.name }}:${{ env.SHA }}
+          format: cyclonedx-json
+          artifact-name: sbom-${{ matrix.name }}.cdx.json
+          output-file: sbom-${{ matrix.name }}.cdx.json
+          upload-artifact-retention: 90
+
+  # The two images we run but do not build. They get the same SBOM artifact name pattern.
+  sbom-third-party:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: postgres, image: "postgres:16-alpine" }
+          - { name: caddy, image: "caddy:2-alpine" }
+    steps:
+      - name: SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ matrix.image }}
+          format: cyclonedx-json
+          artifact-name: sbom-${{ matrix.name }}.cdx.json
+          output-file: sbom-${{ matrix.name }}.cdx.json
+          upload-artifact-retention: 90
+
+  # Reports known vulnerabilities found in the SBOMs. It does not fail the run: the
+  # severity threshold that blocks a deploy belongs to AICHAT-7 (see SBOM-INTERFACE.md).
+  scan-sbom:
+    needs: [build, sbom-third-party]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: sbom-*.cdx.json
+          path: sbom
+          merge-multiple: true
+
+      - uses: anchore/scan-action/download-grype@v6
+        id: grype
+
+      - name: Grype report (does not fail)
+        run: |
+          for f in sbom/sbom-*.cdx.json; do
+            echo "### $(basename "$f")" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            ${{ steps.grype.outputs.cmd }} "sbom:$f" -o table >> "$GITHUB_STEP_SUMMARY" || true
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          done
+
   deploy:
-    needs: build
+    needs: [build, sbom-third-party]
     runs-on: ubuntu-latest
     environment:
       name: production

@@ -1,0 +1,22 @@
+$ docker buildx imagetools inspect localhost:5055/ai-chat/auth-service:local --format '{{ json .SBOM }}' | jq '.SPDX | {spdxVersion, name, packages: (.packages|length), sample: [.packages[]|select(.name=="express" or .name=="musl")|{name,versionInfo}]}'
+{
+  "spdxVersion": "SPDX-2.3",
+  "name": "sbom",
+  "packages": 1252,
+  "sample": [
+    {
+      "name": "express",
+      "versionInfo": "4.22.3"
+    },
+    {
+      "name": "express",
+      "versionInfo": "5.2.1"
+    },
+    {
+      "name": "musl",
+      "versionInfo": "1.2.6-r2"
+    }
+  ]
+}
+
+[exit 0]

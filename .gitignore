@@ -25,3 +25,4 @@ semgrep-results/
 .vitest/
 zap-results/
 zap-wrk/
+sbom-results/
