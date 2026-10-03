@@ -1,0 +1,32 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/routes.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/integration/routes.spec.ts > GET /health and GET /metrics > GET /health · 200 without authentication 20ms
+ ✓ src/integration/routes.spec.ts > GET /health and GET /metrics > GET /metrics · 200 with the Prometheus text format 5ms
+ ✓ src/integration/routes.spec.ts > GET /health and GET /metrics > an unknown route answers with the standard 404 body and a correlation id 6ms
+ ✓ src/integration/routes.spec.ts > chats routes > GET /chats · 200 lists only the caller's chats; 401 without a token 24ms
+ ✓ src/integration/routes.spec.ts > chats routes > POST /chats · 201 creates a chat; 400 on an invalid body 6ms
+ ✓ src/integration/routes.spec.ts > chats routes > GET /chats/:id · 200 for the owner; 404 CHAT_NOT_FOUND for another user 5ms
+ ✓ src/integration/routes.spec.ts > chats routes > PATCH /chats/:id · 200 renames; 400 on an empty body; 404 for a non-owner 20ms
+ ✓ src/integration/routes.spec.ts > chats routes > DELETE /chats/:id · 204 for the owner; 404 for another user, who cannot delete it 7ms
+ ✓ src/integration/routes.spec.ts > membership routes > GET /chats/:id/members · 200 lists owner first; 404 for a non-member 16ms
+ ✓ src/integration/routes.spec.ts > membership routes > POST /chats/:id/members · 201 invites; 404 for a non-owner 12ms
+ ✓ src/integration/routes.spec.ts > membership routes > DELETE /chats/:id/members/:email · 204 for the owner; 404 for a non-member caller 6ms
+ ✓ src/integration/routes.spec.ts > membership routes > DELETE /chats/:id/membership · 204 when a member leaves; 404 for a non-member 6ms
+ ✓ src/integration/routes.spec.ts > messages routes > GET /chats/:chatId/messages · 200 lists the history; 404 for another user 6ms
+ ✓ src/integration/routes.spec.ts > messages routes > POST /chats/:chatId/messages · 201 sends and starts the queue; 400 on empty content; 404 for another user 7ms
+ ✓ src/integration/routes.spec.ts > messages routes > PATCH /chats/:chatId/messages/:messageId · 200 edits a queued message; 404 for another user 10ms
+ ✓ src/integration/routes.spec.ts > messages routes > DELETE /chats/:chatId/messages/:messageId · 204 cancels a queued message; 404 for another user 8ms
+ ✓ src/integration/routes.spec.ts > messages routes > POST /chats/:chatId/messages/:messageId/retry · 202 requeues a failed reply; 404 for another user 6ms
+ ✓ src/integration/routes.spec.ts > messages routes > POST /chats/:chatId/stop · 200 reports whether a stream was stopped; 404 for another user 11ms
+ ✓ src/integration/routes.spec.ts > streaming route > GET /chats/:chatId/stream · 401 without a token; 404 for another user; delivers events to the owner 23ms
+ ✓ src/integration/routes.spec.ts > attachments route > POST /chats/:chatId/messages/:messageId/attachments · 201 stores a text file; 404 for another user 12ms
+
+ Test Files  1 passed (1)
+      Tests  20 passed (20)
+   Start at  16:45:51
+   Duration  802ms (import 39%, transform 30%, tests 30%, setup 1%)
+
+
+[exit 0]

@@ -8,7 +8,7 @@ export default defineConfig({
     setupFiles: ["src/shared/test/setup-env.ts"],
     coverage: coveragePreset({
       include: ["src/**/*.ts"],
-      exclude: ["src/main.ts", "src/shared/prisma.ts", "src/shared/test/**"],
+      exclude: ["src/main.ts", "src/shared/prisma.ts", "src/shared/test/**", "src/test-utils/**"],
     }),
   },
 });

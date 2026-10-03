@@ -1,0 +1,31 @@
+$ ls services/conversation-service/src/test-utils services/auth-service/src/test-utils; grep -rn 'function tokenFor\|function fakePrisma\|class ScriptedProvider' services/conversation-service/src services/auth-service/src | grep -v test-utils || echo 'no duplicate copies left'
+services/auth-service/src/test-utils:
+build-test-app.ts
+expect-safe-500.ts
+fake-prisma.ts
+route-inventory.ts
+session-helpers.ts
+
+services/conversation-service/src/test-utils:
+auth-token.ts
+build-test-app.ts
+expect-safe-500.ts
+fake-attachments-repository.ts
+fake-chats-repository.ts
+fake-http.ts
+fake-messages-repository.ts
+fake-provider-registry.ts
+fake-queue.ts
+fake-storage.ts
+fixtures
+mock-stream.ts
+no-network.spec.ts
+principal.ts
+replay.spec.ts
+replay.ts
+route-inventory.ts
+setup-no-network.ts
+throwing-repository.ts
+no duplicate copies left
+
+[exit 0]

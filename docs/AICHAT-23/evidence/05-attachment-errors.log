@@ -1,0 +1,19 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/attachment-errors.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/integration/attachment-errors.spec.ts > POST /chats/:chatId/messages/:messageId/attachments errors > 404 MESSAGE_NOT_FOUND for an unknown message id 29ms
+ ✓ src/integration/attachment-errors.spec.ts > POST /chats/:chatId/messages/:messageId/attachments errors > 422 ATTACHMENT_NOT_SUPPORTED for an image when the chat's model has no vision 5ms
+ ✓ src/integration/attachment-errors.spec.ts > POST /chats/:chatId/messages/:messageId/attachments errors > 201 for the same image when the model supports vision 4ms
+ ✓ src/integration/attachment-errors.spec.ts > POST /chats/:chatId/messages/:messageId/attachments errors > 404 CHAT_NOT_FOUND when another user uploads to the chat, and nothing is stored 4ms
+ ✓ src/integration/attachment-errors.spec.ts > POST /chats/:chatId/messages/:messageId/attachments errors > 404 MESSAGE_NOT_FOUND when a member uploads to a message written by the owner 11ms
+ ✓ src/integration/attachment-errors.spec.ts > POST /chats/:chatId/messages/:messageId/attachments errors > 400 ATTACHMENT_TOO_LARGE for a file over the configured limit (pinned: not 413) 3ms
+ ✓ src/integration/attachment-errors.spec.ts > POST /chats/:chatId/messages/:messageId/attachments errors > 400 ATTACHMENT_UPLOAD_ERROR for a file over the hard ceiling (pinned: not 413) 4ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  16:45:58
+   Duration  453ms (transform 42%, import 41%, tests 16%, setup 1%, worker 1%)
+
+
+[exit 0]

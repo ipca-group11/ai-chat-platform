@@ -1,0 +1,22 @@
+$ cd services/auth-service && pnpm exec vitest run src/integration/edge-cases.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+ ✓ src/integration/edge-cases.spec.ts > POST /auth/refresh with an expired token > 401 INVALID_REFRESH_TOKEN once the refresh token's lifetime has passed 579ms
+ ✓ src/integration/edge-cases.spec.ts > POST /auth/logout without a cookie > 204, clears the cookies and does not touch the database 6ms
+ ✓ src/integration/edge-cases.spec.ts > POST /auth/logout without a cookie > 204 for a refresh token that was never issued 3ms
+ ✓ src/integration/edge-cases.spec.ts > GET /auth/me for a deleted user > 401 UNAUTHENTICATED when the account no longer exists 565ms
+ ✓ src/integration/edge-cases.spec.ts > POST /auth/login with a malformed body > 401 INVALID_CREDENTIALS for an empty object, without looking anyone up 4ms
+ ✓ src/integration/edge-cases.spec.ts > POST /auth/login with a malformed body > 401 INVALID_CREDENTIALS for an email that is not an email, without looking anyone up 3ms
+ ✓ src/integration/edge-cases.spec.ts > POST /auth/login with a malformed body > 401 INVALID_CREDENTIALS for a missing password, without looking anyone up 2ms
+ ✓ src/integration/edge-cases.spec.ts > POST /auth/login with a malformed body > 401 INVALID_CREDENTIALS for values of the wrong type, without looking anyone up 2ms
+ ✓ src/integration/edge-cases.spec.ts > POST /auth/login with a malformed body > answers an empty body (no JSON at all) the same way 5ms
+ ✓ src/integration/edge-cases.spec.ts > POST /auth/login with a malformed body > 500 INTERNAL_ERROR for a body that is not valid JSON (pinned: should be 400) 2ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  16:46:08
+   Duration  1.49s (tests 83%, import 11%, transform 6%)
+
+
+[exit 0]

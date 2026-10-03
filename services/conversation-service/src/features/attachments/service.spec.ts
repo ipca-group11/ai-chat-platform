@@ -2,30 +2,14 @@ import { describe, expect, it } from "vitest";
 import { FakeAttachmentsRepository } from "../../test-utils/fake-attachments-repository.js";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
 import { FakeMessagesRepository } from "../../test-utils/fake-messages-repository.js";
+import { fakeProvider, fakeProviderRegistry } from "../../test-utils/fake-provider-registry.js";
 import { FakeStorage } from "../../test-utils/fake-storage.js";
 import { HttpError } from "../../shared/error-handler.js";
 import { ChatsService } from "../chats/index.js";
-import type { ProviderRegistry, LlmProvider } from "../llm-adapters/index.js";
 import { AttachmentsService } from "./service.js";
 import { asUser } from "../../test-utils/principal.js";
 
 const ONE_MB = 1024 * 1024;
-
-function fakeProvider(supportsVision: boolean): LlmProvider {
-  return {
-    id: "openai",
-    supportsVision: () => supportsVision,
-    supportsReasoning: () => false,
-    supportsWebFetch: () => false,
-    async *sendMessage() {
-      /* not exercised here */
-    },
-  };
-}
-
-function registryWithVision(supportsVision: boolean): ProviderRegistry {
-  return { get: () => fakeProvider(supportsVision) };
-}
 
 async function setup(options: { supportsVision?: boolean; maxBytes?: number } = {}) {
   const chatsRepo = new FakeChatsRepository();
@@ -33,7 +17,7 @@ async function setup(options: { supportsVision?: boolean; maxBytes?: number } = 
   const messagesRepo = new FakeMessagesRepository();
   const attachmentsRepo = new FakeAttachmentsRepository();
   const storage = new FakeStorage();
-  const providerRegistry = registryWithVision(options.supportsVision ?? true);
+  const providerRegistry = fakeProviderRegistry(fakeProvider({ id: "openai", vision: options.supportsVision ?? true }));
   const service = new AttachmentsService(
     attachmentsRepo,
     chatsService,
