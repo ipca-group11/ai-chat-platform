@@ -1,8 +1,8 @@
 ---
-title: "AICHAT-17 · [Foundations] Unit testing: work log"
+title: "AICHAT-17 · Unit testing: work log"
 ---
 
-# AICHAT-17 · [Foundations] Unit testing: work log
+# AICHAT-17 · Unit testing: work log
 
 | Field | Value |
 |---|---|
@@ -10,7 +10,7 @@ title: "AICHAT-17 · [Foundations] Unit testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-17-unit-testing` |
-| Started / finished | 2026-10-03 / — |
+| Started / finished | 2026-10-03 / … |
 | Pull requests | #… |
 | Status | In Progress |
 
@@ -20,27 +20,23 @@ Date: 2026-10-03
 
 | DoR item | Status | Question asked | Decision | Decided by |
 |---|---|---|---|---|
-| Owner assigned | Met | — | Jean-Pierre Carvalho (epic and all 14 stories) | — |
-| Scope agreed | Met | Whole repo per MFE and microservice, the original Jira wording, or MFEs + services only? | **Every source file**, delivered per project: shell, mfe-auth, mfe-chat, mfe-settings, auth-service, conversation-service, plus shared packages and e2e helpers. Bootstrap, barrel and type-only files go on the exempt list (AICHAT-36) | JP |
-| Tooling agreed | Met | Adopt MSW now, keep hand-written `fetch` stubs, or decide in a spike? | Vitest + Testing Library (`render`, `renderHook`) + supertest. **MSW decided in the time-boxed spike AICHAT-135** | JP |
-| Capability parity (AICHAT-133) | Met | JSON export, move the tables to `packages/shared-types`, or a test-only cross import? | **Move the capability tables to `packages/shared-types`** as the single source of truth for mfe-chat and conversation-service (small app change, accepted) | JP |
-| Target environment available | Met | Local, CI, VM? | **Local + GitHub Actions**: develop and capture evidence locally; `ci.yml` (`nx affected -t test`) is the gate on each PR | JP |
-| Files to cover listed | Met | — | Inventory in README §4 (246 files; 49 without a test) | — |
+| Owner assigned | Met | — | Jean-Pierre Carvalho | — |
+| Scope agreed | Met | Whole repo or only hooks, utils and capability tables? | Whole repo: every source file in `apps/*/src`, `packages/*`, `services/*/src` and `e2e/src`; exempt only bootstrap files, barrel `index` files and type-only modules, one reason each in `unit-test-exempt.json` (plan decision D2). Jira epic text updated | Owner |
+| Tooling agreed | Met | Vitest + Testing Library + supertest; MSW or hand-written `fetch` stubs? | Vitest, Testing Library (`render`, `renderHook`), supertest; **MSW adopted**: handlers for auth, chats, messages and settings replace the hand-written stubs | Owner |
+| Target environment available | Met | Where does it run? | Locally and in GitHub Actions (`nx affected -t test`); the e2e suite is not run for this epic (too slow, now manual-only) | Owner |
+| Capability parity (AICHAT-133) | Met | Test reads both tables, or one shared table? | Move the model capability table to `packages/shared-types`, used by both mfe-chat and conversation-service | Owner |
 
-Blockers: none. Note: the DoD item "meets the AICHAT-34 coverage thresholds" depends on AICHAT-34.
+Blockers: none
 
 ## 2. Environment
 
 | Tool | Version | Install |
 |---|---|---|
-| macOS | 26.3 | — |
-| Node | v24.9.0 | `nvm install 24` |
-| pnpm | 10.4.0 | `corepack enable` |
-| Docker | 29.4.0 | Docker Desktop (not needed for unit tests) |
-| Nx | 23.2.1 | `pnpm install` (workspace dependency) |
-| Vitest | 5.0.1 | `pnpm install` (workspace dependency) |
-
-![Environment](evidence/00-environment.png)
+| macOS / Ubuntu | … | — |
+| Node | `node -v` → … | … |
+| pnpm | `pnpm -v` → … | `corepack enable` |
+| Docker | `docker --version` → … | … |
+| Vitest / MSW | see `package.json` of each project | `pnpm install` |
 
 ## 3. Steps
 
