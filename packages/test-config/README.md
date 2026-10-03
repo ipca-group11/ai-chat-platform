@@ -66,3 +66,15 @@ Vitest suite against its own business logic, inside its own `apps/*`/`services/*
 See also the "Testing strategy & coverage targets" section of
 `docs/pods/quality-observability/PLAN.md` for how this fits alongside contract tests
 (`@platform/pact-config`), load tests (`testing/k6`), and E2E (`e2e/`).
+
+## Guard: no test target may skip coverage (AICHAT-118)
+
+`packages/workspace-config/src/coverage-guard.test.js` checks every project with a `test`
+target: the Nx command and the `package.json` script must run `vitest run --coverage`, and the
+Vitest config must import `@platform/test-config`. The exempt lists live in
+`packages/workspace-config/src/coverage-guard.js`, each entry with a reason:
+
+| Project | Exempt from | Reason |
+|---|---|---|
+| `testing/k6` | coverage and preset import | k6 runtime, not Node: the suite only asserts on the script text |
+| `packages/test-config` | preset import only | it defines the preset and imports it relatively |
