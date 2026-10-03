@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { countRecords, DATASET_NAMES, isDatasetName } from "../data/datasets.js";
+import { registerFaultRoutes } from "../faults/faults.js";
 import type { MockContext } from "../registry.js";
 
 export interface AdminOptions {
@@ -35,6 +36,8 @@ export function createAdminRouter({ ctx, reset }: AdminOptions): Router {
   router.get("/data", (_req, res) => {
     res.json({ dataset: ctx.store.name, counts: countRecords(ctx.store.data), data: ctx.store.data });
   });
+
+  registerFaultRoutes(router, ctx);
 
   router.post("/reset", (_req, res) => {
     reset();

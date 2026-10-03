@@ -26,9 +26,17 @@ import {
   toMessageDto,
   type StoredMessage,
 } from "../conversation/records.js";
+import { faultInjector, FAULT_SCENARIOS, STREAM_DROP_AFTER_EVENTS, type FaultScenario } from "../faults/faults.js";
 import type { MockUser } from "../data/types.js";
 import type { MockContext, MockModule } from "../registry.js";
 import type { ZodType } from "zod";
+
+const FAULT_DESCRIPTIONS: Record<FaultScenario, string> = {
+  "session-expired": "401 UNAUTHENTICATED, as when the access token has expired",
+  "error-500": "500 INTERNAL_ERROR",
+  slow: "Answer is held back (3 s, or delayMs of the fault)",
+  "stream-drop": "The chat stream is cut after a few events",
+};
 
 const SCENARIO_HEADER = "x-mock-scenario";
 const API_KEY_HEADER = "x-llm-api-key";
@@ -64,7 +72,9 @@ function createConversationRouter(ctx: MockContext): Router {
   const engine = engineFor(ctx);
   const userOf = (res: Response): MockUser => res.locals.user as MockUser;
 
-  router.use(cors, express.json());
+  router.use(cors);
+  router.use(faultInjector(ctx, { unauthenticated: "Missing or invalid access token", internal: "An unexpected error occurred" }));
+  router.use(express.json());
 
   router.use((req, res, next) => {
     const user = currentUser(ctx, req);
@@ -253,8 +263,16 @@ function createConversationRouter(ctx: MockContext): Router {
     res.setHeader("Connection", "keep-alive");
     res.setHeader("X-Accel-Buffering", "no");
     res.flushHeaders();
+    const dropping = (res.locals.fault as { scenario?: string } | undefined)?.scenario === "stream-drop";
+    let delivered = 0;
     const unsubscribe = engine.subscribe(target.id, (event) => {
       res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
+      delivered += 1;
+      if (dropping && delivered >= STREAM_DROP_AFTER_EVENTS) {
+        unsubscribe();
+        // flush what was written, then cut the socket without ending the chunked body
+        res.socket?.destroySoon();
+      }
     });
     req.on("close", unsubscribe);
   });
@@ -348,7 +366,9 @@ function createConversationRouter(ctx: MockContext): Router {
 export const conversationMock: MockModule = {
   name: "conversation",
   mountPath: "/api",
-  scenarios: ANSWER_SCENARIOS.map((name) => ({
+  scenarios: [
+    ...FAULT_SCENARIOS.map((name) => ({ mock: "conversation", name, description: FAULT_DESCRIPTIONS[name] })),
+    ...ANSWER_SCENARIOS.map((name) => ({
     mock: "conversation",
     name,
     description:
@@ -357,6 +377,7 @@ export const conversationMock: MockModule = {
         : name === "long"
           ? "Streamed answer five times as long"
           : "Answer fails after two tokens; the message ends as failed and can be retried",
-  })),
+    })),
+  ],
   createRouter: createConversationRouter,
 };

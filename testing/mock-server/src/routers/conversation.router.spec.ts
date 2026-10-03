@@ -584,13 +584,21 @@ describe("errors", () => {
     expect(res.status).toBe(400);
   });
 
-  it("registers the answer scenarios", async () => {
+  it("registers the answer and fault scenarios", async () => {
     const { app } = setup();
     const res = await request(app).get("/__admin/scenarios");
-    expect(res.body.scenarios.map((s: { mock: string; name: string }) => `${s.mock}/${s.name}`)).toEqual([
+    const names = res.body.scenarios.map((s: { mock: string; name: string }) => `${s.mock}/${s.name}`);
+    expect(names).toEqual([
+      "auth/error-500",
+      "auth/session-expired",
+      "auth/slow",
       "conversation/error",
+      "conversation/error-500",
       "conversation/long",
       "conversation/ok",
+      "conversation/session-expired",
+      "conversation/slow",
+      "conversation/stream-drop",
     ]);
   });
 });

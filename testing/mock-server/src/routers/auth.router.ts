@@ -3,7 +3,14 @@ import { auth } from "@app/shared-types";
 import { z } from "zod";
 import { accessTokenOf, currentUser, sessionsFor } from "../auth/sessions.js";
 import { cors, errorHandler, HttpError, parseCookies } from "../backend/http.js";
+import { faultInjector, FAULT_SCENARIOS } from "../faults/faults.js";
 import type { MockContext, MockModule } from "../registry.js";
+
+const FAULT_DESCRIPTIONS = {
+  "session-expired": "401 UNAUTHENTICATED and the session cookies cleared",
+  "error-500": "500 INTERNAL_ERROR",
+  slow: "Answer is held back (3 s, or delayMs of the fault)",
+} as const;
 
 const REFRESH_PATH = "/auth";
 
@@ -39,7 +46,15 @@ function createAuthRouter(ctx: MockContext): Router {
   const router = Router();
   const sessions = sessionsFor(ctx);
 
-  router.use(cors, express.json());
+  router.use(cors);
+  router.use(
+    faultInjector(ctx, {
+      unauthenticated: "Not authenticated",
+      internal: "Internal server error",
+      onSessionExpired: clearSessionCookies,
+    }),
+  );
+  router.use(express.json());
 
   router.post("/register", (req, res) => {
     const parsed = auth.registerRequestSchema.safeParse(req.body);
@@ -103,5 +118,10 @@ function createAuthRouter(ctx: MockContext): Router {
 export const authMock: MockModule = {
   name: "auth",
   mountPath: "/auth",
+  scenarios: FAULT_SCENARIOS.filter((name) => name !== "stream-drop").map((name) => ({
+    mock: "auth",
+    name,
+    description: FAULT_DESCRIPTIONS[name],
+  })),
   createRouter: createAuthRouter,
 };
