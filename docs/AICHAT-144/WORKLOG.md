@@ -668,15 +668,15 @@ gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD
 
 | DoD item | Met | Evidence |
 |---|---|---|
-| Mock server runs locally and in CI with one command; health check green | Locally yes (`pnpm mock:up`, health in the compose check); CI pending PR run | [73](evidence/73-compose-llm-profile.png) |
+| Mock server runs locally and in CI with one command; health check green | ✅ locally (`pnpm mock:up`) and in the PR #12 e2e run (mock-server container healthy) | [73](evidence/73-compose-llm-profile.png), [79](evidence/79-ci-chat-mock-flows.png) |
 | Both LLM adapters stream a full answer from the mock (contract tests pass) | Yes | [71](evidence/71-contract-tests.png) |
 | Shell + MFEs work end to end against the backend mock (`frontend-only`) with every named dataset | Partly: the profile starts and the chat flow works with the default dataset; the other datasets were checked through the API tests, not in the browser | [75](evidence/75-compose-frontend-only-profile.png) |
 | Backend mock responses validated against `@platform/shared-types` (no drift from the real services) | Yes for the mock; the drift of shared-types itself is listed (US15) and passed to AICHAT-20; new drift fails the test | [72](evidence/72-contract-drift-fails.png) |
 | Fault scenarios reproducible on demand | Yes (US6, US7, US11, US12) | see US sections |
-| E2E chat flows run in CI against the mock, no real key used | Locally yes; GitHub run pending PR run | [74](evidence/74-playwright-chat-flows-llm-profile.png) |
+| E2E chat flows run in CI against the mock, no real key used | ✅ all four chat-mock flows passed in the PR #12 run ([37126274589](https://github.com/ipca-group11/ai-chat-platform/actions/runs/37126274589)) | [74](evidence/74-playwright-chat-flows-llm-profile.png), [79](evidence/79-ci-chat-mock-flows.png) |
 | Run instructions and scenario list documented | Yes | [MOCK-SERVER.md](MOCK-SERVER.md) |
 | `nx affected` green, Semgrep and gitleaks clean | Yes | [76](evidence/76-affected-final.png), [77](evidence/77-semgrep.png), [78](evidence/78-gitleaks.png) |
-| e2e workflow green on GitHub | pending PR run | |
+| e2e workflow green on GitHub | Not green: the older specs owned by AICHAT-4/5 still fail and the job hit its 30-minute limit. Since 2026-10-03 the e2e workflow runs on demand only (team decision, too slow for every PR) | [79](evidence/79-ci-chat-mock-flows.png) |
 
 ## 7. Notes for the report
 
