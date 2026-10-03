@@ -1,0 +1,4 @@
+$ sh -c node -v; pnpm -v
+10.4.0
+
+[exit 0]

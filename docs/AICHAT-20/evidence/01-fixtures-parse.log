@@ -1,0 +1,5 @@
+$ sh -c cd packages/shared-types && pnpm exec vitest run src/__fixtures__ --reporter=verbose
+undefined
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command "vitest" not found
+
+[exit 254]
