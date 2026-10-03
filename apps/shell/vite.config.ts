@@ -81,6 +81,15 @@ export default defineConfig({
     // in sandboxed/CI environments without a warm Vite cache; give tests
     // that dynamically import it (e.g. remoteWiring.test.ts) headroom.
     testTimeout: 15000,
-    coverage: coveragePreset({ thresholds: appCoverageThresholds }),
+    coverage: coveragePreset({
+      thresholds: {
+        ...appCoverageThresholds,
+        // Ratchet (AICHAT-34): current values rounded down, raised with AICHAT-17/18 work.
+        lines: 70, // TODO(AICHAT-17, 2026-10-03): raise to 80
+        branches: 60, // TODO(AICHAT-17, 2026-10-03): raise to 75
+        functions: 62, // TODO(AICHAT-17, 2026-10-03): raise to 80
+        statements: 68, // TODO(AICHAT-17, 2026-10-03): raise to 80
+      },
+    }),
   },
 });

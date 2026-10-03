@@ -10,7 +10,7 @@
     "serve": "vite preview --port 5000",
     "lint": "eslint src",
     "typecheck": "tsc -b --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:watch": "vitest"
   },
   "dependencies": {
