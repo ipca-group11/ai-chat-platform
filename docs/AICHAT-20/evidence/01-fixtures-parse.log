@@ -1,5 +1,28 @@
-$ sh -c cd packages/shared-types && pnpm exec vitest run src/__fixtures__ --reporter=verbose
-undefined
- ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command "vitest" not found
+$ pnpm --dir packages/shared-types exec vitest run src/__fixtures__ --reporter=verbose
 
-[exit 254]
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/shared-types
+
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > userProfile passes its schema 2ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > authResponse passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > accessTokenClaims passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > chat passes its schema 1ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > chatMember passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > message passes its schema 1ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > attachment passes its schema 1ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > sseToken passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > sseReasoning passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > sseWebFetch passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > sseDone passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > sseError passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > sseQueued passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > errorResponse passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > testConnectionResponse passes its schema 0ms
+ ✓ src/__fixtures__/fixtures.test.ts > canonical DTO fixtures > covers every schema listed in README section 4.2 0ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  17:00:06
+   Duration  189ms (import 48%, transform 42%, tests 7%, worker 2%)
+
+
+[exit 0]
