@@ -32,6 +32,8 @@ COPY --from=build /workspace/apps/mfe-auth/node_modules ./apps/mfe-auth/node_mod
 COPY --from=build /workspace/apps/mfe-auth/dist ./apps/mfe-auth/dist
 COPY --from=build /workspace/apps/mfe-auth/package.json ./apps/mfe-auth/package.json
 COPY --from=build /workspace/apps/mfe-auth/vite.config.ts ./apps/mfe-auth/vite.config.ts
+# vite.config.ts imports the shared coverage preset, so `vite preview` needs it at runtime
+COPY --from=build /workspace/packages/test-config ./packages/test-config
 
 RUN addgroup -S app && adduser -S app -G app && chown -R app:app /workspace
 USER app

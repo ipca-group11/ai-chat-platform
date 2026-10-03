@@ -30,6 +30,8 @@ COPY --from=build /workspace/apps/mfe-chat/node_modules ./apps/mfe-chat/node_mod
 COPY --from=build /workspace/apps/mfe-chat/dist ./apps/mfe-chat/dist
 COPY --from=build /workspace/apps/mfe-chat/package.json ./apps/mfe-chat/package.json
 COPY --from=build /workspace/apps/mfe-chat/vite.config.ts ./apps/mfe-chat/vite.config.ts
+# vite.config.ts imports the shared coverage preset, so `vite preview` needs it at runtime
+COPY --from=build /workspace/packages/test-config ./packages/test-config
 
 RUN addgroup -S app && adduser -S app -G app && chown -R app:app /workspace
 USER app
