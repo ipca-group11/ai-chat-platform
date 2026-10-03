@@ -1,8 +1,8 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithClient } from "@platform/test-utils";
-import { jsonResponse } from "../../../test/utils";
+import { http, HttpResponse, server } from "@platform/test-utils/msw";
 import type { Chat } from "../../../shared/types";
 import { ChatList } from "./ChatList";
 
@@ -17,12 +17,8 @@ const chatA: Chat = {
 };
 
 describe("ChatList (AC-42, AC-47)", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it("AC-42: renders the user's chats and opens one on click", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([chatA])));
+    server.use(http.get("*/chats", () => HttpResponse.json({ chats: [chatA] })));
     const onOpenChat = vi.fn();
 
     renderWithClient(<ChatList onOpenChat={onOpenChat} />);
@@ -34,7 +30,7 @@ describe("ChatList (AC-42, AC-47)", () => {
   });
 
   it("AC-47: shows an empty state rather than inventing chats when the server returns none", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([])));
+    server.use(http.get("*/chats", () => HttpResponse.json({ chats: [] })));
 
     renderWithClient(<ChatList onOpenChat={vi.fn()} />);
 
@@ -42,11 +38,10 @@ describe("ChatList (AC-42, AC-47)", () => {
   });
 
   it("AC-42: creating a chat via the dialog opens it once created", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse([]))
-      .mockResolvedValueOnce(jsonResponse(chatA, 201));
-    vi.stubGlobal("fetch", fetchMock);
+    server.use(
+      http.get("*/chats", () => HttpResponse.json({ chats: [] })),
+      http.post("*/chats", () => HttpResponse.json({ chat: chatA }, { status: 201 })),
+    );
     const onOpenChat = vi.fn();
 
     renderWithClient(<ChatList onOpenChat={onOpenChat} />);
@@ -60,7 +55,7 @@ describe("ChatList (AC-42, AC-47)", () => {
   });
 
   it("shows an error state when the chats request fails", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ message: "boom" }, 500)));
+    server.use(http.get("*/chats", () => HttpResponse.json({ message: "boom" }, { status: 500 })));
 
     renderWithClient(<ChatList onOpenChat={vi.fn()} />);
 

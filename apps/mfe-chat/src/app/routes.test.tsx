@@ -6,9 +6,9 @@ import {
   createRootRoute,
   createRouter,
 } from "@tanstack/react-router";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { installFakeEventSource, renderWithClient } from "@platform/test-utils";
-import { jsonResponse } from "../test/utils";
+import { http, HttpResponse, server } from "@platform/test-utils/msw";
 import type { Chat, Message } from "../shared/types";
 import { CurrentUserProvider } from "./auth-context";
 import { createChatRoutes } from "./routes";
@@ -42,13 +42,12 @@ function renderChatRoutes(initialPath: string) {
 
 describe("createChatRoutes (FE-1)", () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
     installFakeEventSource();
     window.localStorage.clear();
   });
 
   it("registers /chats and renders the chat list", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([chat])));
+    server.use(http.get("*/chats", () => HttpResponse.json({ chats: [chat] })));
 
     renderChatRoutes("/chats");
 
@@ -56,13 +55,10 @@ describe("createChatRoutes (FE-1)", () => {
   });
 
   it("registers /chats/:chatId and navigates from the list into the chat view", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn((url: string) => {
-        if (url.includes("/messages")) return Promise.resolve(jsonResponse(messages));
-        if (url.endsWith(`/chats/${chat.id}`)) return Promise.resolve(jsonResponse(chat));
-        return Promise.resolve(jsonResponse([chat]));
-      })
+    server.use(
+      http.get("*/chats", () => HttpResponse.json({ chats: [chat] })),
+      http.get("*/chats/:chatId", () => HttpResponse.json({ chat })),
+      http.get("*/chats/:chatId/messages", () => HttpResponse.json({ messages }))
     );
 
     renderChatRoutes("/chats");
@@ -76,13 +72,12 @@ describe("createChatRoutes (FE-1)", () => {
     const second: Chat = { ...chat, id: "chat-2", title: "Second chat" };
     const third: Chat = { ...chat, id: "chat-3", title: "Third chat" };
     const all = [chat, second, third];
-    vi.stubGlobal(
-      "fetch",
-      vi.fn((url: string) => {
-        if (url.includes("/messages")) return Promise.resolve(jsonResponse(messages));
-        const found = all.find((c) => url.endsWith(`/chats/${c.id}`));
-        return Promise.resolve(jsonResponse(found ?? all));
-      })
+    server.use(
+      http.get("*/chats", () => HttpResponse.json({ chats: all })),
+      http.get("*/chats/:chatId", ({ params }) =>
+        HttpResponse.json({ chat: all.find((c) => c.id === params.chatId) ?? all })
+      ),
+      http.get("*/chats/:chatId/messages", () => HttpResponse.json({ messages }))
     );
 
     renderChatRoutes(`/chats/${chat.id}`);

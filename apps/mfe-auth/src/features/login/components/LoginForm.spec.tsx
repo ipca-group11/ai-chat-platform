@@ -1,7 +1,8 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithClient } from "@platform/test-utils";
+import { http, HttpResponse, recordRequests, server } from "@platform/test-utils/msw";
 import { LoginForm } from "./LoginForm";
 
 const navigateMock = vi.fn();
@@ -10,22 +11,17 @@ vi.mock("../../../shared/navigation", () => ({
   useNavigate: () => navigateMock,
 }));
 
-function jsonResponse(body: unknown, status: number) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
 describe("LoginForm", () => {
   beforeEach(() => {
     navigateMock.mockReset();
-    vi.stubGlobal("fetch", vi.fn());
   });
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+  const rejectLogin = () =>
+    server.use(
+      http.post("*/auth/login", () =>
+        HttpResponse.json({ error: "Invalid email or password" }, { status: 401 }),
+      ),
+    );
 
   it("AC-35: renders the login form's email and password fields", () => {
     renderWithClient(<LoginForm />);
@@ -36,9 +32,7 @@ describe("LoginForm", () => {
   });
 
   it("AC-35: a valid login navigates to the chat list route", async () => {
-    vi.mocked(fetch).mockResolvedValue(
-      jsonResponse({ id: "1", email: "user@example.com" }, 200),
-    );
+    const requests = recordRequests();
     const user = userEvent.setup();
     renderWithClient(<LoginForm />);
 
@@ -47,12 +41,11 @@ describe("LoginForm", () => {
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 
     await waitFor(() => expect(navigateMock).toHaveBeenCalledWith({ to: "/chats" }));
+    expect(await requests[0]!.json()).toEqual({ email: "user@example.com", password: "correct-password" });
   });
 
   it("AC-36: invalid credentials show the single generic error message as-is, without navigating", async () => {
-    vi.mocked(fetch).mockResolvedValue(
-      jsonResponse({ error: "Invalid email or password" }, 401),
-    );
+    rejectLogin();
     const user = userEvent.setup();
     renderWithClient(<LoginForm />);
 
@@ -65,9 +58,7 @@ describe("LoginForm", () => {
   });
 
   it("AC-36: the same generic message is shown regardless of an unknown email vs a wrong password", async () => {
-    vi.mocked(fetch).mockResolvedValue(
-      jsonResponse({ error: "Invalid email or password" }, 401),
-    );
+    rejectLogin();
     const user = userEvent.setup();
     renderWithClient(<LoginForm />);
 
@@ -79,12 +70,13 @@ describe("LoginForm", () => {
   });
 
   it("blocks submit client-side when a field is empty, without calling the API", async () => {
+    const requests = recordRequests();
     const user = userEvent.setup();
     renderWithClient(<LoginForm />);
 
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 
     expect(await screen.findByText(/required/i)).toBeInTheDocument();
-    expect(fetch).not.toHaveBeenCalled();
+    expect(requests).toHaveLength(0);
   });
 });

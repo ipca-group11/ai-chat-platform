@@ -1,26 +1,15 @@
 import { LLM_API_KEY_HEADER } from "@app/shared-types/api-keys";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithClient } from "@platform/test-utils";
+import { http, HttpResponse, recordRequests, server } from "@platform/test-utils/msw";
 import { TestConnectionButton } from "./TestConnectionButton";
 
-function jsonResponse(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
+const respondWith = (response: () => Response | Promise<Response>) =>
+  server.use(http.post("*/providers/:provider/test-connection", response));
 
 describe("TestConnectionButton", () => {
-  beforeEach(() => {
-    vi.stubGlobal("fetch", vi.fn());
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   it("AC-85: is disabled when there is no key to test", () => {
     renderWithClient(
       <TestConnectionButton provider="openai" apiKey="" providerLabel="OpenAI" />,
@@ -30,7 +19,7 @@ describe("TestConnectionButton", () => {
   });
 
   it("AC-85: sends the key once via header and shows a success toast", async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse({ success: true }));
+    const requests = recordRequests();
     const user = userEvent.setup();
 
     renderWithClient(
@@ -40,13 +29,11 @@ describe("TestConnectionButton", () => {
     await user.click(screen.getByRole("button", { name: /test openai connection/i }));
 
     await waitFor(() => expect(screen.getByText(/connection successful/i)).toBeInTheDocument());
-    const [, init] = vi.mocked(fetch).mock.calls[0]!;
-    const headers = new Headers(init?.headers);
-    expect(headers.get(LLM_API_KEY_HEADER)).toBe("sk-my-key");
+    expect(requests[0]!.headers.get(LLM_API_KEY_HEADER)).toBe("sk-my-key");
   });
 
   it("AC-85: shows a clear failure reason returned by the server", async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse({ message: "Invalid API key" }, 401));
+    respondWith(() => HttpResponse.json({ message: "Invalid API key" }, { status: 401 }));
     const user = userEvent.setup();
 
     renderWithClient(
@@ -59,7 +46,7 @@ describe("TestConnectionButton", () => {
   });
 
   it("AC-85: shows a failure toast on a network error", async () => {
-    vi.mocked(fetch).mockRejectedValue(new TypeError("Failed to fetch"));
+    respondWith(() => HttpResponse.error());
     const user = userEvent.setup();
 
     renderWithClient(
@@ -72,7 +59,7 @@ describe("TestConnectionButton", () => {
   });
 
   it("AC-85: shows a default failure message when the server doesn't provide one", async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse({ success: false }));
+    respondWith(() => HttpResponse.json({ success: false }));
     const user = userEvent.setup();
 
     renderWithClient(
@@ -85,12 +72,14 @@ describe("TestConnectionButton", () => {
   });
 
   it("AC-85: shows 'Testing…' while the request is in flight", async () => {
-    let resolveFetch: (response: Response) => void = () => {};
-    vi.mocked(fetch).mockReturnValue(
-      new Promise((resolve) => {
-        resolveFetch = resolve;
-      }),
-    );
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    respondWith(async () => {
+      await gate;
+      return HttpResponse.json({ success: true });
+    });
     const user = userEvent.setup();
 
     renderWithClient(
@@ -100,19 +89,18 @@ describe("TestConnectionButton", () => {
     await user.click(screen.getByRole("button", { name: /test openai connection/i }));
 
     expect(screen.getByRole("button", { name: "Testing…" })).toBeDisabled();
-    resolveFetch(jsonResponse({ success: true }));
+    release();
     await waitFor(() => expect(screen.getByText(/connection successful/i)).toBeInTheDocument());
   });
 
   it("shows a fallback toast if the mutation itself throws unexpectedly", async () => {
-    vi.doMock("../api/testConnection", () => ({
-      testConnection: vi.fn().mockRejectedValue(new Error("boom")),
-    }));
-    const { TestConnectionButton: PatchedButton } = await import("./TestConnectionButton");
+    // The one case MSW cannot produce: fetch resolves with something that is not a Response, so the
+    // code after the network call throws. A one-off spy keeps every other request on the MSW server.
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(undefined as unknown as Response);
     const user = userEvent.setup();
 
     renderWithClient(
-      <PatchedButton provider="openai" apiKey="sk-my-key" providerLabel="OpenAI" />,
+      <TestConnectionButton provider="openai" apiKey="sk-my-key" providerLabel="OpenAI" />,
     );
 
     await user.click(screen.getByRole("button", { name: /test openai connection/i }));
@@ -120,8 +108,6 @@ describe("TestConnectionButton", () => {
     await waitFor(() =>
       expect(screen.getByText(/unable to test the connection/i)).toBeInTheDocument(),
     );
-
-    vi.doUnmock("../api/testConnection");
-    vi.resetModules();
+    fetchSpy.mockRestore();
   });
 });

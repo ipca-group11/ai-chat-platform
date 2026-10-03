@@ -1,57 +1,47 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { http, HttpResponse, recordRequests, server } from "@platform/test-utils/msw";
+import { describe, expect, it } from "vitest";
 import { ApiError } from "../../../shared/api-client";
 import { fetchSessionWithRefresh } from "./session";
 
-function jsonResponse(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
+const paths = (requests: Request[]) => requests.map((r) => `${r.method} ${new URL(r.url).pathname}`);
+const user = { id: "1", email: "a@b.com" };
+const unauthorized = () => HttpResponse.json({ error: "Unauthorized" }, { status: 401 });
 
 describe("fetchSessionWithRefresh (F4 session contract)", () => {
-  beforeEach(() => {
-    vi.stubGlobal("fetch", vi.fn());
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   it("AC-41: resolves with the current user when /auth/me succeeds", async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse({ id: "1", email: "a@b.com" }, 200));
+    server.use(http.get("*/auth/me", () => HttpResponse.json(user)));
+    const requests = recordRequests();
 
-    await expect(fetchSessionWithRefresh()).resolves.toEqual({ id: "1", email: "a@b.com" });
-    expect(fetch).toHaveBeenCalledTimes(1);
+    await expect(fetchSessionWithRefresh()).resolves.toEqual(user);
+    expect(paths(requests)).toEqual(["GET /auth/me"]);
   });
 
   it("AC-41: a 401 from /auth/me triggers one silent refresh, then retries /auth/me once", async () => {
-    vi.mocked(fetch)
-      .mockResolvedValueOnce(jsonResponse({ error: "Unauthorized" }, 401)) // GET /auth/me
-      .mockResolvedValueOnce(jsonResponse(undefined, 204)) // POST /auth/refresh
-      .mockResolvedValueOnce(jsonResponse({ id: "1", email: "a@b.com" }, 200)); // GET /auth/me retry
+    server.use(
+      http.get("*/auth/me", unauthorized, { once: true }), // first GET /auth/me
+      http.get("*/auth/me", () => HttpResponse.json(user)), // retry
+    );
+    const requests = recordRequests();
 
-    await expect(fetchSessionWithRefresh()).resolves.toEqual({ id: "1", email: "a@b.com" });
-    expect(fetch).toHaveBeenCalledTimes(3);
-    expect(vi.mocked(fetch).mock.calls[1]![0]).toBe("/auth/refresh");
+    await expect(fetchSessionWithRefresh()).resolves.toEqual(user);
+    expect(paths(requests)).toEqual(["GET /auth/me", "POST /auth/refresh", "GET /auth/me"]);
   });
 
   it("AC-41: surfaces 'not authenticated' (a 401 ApiError) if the refresh retry also fails, without retrying again", async () => {
-    vi.mocked(fetch)
-      .mockResolvedValueOnce(jsonResponse({ error: "Unauthorized" }, 401)) // GET /auth/me
-      .mockResolvedValueOnce(jsonResponse(undefined, 204)) // POST /auth/refresh succeeds
-      .mockResolvedValueOnce(jsonResponse({ error: "Unauthorized" }, 401)); // GET /auth/me retry fails
+    server.use(http.get("*/auth/me", unauthorized)); // refresh succeeds with the default handler
+    const requests = recordRequests();
 
     const failure = fetchSessionWithRefresh();
     await expect(failure).rejects.toMatchObject({ status: 401 });
     await expect(failure).rejects.toBeInstanceOf(ApiError);
-    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(paths(requests)).toEqual(["GET /auth/me", "POST /auth/refresh", "GET /auth/me"]);
   });
 
   it("AC-41: a non-401 error from /auth/me is rethrown immediately without attempting a refresh", async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse({ error: "Server error" }, 500));
+    server.use(http.get("*/auth/me", () => HttpResponse.json({ error: "Server error" }, { status: 500 })));
+    const requests = recordRequests();
 
     await expect(fetchSessionWithRefresh()).rejects.toMatchObject({ status: 500 });
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(paths(requests)).toEqual(["GET /auth/me"]);
   });
 });
