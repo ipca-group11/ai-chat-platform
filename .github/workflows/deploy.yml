@@ -43,6 +43,8 @@ jobs:
           - { name: shell, dockerfile: apps/shell/Dockerfile }
           - { name: prometheus, dockerfile: observability/prometheus.Dockerfile }
           - { name: grafana, dockerfile: observability/grafana.Dockerfile }
+          - { name: loki, dockerfile: observability/loki.Dockerfile }
+          - { name: alloy, dockerfile: observability/alloy.Dockerfile }
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,12 +67,14 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}/${{ matrix.name }}:${{ env.SHA }}
             ${{ env.IMAGE_PREFIX }}/${{ matrix.name }}:latest
-          # The shell bakes the remotes' public URLs into its bundle; the other images
-          # ignore these args.
+          # The shell bakes the remotes' public URLs, the Faro collector URL and its
+          # version into its bundle; the other images ignore these args.
           build-args: |
             VITE_MFE_AUTH_URL=https://${{ vars.DOMAIN }}:3001
             VITE_MFE_CHAT_URL=https://${{ vars.DOMAIN }}:3002
             VITE_MFE_SETTINGS_URL=https://${{ vars.DOMAIN }}:3003
+            VITE_FARO_URL=https://${{ vars.DOMAIN }}/collect
+            VITE_APP_VERSION=${{ env.SHA }}
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
 

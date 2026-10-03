@@ -28,6 +28,7 @@ volumes:
   postgres-data:
   grafana-data:
   uploads-data:
+  loki-data:
 
 services:
   postgres:
@@ -166,6 +167,8 @@ services:
         VITE_MFE_AUTH_URL: http://localhost:${MFE_AUTH_PORT:-3001}
         VITE_MFE_CHAT_URL: http://localhost:${MFE_CHAT_PORT:-3002}
         VITE_MFE_SETTINGS_URL: http://localhost:${MFE_SETTINGS_PORT:-3003}
+        # Browser-facing Grafana Faro collector (alloy below).
+        VITE_FARO_URL: http://localhost:${FARO_PORT:-12347}/collect
     restart: unless-stopped
     depends_on:
       auth-service:
@@ -220,5 +223,30 @@ services:
       - "127.0.0.1:${GRAFANA_PORT:-3300}:3000"
     depends_on:
       - prometheus
+    networks:
+      - llm-chat
+
+  # Frontend observability: the shell's Grafana Faro SDK posts errors, logs and web
+  # vitals to Alloy's faro.receiver, which stores them in Loki (Grafana's "Loki"
+  # datasource, "Frontend (Grafana Faro)" dashboard).
+  loki:
+    build:
+      context: .
+      dockerfile: observability/loki.Dockerfile
+    restart: unless-stopped
+    volumes:
+      - loki-data:/loki
+    networks:
+      - llm-chat
+
+  alloy:
+    build:
+      context: .
+      dockerfile: observability/alloy.Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${FARO_PORT:-12347}:12347"
+    depends_on:
+      - loki
     networks:
       - llm-chat

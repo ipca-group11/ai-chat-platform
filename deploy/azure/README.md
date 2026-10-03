@@ -50,6 +50,13 @@ Grafana is public at https://ai-chat-jpc.swedencentral.cloudapp.azure.com/grafan
 are off). Prometheus (9090) stays on the VM's loopback; reach it with
 `ssh -L 9090:127.0.0.1:9090 azureuser@<host>`.
 
+Observability in Grafana:
+- **Platform overview** (Prometheus): request rate, error rate, p50/p95 latency and open SSE
+  streams for `auth-service` and `conversation-service`.
+- **Frontend (Grafana Faro)** (Loki): real-user sessions, errors, console logs and web vitals
+  (LCP/INP/CLS/TTFB). The shell's Faro SDK posts to `https://$DOMAIN/collect`; Caddy forwards
+  that to Alloy (`observability/alloy.alloy`), which writes to Loki (7-day retention).
+
 LLM keys are not configured on the server: each user pastes their Anthropic key in
 Settings, and the browser sends it with each request.
 
