@@ -11,12 +11,10 @@ export default defineConfig({
     include: ["src/fixtures/**/*.spec.ts", "src/a11y/**/*.spec.ts", "src/ci/**/*.spec.ts"],
     coverage: coveragePreset({
       thresholds: e2eCoverageThresholds,
-      // Only the pure, browser-independent logic (health polling, a11y
-      // result filtering) is meaningfully unit-testable here; the
-      // Playwright-only wrappers (auth-flows/chat-flows/test-users/
-      // wait-for-stack-cli) are exercised by the `e2e` Playwright target
-      // instead.
-      include: ["src/fixtures/wait-for-stack.ts", "src/a11y/axe-helper.ts"],
+      // The Playwright flow helpers are unit-tested against a recording fake page (src/test-utils);
+      // the specs under src/tests are Playwright specs and run through the `e2e` target.
+      include: ["src/fixtures/**/*.ts", "src/a11y/axe-helper.ts"],
+      exclude: ["**/*.spec.ts"],
     }),
   },
 });

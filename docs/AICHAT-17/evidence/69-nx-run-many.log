@@ -1,0 +1,55 @@
+$ pnpm exec nx run-many -t lint typecheck test build -p mfe-settings auth-service conversation-service ui eslint-config e2e
+
+ NX   Running targets lint, typecheck, test, build for 6 projects and 6 tasks they depend on:
+
+- mfe-settings
+- auth-service
+- conversation-service
+- ui
+- eslint-config
+- e2e
+
+
+✔  nx run eslint-config:build  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:prisma-generate  [existing outputs match the cache, left as is]
+✔  nx run auth-service:prisma-generate  [existing outputs match the cache, left as is]
+✔  nx run eslint-config:lint  [existing outputs match the cache, left as is]
+✔  nx run eslint-config:test  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:lint  [existing outputs match the cache, left as is]
+✔  nx run ui:lint  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:lint  [existing outputs match the cache, left as is]
+✔  nx run auth-service:lint  [existing outputs match the cache, left as is]
+✔  nx run e2e:lint  [existing outputs match the cache, left as is]
+✔  nx run test-config:build  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:build  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:test  [local cache]
+✔  nx run conversation-service:typecheck  [existing outputs match the cache, left as is]
+✔  nx run auth-service:test  [local cache]
+✔  nx run auth-service:build  [existing outputs match the cache, left as is]
+✔  nx run auth-service:typecheck  [existing outputs match the cache, left as is]
+✔  nx run shared-types:build  [existing outputs match the cache, left as is]
+✔  nx run ui:build  [existing outputs match the cache, left as is]
+✔  nx run ui:test  [existing outputs match the cache, left as is]
+✔  nx run ui:typecheck  [existing outputs match the cache, left as is]
+✔  nx run e2e:typecheck  [existing outputs match the cache, left as is]
+✔  nx run e2e:test  [local cache]
+✔  nx run mock-server:build  [existing outputs match the cache, left as is]
+✔  nx run test-utils:build  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:build  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:typecheck  [existing outputs match the cache, left as is]
+
+
+
+ NX   Successfully ran targets lint, typecheck, test, build for 6 projects and 6 tasks they depend on
+
+Nx read the output from the cache instead of running the command for 28 out of 28 tasks.
+
+Output of 28 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      164ms
+  Cache:             28/28 hit (100%)
+  Critical path:     54ms (6 tasks)
+  Recoverable time:  <1ms
+
+[exit 0]

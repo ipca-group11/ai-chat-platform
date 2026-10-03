@@ -1,0 +1,17 @@
+$ pnpm exec nx run auth-service:prisma-generate >/dev/null 2>&1; (cd services/auth-service && pnpm exec vitest run --coverage 2>&1 | grep -E 'Test Files|Tests |Statements|Branches|Functions|Lines'); (cd services/conversation-service && pnpm exec vitest run --coverage 2>&1 | grep -E 'Test Files|Tests |Statements|Branches|Functions|Lines')
+ Test Files  16 passed (16)
+      Tests  95 passed (95)
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+Statements   : 95.32% ( 204/214 )
+Branches     : 89.74% ( 70/78 )
+Functions    : 96.07% ( 49/51 )
+Lines        : 95.67% ( 199/208 )
+ Test Files  44 passed (44)
+      Tests  391 passed | 2 todo (393)
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+Statements   : 98.45% ( 765/777 )
+Branches     : 91.26% ( 324/355 )
+Functions    : 97.9% ( 187/191 )
+Lines        : 99.03% ( 715/722 )
+
+[exit 0]
