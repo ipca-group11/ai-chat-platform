@@ -1,0 +1,20 @@
+$ node --test scripts/dast/zap-report.test.ts scripts/dast/zap-session.test.ts
+✔ counts the alerts by risk (0.770792ms)
+✔ only High fails by default, Medium too with the medium threshold (0.133ms)
+✔ lists the reported URLs without query strings and finds the missing ones (0.162167ms)
+✔ the table lists High first and the summary states the verdict (8.083375ms)
+✔ drops an alert whose URLs are all out of scope (0.113ms)
+✔ joins the name=value pairs of Set-Cookie headers and drops attributes and empty cookies (0.534792ms)
+✔ builds a ZAP replacer rule that sets the Cookie request header (0.178167ms)
+✔ keeps only the named cookies, joined without spaces (0.087458ms)
+✔ refuses a cookie with whitespace, which ZAP would split into separate options (0.222208ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 92.103959
+
+[exit 0]

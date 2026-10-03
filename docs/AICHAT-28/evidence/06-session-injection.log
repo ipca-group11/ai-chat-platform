@@ -1,0 +1,10 @@
+$ bash -c echo '--- ZAP options built from the seeded user session (cookie value redacted)'; node scripts/dast/zap-session.ts | sed -E 's/(replacement=access_token=).*/\1<redacted>/' | tr ' ' '\n' | paste -sd' ' - | fold -w 110; echo; echo '--- GET /api/chats without and with the cookie'; curl -s -o /dev/null -w 'anonymous: %{http_code}\n' http://localhost:8000/api/chats; C=$(node scripts/dast/zap-session.ts | sed 's/.*replacement=//'); curl -s -o /dev/null -w 'signed in: %{http_code}\n' http://localhost:8000/api/chats -H "Cookie: $C"
+
+-config replacer.full_list(0).description=dast-session -config replacer.full_list(0).enabled=true -config repl
+acer.full_list(0).matchtype=REQ_HEADER -config replacer.full_list(0).matchstr=Cookie -config replacer.full_lis
+t(0).regex=false -config replacer.full_list(0).replacement=access_token=<redacted>
+--- GET /api/chats without and with the cookie
+anonymous: 401
+signed in: 200
+
+[exit 0]

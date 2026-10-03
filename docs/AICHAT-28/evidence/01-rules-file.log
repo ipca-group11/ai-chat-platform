@@ -1,0 +1,42 @@
+$ awk -f /private/tmp/claude-501/rules-view.awk testing/zap/rules.tsv
+10062   FAIL      High: personal data (card or ID numbers) in a response
+10034   FAIL      High: vulnerable TLS library
+10057   FAIL      High: user name hashes in a response
+10115   FAIL      High: script served from a compromised host
+10028   FAIL      High: open redirect to another site
+90002   FAIL      High: serialized Java objects accepted from the client
+10003   OUTOFSCOPE 
+10003   WARN      Medium: update the library, ticket it
+10020   WARN      Medium: Caddyfile header fix, see AICHAT-28 work log US4
+10038   WARN      Medium: Caddyfile header fix, see AICHAT-28 work log US4
+10055   WARN      Medium: weak CSP directives
+10098   WARN      Medium: CORS allow-list must stay narrow
+10202   WARN      Medium: sessions use SameSite cookies and JSON bodies, review per finding
+10105   WARN      Medium: sign-in over HTTP basic or digest
+10108   WARN      Medium: external links need rel=noopener
+10033   WARN      Medium: directory listing enabled
+10040   WARN      Medium: HTTP resources on HTTPS pages
+3       WARN      Medium: session id in the URL
+10099   WARN      Medium: source code in a response
+10024   WARN      Medium: sensitive data in a query string
+90001   WARN      Medium: not used by this stack
+90003   WARN      Medium: known finding, the Google Fonts stylesheet in index.html cannot use SRI (Google serves different 
+90022   WARN      Medium: stack traces or error pages with internals
+10011   IGNORE    False positive on the local stack: compose.yaml sets COOKIE_SECURE=false because the scan runs over plain
+10010   IGNORE    Low risk, below the gate by the severity policy. Did not fire in the first scan (auth-service sets HttpOn
+10054   IGNORE    Low risk, below the gate by the severity policy. Did not fire in the first scan
+90033   IGNORE    Low risk, below the gate by the severity policy. Did not fire in the first scan
+10021   IGNORE    Low: vite preview does not send it; ticketed to the deploy owner (Caddyfile), see AICHAT-28 work log US4
+10035   IGNORE    Low: HSTS only means something over HTTPS; the local scan is HTTP. Ticketed for the Caddyfile
+10063   IGNORE    Low: ticketed to the deploy owner (Caddyfile), see AICHAT-28 work log US4
+90004   IGNORE    Low: cross-origin isolation headers are not needed by this app; ticketed with the headers
+10036   IGNORE    Low: server banner of vite preview, no version detail; Caddy removes Server in production
+10037   IGNORE    Low: Express services call disable(x-powered-by); only dev servers can send it
+10039   IGNORE    Low: no such header is sent
+...
+WARN: 16
+OUTOFSCOPE: 1
+FAIL: 6
+IGNORE: 45
+
+[exit 0]

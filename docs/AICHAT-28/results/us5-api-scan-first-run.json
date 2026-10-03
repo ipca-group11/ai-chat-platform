@@ -1,0 +1,3207 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Sat, 3 Oct 2026 19:58:11",
+	"created": "2026-10-03T19:58:11.270183444Z",
+	"insights":[
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.error",
+			"description": "ZAP errors logged - see the zap.log file for details",
+			"statistic": "2"
+		},
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.warn",
+			"description": "ZAP warnings logged - see the zap.log file for details",
+			"statistic": "63"
+		},
+		{
+			"level": "Low",
+			"reason": "Exceeded High",
+			"site": "http://localhost:8000",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "84"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "",
+			"key": "insight.network.failure",
+			"description": "Percentage of network failures",
+			"statistic": "1"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "11"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.code.5xx",
+			"description": "Percentage of responses with status code 5xx",
+			"statistic": "3"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "57"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.ctype.text/html",
+			"description": "Percentage of endpoints with content type text/html",
+			"statistic": "11"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.method.DELETE",
+			"description": "Percentage of endpoints with method DELETE",
+			"statistic": "6"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "57"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.method.PATCH",
+			"description": "Percentage of endpoints with method PATCH",
+			"statistic": "1"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "33"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "223"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "4"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://localhost:8000",
+			"key": "insight.endpoint.method.DELETE",
+			"description": "Percentage of endpoints with method DELETE",
+			"statistic": "100"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://localhost:8000",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "1"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "https://localhost:8000",
+			"@host": "localhost",
+			"@port": "8000",
+			"@ssl": "true",
+			"alerts": [ 
+			]
+		},
+		{
+			"@name": "http://localhost:8000",
+			"@host": "localhost",
+			"@port": "8000",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "30002",
+					"alertRef": "30002",
+					"alert": "Format String Error",
+					"name": "Format String Error",
+					"riskcode": "2",
+					"confidence": "2",
+					"riskdesc": "Medium (Medium)",
+					"desc": "<p>A Format String error occurs when the submitted data of an input string is evaluated as a command by the application.</p>",
+					"instances":[ 
+						{
+							"id": "3442",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments ()(multipart:file)",
+							"method": "POST",
+							"param": "file",
+							"attack": "ZAP%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s\n",
+							"evidence": "",
+							"otherinfo": "Potential Format String Error. The script closed the connection on a /%s."
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "<p>Rewrite the background program using proper deletion of bad character strings. This will require a recompile of the background executable.</p>",
+					"otherinfo": "<p>Potential Format String Error. The script closed the connection on a /%s.</p>",
+					"reference": "<p>https://owasp.org/www-community/attacks/Format_string_attack</p>",
+					"cweid": "134",
+					"wascid": "6",
+					"sourceid": "3329"
+				},
+				{
+					"pluginid": "10106",
+					"alertRef": "10106",
+					"alert": "HTTP Only Site",
+					"name": "HTTP Only Site",
+					"riskcode": "2",
+					"confidence": "2",
+					"riskdesc": "Medium (Medium)",
+					"desc": "<p>The site is only served under HTTP and not HTTPS.</p>",
+					"instances":[ 
+						{
+							"id": "3421",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "https:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "Failed to connect.\nZAP attempted to connect via: https://localhost:8000/api/chats/cm0example0000000000000000"
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "<p>Configure your web or application server to use SSL (https).</p>",
+					"otherinfo": "<p>Failed to connect.</p><p>ZAP attempted to connect via: https://localhost:8000/api/chats/cm0example0000000000000000</p>",
+					"reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html</p><p>https://letsencrypt.org/</p>",
+					"cweid": "311",
+					"wascid": "4",
+					"sourceid": "3317"
+				},
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-2",
+					"alert": "A Server Error response code was returned by the server",
+					"name": "A Server Error response code was returned by the server",
+					"riskcode": "1",
+					"confidence": "3",
+					"riskdesc": "Low (High)",
+					"desc": "<p>A response code of 500 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "3635",
+							"uri": "http://localhost:8000/api/chats",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats ()({title,provider,model,reasoning,webFetch})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "500",
+							"otherinfo": ""
+						},
+						{
+							"id": "250",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments ()(multipart:file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "500",
+							"otherinfo": ""
+						},
+						{
+							"id": "3825",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments ()(multipart:rtobject)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "500",
+							"otherinfo": ""
+						}
+					],
+					"count": "3",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "3509"
+				},
+				{
+					"pluginid": "40014",
+					"alertRef": "40014-2",
+					"alert": "Cross Site Scripting Weakness (Persistent in JSON Response)",
+					"name": "Cross Site Scripting Weakness (Persistent in JSON Response)",
+					"riskcode": "1",
+					"confidence": "1",
+					"riskdesc": "Low (Low)",
+					"desc": "<p>A XSS attack was found in a JSON response, this might leave content consumers vulnerable to attack if they don't appropriately handle the data (response).</p>",
+					"instances":[ 
+						{
+							"id": "843",
+							"uri": "http://localhost:8000/api/chats",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats",
+							"method": "GET",
+							"param": "model",
+							"attack": "<script>alert(1);</script>",
+							"evidence": "",
+							"otherinfo": "Raised with LOW confidence as the Content-Type is not HTML."
+						},
+						{
+							"id": "842",
+							"uri": "http://localhost:8000/api/chats",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats",
+							"method": "GET",
+							"param": "title",
+							"attack": "<script>alert(1);</script>",
+							"evidence": "",
+							"otherinfo": "Raised with LOW confidence as the Content-Type is not HTML."
+						}
+					],
+					"count": "2",
+					"systemic": false,
+					"solution": "<p>Phase: Architecture and Design</p><p>Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.</p><p>Examples of libraries and frameworks that make it easier to generate properly encoded output include Microsoft's Anti-XSS library, the OWASP ESAPI Encoding module, and Apache Wicket.</p><p></p><p>Phases: Implementation; Architecture and Design</p><p>Understand the context in which your data will be used and the encoding that will be expected. This is especially important when transmitting data between different components, or when generating outputs that can contain multiple encodings at the same time, such as web pages or multi-part mail messages. Study all expected communication protocols and data representations to determine the required encoding strategies.</p><p>For any data that will be output to another web page, especially any data that was received from external inputs, use the appropriate encoding on all non-alphanumeric characters.</p><p>Consult the XSS Prevention Cheat Sheet for more details on the types of encoding and escaping that are needed.</p><p></p><p>Phase: Architecture and Design</p><p>For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.</p><p></p><p>If available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.</p><p></p><p>Phase: Implementation</p><p>For every web page that is generated, use and specify a character encoding such as ISO-8859-1 or UTF-8. When an encoding is not specified, the web browser may choose a different encoding by guessing which encoding is actually being used by the web page. This can cause the web browser to treat certain sequences as special, opening up the client to subtle XSS attacks. See CWE-116 for more mitigations related to encoding/escaping.</p><p></p><p>To help mitigate XSS attacks against the user's session cookie, set the session cookie to be HttpOnly. In browsers that support the HttpOnly feature (such as more recent versions of Internet Explorer and Firefox), this attribute can prevent the user's session cookie from being accessible to malicious client-side scripts that use document.cookie. This is not a complete solution, since HttpOnly is not supported by all browsers. More importantly, XMLHTTPRequest and other powerful browser technologies provide read access to HTTP headers, including the Set-Cookie header in which the HttpOnly flag is set.</p><p></p><p>Assume all input is malicious. Use an \"accept known good\" input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.</p><p></p><p>When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, \"boat\" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as \"red\" or \"blue.\"</p><p></p><p>Ensure that you perform input validation at well-defined interfaces within the application. This will help protect the application even if a component is reused or moved elsewhere.</p><p>\t</p>",
+					"otherinfo": "<p>Raised with LOW confidence as the Content-Type is not HTML.</p>",
+					"reference": "<p>https://owasp.org/www-community/attacks/xss/</p><p>https://cwe.mitre.org/data/definitions/79.html</p>",
+					"cweid": "79",
+					"wascid": "8",
+					"sourceid": "965"
+				},
+				{
+					"pluginid": "100001",
+					"alertRef": "100001",
+					"alert": "Unexpected Content-Type was returned",
+					"name": "Unexpected Content-Type was returned",
+					"riskcode": "1",
+					"confidence": "3",
+					"riskdesc": "Low (High)",
+					"desc": "<p>A Content-Type of text/html was returned by the server.</p><p>This is not one of the types expected to be returned by an API.</p><p>Raised by the 'Alert on Unexpected Content Types' script</p>",
+					"instances":[ 
+						{
+							"id": "440",
+							"uri": "http://localhost:8000/WEB-INF/applicationContext.xml",
+							"nodeName": "http:\/\/localhost:8000\/WEB-INF\/applicationContext.xml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "441",
+							"uri": "http://localhost:8000/WEB-INF/classes/1/0.class",
+							"nodeName": "http:\/\/localhost:8000\/WEB-INF\/classes\/1\/0.class",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "473",
+							"uri": "http://localhost:8000/WEB-INF/classes/BTgjxohI/css.class",
+							"nodeName": "http:\/\/localhost:8000\/WEB-INF\/classes\/BTgjxohI\/css.class",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "472",
+							"uri": "http://localhost:8000/WEB-INF/classes/feb606b9/js.class",
+							"nodeName": "http:\/\/localhost:8000\/WEB-INF\/classes\/feb606b9\/js.class",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "470",
+							"uri": "http://localhost:8000/WEB-INF/classes/fonts/googleapis/com.class",
+							"nodeName": "http:\/\/localhost:8000\/WEB-INF\/classes\/fonts\/googleapis\/com.class",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "471",
+							"uri": "http://localhost:8000/WEB-INF/classes/fonts/gstatic/com.class",
+							"nodeName": "http:\/\/localhost:8000\/WEB-INF\/classes\/fonts\/gstatic\/com.class",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "437",
+							"uri": "http://localhost:8000/WEB-INF/web.xml",
+							"nodeName": "http:\/\/localhost:8000\/WEB-INF\/web.xml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1247",
+							"uri": "http://localhost:8000/auth",
+							"nodeName": "http:\/\/localhost:8000\/auth",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "2005",
+							"uri": "http://localhost:8000/auth?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3395",
+							"uri": "http://localhost:8000/auth/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3692",
+							"uri": "http://localhost:8000/auth/.env",
+							"nodeName": "http:\/\/localhost:8000\/auth\/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3681",
+							"uri": "http://localhost:8000/auth/.htaccess",
+							"nodeName": "http:\/\/localhost:8000\/auth\/.htaccess",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1949",
+							"uri": "http://localhost:8000/auth/login?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login (class.module.classLoader.DefaultAssertio...)({email,password})",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1947",
+							"uri": "http://localhost:8000/auth/logout?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "4345",
+							"uri": "http://localhost:8000/auth/me",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "2007",
+							"uri": "http://localhost:8000/auth/me?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3393",
+							"uri": "http://localhost:8000/auth/me/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1948",
+							"uri": "http://localhost:8000/auth/refresh?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3658",
+							"uri": "http://localhost:8000/auth/trace.axd",
+							"nodeName": "http:\/\/localhost:8000\/auth\/trace.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "2010",
+							"uri": "http://localhost:8000/auth",
+							"nodeName": "http:\/\/localhost:8000\/auth ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1967",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1119",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3381",
+							"uri": "http://localhost:8000/auth/login/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3887",
+							"uri": "http://localhost:8000/auth/logout",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1960",
+							"uri": "http://localhost:8000/auth/logout",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3378",
+							"uri": "http://localhost:8000/auth/logout/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "2011",
+							"uri": "http://localhost:8000/auth/me",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3890",
+							"uri": "http://localhost:8000/auth/refresh",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1962",
+							"uri": "http://localhost:8000/auth/refresh",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3370",
+							"uri": "http://localhost:8000/auth/refresh/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "1039",
+							"uri": "http://localhost:8000/auth/register",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3375",
+							"uri": "http://localhost:8000/auth/register/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						}
+					],
+					"count": "32",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "501"
+				},
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 404 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "5",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3362",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "9",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/member@example.com",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3364",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/member@example.com\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "10",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/membership",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/membership",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3363",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/membership/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/membership\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "13",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3372",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2586",
+							"uri": "http://localhost:8000/computeMetadata/v1/",
+							"nodeName": "http:\/\/localhost:8000\/computeMetadata\/v1\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "2585",
+							"uri": "http://localhost:8000/computeMetadata/v1/",
+							"nodeName": "http:\/\/localhost:8000\/computeMetadata\/v1\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2584",
+							"uri": "http://localhost:8000/latest/meta-data/",
+							"nodeName": "http:\/\/localhost:8000\/latest\/meta-data\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "2580",
+							"uri": "http://localhost:8000/latest/meta-data/",
+							"nodeName": "http:\/\/localhost:8000\/latest\/meta-data\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2593",
+							"uri": "http://localhost:8000/metadata/instance",
+							"nodeName": "http:\/\/localhost:8000\/metadata\/instance",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2594",
+							"uri": "http://localhost:8000/metadata/v1",
+							"nodeName": "http:\/\/localhost:8000\/metadata\/v1",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2588",
+							"uri": "http://localhost:8000/opc/v1/instance/",
+							"nodeName": "http:\/\/localhost:8000\/opc\/v1\/instance\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "2587",
+							"uri": "http://localhost:8000/opc/v1/instance/",
+							"nodeName": "http:\/\/localhost:8000\/opc\/v1\/instance\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2590",
+							"uri": "http://localhost:8000/opc/v2/instance/",
+							"nodeName": "http:\/\/localhost:8000\/opc\/v2\/instance\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "2589",
+							"uri": "http://localhost:8000/opc/v2/instance/",
+							"nodeName": "http:\/\/localhost:8000\/opc\/v2\/instance\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2595",
+							"uri": "http://localhost:8000/openstack/latest/meta_data.json",
+							"nodeName": "http:\/\/localhost:8000\/openstack\/latest\/meta_data.json",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "34",
+							"uri": "http://localhost:8000",
+							"nodeName": "http:\/\/localhost:8000",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1957",
+							"uri": "http://localhost:8000?aaa=bbb",
+							"nodeName": "http:\/\/localhost:8000 (aaa)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "1951",
+							"uri": "http://localhost:8000?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000 (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "3376",
+							"uri": "http://localhost:8000/",
+							"nodeName": "http:\/\/localhost:8000\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3727",
+							"uri": "http://localhost:8000/.DS_Store",
+							"nodeName": "http:\/\/localhost:8000\/.DS_Store",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3756",
+							"uri": "http://localhost:8000/._darcs",
+							"nodeName": "http:\/\/localhost:8000\/._darcs",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3755",
+							"uri": "http://localhost:8000/.bzr",
+							"nodeName": "http:\/\/localhost:8000\/.bzr",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3694",
+							"uri": "http://localhost:8000/.env",
+							"nodeName": "http:\/\/localhost:8000\/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3708",
+							"uri": "http://localhost:8000/.git/config",
+							"nodeName": "http:\/\/localhost:8000\/.git\/config",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3754",
+							"uri": "http://localhost:8000/.hg",
+							"nodeName": "http:\/\/localhost:8000\/.hg",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3679",
+							"uri": "http://localhost:8000/.htaccess",
+							"nodeName": "http:\/\/localhost:8000\/.htaccess",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3704",
+							"uri": "http://localhost:8000/.idea/WebServers.xml",
+							"nodeName": "http:\/\/localhost:8000\/.idea\/WebServers.xml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3728",
+							"uri": "http://localhost:8000/.php_cs.cache",
+							"nodeName": "http:\/\/localhost:8000\/.php_cs.cache",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3739",
+							"uri": "http://localhost:8000/.ssh/id_dsa",
+							"nodeName": "http:\/\/localhost:8000\/.ssh\/id_dsa",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3738",
+							"uri": "http://localhost:8000/.ssh/id_rsa",
+							"nodeName": "http:\/\/localhost:8000\/.ssh\/id_rsa",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3710",
+							"uri": "http://localhost:8000/.svn/entries",
+							"nodeName": "http:\/\/localhost:8000\/.svn\/entries",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3712",
+							"uri": "http://localhost:8000/.svn/wc.db",
+							"nodeName": "http:\/\/localhost:8000\/.svn\/wc.db",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3700",
+							"uri": "http://localhost:8000/.zap2151333527333581765",
+							"nodeName": "http:\/\/localhost:8000\/.zap2151333527333581765",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "18",
+							"uri": "http://localhost:8000/169092646663187522",
+							"nodeName": "http:\/\/localhost:8000\/169092646663187522",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3757",
+							"uri": "http://localhost:8000/BitKeeper",
+							"nodeName": "http:\/\/localhost:8000\/BitKeeper",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3742",
+							"uri": "http://localhost:8000/CHANGELOG.txt",
+							"nodeName": "http:\/\/localhost:8000\/CHANGELOG.txt",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3713",
+							"uri": "http://localhost:8000/CVS/root",
+							"nodeName": "http:\/\/localhost:8000\/CVS\/root",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3729",
+							"uri": "http://localhost:8000/DEADJOE",
+							"nodeName": "http:\/\/localhost:8000\/DEADJOE",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3724",
+							"uri": "http://localhost:8000/FileZilla.xml",
+							"nodeName": "http:\/\/localhost:8000\/FileZilla.xml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3721",
+							"uri": "http://localhost:8000/WS_FTP.INI",
+							"nodeName": "http:\/\/localhost:8000\/WS_FTP.INI",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3719",
+							"uri": "http://localhost:8000/WS_FTP.ini",
+							"nodeName": "http:\/\/localhost:8000\/WS_FTP.ini",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3726",
+							"uri": "http://localhost:8000/WinSCP.ini",
+							"nodeName": "http:\/\/localhost:8000\/WinSCP.ini",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3753",
+							"uri": "http://localhost:8000/_framework/blazor.boot.json",
+							"nodeName": "http:\/\/localhost:8000\/_framework\/blazor.boot.json",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3752",
+							"uri": "http://localhost:8000/_wpeprivate/config.json",
+							"nodeName": "http:\/\/localhost:8000\/_wpeprivate\/config.json",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3740",
+							"uri": "http://localhost:8000/adminer.php",
+							"nodeName": "http:\/\/localhost:8000\/adminer.php",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "40",
+							"uri": "http://localhost:8000/api",
+							"nodeName": "http:\/\/localhost:8000\/api",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1987",
+							"uri": "http://localhost:8000/api?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3384",
+							"uri": "http://localhost:8000/api/",
+							"nodeName": "http:\/\/localhost:8000\/api\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3690",
+							"uri": "http://localhost:8000/api/.env",
+							"nodeName": "http:\/\/localhost:8000\/api\/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3676",
+							"uri": "http://localhost:8000/api/.htaccess",
+							"nodeName": "http:\/\/localhost:8000\/api\/.htaccess",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "19",
+							"uri": "http://localhost:8000/api/7935344329824204590",
+							"nodeName": "http:\/\/localhost:8000\/api\/7935344329824204590",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3686",
+							"uri": "http://localhost:8000/api/chats/.env",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3675",
+							"uri": "http://localhost:8000/api/chats/.htaccess",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/.htaccess",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "20",
+							"uri": "http://localhost:8000/api/chats/1839106942508757890",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/1839106942508757890",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3703",
+							"uri": "http://localhost:8000/api/chats/actuator/health",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1969",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000 (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1971",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000 (class.module.classLoader.DefaultAssertio...)({title,model,reasoning,webFetch})",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3386",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3685",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/.env",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3674",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/.htaccess",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/.htaccess",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "21",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/4925679457165797798",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/4925679457165797798",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "7",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1989",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1973",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members (class.module.classLoader.DefaultAssertio...)({email})",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3385",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3687",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/.env",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3671",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/.htaccess",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/.htaccess",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "22",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/9149924712412165513",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/9149924712412165513",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1961",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/member@example.com (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3645",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/trace.axd",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/trace.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1953",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/membership?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/membership (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "11",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1990",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1974",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages (class.module.classLoader.DefaultAssertio...)({content,attachmentIds:[]})",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3388",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3693",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/.env",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3672",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/.htaccess",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/.htaccess",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "23",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/4811639802357092566",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/4811639802357092566",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "50",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1956",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001 (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1964",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001 (class.module.classLoader.DefaultAssertio...)({content})",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3391",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3688",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.env",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3677",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.htaccess",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/.htaccess",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "24",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/579474626636818132",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/579474626636818132",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1952",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments (class.module.classLoader.DefaultAssertio...)(multipart:file)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1757",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/retry",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1954",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/retry (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3653",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/trace.axd",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/trace.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3647",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/trace.axd",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/trace.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1950",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/stop?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/stop (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3646",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/trace.axd",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/trace.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3649",
+							"uri": "http://localhost:8000/api/chats/trace.axd",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/trace.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3659",
+							"uri": "http://localhost:8000/api/trace.axd",
+							"nodeName": "http:\/\/localhost:8000\/api\/trace.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3731",
+							"uri": "http://localhost:8000/app/etc/local.xml",
+							"nodeName": "http:\/\/localhost:8000\/app\/etc\/local.xml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "57",
+							"uri": "http://localhost:8000/auth",
+							"nodeName": "http:\/\/localhost:8000\/auth",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1244",
+							"uri": "http://localhost:8000/auth",
+							"nodeName": "http:\/\/localhost:8000\/auth",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2004",
+							"uri": "http://localhost:8000/auth?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "3394",
+							"uri": "http://localhost:8000/auth/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "3691",
+							"uri": "http://localhost:8000/auth/.env",
+							"nodeName": "http:\/\/localhost:8000\/auth\/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "3680",
+							"uri": "http://localhost:8000/auth/.htaccess",
+							"nodeName": "http:\/\/localhost:8000\/auth\/.htaccess",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "25",
+							"uri": "http://localhost:8000/auth/1707693174031029430",
+							"nodeName": "http:\/\/localhost:8000\/auth\/1707693174031029430",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1945",
+							"uri": "http://localhost:8000/auth/login?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login (class.module.classLoader.DefaultAssertio...)({email,password})",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "1944",
+							"uri": "http://localhost:8000/auth/logout?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "4344",
+							"uri": "http://localhost:8000/auth/me",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2006",
+							"uri": "http://localhost:8000/auth/me?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "3392",
+							"uri": "http://localhost:8000/auth/me/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "1946",
+							"uri": "http://localhost:8000/auth/refresh?class.module.classLoader.DefaultAssertionStatus=nonsense",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh (class.module.classLoader.DefaultAssertio...)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "3657",
+							"uri": "http://localhost:8000/auth/trace.axd",
+							"nodeName": "http:\/\/localhost:8000\/auth\/trace.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "3744",
+							"uri": "http://localhost:8000/composer.json",
+							"nodeName": "http:\/\/localhost:8000\/composer.json",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3745",
+							"uri": "http://localhost:8000/composer.lock",
+							"nodeName": "http:\/\/localhost:8000\/composer.lock",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3706",
+							"uri": "http://localhost:8000/config/database.yml",
+							"nodeName": "http:\/\/localhost:8000\/config\/database.yml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3705",
+							"uri": "http://localhost:8000/config/databases.yml",
+							"nodeName": "http:\/\/localhost:8000\/config\/databases.yml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3717",
+							"uri": "http://localhost:8000/core",
+							"nodeName": "http:\/\/localhost:8000\/core",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3644",
+							"uri": "http://localhost:8000/elmah.axd",
+							"nodeName": "http:\/\/localhost:8000\/elmah.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3722",
+							"uri": "http://localhost:8000/filezilla.xml",
+							"nodeName": "http:\/\/localhost:8000\/filezilla.xml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3750",
+							"uri": "http://localhost:8000/i.php",
+							"nodeName": "http:\/\/localhost:8000\/i.php",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3737",
+							"uri": "http://localhost:8000/id_dsa",
+							"nodeName": "http:\/\/localhost:8000\/id_dsa",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3736",
+							"uri": "http://localhost:8000/id_rsa",
+							"nodeName": "http:\/\/localhost:8000\/id_rsa",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3749",
+							"uri": "http://localhost:8000/info.php",
+							"nodeName": "http:\/\/localhost:8000\/info.php",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3735",
+							"uri": "http://localhost:8000/key.pem",
+							"nodeName": "http:\/\/localhost:8000\/key.pem",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3701",
+							"uri": "http://localhost:8000/lfm.php",
+							"nodeName": "http:\/\/localhost:8000\/lfm.php",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3734",
+							"uri": "http://localhost:8000/myserver.key",
+							"nodeName": "http:\/\/localhost:8000\/myserver.key",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3748",
+							"uri": "http://localhost:8000/phpinfo.php",
+							"nodeName": "http:\/\/localhost:8000\/phpinfo.php",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3733",
+							"uri": "http://localhost:8000/privatekey.key",
+							"nodeName": "http:\/\/localhost:8000\/privatekey.key",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3747",
+							"uri": "http://localhost:8000/server-info",
+							"nodeName": "http:\/\/localhost:8000\/server-info",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3716",
+							"uri": "http://localhost:8000/server-status",
+							"nodeName": "http:\/\/localhost:8000\/server-status",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3732",
+							"uri": "http://localhost:8000/server.key",
+							"nodeName": "http:\/\/localhost:8000\/server.key",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3718",
+							"uri": "http://localhost:8000/sftp-config.json",
+							"nodeName": "http:\/\/localhost:8000\/sftp-config.json",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3723",
+							"uri": "http://localhost:8000/sitemanager.xml",
+							"nodeName": "http:\/\/localhost:8000\/sitemanager.xml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3743",
+							"uri": "http://localhost:8000/sites/default/files/.ht.sqlite",
+							"nodeName": "http:\/\/localhost:8000\/sites\/default\/files\/.ht.sqlite",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3730",
+							"uri": "http://localhost:8000/sites/default/private/files/backup_migrate/scheduled/test.txt",
+							"nodeName": "http:\/\/localhost:8000\/sites\/default\/private\/files\/backup_migrate\/scheduled\/test.txt",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3751",
+							"uri": "http://localhost:8000/test.php",
+							"nodeName": "http:\/\/localhost:8000\/test.php",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3663",
+							"uri": "http://localhost:8000/trace.axd",
+							"nodeName": "http:\/\/localhost:8000\/trace.axd",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3741",
+							"uri": "http://localhost:8000/vb_test.php",
+							"nodeName": "http:\/\/localhost:8000\/vb_test.php",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3746",
+							"uri": "http://localhost:8000/vim_settings.xml",
+							"nodeName": "http:\/\/localhost:8000\/vim_settings.xml",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3725",
+							"uri": "http://localhost:8000/winscp.ini",
+							"nodeName": "http:\/\/localhost:8000\/winscp.ini",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3720",
+							"uri": "http://localhost:8000/ws_ftp.ini",
+							"nodeName": "http:\/\/localhost:8000\/ws_ftp.ini",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3699",
+							"uri": "http://localhost:8000/zap7498493972413404712",
+							"nodeName": "http:\/\/localhost:8000\/zap7498493972413404712",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3406",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000 ()({title,model,reasoning,webFetch})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "6",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000 ()({title,model,reasoning,webFetch})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3382",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/ ()({title,model,reasoning,webFetch})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "14",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001 ()({content})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3368",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/ ()({content})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1968",
+							"uri": "http://localhost:8000",
+							"nodeName": "http:\/\/localhost:8000 ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "510",
+							"uri": "http://localhost:8000/?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/ (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "512",
+							"uri": "http://localhost:8000/?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/ (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1991",
+							"uri": "http://localhost:8000/api",
+							"nodeName": "http:\/\/localhost:8000\/api ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "513",
+							"uri": "http://localhost:8000/api?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "520",
+							"uri": "http://localhost:8000/api?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1982",
+							"uri": "http://localhost:8000/api/chats",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats ()(aaa)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "1977",
+							"uri": "http://localhost:8000/api/chats",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "160",
+							"uri": "http://localhost:8000/api/chats",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats ()({title,provider,model,reasoning,webFetch})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "489",
+							"uri": "http://localhost:8000/api/chats?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "494",
+							"uri": "http://localhost:8000/api/chats?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "1980",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000 ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2021",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000 ()(multipart:1,0)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "479",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "502",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1985",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members ()(aaa)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "1979",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "28",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members ()({email})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "8",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members ()({email})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "480",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "501",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "3365",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/ ()({email})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1966",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/member@example.com ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "481",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/member@example.com (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "499",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/member@example.com (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1970",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/membership",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/membership ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "485",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/membership?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/membership (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "497",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/membership?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/membership (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1986",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages ()(aaa)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "1984",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "12",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages ()({content,attachmentIds:[]})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "488",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "503",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "3366",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/ ()({content,attachmentIds:[]})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1975",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001 ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "483",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "498",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1983",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments ()(aaa)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "1976",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "80",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments ()(multipart:file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "17",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments ()(multipart:file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "484",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "506",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "3371",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/attachments\/ ()(multipart:file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "15",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/retry",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1963",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/retry ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "491",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/retry (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "505",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/retry (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3367",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/messages\/cm0example0000000000000001\/retry\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "16",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/stop",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/stop",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1972",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/stop",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/stop ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "500",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/stop?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/stop (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "508",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/stop?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/stop (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3379",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/stop/",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/stop\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2008",
+							"uri": "http://localhost:8000/auth",
+							"nodeName": "http:\/\/localhost:8000\/auth ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "525",
+							"uri": "http://localhost:8000/auth?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "530",
+							"uri": "http://localhost:8000/auth?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1965",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1118",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "493",
+							"uri": "http://localhost:8000/auth/login?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "496",
+							"uri": "http://localhost:8000/auth/login?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "3380",
+							"uri": "http://localhost:8000/auth/login/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "3883",
+							"uri": "http://localhost:8000/auth/logout",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "1958",
+							"uri": "http://localhost:8000/auth/logout",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "3377",
+							"uri": "http://localhost:8000/auth/logout/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2009",
+							"uri": "http://localhost:8000/auth/me",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "526",
+							"uri": "http://localhost:8000/auth/me?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "529",
+							"uri": "http://localhost:8000/auth/me?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "3",
+							"uri": "http://localhost:8000/auth/refresh",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "3889",
+							"uri": "http://localhost:8000/auth/refresh",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "1959",
+							"uri": "http://localhost:8000/auth/refresh",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh ()(class.module.classLoader.DefaultAssertio...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "486",
+							"uri": "http://localhost:8000/auth/refresh?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "495",
+							"uri": "http://localhost:8000/auth/refresh?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "3369",
+							"uri": "http://localhost:8000/auth/refresh/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "http://localhost:8000/auth/register",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "422",
+							"uri": "http://localhost:8000/auth/register",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "1037",
+							"uri": "http://localhost:8000/auth/register",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "487",
+							"uri": "http://localhost:8000/auth/register?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe \/C echo g5l3j47xny6w...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "509",
+							"uri": "http://localhost:8000/auth/register?-d+allow_url_include%3d1+-d+auto_prepend_file%3dphp://input",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo g5l3j47xny6wnifdl8du',$...)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "3374",
+							"uri": "http://localhost:8000/auth/register/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						}
+					],
+					"count": "230",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "13"
+				},
+				{
+					"pluginid": "10111",
+					"alertRef": "10111",
+					"alert": "Authentication Request Identified",
+					"name": "Authentication Request Identified",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>The given request has been identified as an authentication request. The 'Other Info' field contains a set of key=value lines which identify any relevant fields. If the request is in a context which has an Authentication Method set to \"Auto-Detect\" then this rule will change the authentication to match the request identified.</p>",
+					"instances":[ 
+						{
+							"id": "226",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "email",
+							"attack": "",
+							"evidence": "password",
+							"otherinfo": "userParam=email\nuserValue=zaproxy@example.com\npasswordParam=password"
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "<p>This is an informational alert rather than a vulnerability and so there is nothing to fix.</p>",
+					"otherinfo": "<p>userParam=email</p><p>userValue=zaproxy@example.com</p><p>passwordParam=password</p>",
+					"reference": "<p>https://www.zaproxy.org/docs/desktop/addons/authentication-helper/auth-req-id/</p>",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "4"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-1",
+					"alert": "Non-Storable Content",
+					"name": "Non-Storable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>",
+					"instances":[ 
+						{
+							"id": "265",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "DELETE ",
+							"otherinfo": ""
+						},
+						{
+							"id": "259",
+							"uri": "http://localhost:8000/api/chats",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats ()({title,provider,model,reasoning,webFetch})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "201",
+							"otherinfo": ""
+						},
+						{
+							"id": "262",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "256",
+							"uri": "http://localhost:8000/auth/refresh",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1",
+							"uri": "http://localhost:8000/auth/register",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>The content may be marked as storable by ensuring that the following conditions are satisfied:</p><p>The request method must be understood by the cache and defined as being cacheable (\"GET\", \"HEAD\", and \"POST\" are currently defined as cacheable)</p><p>The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)</p><p>The \"no-store\" cache directive must not appear in the request or response header fields</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"private\" response directive must not appear in the response</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"Authorization\" header field must not appear in the request, unless the response explicitly allows it (using one of the \"must-revalidate\", \"public\", or \"s-maxage\" Cache-Control response directives)</p><p>In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:</p><p>It must contain an \"Expires\" header field</p><p>It must contain a \"max-age\" response directive</p><p>For \"shared\" caches such as \"proxy\" caches, it must contain a \"s-maxage\" response directive</p><p>It must contain a \"Cache Control Extension\" that allows it to be cached</p><p>It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "13"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-3",
+					"alert": "Storable and Cacheable Content",
+					"name": "Storable and Cacheable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where \"shared\" caching servers such as \"proxy\" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.</p>",
+					"instances":[ 
+						{
+							"id": "261",
+							"uri": "http://localhost:8000/api/chats",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "252",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "267",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "257",
+							"uri": "http://localhost:8000/auth/me",
+							"nodeName": "http:\/\/localhost:8000\/auth\/me",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "255",
+							"uri": "http://localhost:8000/auth/logout",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						}
+					],
+					"count": "5",
+					"systemic": false,
+					"solution": "<p>Validate that the response does not contain sensitive, personal or user-specific information. If it does, consider the use of the following HTTP response headers, to limit, or prevent the content being stored and retrieved from the cache by another user:</p><p>Cache-Control: no-cache, no-store, must-revalidate, private</p><p>Pragma: no-cache</p><p>Expires: 0</p><p>This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers to not store the response, and to not retrieve the response (without validation) from the cache, in response to a similar request.</p>",
+					"otherinfo": "<p>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</p>",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "8"
+				},
+				{
+					"pluginid": "10104",
+					"alertRef": "10104",
+					"alert": "User Agent Fuzzer",
+					"name": "User Agent Fuzzer",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>Check for differences in response based on fuzzed User Agent (eg. mobile sites, access as a Search Engine Crawler). Compares the response statuscode and the hashcode of the response body with the original response.</p>",
+					"instances":[ 
+						{
+							"id": "3879",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000",
+							"method": "DELETE",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "3881",
+							"uri": "http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com",
+							"nodeName": "http:\/\/localhost:8000\/api\/chats\/cm0example0000000000000000\/members\/member@example.com",
+							"method": "DELETE",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "3888",
+							"uri": "http://localhost:8000/auth/logout",
+							"nodeName": "http:\/\/localhost:8000\/auth\/logout",
+							"method": "POST",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "3891",
+							"uri": "http://localhost:8000/auth/refresh",
+							"nodeName": "http:\/\/localhost:8000\/auth\/refresh",
+							"method": "POST",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "3886",
+							"uri": "http://localhost:8000/auth/register",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register ()({email,password})",
+							"method": "POST",
+							"param": "Header User-Agent",
+							"attack": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)",
+							"evidence": "",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "<p>https://owasp.org/wstg</p>",
+					"cweid": "0",
+					"wascid": "0",
+					"sourceid": "3748"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}
