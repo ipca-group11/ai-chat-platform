@@ -1,0 +1,40 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DTO snapshots > every SSE event, in the order of sseEventSchema 1`] = `
+[
+  {
+    "messageId": "<uuid>",
+    "token": "Hel",
+    "type": "token",
+  },
+  {
+    "messageId": "<uuid>",
+    "token": "Thinking",
+    "type": "reasoning",
+  },
+  {
+    "fetch": {
+      "id": "<uuid>",
+      "status": "done",
+      "title": "Example article",
+      "url": "https://example.com/article",
+    },
+    "messageId": "<uuid>",
+    "type": "web_fetch",
+  },
+  {
+    "messageId": "<uuid>",
+    "type": "done",
+  },
+  {
+    "message": "provider timeout",
+    "messageId": "<uuid>",
+    "type": "error",
+  },
+  {
+    "messageId": "<uuid>",
+    "position": 2,
+    "type": "queued",
+  },
+]
+`;
