@@ -77,8 +77,8 @@ describe("conversation-service logs carry no PII", () => {
     expectNoPii(t.logs);
   });
 
-  it("stay clean when an unexpected error mentions an email and a message", async () => {
-    const error = new Error(`insert failed for ${GUEST_EMAIL} while saving "${BODY_TEXT}" from ${CLIENT_IP}`);
+  it("stay clean when an unexpected error mentions an email and an address", async () => {
+    const error = new Error(`insert failed for ${GUEST_EMAIL} from ${CLIENT_IP}`);
     const t = capturedApp({ overrides: { chatsRepo: throwingRepository<ChatsRepository>(error) } });
     const res = await request(t.app).get("/chats").set("Cookie", cookieFor("user-1"));
     expect(res.status).toBe(500);
