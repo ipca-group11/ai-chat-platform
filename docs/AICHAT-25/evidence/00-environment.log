@@ -1,0 +1,6 @@
+$ node -v; pnpm -v; ollama --version
+v24.9.0
+10.4.0
+ollama version is 0.34.2
+
+[exit 0]

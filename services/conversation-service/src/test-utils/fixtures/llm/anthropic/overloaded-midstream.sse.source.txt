@@ -1,0 +1,2 @@
+hand-written from https://docs.anthropic.com/en/docs/build-with-claude/streaming#error-events
+Not recorded from a live API: written to match the documented wire format.

@@ -1,0 +1,2 @@
+hand-written from https://docs.anthropic.com/en/api/errors
+Not recorded from a live API: written to match the documented wire format.
