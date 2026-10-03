@@ -9,6 +9,9 @@
   "packageManager": "pnpm@10.4.0",
   "scripts": {
     "dev": "bash scripts/dev.sh",
+    "dev:mock": "bash scripts/dev-mock.sh",
+    "mock:up": "bash scripts/mock-compose.sh up",
+    "mock:down": "bash scripts/mock-compose.sh down",
     "nx": "nx",
     "lint": "nx run-many -t lint",
     "typecheck": "nx run-many -t typecheck",
