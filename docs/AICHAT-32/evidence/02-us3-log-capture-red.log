@@ -1,0 +1,204 @@
+$ pnpm -r --no-bail --filter @app/auth-service --filter @app/conversation-service exec vitest run src/integration/pii-logs.spec.ts
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+ ❯ src/integration/pii-logs.spec.ts (2 tests | 2 failed) 77ms
+   ❯ conversation-service logs carry no PII (2)
+     × stay clean across every route, success and failure 74ms
+     × stay clean when an unexpected error mentions an email and a message 3ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  21:25:39
+   Duration  580ms (import 49%, transform 31%, tests 16%, worker 4%)
+
+undefined
+ ❯ src/integration/pii-logs.spec.ts (2 tests | 2 failed) 884ms
+   ❯ auth-service logs carry no PII (2)
+     × stay clean across every route, success and failure 879ms
+     × stay clean when an unexpected error mentions an email 4ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  21:25:39
+   Duration  1.26s (tests 75%, import 15%, transform 9%, worker 1%)
+
+undefined
+ ERR_PNPM_RECURSIVE_FAIL  
+
+
+Summary: 2 fails, 0 passes
+
+/Users/truezone/Projects/ai-chat-platform/services/auth-service:
+ ERROR  Command failed with exit code 1: vitest run src/integration/pii-logs.spec.ts
+
+/Users/truezone/Projects/ai-chat-platform/services/conversation-service:
+ ERROR  Command failed with exit code 1: vitest run src/integration/pii-logs.spec.ts
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/pii-logs.spec.ts > conversation-service logs carry no PII > stay clean across every route, success and failure
+AssertionError: expected 'canary "PII-CANARY-7f3a" on line 7' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ canary "PII-CANARY-7f3a" on line 7
+
+ ❯ expectNoPii src/integration/pii-logs.spec.ts:32:67
+     30| function expectNoPii(logs: ReturnType<typeof createLogCapture>) {
+     31|   expect(logs.lines().length).toBeGreaterThan(0); // the test must hav…
+     32|   expect(describePii(findPiiInLines(logs.lines(), { canaries }))).toBe…
+       |                                                                   ^
+     33| }
+     34|
+ ❯ src/integration/pii-logs.spec.ts:77:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/integration/pii-logs.spec.ts > conversation-service logs carry no PII > stay clean when an unexpected error mentions an email and a message
+AssertionError: expected 'email "guest.canary@pii-canary.exampl…' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ email "guest.canary@pii-canary.example.com" on line 1
++ canary "guest.canary@pii-canary.example.com" on line 1
++ canary "PII-CANARY-7f3a" on line 1
++ ip "203.0.113.77" on line 1
+
+ ❯ expectNoPii src/integration/pii-logs.spec.ts:32:67
+     30| function expectNoPii(logs: ReturnType<typeof createLogCapture>) {
+     31|   expect(logs.lines().length).toBeGreaterThan(0); // the test must hav…
+     32|   expect(describePii(findPiiInLines(logs.lines(), { canaries }))).toBe…
+       |                                                                   ^
+     33| }
+     34|
+ ❯ src/integration/pii-logs.spec.ts:85:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+stderr | src/integration/pii-logs.spec.ts > auth-service logs carry no PII > stay clean across every route, success and failure
+ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+    at Object.xForwardedForHeader (file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/express-rate-limit@8.7.0_express@4.22.3/node_modules/express-rate-limit/dist/index.mjs:358:13)
+    at Object.wrappedValidations.<computed> [as xForwardedForHeader] (file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/express-rate-limit@8.7.0_express@4.22.3/node_modules/express-rate-limit/dist/index.mjs:683:22)
+    at Object.keyGenerator (file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/express-rate-limit@8.7.0_express@4.22.3/node_modules/express-rate-limit/dist/index.mjs:793:20)
+    at file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/express-rate-limit@8.7.0_express@4.22.3/node_modules/express-rate-limit/dist/index.mjs:883:32
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/express-rate-limit@8.7.0_express@4.22.3/node_modules/express-rate-limit/dist/index.mjs:836:5 {
+  code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+  help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+}
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/pii-logs.spec.ts > auth-service logs carry no PII > stay clean across every route, success and failure
+AssertionError: expected 'ip "203.0.113.77" on line 1\ncanary "…' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ ip "203.0.113.77" on line 1
++ canary "203.0.113.77" on line 1
++ ip "127.0.0.1" on line 1
++ ip "::ffff:127" on line 1
++ ip "203.0.113.77" on line 2
++ canary "203.0.113.77" on line 2
++ ip "127.0.0.1" on line 2
++ ip "::ffff:127" on line 2
++ email "ana.canary@pii-canary.example.com" on line 3
++ canary "ana.canary@pii-canary.example.com" on line 3
++ email "bo.canary@pii-canary.example.com" on line 3
++ canary "bo.canary@pii-canary.example.com" on line 3
++ canary "PII-CANARY-7f3a" on line 3
++ ip "203.0.113.77" on line 3
++ canary "203.0.113.77" on line 3
++ ip "127.0.0.1" on line 3
++ ip "::ffff:127" on line 3
++ ip "127.0.0.1" on line 4
++ ip "::ffff:127" on line 4
++ ip "203.0.113.77" on line 5
++ canary "203.0.113.77" on line 5
++ ip "127.0.0.1" on line 5
++ ip "::ffff:127" on line 5
++ ip "203.0.113.77" on line 6
++ canary "203.0.113.77" on line 6
++ ip "127.0.0.1" on line 6
++ ip "::ffff:127" on line 6
++ ip "203.0.113.77" on line 7
++ canary "203.0.113.77" on line 7
++ ip "127.0.0.1" on line 7
++ ip "::ffff:127" on line 7
++ ip "127.0.0.1" on line 8
++ ip "::ffff:127" on line 8
++ email "ana.canary@pii-canary.example.com" on line 9
++ canary "ana.canary@pii-canary.example.com" on line 9
++ ip "203.0.113.77" on line 9
++ canary "203.0.113.77" on line 9
++ ip "127.0.0.1" on line 9
++ ip "::ffff:127" on line 9
++ ip "203.0.113.77" on line 10
++ canary "203.0.113.77" on line 10
++ ip "127.0.0.1" on line 10
++ ip "::ffff:127" on line 10
++ ip "203.0.113.77" on line 11
++ canary "203.0.113.77" on line 11
++ ip "127.0.0.1" on line 11
++ ip "::ffff:127" on line 11
++ ip "203.0.113.77" on line 12
++ canary "203.0.113.77" on line 12
++ ip "127.0.0.1" on line 12
++ ip "::ffff:127" on line 12
++ ip "203.0.113.77" on line 13
++ canary "203.0.113.77" on line 13
++ ip "127.0.0.1" on line 13
++ ip "::ffff:127" on line 13
++ ip "203.0.113.77" on line 14
++ canary "203.0.113.77" on line 14
++ ip "127.0.0.1" on line 14
++ ip "::ffff:127" on line 14
+
+ ❯ expectNoPii src/integration/pii-logs.spec.ts:29:86
+     27| function expectNoPii(logs: ReturnType<typeof createLogCapture>) {
+     28|   expect(logs.lines().length).toBeGreaterThan(0); // the test must hav…
+     29|   expect(describePii(findPiiInLines(logs.lines(), { canaries, ignore: …
+       |                                                                                      ^
+     30| }
+     31|
+ ❯ src/integration/pii-logs.spec.ts:58:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/integration/pii-logs.spec.ts > auth-service logs carry no PII > stay clean when an unexpected error mentions an email
+AssertionError: expected 'ip "127.0.0.1" on line 1\nip "::ffff:…' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ ip "127.0.0.1" on line 1
++ ip "::ffff:127" on line 1
++ email "ana.canary@pii-canary.example.com" on line 1
++ canary "ana.canary@pii-canary.example.com" on line 1
++ ip "203.0.113.77" on line 1
++ canary "203.0.113.77" on line 1
++ canary "PII-CANARY-7f3a" on line 1
++ ip "127.0.0.1" on line 2
++ ip "::ffff:127" on line 2
+
+ ❯ expectNoPii src/integration/pii-logs.spec.ts:29:86
+     27| function expectNoPii(logs: ReturnType<typeof createLogCapture>) {
+     28|   expect(logs.lines().length).toBeGreaterThan(0); // the test must hav…
+     29|   expect(describePii(findPiiInLines(logs.lines(), { canaries, ignore: …
+       |                                                                                      ^
+     30| }
+     31|
+ ❯ src/integration/pii-logs.spec.ts:66:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+[exit 1]

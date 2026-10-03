@@ -1,12 +1,21 @@
-$ pnpm --filter @platform/test-utils exec vitest run src/pii.test.ts
+$ pnpm --filter @platform/pii-detector --filter @platform/test-utils exec vitest run src/pii.spec.ts src/pii.test.ts
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/pii-detector
+
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  21:25:35
+   Duration  115ms (transform 58%, import 20%, tests 14%, worker 8%)
+
 
  RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/test-utils
 
 
  Test Files  1 passed (1)
-      Tests  13 passed (13)
-   Start at  21:21:44
-   Duration  625ms (environment 65%, setup 22%, transform 10%, tests 1%, worker 1%)
+      Tests  1 passed (1)
+   Start at  21:25:35
+   Duration  809ms (environment 68%, setup 23%, transform 8%, worker 1%, tests 1%)
 
 
 [exit 0]

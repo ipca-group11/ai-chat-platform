@@ -1,0 +1,15 @@
+$ pnpm --filter @app/shell exec vitest run src/shared/observability
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/shell
+
+
+ Test Files  3 passed (3)
+      Tests  17 passed (17)
+   Start at  21:32:07
+   Duration  1.06s (environment 52%, setup 22%, tests 14%, transform 9%, import 3%, worker 2%)
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./module-federation.config" without a file extension (vite.config.ts:6:36). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+[exit 0]
