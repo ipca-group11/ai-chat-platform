@@ -111,6 +111,45 @@ pnpm nx run-many -t test --skip-nx-cache
 - `eslint-config` and `test-config` now depend on each other, which made Nx report a circular task graph. We set the no-op `eslint-config:build` to `dependsOn: []` and switched off the circular-dependency lint rule for `test-config/eslint.config.js` only.
 - Lowered branch threshold for `apps/mfe-chat` and `apps/mfe-settings` from 80 to 75 follows the agreed app group. Their measured values still pass.
 
+### US3 · Enforce coverage in shell, ui, mfe-auth and e2e ([AICHAT-100](https://ipca-grupo11.atlassian.net/browse/AICHAT-100))
+
+**What and why.** Four projects did not enforce coverage in CI: `apps/shell` and `packages/ui` ran `vitest run` without `--coverage`, and `apps/mfe-auth` and `e2e` had no thresholds (the preset from US2 now gives them one). We turned `--coverage` on in the first two. `apps/shell` is below its target, so we applied the ratchet policy instead of lowering the bar.
+
+**Files.**
+- `apps/shell/package.json`, `apps/shell/project.json`, `packages/ui/package.json`, `packages/ui/project.json` (`vitest run --coverage`).
+- `apps/shell/vite.config.ts` (ratcheted thresholds with dated TODOs).
+- Thresholds for `apps/mfe-auth` (80/75/80/80) and `e2e` (80/70/80/80) come from the preset set up in US2.
+
+**How to run.**
+```sh
+pnpm nx run shell:test --skip-nx-cache   # also ui, mfe-auth, e2e
+```
+
+**How to repeat it manually.**
+1. Clean checkout of the branch, `pnpm install`.
+2. `pnpm nx run shell:test --skip-nx-cache`. Expected: 24 tests pass, a coverage table with "All files | 68.71 | 60.97 | 62.12 | 70.51", exit 0.
+3. Repeat for `ui`, `mfe-auth`, `e2e`. Expected: exit 0 and the numbers below.
+4. Check that `coverage/coverage-summary.json` exists in each of the four projects.
+
+**Result.**
+
+| Project | Statements | Branches | Functions | Lines | Thresholds (S/B/F/L) |
+|---|---|---|---|---|---|
+| `apps/shell` | 68.71 | 60.97 | 62.12 | 70.51 | 68/60/62/70 (ratchet, target 80/75/80/80) |
+| `packages/ui` | 97.20 | 80.48 | 92.06 | 97.20 | 80/80/80/80 |
+| `apps/mfe-auth` | 92.23 | 75.40 | 93.10 | 92.23 | 80/75/80/80 |
+| `e2e` | 80.95 | 77.77 | 81.25 | 82.05 | 80/70/80/80 |
+
+![shell](evidence/07-after-shell.png)
+![ui](evidence/08-after-ui.png)
+![mfe-auth](evidence/09-after-mfe-auth.png)
+![e2e](evidence/10-after-e2e.png)
+![json-summary](evidence/11-json-summary.png)
+
+`pnpm test` (all projects) is run at the end of the epic, see section 5.
+
+**Problems and fixes.** Nothing failed. The numbers are identical to the US1 measurement, so moving to the preset did not change what is counted. The `html` reporter used by these projects was replaced by the shared `text` + `lcov` + `json-summary` set.
+
 ## 4. How to run everything
 
 ```sh
