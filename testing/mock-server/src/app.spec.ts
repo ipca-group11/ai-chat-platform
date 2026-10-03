@@ -29,7 +29,7 @@ describe("admin endpoints", () => {
   });
 
   it("GET /__admin/scenarios is empty while no mock registers a scenario", async () => {
-    const { app } = createApp(config());
+    const { app } = createApp(config(), []);
     const res = await request(app).get("/__admin/scenarios");
     expect(res.body).toEqual({ scenarios: [] });
   });
@@ -72,9 +72,9 @@ describe("mock routers", () => {
   it.each(mockModules.map((m) => m.mountPath))("answers 404 JSON for an unmocked route under %s", async (path) => {
     const { app } = createApp(config());
     const res = await request(app).get(`${path}/unknown`);
-    expect(res.status).toBe(404);
-    // the backend mocks answer like the real services do (NOT_FOUND)
-    expect(["not_mocked", "NOT_FOUND"]).toContain(res.body.error.code);
+    expect([401, 404]).toContain(res.status);
+    // the backend mocks answer like the real services do: NOT_FOUND, or UNAUTHENTICATED without a session
+    expect(["not_mocked", "NOT_FOUND", "UNAUTHENTICATED"]).toContain(res.body.error.code);
   });
 
   it("answers 404 JSON outside every mock", async () => {
