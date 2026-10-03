@@ -2,3 +2,8 @@
 cd64fd22d8841aee77857621e5d0a8d9d31d9ed9:services/auth-service/src/integration/session-tokens-in-logs.spec.ts:generic-api-key:46
 06bf28b05c80727667d07693ff3e2db5fdb0787e:packages/pii-detector/src/pii.spec.ts:generic-api-key:47
 417cd7909e029def675fea5c63d5d4c5353d2d62:packages/test-utils/src/pii.test.ts:generic-api-key:47
+# Fake test JWT (sub "u1", signature "signature") quoted in the AICHAT-32 work log and the red-run evidence of US4/US6.
+933864272e9235957e016ea4dd2042a197a9ca39:docs/AICHAT-32/WORKLOG.md:generic-api-key:151
+933864272e9235957e016ea4dd2042a197a9ca39:docs/AICHAT-32/evidence/08-us6-faro-collect-red.log:generic-api-key:29
+933864272e9235957e016ea4dd2042a197a9ca39:docs/AICHAT-32/evidence/08-us6-faro-collect-red.log:generic-api-key:66
+933864272e9235957e016ea4dd2042a197a9ca39:docs/AICHAT-32/evidence/08-us6-faro-collect-red.log:generic-api-key:86
