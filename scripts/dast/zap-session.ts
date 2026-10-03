@@ -4,7 +4,7 @@
 //   ZAP_OPTS="$(node scripts/dast/zap-session.ts)"; zap-baseline.py ... -z "$ZAP_OPTS"
 // The cookie is a live session of a throw-away account on a local stack. It is only written to stdout, never to a file.
 // Variables: DAST_BASE_URL (default http://localhost:8000, the shell, which proxies /auth and /api),
-// DAST_EMAIL, DAST_PASSWORD, DAST_CHATS (number of chats to seed, default 3).
+// DAST_EMAIL, DAST_PASSWORD (required), DAST_CHATS (number of chats to seed, default 3).
 import { pathToFileURL } from 'node:url';
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
@@ -71,7 +71,9 @@ export async function signInSeededUser(base: string, email: string, password: st
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const base = (process.env['DAST_BASE_URL'] ?? 'http://localhost:8000').replace(/\/$/, '');
   const email = process.env['DAST_EMAIL'] ?? 'dast-user@dast.example.com';
-  const password = process.env['DAST_PASSWORD'] ?? 'DastScan-1234';
+  // No literal fallback here (a secret must not have a default in code); run.sh sets the password of the throw-away account.
+  const password = process.env['DAST_PASSWORD'];
+  if (!password) throw new Error('DAST_PASSWORD is not set (testing/zap/run.sh sets it for the local stack)');
   const cookie = await signInSeededUser(base, email, password, Number(process.env['DAST_CHATS'] ?? 3));
   // The access token is all the services check; it is valid for ACCESS_TOKEN_TTL_SECONDS (the stack is started with 3600).
   process.stdout.write(buildReplacerOptions(pickCookies(cookie, ['access_token'])));

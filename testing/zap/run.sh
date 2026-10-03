@@ -45,7 +45,8 @@ cp testing/zap/openapi.yaml "$results/openapi.yaml" 2> /dev/null || true
 
 zap_args=(-c rules.tsv -r "$name.html" -J "$name.json" -w "$name.md")
 if [ "$auth" = "1" ]; then
-  opts="$(DAST_BASE_URL="$base" node scripts/dast/zap-session.ts)"
+  # The account only exists on the throw-away stack, so a fixed password is fine here.
+  opts="$(DAST_BASE_URL="$base" DAST_PASSWORD="${DAST_PASSWORD:-DastScan-1234}" node scripts/dast/zap-session.ts)"
   # The cookie must not appear in a CI log: mask it before anything can print it.
   if [ -n "${GITHUB_ACTIONS:-}" ]; then echo "::add-mask::${opts##*replacement=}"; fi
   zap_args+=(-z "$opts")
