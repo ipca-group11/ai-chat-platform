@@ -42,7 +42,8 @@ All stories were created in Jira on 2026-10-03 as children of their epic, assign
 
 ## Suggested order
 
-Ordered by value, how blocked each epic is, and dependencies between them:
+Ordered by value, how blocked each epic is, and dependencies between them. The binding order, with waves and start
+commands, is in [EPIC-PLAN.md](EPIC-PLAN.md).
 
 1. **Quick wins that unblock others:** AICHAT-34 (coverage enforcement, needed by 17 and by João Vieira's AICHAT-16), AICHAT-31 (history scan; a real `.env.credentials` exists locally), AICHAT-27 (SAST; finds the JWT default secret).
 2. **Core LLM risk:** AICHAT-25 (recorded replay; already found 2 defects), then AICHAT-24 (mock LLM reuses the fixtures).

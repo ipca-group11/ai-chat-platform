@@ -13,6 +13,7 @@ epics listed in [AICHAT-EPICS.md](AICHAT-EPICS.md).
 | Jira project | [AICHAT](https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list) |
 | Owner of every epic and story | Jean-Pierre Carvalho |
 | Board columns | TODO → In Progress → Review → Done |
+| Execution order | [EPIC-PLAN.md](EPIC-PLAN.md) |
 | Per-epic analysis | `docs/AICHAT-<n>/README.md` (goal, current state, plan, stories, risks) |
 | Per-epic work log | `docs/AICHAT-<n>/WORKLOG.md` (what was done, how to run it, how to repeat it by hand, evidence) |
 | Evidence (screenshots, logs, reports) | `docs/AICHAT-<n>/evidence/` |
@@ -36,34 +37,12 @@ epics listed in [AICHAT-EPICS.md](AICHAT-EPICS.md).
 
 ## 1. Start the epic
 
-1. Pick the next epic from the order below (dependencies first). Only **one epic In Progress at a time**.
+1. Pick the next epic from [EPIC-PLAN.md](EPIC-PLAN.md) (dependencies first). Only **one epic In Progress at a time**.
 2. In Jira, move the epic **TODO → In Progress** (transition *Em andamento*).
 3. Check the epic and every child story are assigned to the owner.
 4. Add a comment to the epic: `Started <date>. Work log: docs/AICHAT-<n>/WORKLOG.md`.
 
-**Recommended order**
-
-| # | Epic | Why here |
-|---|---|---|
-| 1 | AICHAT-34 Coverage thresholds | Sets the quality gate the other test epics are measured against |
-| 2 | AICHAT-17 Unit testing | Base of the test pyramid |
-| 3 | AICHAT-18 Component testing | Builds on the unit-test helpers |
-| 4 | AICHAT-20 Snapshot testing | Small, no blockers |
-| 5 | AICHAT-23 Integration testing | Needs the backend fakes |
-| 6 | AICHAT-144 Mock server | Unblocks E2E chat flows, load, DAST, prompt-injection and frontend-only tests |
-| 7 | AICHAT-25 Provider adapter testing | Needs one recording run with API keys |
-| 8 | AICHAT-27 SAST | Security baseline, no blockers |
-| 9 | AICHAT-31 Secret scanning | Security baseline, no blockers |
-| 10 | AICHAT-30 SBOM generation | Plugs into the image build |
-| 11 | AICHAT-28 DAST | Reuses the e2e stack |
-| 12 | AICHAT-22 Bundle size budget | Needs agreed limits |
-| 13 | AICHAT-21 Performance testing (frontend) | Needs agreed budgets |
-| 14 | AICHAT-19 Visual regression | Needs the e2e harness and the font decision |
-| 15 | AICHAT-24 Load testing | Needs the mock server (AICHAT-144) |
-| 16 | AICHAT-32 PII masking | Needs the masking rule |
-| 17 | AICHAT-26 Prompt injection | Needs the system-prompt decision and an API budget |
-| 18 | AICHAT-33 GDPR retention and deletion | Blocked until the user deletion endpoint exists |
-| 19 | AICHAT-29 Penetration testing | Last: tests everything above; needs rules of engagement |
+**Order**: follow [EPIC-PLAN.md](EPIC-PLAN.md) (waves, dependencies and the start command for every epic).
 
 ## 2. Definition of Ready review
 
