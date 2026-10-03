@@ -11,7 +11,7 @@ title: "AICHAT-23 · Integration testing: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-23-integration-testing` |
 | Started / finished | 2026-10-03 / 2026-10-03 |
-| Pull requests | pending (branch not pushed yet) |
+| Pull requests | [#15](https://github.com/ipca-group11/ai-chat-platform/pull/15) |
 | Status | Ready for review |
 
 ## 1. DoR review
