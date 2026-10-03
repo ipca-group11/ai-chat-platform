@@ -9,10 +9,10 @@
 # integration pass.
 name: e2e
 
+# Team decision 2026-10-03 (AICHAT-17): the full suite takes 15+ minutes per run, so it no
+# longer runs on pull requests or pushes. Run it by hand from the Actions tab
+# (workflow_dispatch) before a release or when a change touches the user flows.
 on:
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch: {}
 
 jobs:

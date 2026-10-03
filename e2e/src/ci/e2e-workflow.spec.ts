@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 
 /**
  * Structural checks on `.github/workflows/e2e.yml` (O8, AC-100): the e2e suite must run in
- * CI, triggered on every pull request (so it can gate merges) as well as on push to main
- * and manually. Actually marking the job as a *required* status check is a repo-admin
+ * CI on demand (`workflow_dispatch`); since 2026-10-03 it no longer runs on every pull request
+ * because the full suite is too slow. Actually marking the job as a *required* status check is a repo-admin
  * branch-protection action outside any pod's file ownership (see PLAN.md "Known gaps") and
  * isn't something a workflow-file test can assert; this suite only verifies the workflow
  * itself is wired up correctly to produce that status check.
@@ -15,9 +15,11 @@ const workflowPath = fileURLToPath(new URL("../../../.github/workflows/e2e.yml",
 const workflow = readFileSync(workflowPath, "utf-8");
 
 describe("e2e CI workflow (AC-100)", () => {
-  it("AC-100: runs on every pull request so its result can gate merges", () => {
+  it("runs only on demand (team decision 2026-10-03: the full suite is too slow for every pull request)", () => {
     expect(workflow).toMatch(/^on:/m);
-    expect(workflow).toMatch(/pull_request:/);
+    expect(workflow).toMatch(/workflow_dispatch:/);
+    expect(workflow).not.toMatch(/^\s+pull_request:/m);
+    expect(workflow).not.toMatch(/^\s+push:/m);
   });
 
   it("AC-100: brings up the full docker-compose stack before testing", () => {
