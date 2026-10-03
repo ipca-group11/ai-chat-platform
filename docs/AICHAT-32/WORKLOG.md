@@ -233,7 +233,7 @@ pnpm exec nx affected -t lint typecheck test build --base=origin/integration/tes
 
 | Metric | Before | After |
 |---|---|---|
-| PII tests on telemetry | none | 36 (detector 13+1, logs 4, tokens 4, metrics 4, Faro 3 capture + 12 scrubber and wiring) |
+| PII tests on telemetry | none | 40 (detector 13+1, logs 4, tokens 4, metrics 4, Faro 3 capture + 11 scrubber and wiring) |
 | auth-service log line | client address, all request headers, URL with query, `Set-Cookie` with both tokens, error message with email | id, method, path, status code; errors as type and scrubbed message |
 | conversation-service log line | attachment name of a rejected upload, email and address in error messages | scrubbed error, no file name |
 | `/metrics` | clean | clean, now guarded by a test; unmatched route test in both services |
