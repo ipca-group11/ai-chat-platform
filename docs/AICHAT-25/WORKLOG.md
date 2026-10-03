@@ -43,12 +43,12 @@ Blockers: none
 
 ### US1 · Script to record real provider streams ([AICHAT-46](https://ipca-grupo11.atlassian.net/browse/AICHAT-46))
 
-**What and why.** We wrote `scripts/record-llm-fixtures.mjs`, which sends one small prompt per scenario and stores the raw response bytes as `.sse` fixtures, so the adapter tests replay real wire data instead of events we typed by hand. The plan has no paid API (D5), so the script targets a local Ollama by default: OpenAI-format streams through `/v1/chat/completions` and Anthropic-format streams through `/v1/messages`. Ollama 0.34.2 serves both. Base URLs, models and keys come from env vars (`OPENAI_BASE_URL`, `OPENAI_MODEL`, `OPENAI_API_KEY`, and the `ANTHROPIC_` equivalents), so the same script records from the real APIs later. It is manual only and never runs in CI. Before writing, it replaces ids (`id`, `request_id`, `msg_...`, `chatcmpl-...`), `created` timestamps, `system_fingerprint`, token counts that depend on the server cache, and any copy of the key with stable placeholders.
+**What and why.** We wrote `scripts/record-llm-fixtures.ts`, which sends one small prompt per scenario and stores the raw response bytes as `.sse` fixtures, so the adapter tests replay real wire data instead of events we typed by hand. The plan has no paid API (D5), so the script targets a local Ollama by default: OpenAI-format streams through `/v1/chat/completions` and Anthropic-format streams through `/v1/messages`. Ollama 0.34.2 serves both. Base URLs, models and keys come from env vars (`OPENAI_BASE_URL`, `OPENAI_MODEL`, `OPENAI_API_KEY`, and the `ANTHROPIC_` equivalents), so the same script records from the real APIs later. It is manual only and never runs in CI. Before writing, it replaces ids (`id`, `request_id`, `msg_...`, `chatcmpl-...`), `created` timestamps, `system_fingerprint`, token counts that depend on the server cache, and any copy of the key with stable placeholders.
 
 Recorded with Ollama: `anthropic/text.sse`, `anthropic/max-tokens.sse`, `openai/text.sse`, `openai/max-tokens.sse` (both truncation cases are producible with `max_tokens: 10`). Written by hand from the provider documentation, because a local model cannot produce them: Anthropic thinking and signature, `pause_turn` (two files), web fetch error, mid-stream `overloaded_error`, `text-ping.sse` (Ollama sends no `ping`), HTTP 400/401/429/529; OpenAI `reasoning.sse`, mid-stream `error`, HTTP 400/401/429/500. Each hand-written file has a `<file>.source.txt` sidecar that starts with "hand-written from <doc URL>".
 
 **Files.**
-- `scripts/record-llm-fixtures.mjs` (new): the recording script and its scrubber.
+- `scripts/record-llm-fixtures.ts` (new): the recording script and its scrubber.
 - `services/conversation-service/src/test-utils/fixtures/llm/{anthropic,openai}/*` (new): the `.sse` and `.json` fixtures and the `.source.txt` sidecars.
 - `services/conversation-service/src/test-utils/fixtures/llm/README.md` (new): which fixtures are recorded and which are hand-written, and how to re-record.
 
@@ -56,14 +56,14 @@ Recorded with Ollama: `anthropic/text.sse`, `anthropic/max-tokens.sse`, `openai/
 
 ```sh
 # needs Ollama running with the model: ollama pull llama3.2:1b
-node scripts/record-llm-fixtures.mjs            # both providers
-node scripts/record-llm-fixtures.mjs openai     # one provider
+node scripts/record-llm-fixtures.ts            # both providers
+node scripts/record-llm-fixtures.ts openai     # one provider
 ```
 
 **How to repeat it manually.**
 
 1. Start Ollama and pull the model: `ollama serve` and `ollama pull llama3.2:1b`.
-2. From the repo root run `node scripts/record-llm-fixtures.mjs`.
+2. From the repo root run `node scripts/record-llm-fixtures.ts`.
 3. Expected output: four `recorded <provider>/<file> (<n> bytes)` lines and no change in `git status` for the fixtures folder (a second run is byte-identical). To record from the real APIs set `OPENAI_BASE_URL=https://api.openai.com OPENAI_MODEL=gpt-4o OPENAI_API_KEY=...` (and the Anthropic variables), run the script, and review the diff before committing.
 
 **Result.** The four recorded fixtures are written with placeholders, with accents in the text (`ça`, `enção`) so multi-byte characters are covered. A second run produces identical files.
@@ -186,7 +186,7 @@ pnpm exec nx affected -t lint typecheck test --base=origin/integration/testing-e
 # only the replay tests
 cd services/conversation-service && npx vitest run src/test-utils src/features/llm-adapters/recorded-replay.spec.ts
 # manual, needs Ollama: re-record the fixtures
-node scripts/record-llm-fixtures.mjs
+node scripts/record-llm-fixtures.ts
 ```
 
 ![nx affected](evidence/06-nx-affected.png)

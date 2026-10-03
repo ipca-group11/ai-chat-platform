@@ -22,7 +22,7 @@ Needs Docker running.
 
 ```sh
 scripts/ci/semgrep.sh                                      # writes semgrep-results/semgrep.sarif
-node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif   # table; exit 1 when an ERROR is left
+node scripts/ci/sast-summary.ts semgrep-results/semgrep.sarif   # table; exit 1 when an ERROR is left
 ```
 
 Both steps in one command, the same gate as CI: `pnpm sast`. `semgrep.sh` alone always exits 0; only the summary step fails on an ERROR finding.

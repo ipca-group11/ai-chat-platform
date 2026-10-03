@@ -51,20 +51,20 @@ now, so nobody has to edit it later and the teams do not get merge conflicts on 
 **Files.**
 - `docs/AICHAT-17/UNIT-TEST-POLICY.md` (new): the policy, the source-file rules, the three exempt categories, the list format, who edits it. Linked from the epic README.
 - `packages/workspace-config/unit-test-exempt.json` (new): 50 entries, each with `path`, `category` and one `reason`. It sits in `workspace-config` so the guard of AICHAT-138 can read it.
-- `scripts/unit-test/source-files.mjs` (new): lists the source files with the rules of README section 4.1, shows which have a test or an entry, and `--check` validates the exempt list (exit 1 on a stale path, a missing reason, an unknown category, or an exempt file that now has a test).
+- `scripts/unit-test/source-files.ts` (new): lists the source files with the rules of README section 4.1, shows which have a test or an entry, and `--check` validates the exempt list (exit 1 on a stale path, a missing reason, an unknown category, or an exempt file that now has a test).
 - `docs/AICHAT-17/README.md`: link to the policy and the list.
 
 **How to run.**
 
 ```sh
-node scripts/unit-test/source-files.mjs --check   # validates the exempt list
-node scripts/unit-test/source-files.mjs           # per project: files, own test, exempt, neither
-node scripts/unit-test/source-files.mjs --list | grep NO-TEST   # what is left to test
+node scripts/unit-test/source-files.ts --check   # validates the exempt list
+node scripts/unit-test/source-files.ts           # per project: files, own test, exempt, neither
+node scripts/unit-test/source-files.ts --list | grep NO-TEST   # what is left to test
 ```
 
 **How to repeat it manually.**
 
-1. From the repository root run `node scripts/unit-test/source-files.mjs --check`.
+1. From the repository root run `node scripts/unit-test/source-files.ts --check`.
 2. Open `packages/workspace-config/unit-test-exempt.json` and pick an entry: its file must exist and have no `*.test.*` / `*.spec.*` next to it.
 3. Expected output: `245 source files, 50 exempt entries, 0 problems`, exit code 0. Add a test next to an exempt file and the check fails with "exempt but has its own test".
 
@@ -186,7 +186,7 @@ Nothing is left over for the per-project stories on the MFE side; the shell has 
 
 **How to run.** `pnpm exec nx test mfe-auth`.
 
-**How to repeat it manually.** `cd apps/mfe-auth && pnpm exec vitest run --coverage`; `node scripts/unit-test/source-files.mjs --list | grep NO-TEST | grep apps/mfe-auth/` prints nothing.
+**How to repeat it manually.** `cd apps/mfe-auth && pnpm exec vitest run --coverage`; `node scripts/unit-test/source-files.ts --list | grep NO-TEST | grep apps/mfe-auth/` prints nothing.
 
 **Result.**
 
@@ -221,7 +221,7 @@ Nothing is left over for the per-project stories on the MFE side; the shell has 
 
 **How to run.** `pnpm exec nx test shell` (runs `vitest run --coverage`, so the thresholds are enforced).
 
-**How to repeat it manually.** `cd apps/shell && pnpm exec vitest run --coverage`, then `node scripts/unit-test/source-files.mjs --list | grep NO-TEST | grep apps/shell/`: the list is empty.
+**How to repeat it manually.** `cd apps/shell && pnpm exec vitest run --coverage`, then `node scripts/unit-test/source-files.ts --list | grep NO-TEST | grep apps/shell/`: the list is empty.
 
 **Result.**
 
@@ -312,7 +312,7 @@ Coverage of `mfe-chat` went from 89.87 / 85.05 / 89.71 / 91.86 (statements / bra
 
 ```bash
 pnpm exec nx run mfe-settings:test
-node scripts/unit-test/source-files.mjs --list | grep -E "apps/mfe-settings" | grep NO-TEST
+node scripts/unit-test/source-files.ts --list | grep -E "apps/mfe-settings" | grep NO-TEST
 ```
 
 **How to repeat it manually.** Run the second command: it prints nothing. The first one runs the 53 tests with coverage and checks the thresholds.
@@ -383,7 +383,7 @@ cd services/conversation-service && pnpm exec vitest run src/features/llm-adapte
 
 Playwright was never started: only Vitest runs here.
 
-**Files.** `packages/ui/src/components/alert/alert.test.tsx`, `packages/eslint-config/src/{base,node,react,local-plugin}.test.js`, `packages/eslint-config/src/test-utils/lint.js`, `e2e/src/fixtures/*.spec.ts` (five new), `e2e/src/test-utils/fake-page.ts`, `e2e/vitest.config.ts`, `packages/shared-types/src/chat/provider.test.ts`.
+**Files.** `packages/ui/src/components/alert/alert.test.tsx`, `packages/eslint-config/src/{base,node,react,local-plugin}.test.ts`, `packages/eslint-config/src/test-utils/lint.js`, `e2e/src/fixtures/*.spec.ts` (five new), `e2e/src/test-utils/fake-page.ts`, `e2e/vitest.config.ts`, `packages/shared-types/src/chat/provider.test.ts`.
 
 **How to run.**
 
@@ -449,15 +449,15 @@ pnpm exec nx run-many -t test -p shared-types mfe-chat conversation-service work
 
 ### US14 · Guard test for source files without unit tests ([AICHAT-138](https://ipca-grupo11.atlassian.net/browse/AICHAT-138))
 
-**What and why.** The exempt list says which files may go without a test, but nothing stopped a new file from being added with neither. The inventory rules of `scripts/unit-test/source-files.mjs` now live in `packages/workspace-config/src/source-files.ts`, and a guard test built on them runs with the rest of the suite in CI. It fails when a source file has no co-located test and no exempt entry, and when an exempt entry points at a file that is gone, is outside the policy, or has a test now.
+**What and why.** The exempt list says which files may go without a test, but nothing stopped a new file from being added with neither. The inventory rules of `scripts/unit-test/source-files.ts` now live in `packages/workspace-config/src/source-files.ts`, and a guard test built on them runs with the rest of the suite in CI. It fails when a source file has no co-located test and no exempt entry, and when an exempt entry points at a file that is gone, is outside the policy, or has a test now.
 
-**Files.** `packages/workspace-config/src/source-files.ts` (the rules), `packages/workspace-config/src/source-files.test.ts` (the guard on the repository, plus the rules on a scratch git repository), `scripts/unit-test/source-files.mjs` (now a thin wrapper, same options; `--check` also reports untested files), `packages/workspace-config/unit-test-exempt.json` (one stale entry removed), `packages/workspace-config/vitest.config.ts`.
+**Files.** `packages/workspace-config/src/source-files.ts` (the rules), `packages/workspace-config/src/source-files.test.ts` (the guard on the repository, plus the rules on a scratch git repository), `scripts/unit-test/source-files.ts` (now a thin wrapper, same options; `--check` also reports untested files), `packages/workspace-config/unit-test-exempt.json` (one stale entry removed), `packages/workspace-config/vitest.config.ts`.
 
 **How to run.**
 
 ```sh
 pnpm exec nx run workspace-config:test
-node scripts/unit-test/source-files.mjs --check
+node scripts/unit-test/source-files.ts --check
 ```
 
 **How to repeat it manually.**
@@ -492,8 +492,8 @@ pnpm exec nx run-many -t test                         # every project, with cove
 pnpm exec nx run <project>:test                       # one project (for example mfe-chat, shell, conversation-service)
 cd apps/mfe-chat && pnpm exec vitest src/shared       # watch mode on a folder
 
-node scripts/unit-test/source-files.mjs               # inventory by project
-node scripts/unit-test/source-files.mjs --check       # untested files and the exempt list (US1, US14)
+node scripts/unit-test/source-files.ts               # inventory by project
+node scripts/unit-test/source-files.ts --check       # untested files and the exempt list (US1, US14)
 pnpm exec nx run workspace-config:test                # guard (US14) and capability parity (US13)
 git grep -h 'stubGlobal("fetch"' -- apps packages e2e | wc -l   # 0 (US3)
 
@@ -597,3 +597,16 @@ Final gates (all green; `pnpm sast` exit 0; gitleaks found no leaks):
 - A package consumed by a Node service needs a compiled output, a `build` script and a Docker step, not only a path alias.
 - Run the guard first: it finds stale exempt entries on day one.
 - Coverage thresholds alone are not enough; the guard says a file has a test, the thresholds say the test exercises it.
+
+**TypeScript everywhere**
+
+The repository had grown 52 JavaScript files next to the TypeScript code: the ESLint configs, the `eslint-config` and `test-config` packages, the `workspace-config` helpers, the CI and evidence scripts, the PostCSS config and the k6 script. The team rule is TypeScript only, so we converted all of them (`git ls-files | grep -E "\.(m?js|cjs)$"` now prints nothing outside `docs/`). Files were moved with `git mv`, so their history follows them.
+
+- **ESLint configs** are `eslint.config.ts` in every project. ESLint loads them through `jiti`, which is a root dev dependency (`packages/ui` still uses ESLint 9 and has its own `jiti` 2). `@platform/eslint-config` is TypeScript source with typed presets and a typed local rule, and its tests run with Vitest and the `RuleTester`. It has a `typecheck` target now.
+- **`@platform/test-config`** is TypeScript source again, and the hand-written `.d.ts` files are gone. Relative imports inside the shared packages carry the `.ts` extension, because Vite loads a `vitest.config.ts` natively through Node, which does not map `.js` to `.ts`. For that, `tsconfig.base.json` sets `rewriteRelativeImportExtensions` and the projects that do not extend it set `allowImportingTsExtensions`. No build step or Dockerfile change was needed; the image builds work from a clean checkout.
+- **Scripts** (`scripts/**`, `testing/mock-server/scripts/build.ts`) run as `node file.ts` on Node 24 type stripping, so they only use erasable syntax. `tsconfig.scripts.json` (`erasableSyntaxOnly`, `verbatimModuleSyntax`, `noEmit`) checks them: `pnpm typecheck:scripts`. The script tests keep `node:test` and run with `pnpm test:scripts`. CI runs both before `nx affected`, and the `sast` job now sets up the pinned Node so `sast-summary.ts` runs there.
+- **`packages/ui/postcss.config.ts`** is read by `postcss-load-config`; the library and the apps build as before.
+- **`testing/k6/streaming-load.ts`**: k6 runs TypeScript natively (checked with `k6 inspect`), types come from `@types/k6`, and the project has a `typecheck` target.
+- **Rules that look at file names** (the unit-test inventory, the coverage guard, `nx.json` inputs, `.semgrepignore`) and every command in the docs and in the epic skills now use the `.ts` names.
+
+Problems we hit: `tsc` rejected the `.ts` import specifiers in projects that do not extend the base config (fixed per project, see above), and ESLint 9 in `packages/ui` refused the old `jiti` 1.

@@ -157,7 +157,7 @@ pnpm nx run shell:test --skip-nx-cache   # also ui, mfe-auth, e2e
 
 **Files.**
 - `packages/workspace-config/src/coverage-guard.js` (project discovery, `checkProject`, exempt lists with reasons)
-- `packages/workspace-config/src/coverage-guard.test.js`
+- `packages/workspace-config/src/coverage-guard.test.ts`
 - `apps/mfe-auth/package.json` (fix found by the guard)
 - `packages/test-config/README.md` (documents the exempt list)
 
@@ -165,7 +165,7 @@ pnpm nx run shell:test --skip-nx-cache   # also ui, mfe-auth, e2e
 ```sh
 pnpm nx run workspace-config:test --skip-nx-cache
 # or only the guard
-cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.js
+cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.ts
 ```
 
 **How to repeat it manually.**
@@ -187,19 +187,19 @@ cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.js
 **What and why.** Thresholds already fail the `test` target, but a reviewer only sees a red job. We added a small Node script that reads every project's `coverage/coverage-summary.json` (the `json-summary` reporter) and writes one Markdown table to the GitHub job summary: project, lines, branches, functions, statements. The CI step uses `if: always()`, so the table still appears when a threshold fails the test step. The script has no dependencies. Thresholds stay in each project's own Vitest config: 80 for services and packages, 80 (75 branches) for MFEs and shell, 80 (70 branches) for e2e.
 
 **Files.**
-- `scripts/ci/coverage-summary.mjs`: finds `**/coverage/coverage-summary.json` (skips `node_modules`, `.git`, `.nx`, `dist`) and writes the table to `$GITHUB_STEP_SUMMARY`, or to stdout when it is unset.
-- `scripts/ci/coverage-summary.test.mjs`: `node --test` unit test for the table formatting.
+- `scripts/ci/coverage-summary.ts`: finds `**/coverage/coverage-summary.json` (skips `node_modules`, `.git`, `.nx`, `dist`) and writes the table to `$GITHUB_STEP_SUMMARY`, or to stdout when it is unset.
+- `scripts/ci/coverage-summary.test.ts`: `node --test` unit test for the table formatting.
 - `.github/workflows/ci.yml`: new `Coverage summary` step after `nx affected`.
 - `docs/AICHAT-34/evidence/20-coverage-summary-local.{log,png}`
 
 **How to run.**
 ```bash
 pnpm exec nx affected -t test        # writes coverage/coverage-summary.json per project
-node scripts/ci/coverage-summary.mjs # table on stdout
-node --test scripts/ci/coverage-summary.test.mjs
+node scripts/ci/coverage-summary.ts # table on stdout
+node --test scripts/ci/coverage-summary.test.ts
 ```
 
-**How to repeat it manually.** Create two fixtures such as `/tmp/fx/packages/ui/coverage/coverage-summary.json` and `/tmp/fx/services/auth/coverage/coverage-summary.json`, each with `{"total":{"lines":{"pct":92.5},"branches":{"pct":81.25},"functions":{"pct":100},"statements":{"pct":93.1}}}`, then run `node scripts/ci/coverage-summary.mjs /tmp/fx`. Set `GITHUB_STEP_SUMMARY=/tmp/out.md` to check the file output.
+**How to repeat it manually.** Create two fixtures such as `/tmp/fx/packages/ui/coverage/coverage-summary.json` and `/tmp/fx/services/auth/coverage/coverage-summary.json`, each with `{"total":{"lines":{"pct":92.5},"branches":{"pct":81.25},"functions":{"pct":100},"statements":{"pct":93.1}}}`, then run `node scripts/ci/coverage-summary.ts /tmp/fx`. Set `GITHUB_STEP_SUMMARY=/tmp/out.md` to check the file output.
 
 **Result.** The table lists one row per project with two decimals; missing metrics show `n/a` and an empty run prints a "no coverage-summary.json found" row. Both unit tests pass.
 
@@ -262,11 +262,11 @@ pnpm nx run mfe-chat:test --skip-nx-cache    # one project; coverage in apps/mfe
 pnpm lint && pnpm typecheck && pnpm build
 
 # guard: every test target runs --coverage and imports the shared preset
-cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.js
+cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.ts
 
 # per-project coverage table (what CI writes to the job summary)
-node scripts/ci/coverage-summary.mjs
-node --test scripts/ci/coverage-summary.test.mjs
+node scripts/ci/coverage-summary.ts
+node --test scripts/ci/coverage-summary.test.ts
 ```
 
 Thresholds: see `docs/AICHAT-34/README.md` §5. Each project writes `coverage/coverage-summary.json`, `lcov.info` and a text table.

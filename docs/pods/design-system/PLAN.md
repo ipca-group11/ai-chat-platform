@@ -32,7 +32,7 @@ scaffold, tokens, and Storybook config that every component and story relies on.
 
 ### Task 1 — Package scaffold, design tokens, and Storybook/a11y setup
 **Owns:** `packages/ui/package.json`, `packages/ui/project.json`, `packages/ui/tsconfig*.json`,
-`packages/ui/tailwind.config.ts`, `packages/ui/postcss.config.js`, `packages/ui/vite.config.ts`,
+`packages/ui/tailwind.config.ts`, `packages/ui/postcss.config.ts`, `packages/ui/vite.config.ts`,
 `packages/ui/src/styles/globals.css` (CSS variables/tokens for color, spacing, radius,
 typography, light + dark themes), `packages/ui/src/lib/utils.ts` (`cn` helper),
 `packages/ui/.storybook/main.ts`, `packages/ui/.storybook/preview.tsx`,

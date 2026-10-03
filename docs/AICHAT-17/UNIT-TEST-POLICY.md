@@ -11,7 +11,7 @@ Story: [AICHAT-36](https://ipca-grupo11.atlassian.net/browse/AICHAT-36) · Epic:
 | Status | Agreed with the owner on 2026-10-03; open for team review in the epic pull request |
 | Applies to | Every source file in `apps/*/src`, `packages/*`, `services/*/src` and `e2e/src` |
 | Exempt list | [`packages/workspace-config/unit-test-exempt.json`](../../packages/workspace-config/unit-test-exempt.json) |
-| Inventory tool | `node scripts/unit-test/source-files.mjs` |
+| Inventory tool | `node scripts/unit-test/source-files.ts` |
 
 ## 1. The rule
 
@@ -30,13 +30,13 @@ Tracked `.ts`, `.tsx` and `.js` files under `apps/*/src`, `packages/*`, `service
 
 | Not a source file | Examples |
 |---|---|
-| Tests | `*.test.ts(x)`, `*.spec.ts(x)`, `*.test.js` |
+| Tests | `*.test.ts(x)`, `*.spec.ts(x)` |
 | Declarations and stories | `*.d.ts`, `*.stories.tsx`, `.storybook/` |
 | Generated code | `routeTree.gen.ts`, `@mf-types/`, `generated/` (Prisma client) |
 | Tool configs | `vitest.config`, `vite.config`, `eslint.config`, `tailwind.config`, `postcss.config` |
-| Test helpers | folders `test/` and `test-utils/`, `test-setup.ts`, `test-fakes.ts`, `setup*.ts`, `packages/test-utils`, `packages/workspace-config/src/repo.js` |
+| Test helpers | folders `test/` and `test-utils/`, `test-setup.ts`, `test-fakes.ts`, `setup*.ts`, `packages/test-utils`, `packages/workspace-config/src/repo.ts` |
 
-The exact rules are in `scripts/unit-test/source-files.mjs`; the guard of [AICHAT-138](https://ipca-grupo11.atlassian.net/browse/AICHAT-138)
+The exact rules are in `scripts/unit-test/source-files.ts`; the guard of [AICHAT-138](https://ipca-grupo11.atlassian.net/browse/AICHAT-138)
 reuses them. Today that is 245 files (the discovery count of 246 in the README had one more helper in `auth-service`).
 
 ## 3. What can be exempt
@@ -83,11 +83,11 @@ File: `packages/workspace-config/unit-test-exempt.json`. It lives in `workspace-
 | `category` | One of `bootstrap`, `barrel`, `type-only`. |
 | `reason` | One sentence saying why this file cannot or need not have a unit test. Required, at least 10 characters. |
 
-Checks (`node scripts/unit-test/source-files.mjs --check`, exit 1 on any problem): unique paths, valid category, a reason,
+Checks (`node scripts/unit-test/source-files.ts --check`, exit 1 on any problem): unique paths, valid category, a reason,
 the file exists and is in scope, and the file has **no** test of its own (an exempt file that gets a test must leave the list).
 
 Today: 245 source files, 131 with their own test, 50 exempt (35 barrels, 14 bootstrap, 1 type-only), 64 still without a test.
-Those 64 are the work of the per-project stories (`node scripts/unit-test/source-files.mjs --list | grep NO-TEST`).
+Those 64 are the work of the per-project stories (`node scripts/unit-test/source-files.ts --list | grep NO-TEST`).
 
 **Who edits it.** The complete list was written once, for the whole repository, so the per-project stories do not touch it.
 That avoids merge conflicts between teams working in parallel. If a project needs a new entry (for example a new `main.tsx`),

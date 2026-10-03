@@ -79,11 +79,11 @@ pnpm exec nx test conversation-service
 How a mock is added: create `src/routers/<name>.router.ts` that exports a `MockModule` (`name`, `mountPath`, optional `scenarios`, `createRouter(ctx)`) and add one import line and one list entry in `src/routers/index.ts`. `ctx.onReset(hook)` clears a mock's state on `/__admin/reset`.
 
 **Files.**
-- `testing/mock-server/project.json`, `package.json`, `tsconfig.json`, `eslint.config.js`, `vitest.config.ts` (new): lint, typecheck, test (with the shared `coveragePreset`, thresholds 80) and build targets.
+- `testing/mock-server/project.json`, `package.json`, `tsconfig.json`, `eslint.config.ts`, `vitest.config.ts` (new): lint, typecheck, test (with the shared `coveragePreset`, thresholds 80) and build targets.
 - `testing/mock-server/src/app.ts`, `main.ts`, `config.ts`, `prng.ts`, `middleware.ts`, `registry.ts` (new): the app, env parsing, seeded generator, latency and error middleware, mock and scenario registries.
 - `testing/mock-server/src/routers/*.router.ts`, `index.ts` (new): the six mock routers and the list of mounted mocks.
 - `testing/mock-server/src/admin/admin.router.ts` (new): the `/__admin` endpoints.
-- `testing/mock-server/scripts/build.mjs` (new): bundles the server into one file with esbuild.
+- `testing/mock-server/scripts/build.ts` (new): bundles the server into one file with esbuild.
 - `testing/mock-server/Dockerfile`, `.env.example` (new): multi-stage image running as a non-root user; documented variables.
 - `.dockerignore`, `pnpm-workspace.yaml`, `packages/workspace-config/src/coverage-guard.js`: the project is part of the workspace, sent to the Docker build, and checked by the coverage guard test.
 
