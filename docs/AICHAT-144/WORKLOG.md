@@ -512,28 +512,176 @@ pnpm exec nx test mock-server
 ![Masked request log and reset](evidence/55-masked-request-log.png)
 ![mock-server tests](evidence/56-mock-server-tests.png)
 
-**Problems and fixes.** The log needs the parsed body, so the JSON parser runs before the mock routers; the parser skips a body that is already parsed, so routers that call `express.json()` themselves still work. The log is written when the request arrives and the status is filled in when the response finishes, so a slow request is already listed while it waits.
+**Problems and fixes.** The log needs the parsed body, so the JSON parser runs before the mock routers; the parser skips a body that is already parsed, so routers that call `express.json()` themselves still work. After the merge we changed this: the log no longer answers a malformed body itself (see the integration fixes in section 7). The log is written when the request arrives and the status is filled in when the response finishes, so a slow request is already listed while it waits.
+
+### US15 · Contract tests for the mocks ([AICHAT-151](https://ipca-grupo11.atlassian.net/browse/AICHAT-151))
+
+**What and why.** A mock that drifts from the real thing is worse than no mock. Two contract tests keep the mocks honest and fail CI when they drift. The LLM test starts the mock in-process and calls it with the real `AnthropicProvider` and `OpenAiProvider` of conversation-service, once for every scenario the mock registers (and for every recorded fixture served by `replay:`). Every scenario needs an entry in the expectation table, so a new scenario nobody checked fails the test. The backend test drives the auth and conversation mocks and checks each kind of response twice: against the service schemas in `src/conversation/contract.ts` (no missing and no extra field), and against `@platform/shared-types`. Where shared-types differs from the services, the mock follows the services and the difference is in an exact drift list in the test. A new difference fails the test, and so does a difference that was fixed but is still listed.
+
+**Files.**
+- `testing/mock-server/src/contract/llm.contract.spec.ts` (new): real adapters against every LLM scenario.
+- `testing/mock-server/src/contract/backend.contract.spec.ts` (new): responses and stream events against the service schemas and shared-types, the drift lists, and a check that what shared-types accepts as a request is accepted by the mock.
+- `testing/mock-server/project.json`: `implicitDependencies: ["conversation-service"]`, so a change to the adapters re-runs the mock-server tests in `nx affected`.
+
+**How to run.**
+
+```sh
+pnpm exec nx test mock-server
+cd testing/mock-server && pnpm exec vitest run src/contract
+```
+
+**How to repeat it manually.**
+
+1. Run `pnpm exec vitest run src/contract --reporter=verbose` in `testing/mock-server`. Expected: 30 tests pass, one per scenario and provider plus the backend checks.
+2. Add a required field to a shared-types schema, for example `pinned: z.boolean()` in `packages/shared-types/src/chat/chat.ts`, and run the backend contract test. Expected: it fails and prints the new difference `pinned: invalid_type` for `chat`. Undo the change.
+3. Add a scenario to the LLM mock without an entry in `EXPECTED`. Expected: "new scenario without a contract expectation".
+
+**Result.** Both tests pass on the current code, and the drift demo fails as intended.
+
+![Full run of the mock-server targets, 0 failures](evidence/70-mock-server-full-run.png)
+
+![Contract tests](evidence/71-contract-tests.png)
+
+![A change in shared-types fails the backend contract test](evidence/72-contract-drift-fails.png)
+
+**Findings for AICHAT-20 (snapshot testing): drift of `@platform/shared-types` from the services.** The mock follows the services; these are the differences the test records.
+
+| Kind | Service sends | shared-types says |
+|---|---|---|
+| auth `register`, `login`, `me` | `{ id, email }` | `authResponseSchema` is `{ user: { id, email, createdAt } }` |
+| chat | has `ownerEmail` | no `ownerEmail` |
+| message | `status` `sent`; `authorId`, `authorEmail`, `error`; `attachments` as objects; role may be `system` | statuses `complete` and `canceled` instead of `sent`; none of those fields; only `attachmentIds` |
+| attachment | `filename`, `kind`, `size`, `messageId` | `originalFilename`, `ownerId`, `storedPath`, `extractedTextStatus`, mime type enum |
+| stream events | events `message` and `started`; `queued` without `position`; `error` has `retryable`; `done` may have `stopped` | no `message` and no `started`; `queued` needs `position`; `error` without `retryable`; `done` without `stopped` |
+
+The member entry and the error body (`{ error, correlationId }`) agree. One more finding, for AICHAT-25: when the connection drops in the middle of a stream, both adapters let fetch's own `TypeError: terminated` through instead of a `ProviderError`. The contract test only requires that the adapter fails, and the comment on the expectation says so.
+
+**Problems and fixes.** The tests import the adapters by a relative path, which the Nx module boundary rule forbids, so the import lines carry an explicit `eslint-disable` with the reason (the adapters are the code under test). The mock-server test then depends on conversation-service, which is why the implicit dependency is declared.
+
+### US16 · Compose profiles and one-command start with the mocks ([AICHAT-152](https://ipca-grupo11.atlassian.net/browse/AICHAT-152))
+
+**What and why.** Testers should start the app against the mocks with one command. `compose.mock.yaml` is used on top of `compose.yaml` and adds two profiles. `llm` is the real stack plus the mock: conversation-service gets `ANTHROPIC_BASE_URL` and `OPENAI_BASE_URL` pointing at the mock, so no provider key is needed. `frontend-only` is the shell and the three MFEs plus the mock: the shell proxies `/auth` and `/api` to the mock, and no database or backend service starts. In the overlay the real services are put in the `llm` profile, so they stay out of `frontend-only`; the plain `docker compose up` of `compose.yaml` is not touched. The shell for `frontend-only` is a second service, `shell-frontend-only`, that extends `shell`. The shell strips `/api` before it forwards, so its target is `http://mock-server:4010/api`.
+
+**Files.**
+- `compose.mock.yaml` (new): `mock-server`, the profile assignments, the base URLs and `shell-frontend-only`.
+- `scripts/mock-compose.sh`, `scripts/dev-mock.sh` (new) and `package.json`: `pnpm mock:up`, `pnpm mock:down`, `pnpm dev:mock`.
+- `scripts/ci/mock-chat-smoke.sh` (new): register, sign in, create a chat, send a message and read the stream through the shell.
+- `.gitleaks.toml`: narrow exception for the first version of the smoke script (a throwaway password).
+
+**How to run.**
+
+```sh
+pnpm mock:up                                      # profile llm, app on :8000, mock on :4010
+bash scripts/mock-compose.sh up frontend-only     # shell + MFEs + backend mock
+bash scripts/ci/mock-chat-smoke.sh                # one chat flow through the shell
+pnpm mock:down                                    # stops both profiles and removes the volumes
+pnpm dev:mock                                     # no Docker: dev servers + mock on :4010
+```
+
+**How to repeat it manually.**
+
+1. `pnpm mock:up`, then `docker compose -f compose.yaml -f compose.mock.yaml --profile llm ps`. Expected: postgres, auth-service, conversation-service, the MFEs, the shell, the observability services and `mock-server` are healthy.
+2. `bash scripts/ci/mock-chat-smoke.sh`. Expected: the stream shows `started`, 40 `token` events and `done`. The text comes from the mock through conversation-service.
+3. `pnpm mock:down`, then `bash scripts/mock-compose.sh up frontend-only` and the same smoke script. Expected: only `mfe-auth`, `mfe-chat`, `mfe-settings`, `mock-server` and `shell-frontend-only` run, and the flow works.
+
+**Result.** Both profiles start and answer the chat flow. In the `llm` profile the answer goes through the real conversation-service and the mock.
+
+![Profile llm: services and a chat flow](evidence/73-compose-llm-profile.png)
+
+![Profile frontend-only: services and a chat flow](evidence/75-compose-frontend-only-profile.png)
+
+**Problems and fixes.** Compose cannot leave out a service that has no profile, so the `frontend-only` profile needs the real backend services to be profile-bound; that is done in the overlay only (`profiles: !override [llm]`), which keeps the default stack and the existing deploy commands unchanged. The conversation-service environment is validated as a URL, so the variable cannot be left empty and the overlay sets it to the mock. Ports 4001, 4002, 9090 and 3300 were in use by another stack on the machine, so we ran with `AUTH_SERVICE_PORT`, `CONVERSATION_SERVICE_PORT`, `PROMETHEUS_PORT` and `GRAFANA_PORT` changed; the overlay needs nothing else. We checked the `frontend-only` profile with the default dataset and the chat flow by curl; we did not click through the UI in that profile. `pnpm dev:mock` has a syntax check only: we did not run the five dev servers.
+
+### US17 · E2E chat flows in CI against the mock ([AICHAT-153](https://ipca-grupo11.atlassian.net/browse/AICHAT-153))
+
+**What and why.** The e2e workflow needed a real Anthropic key for any chat spec, so in CI the chat specs were skipped. Now the workflow starts the stack with `pnpm mock:up` (profile `llm`) and sets `ANTHROPIC_API_KEY` to a placeholder text, so conversation-service calls the mock and no real key is used. The whole suite still runs, as before. A new spec covers the flows the story asks for: send, stream, cancel (Stop, and removing a queued message), retry and provider error. Each test creates its chat through the API with a model name such as `claude-haiku-4-5@long`, which picks the mock scenario (`ok`, `long`, `error-529`). For the retry test the chat goes back to the normal model after the failure, as if the provider recovered, and the Retry button then gets an answer.
+
+**Files.**
+- `.github/workflows/e2e.yml`: `pnpm mock:up` and `pnpm mock:down`, placeholder key instead of the secret.
+- `e2e/src/tests/chat-mock.spec.ts` (new): the four tests.
+- `e2e/src/fixtures/settings-flows.ts`: `configureAnthropicKey` uses its own locators.
+- `e2e/src/ci/e2e-workflow.spec.ts`: the structure test follows the new commands and checks the `llm` profile and the missing secret.
+
+**How to run.**
+
+```sh
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 ANTHROPIC_API_KEY=mock-key pnpm exec playwright test chat-mock.spec.ts
+pnpm mock:down
+```
+
+**How to repeat it manually.** Start the `llm` profile, sign up in the browser at `http://localhost:8000`, save any text as the Anthropic key in Settings, create a chat and send a message. Expected: the answer streams in, Stop keeps the part already written. In the workflow file, `ANTHROPIC_API_KEY` is the text `mock-key-not-a-secret`.
+
+**Result.** The four tests pass locally against the `llm` profile. The GitHub run is pending the pull request.
+
+![Playwright chat flows against the llm profile](evidence/74-playwright-chat-flows-llm-profile.png)
+
+**Problems and fixes.** The settings helper `apiKeyField` matches the form and the input at once (strict mode violation), which broke every chat spec before it reached the chat; we gave `configureAnthropicKey` its own locators and left `apiKeyField` and `saveApiKey` as they are for the configuration specs. As agreed, the other failing specs (auth, configuration, shell selectors, AICHAT-4/5) are not touched. The older `chat.spec.ts` (US-13 to US-22) also fails against the current UI: "New chat" now opens a dialog, and the specs look for test ids and labels that do not exist (`assistant-message`, `user-message`). Rewriting it is outside this story, so the chat flows of this story are in the new spec. This is an open question for the report.
+
+### US18 · Mock server usage guide for the other testing epics ([AICHAT-154](https://ipca-grupo11.atlassian.net/browse/AICHAT-154))
+
+**What and why.** The epics AICHAT-18, 19, 21, 24, 26, 28 and 32 should reuse the mock instead of building their own. `MOCK-SERVER.md` has the run commands, the mock and scenario tables, the environment variables, the admin endpoints and a short example for each of those epics.
+
+**Files.**
+- `docs/AICHAT-144/MOCK-SERVER.md` (new).
+
+**How to run.** Open [MOCK-SERVER.md](MOCK-SERVER.md). The scenario tables match `GET /__admin/scenarios`.
+
+**How to repeat it manually.** Start the server, run `curl localhost:4010/__admin/scenarios` and compare the names with the tables. Run one of the examples, for example the AICHAT-32 one (`GET /__admin/requests?mock=collect`).
+
+**Result.** The guide is written; the tables were copied from the live scenario list.
+
+**Problems and fixes.** The examples for AICHAT-24, 26 and 28 name the tools (k6, ZAP) but we did not run those tools here; they show the mock side of the setup.
 
 ## 4. How to run everything
 
 ```sh
-# all checks added by this epic, from the repo root
+export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH
+# all checks of the mock server
+pnpm exec nx run-many -t lint typecheck test build -p mock-server --skip-nx-cache
+# everything that changed against the integration branch
+pnpm exec nx affected -t lint typecheck test build --base=origin/integration/testing-epics
+# contract tests only
+cd testing/mock-server && pnpm exec vitest run src/contract
+# stack with the mock, chat flows, stop
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 ANTHROPIC_API_KEY=mock-key pnpm exec playwright test chat-mock.spec.ts
+pnpm mock:down
+# security checks
+bash scripts/ci/semgrep.sh
+gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD
 ```
 
 ## 5. Results
 
 | Metric | Before | After |
 |---|---|---|
-| … | … | … |
+| mock-server tests after the three tracks were merged | 3 failing | all pass (evidence 70) |
+| Contract tests (LLM scenarios and backend responses) | none | 30 tests, new drift fails |
+| Providers the e2e chat flows can use in CI | real Anthropic key only (specs skipped without it) | the LLM mock, placeholder key |
+| E2E chat flows against the mock | 0 | 4 pass locally (evidence 74) |
+| Compose profiles with the mock | 0 | 2 (`llm`, `frontend-only`) |
+| `nx affected` lint, typecheck, test, build | not run after the merge | 16 projects pass (evidence 76) |
+| Semgrep, gitleaks | not run for this branch | no new ERROR, no leaks (evidence 77, 78) |
 
 ## 6. DoD check
 
 | DoD item | Met | Evidence |
 |---|---|---|
-| … | ✅ | [link](evidence/…) |
+| Mock server runs locally and in CI with one command; health check green | Locally yes (`pnpm mock:up`, health in the compose check); CI pending PR run | [73](evidence/73-compose-llm-profile.png) |
+| Both LLM adapters stream a full answer from the mock (contract tests pass) | Yes | [71](evidence/71-contract-tests.png) |
+| Shell + MFEs work end to end against the backend mock (`frontend-only`) with every named dataset | Partly: the profile starts and the chat flow works with the default dataset; the other datasets were checked through the API tests, not in the browser | [75](evidence/75-compose-frontend-only-profile.png) |
+| Backend mock responses validated against `@platform/shared-types` (no drift from the real services) | Yes for the mock; the drift of shared-types itself is listed (US15) and passed to AICHAT-20; new drift fails the test | [72](evidence/72-contract-drift-fails.png) |
+| Fault scenarios reproducible on demand | Yes (US6, US7, US11, US12) | see US sections |
+| E2E chat flows run in CI against the mock, no real key used | Locally yes; GitHub run pending PR run | [74](evidence/74-playwright-chat-flows-llm-profile.png) |
+| Run instructions and scenario list documented | Yes | [MOCK-SERVER.md](MOCK-SERVER.md) |
+| `nx affected` green, Semgrep and gitleaks clean | Yes | [76](evidence/76-affected-final.png), [77](evidence/77-semgrep.png), [78](evidence/78-gitleaks.png) |
+| e2e workflow green on GitHub | pending PR run | |
 
 ## 7. Notes for the report
 
-- What was found
-- What was fixed / waived
-- Lessons learned
+- **Integration fixes after merging the three tracks.** The request log of the edge track parsed the JSON body for every router and answered `invalid_json` itself, which broke the real error shape of the auth and conversation mocks. It now parses leniently: the error is kept on the request and each router answers in its own shape (`VALIDATION_ERROR` for auth and conversation, `invalid_request_error` for the two LLM mocks). The scenario-list assertions of the remotes and conversation specs are filtered by mock. The streamed chat answer now takes its text from the LLM module (`streamScenarioText`), so `long` is ten times `TOKENS` like in the LLM mock (it was five); `error` keeps the text of `ok` and fails after two tokens. `.vitest/` is ignored.
+- **Found:** `@platform/shared-types` has drifted from auth-service and conversation-service (table in US15); this is the input for AICHAT-20. The adapters do not wrap a dropped connection in a `ProviderError` (input for AICHAT-25).
+- **Found:** the settings helper `apiKeyField` is ambiguous and the older `chat.spec.ts` no longer matches the chat UI. We fixed the first only for the chat specs and left the rest, as agreed with the owner.
+- **Waived / not done:** the other failing e2e specs (AICHAT-4/5); a browser check of every dataset in `frontend-only`; a live run of `pnpm dev:mock`; the GitHub run of the e2e workflow.
+- **Lessons learned:** a profile that must leave services out needs those services to be profile-bound, so the overlay file is the safe place for it. Choosing the scenario with the model name works through the real conversation-service without any change to it. Ports of other stacks on a developer machine can collide with the compose defaults; every published port has an environment variable.
