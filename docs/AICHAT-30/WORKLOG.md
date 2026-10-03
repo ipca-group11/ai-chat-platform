@@ -11,8 +11,8 @@ title: "AICHAT-30 · SBOM generation: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-30-sbom-generation` |
 | Started / finished | 2026-10-03 / 2026-10-03 |
-| Pull requests | not opened yet |
-| Status | In Progress |
+| Pull requests | [#21](https://github.com/ipca-group11/ai-chat-platform/pull/21) |
+| Status | Done, merged into `integration/testing-epics` |
 
 ## 1. DoR review
 
