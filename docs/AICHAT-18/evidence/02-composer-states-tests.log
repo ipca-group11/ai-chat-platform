@@ -1,0 +1,12 @@
+$ pnpm --filter @app/mfe-chat exec vitest run src/features/composer
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-chat
+
+
+ Test Files  2 passed (2)
+      Tests  15 passed (15)
+   Start at  16:15:02
+   Duration  2.18s (import 33%, environment 31%, tests 16%, setup 11%, transform 10%)
+
+
+[exit 0]

@@ -1,6 +1,10 @@
 import { expect } from "vitest";
-import { axe } from "vitest-axe";
+import { configureAxe } from "vitest-axe";
 import type { AxeMatchers } from "vitest-axe/matchers";
+
+// jsdom does no layout and draws no canvas, so axe cannot compute colours: the contrast rule is
+// left to the browser checks (Playwright axe) and to the visual review.
+const axe = configureAxe({ rules: { "color-contrast": { enabled: false } } });
 
 /**
  * Runs axe on the rendered DOM and fails with the list of violations (rule, impact, element).
