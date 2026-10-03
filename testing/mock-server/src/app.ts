@@ -1,9 +1,11 @@
 import express, { type Express } from "express";
 import { createAdminRouter } from "./admin/admin.router.js";
+import { buildDataset } from "./data/datasets.js";
+import type { Dataset } from "./data/types.js";
 import { loadConfig, type MockConfig } from "./config.js";
 import { latency, randomErrors } from "./middleware.js";
 import { createRng } from "./prng.js";
-import { createScenarioRegistry, type MockContext, type MockModule } from "./registry.js";
+import { createScenarioRegistry, type DataStore, type MockContext, type MockModule } from "./registry.js";
 import { mockModules } from "./routers/index.js";
 
 export interface MockApp {
@@ -15,10 +17,25 @@ export interface MockApp {
 export function createApp(config: MockConfig = loadConfig(), modules: MockModule[] = mockModules): MockApp {
   const rng = createRng(config.seed);
   const resetHooks: Array<() => void> = [];
+  let datasetName = config.dataset;
+  let data: Dataset = buildDataset(datasetName, config.seed);
+  const store: DataStore = {
+    get name() {
+      return datasetName;
+    },
+    get data() {
+      return data;
+    },
+    load(name) {
+      data = buildDataset(name, config.seed);
+      datasetName = name;
+    },
+  };
   const ctx: MockContext = {
     config,
     rng,
     scenarios: createScenarioRegistry(),
+    store,
     onReset: (hook) => {
       resetHooks.push(hook);
     },
@@ -29,6 +46,7 @@ export function createApp(config: MockConfig = loadConfig(), modules: MockModule
 
   const reset = (): void => {
     rng.reset();
+    store.load(config.dataset);
     for (const hook of resetHooks) hook();
   };
   app.use("/__admin", express.json(), createAdminRouter({ ctx, reset }));

@@ -1,5 +1,6 @@
 import type { Router } from "express";
 import type { MockConfig } from "./config.js";
+import type { Dataset } from "./data/types.js";
 import type { Rng } from "./prng.js";
 
 /** A named behavior a mock can be switched to (X-Mock-Scenario header or /__admin/faults). */
@@ -34,12 +35,23 @@ export function createScenarioRegistry(): ScenarioRegistry {
   };
 }
 
+/** The records the mocks serve. Replaced as a whole by `/__admin/seed/<dataset>`. */
+export interface DataStore {
+  /** Name of the dataset currently loaded. */
+  readonly name: string;
+  /** The records; read it on every request, because a seed swaps the object. */
+  readonly data: Dataset;
+  /** Replaces the records with a named dataset; throws for an unknown name. */
+  load(name: string): void;
+}
+
 /** What every mock receives when its router is created. */
 export interface MockContext {
   config: MockConfig;
   /** Seeded generator, back to its first value after `/__admin/reset`. */
   rng: Rng;
   scenarios: ScenarioRegistry;
+  store: DataStore;
   /** Registers a function that clears the mock's own state on `/__admin/reset`. */
   onReset(hook: () => void): void;
 }

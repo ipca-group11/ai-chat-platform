@@ -132,3 +132,46 @@ describe("LATENCY_MS and ERROR_RATE", () => {
     expect(new Set(first).size).toBe(2);
   });
 });
+
+describe("seed endpoints", () => {
+  it("POST /__admin/seed/<dataset> loads the dataset and returns the record counts", async () => {
+    const { app, ctx } = createApp(config());
+    expect(ctx.store.name).toBe("empty");
+
+    const res = await request(app).post("/__admin/seed/many-chats");
+
+    expect(res.status).toBe(200);
+    expect(res.body.dataset).toBe("many-chats");
+    expect(res.body.counts.chats).toBeGreaterThan(200);
+    expect(ctx.store.data.chats.length).toBe(res.body.counts.chats);
+  });
+
+  it("answers 404 and lists the datasets for an unknown name", async () => {
+    const { app } = createApp(config());
+    const res = await request(app).post("/__admin/seed/nope");
+    expect(res.status).toBe(404);
+    expect(res.body.error.available).toContain("default");
+  });
+
+  it("GET /__admin/data returns the loaded records", async () => {
+    const { app } = createApp(config({ MOCK_DATASET: "long-conversation" }));
+    const res = await request(app).get("/__admin/data");
+    expect(res.body.dataset).toBe("long-conversation");
+    expect(res.body.data.messages).toHaveLength(500);
+  });
+
+  it("loads MOCK_DATASET at start-up", () => {
+    const { ctx } = createApp(config({ MOCK_DATASET: "default" }));
+    expect(ctx.store.name).toBe("default");
+    expect(ctx.store.data.users.length).toBeGreaterThan(0);
+  });
+
+  it("POST /__admin/reset goes back to MOCK_DATASET", async () => {
+    const { app, ctx } = createApp(config({ MOCK_DATASET: "default" }));
+    await request(app).post("/__admin/seed/empty");
+    expect(ctx.store.data.users).toHaveLength(0);
+    await request(app).post("/__admin/reset");
+    expect(ctx.store.name).toBe("default");
+    expect(ctx.store.data.users.length).toBeGreaterThan(0);
+  });
+});

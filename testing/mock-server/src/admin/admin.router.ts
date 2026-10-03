@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { countRecords, DATASET_NAMES, isDatasetName } from "../data/datasets.js";
 import type { MockContext } from "../registry.js";
 
 export interface AdminOptions {
@@ -17,6 +18,22 @@ export function createAdminRouter({ ctx, reset }: AdminOptions): Router {
 
   router.get("/scenarios", (_req, res) => {
     res.json({ scenarios: ctx.scenarios.list() });
+  });
+
+  router.post("/seed/:dataset", (req, res) => {
+    const name = req.params.dataset;
+    if (!isDatasetName(name)) {
+      res.status(404).json({
+        error: { code: "unknown_dataset", message: `Unknown dataset "${name}"`, available: DATASET_NAMES },
+      });
+      return;
+    }
+    ctx.store.load(name);
+    res.json({ dataset: name, counts: countRecords(ctx.store.data) });
+  });
+
+  router.get("/data", (_req, res) => {
+    res.json({ dataset: ctx.store.name, counts: countRecords(ctx.store.data), data: ctx.store.data });
   });
 
   router.post("/reset", (_req, res) => {
