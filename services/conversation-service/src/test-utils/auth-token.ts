@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 
+// Fixed signing key for in-process tests, not a credential.
+// nosemgrep: ajinabraham.njsscan.generic.hardcoded_secrets.node_secret
 export const TEST_JWT_SECRET = "test-secret";
 
 /** A signed access token whose email claim matches `asUser(userId)`. */

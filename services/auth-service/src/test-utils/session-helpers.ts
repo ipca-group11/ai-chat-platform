@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import request from "supertest";
 
+// Throwaway password of the fake accounts in tests, not a credential.
+// nosemgrep: ajinabraham.njsscan.generic.hardcoded_secrets.node_password
 export const PASSWORD = "password1";
 
 /** Registers `email` through the API. */
