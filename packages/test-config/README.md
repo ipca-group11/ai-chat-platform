@@ -78,3 +78,4 @@ Vitest config must import `@platform/test-config`. The exempt lists live in
 |---|---|---|
 | `testing/k6` | coverage and preset import | k6 runtime, not Node: the suite only asserts on the script text |
 | `packages/test-config` | preset import only | it defines the preset and imports it relatively |
+| `packages/eslint-config` | preset import only | would create a dependency cycle with `@platform/test-config`; keeps identical thresholds inline |

@@ -20,7 +20,6 @@
       }
     },
     "build": {
-      "dependsOn": [],
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'eslint-config is plain JS; nothing to build'",

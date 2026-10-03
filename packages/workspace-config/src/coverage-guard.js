@@ -15,6 +15,8 @@ export const COVERAGE_EXEMPT = {
  */
 export const PRESET_IMPORT_EXEMPT = {
   "packages/test-config": "defines the preset, so it imports it relatively",
+  "packages/eslint-config":
+    "would create a dependency cycle with @platform/test-config; keeps identical thresholds inline",
 };
 
 const CONFIG_FILES = ["vitest.config.ts", "vite.config.ts"];

@@ -385,9 +385,6 @@ importers:
         specifier: ^8.70.1
         version: 8.70.1(eslint@10.11.0(jiti@2.7.0))(typescript@6.0.3)
     devDependencies:
-      '@platform/test-config':
-        specifier: workspace:*
-        version: link:../test-config
       '@types/node':
         specifier: ^24.13.6
         version: 24.13.6
