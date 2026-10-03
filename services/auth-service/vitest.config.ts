@@ -1,3 +1,4 @@
+import { coveragePreset } from "@platform/test-config";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -5,22 +6,9 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.spec.ts"],
     setupFiles: ["src/shared/test/setup-env.ts"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "lcov"],
+    coverage: coveragePreset({
       include: ["src/**/*.ts"],
-      exclude: [
-        "src/**/*.spec.ts",
-        "src/main.ts",
-        "src/shared/prisma.ts",
-        "src/shared/test/**",
-      ],
-      thresholds: {
-        lines: 80,
-        statements: 80,
-        functions: 80,
-        branches: 80,
-      },
-    },
+      exclude: ["src/main.ts", "src/shared/prisma.ts", "src/shared/test/**"],
+    }),
   },
 });

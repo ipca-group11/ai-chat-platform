@@ -24,6 +24,7 @@
   "devDependencies": {
     "@module-federation/vite": "^1.22.1",
     "@platform/eslint-config": "workspace:*",
+    "@platform/test-config": "workspace:*",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",

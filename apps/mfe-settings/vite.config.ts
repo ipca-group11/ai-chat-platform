@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { coveragePreset, appCoverageThresholds } from "@platform/test-config";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { federation } from "@module-federation/vite";
@@ -65,22 +66,9 @@ export default defineConfig({
     },
     setupFiles: ["./src/shared/test/setup.ts"],
     css: false,
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "lcov"],
-      thresholds: {
-        lines: 80,
-        statements: 80,
-        functions: 80,
-        branches: 80,
-      },
-      exclude: [
-        "src/main.tsx",
-        "src/routes.tsx",
-        "src/app.tsx",
-        "src/shared/test/**",
-        "**/*.d.ts",
-      ],
-    },
+    coverage: coveragePreset({
+      thresholds: appCoverageThresholds,
+      exclude: ["src/main.tsx", "src/routes.tsx", "src/app.tsx", "src/shared/test/**"],
+    }),
   },
 });
