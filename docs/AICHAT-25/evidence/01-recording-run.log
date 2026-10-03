@@ -1,0 +1,8 @@
+$ node scripts/record-llm-fixtures.mjs && git status --short services/conversation-service/src/test-utils/fixtures && echo '(no changes listed above: the new recording is byte-identical to the committed one)'
+recorded anthropic/text.sse (1305 bytes) from http://localhost:11434/v1/messages
+recorded anthropic/max-tokens.sse (1762 bytes) from http://localhost:11434/v1/messages
+recorded openai/text.sse (1404 bytes) from http://localhost:11434/v1/chat/completions
+recorded openai/max-tokens.sse (2180 bytes) from http://localhost:11434/v1/chat/completions
+(no changes listed above: the new recording is byte-identical to the committed one)
+
+[exit 0]

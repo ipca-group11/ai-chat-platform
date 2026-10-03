@@ -1,0 +1,42 @@
+$ pnpm exec nx affected -t lint typecheck test --base=origin/integration/testing-epics
+
+ NX   Running targets lint, typecheck, test for 4 projects and 5 tasks they depend on:
+
+- conversation-service
+- shared-types
+- mfe-settings
+- shell
+
+
+✔  nx run eslint-config:build  [existing outputs match the cache, left as is]
+✔  nx run shared-types:lint  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:lint  [existing outputs match the cache, left as is]
+✔  nx run shell:lint  [existing outputs match the cache, left as is]
+✔  nx run test-config:build  [existing outputs match the cache, left as is]
+✔  nx run ui:build  [existing outputs match the cache, left as is]
+✔  nx run shared-types:build  [existing outputs match the cache, left as is]
+✔  nx run shared-types:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:test  [existing outputs match the cache, left as is]
+✔  nx run shell:test  [existing outputs match the cache, left as is]
+✔  nx run shared-types:typecheck
+✔  nx run conversation-service:prisma-generate
+✔  nx run conversation-service:lint
+✔  nx run conversation-service:test
+✔  nx run shell:typecheck
+✔  nx run conversation-service:typecheck
+✔  nx run mfe-settings:typecheck
+
+
+
+ NX   Successfully ran targets lint, typecheck, test for 4 projects and 5 tasks they depend on
+
+Nx read the output from the cache instead of running the command for 10 out of 17 tasks.
+
+Output of 17 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      5.5s
+  Cache:             10/17 hit (59%)
+  Critical path:     4.8s (4 tasks)
+  Recoverable time:  672ms (12% of the run)
+
+[exit 0]

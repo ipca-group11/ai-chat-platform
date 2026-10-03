@@ -1,0 +1,51 @@
+$ cd services/conversation-service && pnpm test
+
+> @app/conversation-service@0.0.0 test /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+      Coverage enabled with v8
+
+
+ Test Files  34 passed (34)
+      Tests  269 passed | 2 todo (271)
+   Start at  12:49:45
+   Duration  1.82s (import 51%, transform 23%, tests 14%, worker 7%, setup 4%)
+
+    Isolate  34 workers spawned · ~136ms startup each (spawn + environment, per file)
+             at least ~523ms faster with isolate: false — reuses workers across files instead of one per file
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   98.19 |    90.67 |   97.38 |   98.75 |                   
+ src               |   96.96 |      100 |      75 |   96.77 |                   
+  app.ts           |   96.96 |      100 |      75 |   96.77 | 57                
+ ...es/attachments |   98.85 |     92.1 |     100 |    98.8 |                   
+  llm-context.ts   |     100 |    83.33 |     100 |     100 | 15,38             
+  ...-extractor.ts |   88.88 |      100 |     100 |   88.88 | 15                
+  validators.ts    |     100 |     87.5 |     100 |     100 | 40                
+ ...features/chats |   98.03 |      100 |   94.87 |   98.01 |                   
+  service.ts       |   96.36 |      100 |   92.59 |   96.29 | 86-89             
+ ...s/llm-adapters |   97.23 |    88.76 |   97.56 |   98.37 |                   
+  ...c.provider.ts |   96.21 |    85.82 |     100 |   98.24 | 228,256           
+  ...i.provider.ts |   97.87 |    94.44 |   91.66 |   97.43 | 37                
+ ...tures/messages |   97.05 |    88.52 |   97.14 |   98.48 |                   
+  controller.ts    |     100 |       50 |     100 |     100 | 9                 
+  processor.ts     |   95.83 |    88.88 |     100 |     100 | 35,40,108         
+  service.ts       |   96.15 |    93.33 |   94.44 |   96.15 | 172,228           
+ src/shared        |     100 |    88.46 |     100 |     100 |                   
+  error-handler.ts |     100 |       90 |     100 |     100 | 51                
+  metrics.ts       |     100 |    66.66 |     100 |     100 | 29                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 98.19% ( 762/776 )
+Branches     : 90.67% ( 321/354 )
+Functions    : 97.38% ( 186/191 )
+Lines        : 98.75% ( 712/721 )
+================================================================================
+
+[exit 0]

@@ -1,0 +1,55 @@
+$ cd services/conversation-service && npx vitest run src/features/llm-adapters/recorded-replay.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > Anthropic > text.sse (recorded): streams the text deltas 16ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > Anthropic > text-ping.sse: ignores ping and keeps multi-byte text intact 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > Anthropic > thinking.sse: yields reasoning chunks, then the answer 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > Anthropic > max-tokens.sse (recorded): the truncated text is streamed like a complete answer 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > Anthropic > web-fetch-error.sse: reports fetching, then the error code, then the answer 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > Anthropic > pause-turn-1.sse + pause-turn-2.sse: resumes the paused turn with the reply so far 2ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > Anthropic > overloaded-midstream.sse: partial text, then a retryable ProviderError 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > OpenAI > text.sse (recorded): streams the content deltas 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > OpenAI > reasoning.sse: sends reasoning_effort and streams only the content 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > OpenAI > max-tokens.sse (recorded): the truncated text is streamed like a complete answer 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, uneven (1, 7, 64, 3) > OpenAI > error-midstream.sse: CURRENT behaviour, the mid-stream error is swallowed and the answer looks complete 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > Anthropic > text.sse (recorded): streams the text deltas 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > Anthropic > text-ping.sse: ignores ping and keeps multi-byte text intact 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > Anthropic > thinking.sse: yields reasoning chunks, then the answer 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > Anthropic > max-tokens.sse (recorded): the truncated text is streamed like a complete answer 2ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > Anthropic > web-fetch-error.sse: reports fetching, then the error code, then the answer 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > Anthropic > pause-turn-1.sse + pause-turn-2.sse: resumes the paused turn with the reply so far 2ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > Anthropic > overloaded-midstream.sse: partial text, then a retryable ProviderError 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > OpenAI > text.sse (recorded): streams the content deltas 2ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > OpenAI > reasoning.sse: sends reasoning_effort and streams only the content 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > OpenAI > max-tokens.sse (recorded): the truncated text is streamed like a complete answer 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, one byte at a time > OpenAI > error-midstream.sse: CURRENT behaviour, the mid-stream error is swallowed and the answer looks complete 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > Anthropic > text.sse (recorded): streams the text deltas 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > Anthropic > text-ping.sse: ignores ping and keeps multi-byte text intact 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > Anthropic > thinking.sse: yields reasoning chunks, then the answer 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > Anthropic > max-tokens.sse (recorded): the truncated text is streamed like a complete answer 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > Anthropic > web-fetch-error.sse: reports fetching, then the error code, then the answer 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > Anthropic > pause-turn-1.sse + pause-turn-2.sse: resumes the paused turn with the reply so far 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > Anthropic > overloaded-midstream.sse: partial text, then a retryable ProviderError 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > OpenAI > text.sse (recorded): streams the content deltas 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > OpenAI > reasoning.sse: sends reasoning_effort and streams only the content 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > OpenAI > max-tokens.sse (recorded): the truncated text is streamed like a complete answer 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > recorded replay, whole body > OpenAI > error-midstream.sse: CURRENT behaviour, the mid-stream error is swallowed and the answer looks complete 0ms
+ □ src/features/llm-adapters/recorded-replay.spec.ts > expected behaviour once the defects are fixed > AICHAT-211: an OpenAI mid-stream `error` event rejects with a ProviderError instead of ending the answer
+ □ src/features/llm-adapters/recorded-replay.spec.ts > expected behaviour once the defects are fixed > AICHAT-212: stop_reason max_tokens (Anthropic) and finish_reason length (OpenAI) mark the answer as incomplete
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > HTTP errors > anthropic http-400 maps to a ProviderError with message and retryable flag 1ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > HTTP errors > anthropic http-401 maps to a ProviderError with message and retryable flag 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > HTTP errors > anthropic http-429 maps to a ProviderError with message and retryable flag 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > HTTP errors > anthropic http-529 maps to a ProviderError with message and retryable flag 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > HTTP errors > openai http-400 maps to a ProviderError with message and retryable flag 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > HTTP errors > openai http-401 maps to a ProviderError with message and retryable flag 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > HTTP errors > openai http-429 maps to a ProviderError with message and retryable flag 0ms
+ ✓ src/features/llm-adapters/recorded-replay.spec.ts > HTTP errors > openai http-500 maps to a ProviderError with message and retryable flag 0ms
+
+ Test Files  1 passed (1)
+      Tests  41 passed | 2 todo (43)
+   Start at  12:49:22
+   Duration  196ms (transform 45%, tests 39%, import 10%, setup 4%, worker 2%)
+
+
+[exit 0]
