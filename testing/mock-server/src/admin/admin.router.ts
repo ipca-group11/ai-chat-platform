@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { countRecords, DATASET_NAMES, isDatasetName } from "../data/datasets.js";
+import { registerFaultRoutes } from "../faults/faults.js";
 import type { RequestLog } from "../core/request-log.js";
 import type { MockContext } from "../registry.js";
 
@@ -44,6 +45,8 @@ export function createAdminRouter({ ctx, reset, requests }: AdminOptions): Route
     const list = requests.list({ mock });
     res.json({ count: list.length, requests: list });
   });
+
+  registerFaultRoutes(router, ctx);
 
   router.post("/reset", (_req, res) => {
     reset();

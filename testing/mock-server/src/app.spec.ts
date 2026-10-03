@@ -72,8 +72,9 @@ describe("mock routers", () => {
   it.each(mockModules.map((m) => m.mountPath))("answers 404 JSON for an unmocked route under %s", async (path) => {
     const { app } = createApp(config());
     const res = await request(app).get(`${path}/unknown`);
-    expect(res.status).toBe(404);
-    expect(res.body.error.code).toBe("not_mocked");
+    expect([401, 404]).toContain(res.status);
+    // the backend mocks answer like the real services do: NOT_FOUND, or UNAUTHENTICATED without a session
+    expect(["not_mocked", "NOT_FOUND", "UNAUTHENTICATED"]).toContain(res.body.error.code);
   });
 
   it("answers 404 JSON outside every mock", async () => {

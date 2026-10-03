@@ -1,0 +1,47 @@
+$ ./.evidence-tmp/33-queue.sh
+$ curl -s -c cookies.txt -X POST localhost:4010/auth/login -H content-type: application/json -d {"email":"alice@mock.test","password":"Mock-pass-1234"}
+{"id":"user_00001","email":"alice@mock.test"}
+$ curl -s -b cookies.txt -X POST localhost:4010/api/chats/chat_00001/messages -H content-type: application/json -d {"content":"first"}
+{"message":{"id":"msg_00011","chatId":"chat_00001","authorId":"user_00001","authorEmail":"alice@mock.test","role":"user","content":"first","reasoning":null,"webFetches":[],"attachments":[],"status":"sent","error":null,"createdAt":"2026-10-03T12:18:17.905Z"}}
+$ curl -s -b cookies.txt -X POST localhost:4010/api/chats/chat_00001/messages -H content-type: application/json -d {"content":"second"}
+{"message":{"id":"msg_00013","chatId":"chat_00001","authorId":"user_00001","authorEmail":"alice@mock.test","role":"user","content":"second","reasoning":null,"webFetches":[],"attachments":[],"status":"queued","error":null,"createdAt":"2026-10-03T12:18:17.915Z"}}
+$ curl -s -b cookies.txt -X POST localhost:4010/api/chats/chat_00001/messages -H content-type: application/json -d {"content":"third"}
+{"message":{"id":"msg_00014","chatId":"chat_00001","authorId":"user_00001","authorEmail":"alice@mock.test","role":"user","content":"third","reasoning":null,"webFetches":[],"attachments":[],"status":"queued","error":null,"createdAt":"2026-10-03T12:18:17.924Z"}}
+# second and third wait in the queue: edit the second, cancel the third
+$ curl -s -b cookies.txt -X PATCH localhost:4010/api/chats/chat_00001/messages/msg_00013 -H content-type: application/json -d {"content":"second (edited)"}
+{"message":{"id":"msg_00013","chatId":"chat_00001","authorId":"user_00001","authorEmail":"alice@mock.test","role":"user","content":"second (edited)","reasoning":null,"webFetches":[],"attachments":[],"status":"queued","error":null,"createdAt":"2026-10-03T12:18:17.915Z"}}
+$ curl -si -b cookies.txt -X DELETE localhost:4010/api/chats/chat_00001/messages/msg_00014
+HTTP/1.1 204 No Content
+Date: Sat, 03 Oct 2026 12:18:17 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+# the first one already started: editing it is refused
+$ curl -s -b cookies.txt -X PATCH localhost:4010/api/chats/chat_00001/messages/msg_00011 -H content-type: application/json -d {"content":"too late"}
+{"error":{"code":"MESSAGE_NOT_EDITABLE","message":"Message is not queued and can no longer be edited"},"correlationId":"b900e029-acc1-43c3-8561-977c180968e4"}
+$ curl -s -b cookies.txt localhost:4010/api/chats/chat_00001/messages | jq -c '.messages[-4:][] | {id,role,status,content}'
+{"id":"msg_00011","role":"user","status":"sent","content":"first"}
+{"id":"msg_00012","role":"assistant","status":"sent","content":"Here is a short summary of what you asked. The"}
+{"id":"msg_00013","role":"user","status":"sent","content":"second (edited)"}
+{"id":"msg_00015","role":"assistant","status":"sent","content":"Both options are valid; the second is simpler to test."}
+
+# an answer that fails, then retry
+$ curl -s -b cookies.txt -X POST localhost:4010/api/chats/chat_00001/messages -H content-type: application/json -H X-Mock-Scenario: error -d {"content":"break it"}
+{"message":{"id":"msg_00016","chatId":"chat_00001","authorId":"user_00001","authorEmail":"alice@mock.test","role":"user","content":"break it","reasoning":null,"webFetches":[],"attachments":[],"status":"sent","error":null,"createdAt":"2026-10-03T12:18:20.986Z"}}
+$ curl -s -b cookies.txt localhost:4010/api/chats/chat_00001/messages | jq -c '.messages[-4:][] | {id,role,status,content}'
+{"id":"msg_00013","role":"user","status":"sent","content":"second (edited)"}
+{"id":"msg_00015","role":"assistant","status":"sent","content":"Both options are valid; the second is simpler to test."}
+{"id":"msg_00016","role":"user","status":"sent","content":"break it"}
+{"id":"msg_00017","role":"assistant","status":"failed","content":"Both options "}
+
+$ curl -s -b cookies.txt -X POST localhost:4010/api/chats/chat_00001/messages/msg_00017/retry
+{"message":{"id":"msg_00017","chatId":"chat_00001","authorId":"user_00001","authorEmail":null,"role":"assistant","content":"","reasoning":null,"webFetches":[],"attachments":[],"status":"queued","error":null,"createdAt":"2026-10-03T12:18:20.986Z"}}
+$ curl -s -b cookies.txt localhost:4010/api/chats/chat_00001/messages | jq -c '.messages[-4:][] | {id,role,status,content}'
+{"id":"msg_00013","role":"user","status":"sent","content":"second (edited)"}
+{"id":"msg_00015","role":"assistant","status":"sent","content":"Both options are valid; the second is simpler to test."}
+{"id":"msg_00016","role":"user","status":"sent","content":"break it"}
+{"id":"msg_00017","role":"assistant","status":"sent","content":"Streaming responses arrive token by token. You can attach a"}
+
+
+[exit 0]
