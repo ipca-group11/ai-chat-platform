@@ -23,3 +23,5 @@ apps/*/.mf/
 .claude/worktrees/
 semgrep-results/
 .vitest/
+zap-results/
+zap-wrk/
