@@ -1,9 +1,6 @@
 import { ProviderError, type LlmProvider, type SendMessageContext, type SendMessageOptions } from "./types.js";
 import { readSseData } from "./http-stream.js";
-
-const VISION_MODEL_HINTS = ["gpt-4o", "gpt-4-vision", "gpt-4.1", "gpt-5", "o4"];
-/** Reasoning models: the o-series (o1, o3, o4-mini, ...) and GPT-5 and later. */
-const REASONING_MODEL_PATTERN = /^(o\d|gpt-[5-9])/;
+import { supportsReasoning, supportsVision } from "@app/shared-types/model-capabilities";
 
 export interface OpenAiProviderConfig {
   baseUrl?: string;
@@ -24,12 +21,11 @@ export class OpenAiProvider implements LlmProvider {
   }
 
   supportsVision(model: string): boolean {
-    const lower = model.toLowerCase();
-    return VISION_MODEL_HINTS.some((hint) => lower.includes(hint));
+    return supportsVision("openai", model);
   }
 
   supportsReasoning(model: string): boolean {
-    return REASONING_MODEL_PATTERN.test(model.toLowerCase());
+    return supportsReasoning("openai", model);
   }
 
   /** Chat Completions has no built-in web fetch tool. */

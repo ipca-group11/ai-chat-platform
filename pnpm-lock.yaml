@@ -102,6 +102,9 @@ importers:
 
   apps/mfe-chat:
     dependencies:
+      '@app/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       '@app/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -698,6 +701,15 @@ importers:
 
   packages/workspace-config:
     devDependencies:
+      '@app/conversation-service':
+        specifier: workspace:*
+        version: link:../../services/conversation-service
+      '@app/mfe-chat':
+        specifier: workspace:*
+        version: link:../../apps/mfe-chat
+      '@app/shared-types':
+        specifier: workspace:*
+        version: link:../shared-types
       '@platform/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
@@ -807,6 +819,9 @@ importers:
 
   services/conversation-service:
     dependencies:
+      '@app/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       '@prisma/client':
         specifier: 6.1.0
         version: 6.1.0(prisma@6.1.0)

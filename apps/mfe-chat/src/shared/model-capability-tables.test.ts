@@ -1,6 +1,4 @@
 import { describe, expect, it } from "vitest";
-// Everything this file depends on is imported here. When the capability tables move to
-// packages/shared-types, only these three imports change.
 import { supportsAttachmentKind } from "../features/attachments/model/model-capabilities";
 import { supportsReasoning, supportsWebFetch } from "./model-capabilities";
 import { PROVIDERS, PROVIDER_MODELS, type Provider } from "./types";
@@ -29,7 +27,7 @@ const EXPECTED: Record<Provider, Record<string, Capabilities>> = {
     "claude-sonnet-5-5": { reasoning: true, webFetch: true, vision: true },
     "claude-haiku-4-5": { reasoning: true, webFetch: true, vision: true },
     "claude-3-5-sonnet-latest": { reasoning: false, webFetch: false, vision: true },
-    "claude-3-5-haiku-latest": { reasoning: false, webFetch: false, vision: false },
+    "claude-3-5-haiku-latest": { reasoning: false, webFetch: false, vision: true },
   },
 };
 

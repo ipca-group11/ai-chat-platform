@@ -3,11 +3,25 @@ import { coveragePreset, appCoverageThresholds } from "@platform/test-config";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { federation } from "@module-federation/vite";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Chat microfrontend: exposes /chats, /chats/:id routes and a mount function to
 // apps/shell (the Module Federation host). See docs/pods/chat/PLAN.md FE-1 and
 // docs/ARCHITECTURE.md §3 for the module map / remote contract.
 export default defineConfig({
+  resolve: {
+    alias: {
+      // The model catalogue shared with conversation-service (AICHAT-133); read from source so
+      // the app builds and tests without building the package first.
+      "@app/shared-types/model-capabilities": path.resolve(
+        dirname,
+        "../../packages/shared-types/src/model-capabilities.ts",
+      ),
+    },
+  },
   // Dev port the shell expects for this remote (apps/shell/module-federation.config.ts).
   server: {
     port: 5002,

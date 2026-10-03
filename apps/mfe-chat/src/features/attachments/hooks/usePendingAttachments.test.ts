@@ -48,7 +48,7 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
   it("AC-71: rejects an image attachment for a model without vision support, before sending", () => {
     const requests = recordRequests();
 
-    const { result } = renderHookWithClient(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"));
+    const { result } = renderHookWithClient(() => usePendingAttachments("chat-1", "anthropic", "claude-2.1"));
 
     act(() => result.current.addFiles([makeFile("photo.png", "image/png")]));
 

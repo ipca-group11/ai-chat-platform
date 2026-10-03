@@ -8,3 +8,4 @@
 export * as auth from "./auth";
 export * as chat from "./chat";
 export * as http from "./http";
+export * as modelCapabilities from "./model-capabilities";

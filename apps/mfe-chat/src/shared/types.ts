@@ -9,20 +9,11 @@
  * should re-declare these shapes, so that swap is a one-line change per import.
  */
 
-export type Provider = "openai" | "anthropic";
+// The model catalogue lives in packages/shared-types, shared with conversation-service (AICHAT-133).
+import { PROVIDER_MODELS, PROVIDERS, type Provider } from "@app/shared-types/model-capabilities";
 
-export const PROVIDERS: readonly Provider[] = ["anthropic", "openai"];
-
-export const PROVIDER_MODELS: Record<Provider, readonly string[]> = {
-  openai: ["gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-5-mini", "o4-mini"],
-  anthropic: [
-    "claude-opus-5-5",
-    "claude-sonnet-5-5",
-    "claude-haiku-4-5",
-    "claude-3-5-sonnet-latest",
-    "claude-3-5-haiku-latest",
-  ],
-};
+export { PROVIDER_MODELS, PROVIDERS };
+export type { Provider };
 
 export interface Chat {
   id: string;

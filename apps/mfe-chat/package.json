@@ -14,6 +14,7 @@
     "test:watch": "cross-env NODE_ENV=test vitest"
   },
   "dependencies": {
+    "@app/shared-types": "workspace:*",
     "@app/ui": "workspace:*",
     "@tanstack/react-query": "^5.103.2",
     "@tanstack/react-router": "^1.170.39",

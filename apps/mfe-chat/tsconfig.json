@@ -12,6 +12,9 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // Module Federation DTS generation walks into packages/shared-types, outside src/.
+    "rootDir": "../..",
+    "paths": { "@app/shared-types/model-capabilities": ["../../packages/shared-types/src/model-capabilities.ts"] },
     "noEmit": true,
     "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom", "node"]
   },
