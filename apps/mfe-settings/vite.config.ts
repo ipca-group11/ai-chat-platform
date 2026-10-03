@@ -64,7 +64,7 @@ export default defineConfig({
     env: {
       NODE_ENV: "test",
     },
-    setupFiles: ["./src/shared/test/setup.ts"],
+    setupFiles: ["./src/shared/test/setup.ts", "@platform/test-utils/setup"],
     css: false,
     coverage: coveragePreset({
       thresholds: appCoverageThresholds,

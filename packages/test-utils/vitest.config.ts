@@ -6,7 +6,8 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     env: { NODE_ENV: "test" },
-    setupFiles: ["@testing-library/jest-dom/vitest"],
+    // The package tests itself with the same setup file the microfrontends use.
+    setupFiles: ["@testing-library/jest-dom/vitest", "./src/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     coverage: coveragePreset({
       include: ["src/**/*.{ts,tsx}"],

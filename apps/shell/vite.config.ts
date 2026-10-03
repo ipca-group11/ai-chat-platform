@@ -74,7 +74,7 @@ export default defineConfig({
     env: {
       NODE_ENV: 'test',
     },
-    setupFiles: ['./src/test-setup.ts'],
+    setupFiles: ['./src/test-setup.ts', '@platform/test-utils/setup'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     // Cold-cache transform of module-federation.config.ts (and its
     // @module-federation/vite import) can exceed the 5s default, especially

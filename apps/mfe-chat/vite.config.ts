@@ -39,7 +39,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
-    setupFiles: ["./src/test/setup.ts"],
+    setupFiles: ["./src/test/setup.ts", "@platform/test-utils/setup"],
     css: false,
     testTimeout: 15000,
     coverage: coveragePreset({
