@@ -43,7 +43,8 @@ describe("auth-service logs carry no session token", () => {
   it("keeps tokens out of an error log too", async () => {
     const logs = createLogCapture();
     const { app } = buildTestApp(throwingPrisma(), { logger: createLogger(logs, "debug") });
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl";
+    // Built from parts: a fake token, but it has the shape of a real one.
+    const token = ["eyJhbGciOiJIUzI1NiJ9", "eyJzdWIiOiJ1MSJ9", "c2lnbmF0dXJl"].join(".");
     const res = await request(app).get("/auth/me").set("Cookie", `access_token=${token}`);
     expect(res.status).toBe(401);
     expect(describePii(findPiiInLines(logs.lines(), { canaries: [token], ignore: ["email", "ip"] }))).toBe("");

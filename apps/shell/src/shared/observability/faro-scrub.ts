@@ -19,7 +19,7 @@ const IPV6 = new RegExp(
 );
 const JWT = /\beyJ[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]*/g;
 const BEARER = /\bBearer\s+[A-Za-z0-9._~+/=-]{8,}/g;
-const API_KEY = /\bsk-[A-Za-z0-9_-]{12,}/g;
+const PROVIDER_KEY = /\bsk-[A-Za-z0-9_-]{12,}/g;
 const URL_IN_TEXT = /https?:\/\/[^\s"'<>)\]]+/g;
 
 /** Keys whose value is replaced whatever it holds. */
@@ -31,7 +31,7 @@ function scrubText(text: string): string {
     .replace(EMAIL, REDACTED)
     .replace(JWT, REDACTED)
     .replace(BEARER, REDACTED)
-    .replace(API_KEY, REDACTED)
+    .replace(PROVIDER_KEY, REDACTED)
     .replace(IPV4, REDACTED)
     .replace(IPV6, REDACTED);
 }

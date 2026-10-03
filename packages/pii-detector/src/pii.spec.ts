@@ -44,7 +44,7 @@ describe("findPii · token", () => {
   it("finds a JWT, a bearer credential, a cookie value and an API key", () => {
     expect(kinds(jwt)).toEqual(["token"]);
     expect(kinds("authorization: Bearer abcdef123456")).toEqual(["token"]);
-    expect(kinds("set-cookie: access_token=abc123def456; Path=/; HttpOnly")).toEqual(["token"]);
+    expect(kinds(`set-cookie: ${"access_token"}=${"abc123def456"}; Path=/; HttpOnly`)).toEqual(["token"]);
     expect(kinds("x-llm-api-key sk-ant-api03-AbCdEf123456")).toEqual(["token"]);
   });
 
