@@ -11,11 +11,17 @@ $ pnpm --filter e2e exec vitest run src/ci/dast-workflow.spec.ts --reporter=verb
  ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > keeps the HTML, JSON and Markdown reports as build artifacts even when the scan fails 0ms
  ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > tears the stack down even if the job fails 0ms
  ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > documents the required-check team rule and never targets production 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST weekly API scan (AICHAT-121) > runs on a weekly schedule and on demand, never on a pull request 1ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST weekly API scan (AICHAT-121) > scans the OpenAPI file with zap-api-scan.py and keeps the reports 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST weekly API scan (AICHAT-121) > sets the active High rules to FAIL 0ms
+ ✓ src/ci/dast-workflow.spec.ts > OpenAPI file for the API scan (AICHAT-121) > is OpenAPI 3 and uses the shell as the server 0ms
+ ✓ src/ci/dast-workflow.spec.ts > OpenAPI file for the API scan (AICHAT-121) > lists every conversation-service route under /api/chats, except the endless stream 1ms
+ ✓ src/ci/dast-workflow.spec.ts > OpenAPI file for the API scan (AICHAT-121) > lists every auth-service route under /auth 0ms
 
  Test Files  1 passed (1)
-      Tests  9 passed (9)
-   Start at  20:47:02
-   Duration  104ms (transform 55%, import 23%, tests 13%, worker 9%)
+      Tests  15 passed (15)
+   Start at  21:13:38
+   Duration  144ms (transform 48%, import 31%, tests 13%, worker 8%)
 
 
 [exit 0]
