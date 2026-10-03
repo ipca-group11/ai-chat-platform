@@ -43,24 +43,26 @@ branch (`git switch integration/testing-epics && git merge origin/main && git pu
 
 ## Wave 0: decisions (one team session, before any code)
 
-| # | Decision | Epic | Proposal to bring |
+Decisions taken by the owner on 2026-10-03:
+
+| # | Decision | Epic | Answer |
 |---|---|---|---|
-| D1 | Coverage thresholds per project group, ratchet policy | 34 | README §5 proposal |
-| D2 | Unit-test exempt list (bootstrap, barrels, type-only) | 17 | README policy |
-| D3 | Testability changes allowed in app code: `createApp` DI, env-configurable LLM base URLs | 23, 144, 24, 26 | Yes, small and reviewed |
-| D4 | SAST tool: Semgrep CE vs paid CodeQL; GitHub secret scanning licence | 27, 31 | Semgrep CE + gitleaks (free) |
-| D5 | API keys and budget for one recording run and the red-team run | 25, 26 | Keys from the team account, fixed cap |
-| D6 | Bundle size limits and performance budgets | 22, 21 | Current size + 10 %, Lighthouse ≥ 90 |
-| D7 | Masking rule for emails and IPs | 32 | Hash emails, truncate IPs |
-| D8 | System prompt or test-only canary | 26 | Test-only canary |
-| D9 | Self-hosted fonts for visual tests | 19 | Self-host |
-| D10 | Retention periods, shared-chat behaviour on account deletion, who builds the deletion endpoint | 33 | Raise with the backend owner now |
-| D11 | Pentest rules of engagement and environment | 29 | Staging VM, written approval |
+| D1 | Coverage thresholds per project group, ratchet policy | 34 | README §5 proposal (services/packages 80/80/80/80, MFEs and shell 80/75/80/80, e2e helpers 80/70/80/80, k6 exempt); projects below it are ratcheted from their current value |
+| D2 | Unit-test exempt list | 17 | README policy: bootstrap files, barrel `index` files and type-only modules, one reason each |
+| D3 | Testability changes in app code (`createApp` DI, env-configurable LLM base URLs) | 23, 144, 24, 26 | Allowed: small, one commit and PR each, reviewed by the code owner |
+| D4 | SAST and secret scanning tools | 27, 31 | Semgrep CE + gitleaks (free, in GitHub Actions) |
+| D5 | LLM API keys and budget | 25, 26 | No paid API: recordings and red-team runs use local Ollama; OpenAI/Anthropic fixtures are written by hand from the provider docs |
+| D6 | Bundle size limits and performance budgets | 22, 21 | Size limit = current gzip size + 10 %; Lighthouse performance ≥ 90, LCP < 2.5 s, CLS < 0.1 |
+| D7 | Masking rule for emails and IPs | 32 | Email → short salted hash; IPv4 last octet zeroed |
+| D8 | System prompt | 26 | Test-only canary system prompt, enabled by env; production unchanged |
+| D9 | Fonts for visual tests | 19 | Self-hosted fonts |
+| D10 | User deletion endpoint | 33 | Built inside AICHAT-33 as a testability change, reviewed by the backend owner; 30-day retention |
+| D11 | Pentest environment | 29 | Local Docker compose stack only, no deployed target |
 
 External dependencies to raise in the same session: **AICHAT-4** (E2E harness, João Delgado) for AICHAT-19,
 **AICHAT-7** (image scanning, João Delgado) for AICHAT-30, and the **user deletion endpoint** for AICHAT-33.
 
-Record the answers as a comment on each epic in Jira; the DoR review of each epic then only confirms them.
+The answers are recorded as a comment on each epic in Jira; the DoR review of each epic only confirms them.
 
 ## The path
 
@@ -69,7 +71,7 @@ Record the answers as a comment on each epic in Jira; the DoR review of each epi
 | 1 | 1 · Foundations | AICHAT-34 Coverage thresholds | 11 | Gate the other epics are measured against | D1 |
 | 2 | 1 · Foundations | AICHAT-31 Secret scanning | 10 | No blockers, real secret file present locally | D4 |
 | 3 | 1 · Foundations | AICHAT-27 SAST | 10 | No blockers, finds the JWT default secret (F1) | D4 |
-| 4 | 2 · Test infrastructure | AICHAT-25 Provider adapter testing | 13 | Produces the recorded LLM fixtures the mock server replays | D5 |
+| 4 | 2 · Test infrastructure | AICHAT-25 Provider adapter testing | 13 | Produces the recorded LLM fixtures (from Ollama) the mock server replays | D5 |
 | 5 | 2 · Test infrastructure | AICHAT-144 Mock server | 51 | Unblocks 24, 26, 28, 32 and frontend tests | D3 |
 | 6 | 3 · Code quality | AICHAT-17 Unit testing | 47 | Base of the pyramid, provides shared test helpers | D2, step 1 |
 | 7 | 3 · Code quality | AICHAT-18 Component testing | 14 | Uses the helpers from AICHAT-17 | step 6 |
@@ -98,7 +100,7 @@ Each line is typed in Claude Code. After the epic's PRs are merged into the inte
 move to the next line. To resume an epic that was interrupted, use `continue AICHAT-<n>` instead.
 
 **Wave 0**
-- [ ] Hold the decision session (D1 to D11), record the answers in Jira
+- [x] Hold the decision session (D1 to D11), record the answers in Jira
 
 **Wave 1: foundations**
 - [ ] `start AICHAT-34`
