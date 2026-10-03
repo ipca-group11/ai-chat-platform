@@ -14,6 +14,7 @@ function setup(env: NodeJS.ProcessEnv = {}) {
 
 async function signIn(app: ReturnType<typeof setup>["app"]) {
   const login = await request(app).post("/auth/login").send({ email: "alice@mock.test", password: MOCK_PASSWORD });
+  expect(login.status, `sign-in: ${JSON.stringify(login.body)}`).toBe(200);
   return (login.headers["set-cookie"] as unknown as string[]).map((c) => c.split(";")[0]).join("; ");
 }
 
@@ -172,16 +173,21 @@ describe("conversation faults", () => {
     await new Promise((resolve) => server.once("listening", resolve));
     const { port } = server.address() as AddressInfo;
     const received: string[] = [];
+    // Resolves once the stream is open: the message is sent only after that, so the answer is
+    // never produced before anyone listens (a fixed 30 ms pause was not enough on a loaded machine).
+    let opened!: () => void;
+    const streamOpen = new Promise<void>((resolve) => (opened = resolve));
     const closed = new Promise<void>((resolve) => {
       get({ port, path: "/api/chats/chat_00001/stream", headers: { Cookie: cookie } }, (res) => {
         expect(res.headers["x-mock-fault"]).toBe("stream-drop");
+        opened();
         res.setEncoding("utf8");
         res.on("data", (chunk: string) => received.push(chunk));
         res.on("close", resolve);
         res.on("error", () => undefined);
       }).on("error", () => resolve());
     });
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    await streamOpen;
     await request(app).post("/api/chats/chat_00001/messages").set("Cookie", cookie).send({ content: "go" });
     await closed;
     server.closeAllConnections();

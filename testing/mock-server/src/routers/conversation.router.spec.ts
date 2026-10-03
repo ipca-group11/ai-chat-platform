@@ -17,6 +17,9 @@ import {
   type SseEvent,
 } from "../conversation/contract.js";
 
+/** Longest a test waits for the mock to settle or to deliver an event. */
+const WAIT_LIMIT_MS = 15_000;
+
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function setup(env: NodeJS.ProcessEnv = {}) {
@@ -29,6 +32,8 @@ function setup(env: NodeJS.ProcessEnv = {}) {
 /** Signs in and returns a client with the session cookie on every call. */
 async function signIn(app: Express, email = "alice@mock.test") {
   const login = await request(app).post("/auth/login").send({ email, password: MOCK_PASSWORD });
+  // Fail with the real reason instead of a TypeError on a missing cookie.
+  expect(login.status, `sign-in of ${email}: ${JSON.stringify(login.body)}`).toBe(200);
   const cookie = (login.headers["set-cookie"] as unknown as string[]).map((c) => c.split(";")[0]).join("; ");
   const as = (method: "get" | "post" | "patch" | "delete", path: string) =>
     request(app)[method](`/api${path}`).set("Cookie", cookie);
@@ -42,7 +47,9 @@ async function firstChatId(as: Awaited<ReturnType<typeof signIn>>["as"], title =
 
 /** Waits until nothing is streaming or queued in a chat. */
 async function settled(as: Awaited<ReturnType<typeof signIn>>["as"], chatId: string): Promise<MessageDto[]> {
-  for (let i = 0; i < 200; i++) {
+  // A deadline, not a fixed number of polls: a loaded machine (parallel nx runs) is slower, not wrong.
+  const deadline = Date.now() + WAIT_LIMIT_MS;
+  while (Date.now() < deadline) {
     const { messages } = (await as("get", `/chats/${chatId}/messages`)).body as { messages: MessageDto[] };
     if (messages.every((m) => m.status !== "streaming" && m.status !== "queued")) return messages;
     await wait(10);
@@ -86,7 +93,8 @@ async function openStream(app: Express, cookie: string, chatId: string) {
       return ended;
     },
     async until(predicate: (events: SseEvent[]) => boolean) {
-      for (let i = 0; i < 300 && !predicate(events); i++) await wait(10);
+      const deadline = Date.now() + WAIT_LIMIT_MS;
+      while (!predicate(events) && Date.now() < deadline) await wait(10);
       return events;
     },
     close() {
