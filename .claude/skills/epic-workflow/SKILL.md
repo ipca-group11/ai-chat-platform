@@ -82,7 +82,8 @@ Acceptance criteria:
 Decisions that apply: <1–5 lines from WORKLOG §1>
 Load only this context: <1–3 awk commands from the epic skill's context loaders>; then open only the files those sections reference.
 Do:
-1. Implement the story. Small commits, Conventional Commits, body "Refs: <JIRA-KEY>". No co-author/generated trailers.
+1. Implement the story in TypeScript only (no new .js/.mjs: scripts run as `node script.ts`, tests are .ts, ESLint configs
+   are eslint.config.ts). Small commits, Conventional Commits, body "Refs: <JIRA-KEY>". No co-author/generated trailers.
 2. Run it. Capture evidence with: node scripts/evidence/term-shot.mjs --out docs/<epic>/evidence --name <nn>-<what> -- <cmd>
    (also capture an expected failure if the story adds a gate).
 3. Write section "### US<k> · <summary>" in docs/<epic>/WORKLOG.md §3 using the template headings (What and why, Files,
