@@ -10,9 +10,9 @@ title: "AICHAT-144 · Mock server: work log"
 | Analysis | [README.md](README.md) |
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-144-mock-server` |
-| Started / finished | 2026-10-03 / … |
-| Pull requests | #… |
-| Status | In Progress |
+| Started / finished | 2026-10-03 / 2026-10-03 |
+| Pull requests | [#12](https://github.com/ipca-group11/ai-chat-platform/pull/12) |
+| Status | Review |
 
 ## 1. DoR review
 
