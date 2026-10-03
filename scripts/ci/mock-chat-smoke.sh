@@ -11,7 +11,7 @@ SCENARIO="${1:-ok}"
 JAR="$(mktemp)"
 trap 'rm -f "$JAR"' EXIT
 EMAIL="smoke.$(date +%s)@mock.test"
-PASSWORD="Smoke1234pass"
+PASSWORD="Smoke$(date +%s)pass"
 json=(-H 'content-type: application/json')
 
 echo "== register and sign in as $EMAIL"

@@ -1,0 +1,6 @@
+$ bash scripts/ci/semgrep.sh
+semgrep exit code: 0 (results in semgrep-results/)
+[00.13][WARNING]: Skipping unknown field 'pattern-not-sinks' in rule "ajinabraham.njsscan.database.nosql_find_injection.node_nosqli_injection"
+[00.91][WARNING]: Skipping unknown field 'pattern-not-sinks' in rule "ajinabraham.njsscan.database.nosql_find_injection.node_nosqli_injection"
+
+[exit 0]

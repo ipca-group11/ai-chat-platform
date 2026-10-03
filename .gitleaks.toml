@@ -20,3 +20,8 @@ useDefault = true
 # description = "Fake provider key used as a fixture in the settings tests"
 # paths = ['''^apps/mfe-settings/src/features/api-keys/hooks/useApiKeys\.test\.tsx$''']
 # regexes = ['''sk-ant-test-[A-Za-z0-9]+''']
+
+[[allowlists]]
+description = "Throwaway password of the mock smoke script (first version, commit 4e7ad2b); it now builds the password at run time"
+paths = ['''^scripts/ci/mock-chat-smoke\.sh$''']
+regexes = ['''PASSWORD="Smoke1234pass"''']
