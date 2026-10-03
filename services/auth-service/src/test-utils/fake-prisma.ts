@@ -55,6 +55,13 @@ export function fakePrisma(seed: { users?: FakeUserRow[]; refreshTokens?: FakeRe
       users.set(user.email, user);
       usersById.set(user.id, user);
     },
+    /** Test-only: deletes a user, e.g. to simulate an account removed after login. */
+    __removeUser(id: string) {
+      const user = usersById.get(id);
+      if (!user) return;
+      usersById.delete(id);
+      users.delete(user.email);
+    },
     user: {
       findUnique: vi.fn(async ({ where }: { where: { email?: string; id?: string } }) => {
         if (where.email) return users.get(where.email) ?? null;
