@@ -55,7 +55,7 @@ if [ "$mode" = "baseline" ]; then
   # -j AJAX spider (the shell is a React app), -I never fail on warnings inside ZAP itself.
   cmd=(zap-baseline.py -t "$target" -j -m "${ZAP_MINUTES:-3}" -I "${zap_args[@]}")
 else
-  cmd=(zap-api-scan.py -t /zap/wrk/openapi.yaml -f openapi -O "$target" -T "${ZAP_MINUTES:-10}" -I "${zap_args[@]}")
+  cmd=(zap-api-scan.py -t /zap/wrk/openapi.yaml -f openapi -O "$base" -T "${ZAP_MINUTES:-10}" -I "${zap_args[@]}")
 fi
 
 status=0

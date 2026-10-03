@@ -8,9 +8,9 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Risk Level | Number of Alerts |
 | --- | --- |
 | High | 0 |
-| Medium | 0 |
-| Low | 1 |
-| Informational | 5 |
+| Medium | 1 |
+| Low | 3 |
+| Informational | 6 |
 
 
 
@@ -19,9 +19,12 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Level | Reason | Site | Description | Statistic |
 | --- | --- | --- | --- | --- |
-| Low | Warning |  | ZAP warnings logged - see the zap.log file for details | 63    |
-| Low | Exceeded High | http://localhost:8000 | Percentage of responses with status code 4xx | 97 % |
+| Low | Warning |  | ZAP errors logged - see the zap.log file for details | 3    |
+| Low | Warning |  | ZAP warnings logged - see the zap.log file for details | 62    |
+| Low | Exceeded High | http://localhost:8000 | Percentage of responses with status code 4xx | 83 % |
 | Info | Informational |  | Percentage of network failures | 1 % |
+| Info | Informational | http://localhost:12347 | Percentage of responses with status code 2xx | 100 % |
+| Info | Informational | http://localhost:12347 | Percentage of slow responses | 66 % |
 | Info | Informational | http://localhost:3001 | Percentage of responses with status code 2xx | 100 % |
 | Info | Informational | http://localhost:3001 | Percentage of endpoints with content type text/javascript | 100 % |
 | Info | Informational | http://localhost:3001 | Percentage of endpoints with method GET | 100 % |
@@ -36,22 +39,29 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Info | Informational | http://localhost:3003 | Percentage of endpoints with content type text/javascript | 100 % |
 | Info | Informational | http://localhost:3003 | Percentage of endpoints with method GET | 100 % |
 | Info | Informational | http://localhost:3003 | Count of total endpoints | 7    |
-| Info | Informational | http://localhost:3003 | Percentage of slow responses | 28 % |
-| Info | Informational | http://localhost:8000 | Percentage of responses with status code 2xx | 2 % |
-| Info | Informational | http://localhost:8000 | Percentage of endpoints with content type application/json | 68 % |
+| Info | Informational | http://localhost:3003 | Percentage of slow responses | 42 % |
+| Info | Informational | http://localhost:8000 | Percentage of responses with status code 2xx | 12 % |
+| Info | Informational | http://localhost:8000 | Percentage of responses with status code 5xx | 3 % |
+| Info | Informational | http://localhost:8000 | Percentage of endpoints with content type application/json | 53 % |
 | Info | Informational | http://localhost:8000 | Percentage of endpoints with content type text/css | 1 % |
-| Info | Informational | http://localhost:8000 | Percentage of endpoints with content type text/html | 2 % |
-| Info | Informational | http://localhost:8000 | Percentage of endpoints with content type text/javascript | 5 % |
+| Info | Informational | http://localhost:8000 | Percentage of endpoints with content type text/html | 14 % |
+| Info | Informational | http://localhost:8000 | Percentage of endpoints with content type text/javascript | 6 % |
 | Info | Informational | http://localhost:8000 | Percentage of endpoints with method DELETE | 5 % |
 | Info | Informational | http://localhost:8000 | Percentage of endpoints with method GET | 64 % |
 | Info | Informational | http://localhost:8000 | Percentage of endpoints with method PATCH | 1 % |
 | Info | Informational | http://localhost:8000 | Percentage of endpoints with method POST | 28 % |
-| Info | Informational | http://localhost:8000 | Count of total endpoints | 288    |
+| Info | Informational | http://localhost:8000 | Count of total endpoints | 270    |
+| Info | Informational | http://localhost:8000 | Percentage of slow responses | 2 % |
 | Info | Informational | https://fonts.googleapis.com | Percentage of responses with status code 2xx | 100 % |
 | Info | Informational | https://fonts.googleapis.com | Percentage of endpoints with content type text/css | 100 % |
 | Info | Informational | https://fonts.googleapis.com | Percentage of endpoints with method GET | 100 % |
 | Info | Informational | https://fonts.googleapis.com | Count of total endpoints | 1    |
 | Info | Informational | https://fonts.googleapis.com | Percentage of slow responses | 100 % |
+| Info | Informational | https://fonts.gstatic.com | Percentage of responses with status code 2xx | 100 % |
+| Info | Informational | https://fonts.gstatic.com | Percentage of endpoints with content type font/woff2 | 100 % |
+| Info | Informational | https://fonts.gstatic.com | Percentage of endpoints with method GET | 100 % |
+| Info | Informational | https://fonts.gstatic.com | Count of total endpoints | 1    |
+| Info | Informational | https://fonts.gstatic.com | Percentage of slow responses | 100 % |
 
 
 
@@ -63,11 +73,15 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Name | Risk Level | Number of Instances |
 | --- | --- | --- |
-| Unexpected Content-Type was returned | Low | 46 |
-| A Client Error response code was returned by the server | Informational | 273 |
+| Format String Error | Medium | 1 |
+| A Server Error response code was returned by the server | Low | 4 |
+| Cross Site Scripting Weakness (Persistent in JSON Response) | Low | 3 |
+| Unexpected Content-Type was returned | Low | 87 |
+| A Client Error response code was returned by the server | Informational | 256 |
 | Authentication Request Identified | Informational | 1 |
-| Non-Storable Content | Informational | 2 |
-| Storable and Cacheable Content | Informational | Systemic |
+| Information Disclosure - Suspicious Comments | Informational | 1 |
+| Non-Storable Content | Informational | Systemic |
+| Storable and Cacheable Content | Informational | 5 |
 | User Agent Fuzzer | Informational | Systemic |
 
 
@@ -76,6 +90,181 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 ## Alert Detail
 
 
+
+### [ Format String Error ](https://www.zaproxy.org/docs/alerts/30002/)
+
+
+
+##### Medium (Medium)
+
+### Description
+
+A Format String error occurs when the submitted data of an input string is evaluated as a command by the application.
+
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:file)`
+  * Method: `POST`
+  * Parameter: `file`
+  * Attack: `ZAP%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s
+`
+  * Evidence: ``
+  * Other Info: `Potential Format String Error. The script closed the connection on a /%s.`
+
+
+Instances: 1
+
+### Solution
+
+Rewrite the background program using proper deletion of bad character strings. This will require a recompile of the background executable.
+
+### Reference
+
+
+* [ https://owasp.org/www-community/attacks/Format_string_attack ](https://owasp.org/www-community/attacks/Format_string_attack)
+
+
+#### CWE Id: [ 134 ](https://cwe.mitre.org/data/definitions/134.html)
+
+
+#### WASC Id: 6
+
+#### Source ID: 1
+
+### [ A Server Error response code was returned by the server ](https://www.zaproxy.org/docs/alerts/100000/)
+
+
+
+##### Low (High)
+
+### Description
+
+A response code of 500 was returned by the server.
+This may indicate that the application is failing to handle unexpected input correctly.
+Raised by the 'Alert on HTTP Response Code Error' script
+
+* URL: http://localhost:8000/api/chats
+  * Node Name: `http://localhost:8000/api/chats ()({title,provider,model,reasoning,webFetch})`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `500`
+  * Other Info: ``
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:)`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `500`
+  * Other Info: ``
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:file)`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `500`
+  * Other Info: ``
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:rtobject)`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `500`
+  * Other Info: ``
+
+
+Instances: 4
+
+### Solution
+
+
+
+### Reference
+
+
+
+#### CWE Id: [ 388 ](https://cwe.mitre.org/data/definitions/388.html)
+
+
+#### WASC Id: 20
+
+#### Source ID: 4
+
+### [ Cross Site Scripting Weakness (Persistent in JSON Response) ](https://www.zaproxy.org/docs/alerts/40014/)
+
+
+
+##### Low (Low)
+
+### Description
+
+A XSS attack was found in a JSON response, this might leave content consumers vulnerable to attack if they don't appropriately handle the data (response).
+
+* URL: http://localhost:8000/api/chats
+  * Node Name: `http://localhost:8000/api/chats`
+  * Method: `GET`
+  * Parameter: `file`
+  * Attack: `<script>alert(1);</script>`
+  * Evidence: ``
+  * Other Info: `Raised with LOW confidence as the Content-Type is not HTML.`
+* URL: http://localhost:8000/api/chats
+  * Node Name: `http://localhost:8000/api/chats`
+  * Method: `GET`
+  * Parameter: `model`
+  * Attack: `<script>alert(1);</script>`
+  * Evidence: ``
+  * Other Info: `Raised with LOW confidence as the Content-Type is not HTML.`
+* URL: http://localhost:8000/api/chats
+  * Node Name: `http://localhost:8000/api/chats`
+  * Method: `GET`
+  * Parameter: `title`
+  * Attack: `<script>alert(1);</script>`
+  * Evidence: ``
+  * Other Info: `Raised with LOW confidence as the Content-Type is not HTML.`
+
+
+Instances: 3
+
+### Solution
+
+Phase: Architecture and Design
+Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid.
+Examples of libraries and frameworks that make it easier to generate properly encoded output include Microsoft's Anti-XSS library, the OWASP ESAPI Encoding module, and Apache Wicket.
+
+Phases: Implementation; Architecture and Design
+Understand the context in which your data will be used and the encoding that will be expected. This is especially important when transmitting data between different components, or when generating outputs that can contain multiple encodings at the same time, such as web pages or multi-part mail messages. Study all expected communication protocols and data representations to determine the required encoding strategies.
+For any data that will be output to another web page, especially any data that was received from external inputs, use the appropriate encoding on all non-alphanumeric characters.
+Consult the XSS Prevention Cheat Sheet for more details on the types of encoding and escaping that are needed.
+
+Phase: Architecture and Design
+For any security checks that are performed on the client side, ensure that these checks are duplicated on the server side, in order to avoid CWE-602. Attackers can bypass the client-side checks by modifying values after the checks have been performed, or by changing the client to remove the client-side checks entirely. Then, these modified values would be submitted to the server.
+
+If available, use structured mechanisms that automatically enforce the separation between data and code. These mechanisms may be able to provide the relevant quoting, encoding, and validation automatically, instead of relying on the developer to provide this capability at every point where output is generated.
+
+Phase: Implementation
+For every web page that is generated, use and specify a character encoding such as ISO-8859-1 or UTF-8. When an encoding is not specified, the web browser may choose a different encoding by guessing which encoding is actually being used by the web page. This can cause the web browser to treat certain sequences as special, opening up the client to subtle XSS attacks. See CWE-116 for more mitigations related to encoding/escaping.
+
+To help mitigate XSS attacks against the user's session cookie, set the session cookie to be HttpOnly. In browsers that support the HttpOnly feature (such as more recent versions of Internet Explorer and Firefox), this attribute can prevent the user's session cookie from being accessible to malicious client-side scripts that use document.cookie. This is not a complete solution, since HttpOnly is not supported by all browsers. More importantly, XMLHTTPRequest and other powerful browser technologies provide read access to HTTP headers, including the Set-Cookie header in which the HttpOnly flag is set.
+
+Assume all input is malicious. Use an "accept known good" input validation strategy, i.e., use an allow list of acceptable inputs that strictly conform to specifications. Reject any input that does not strictly conform to specifications, or transform it into something that does. Do not rely exclusively on looking for malicious or malformed inputs (i.e., do not rely on a deny list). However, deny lists can be useful for detecting potential attacks or determining which inputs are so malformed that they should be rejected outright.
+
+When performing input validation, consider all potentially relevant properties, including length, type of input, the full range of acceptable values, missing or extra inputs, syntax, consistency across related fields, and conformance to business rules. As an example of business rule logic, "boat" may be syntactically valid because it only contains alphanumeric characters, but it is not valid if you are expecting colors such as "red" or "blue."
+
+Ensure that you perform input validation at well-defined interfaces within the application. This will help protect the application even if a component is reused or moved elsewhere.
+	
+
+### Reference
+
+
+* [ https://owasp.org/www-community/attacks/xss/ ](https://owasp.org/www-community/attacks/xss/)
+* [ https://cwe.mitre.org/data/definitions/79.html ](https://cwe.mitre.org/data/definitions/79.html)
+
+
+#### CWE Id: [ 79 ](https://cwe.mitre.org/data/definitions/79.html)
+
+
+#### WASC Id: 8
+
+#### Source ID: 1
 
 ### [ Unexpected Content-Type was returned ](https://www.zaproxy.org/docs/alerts/100001/)
 
@@ -243,6 +432,13 @@ Raised by the 'Alert on Unexpected Content Types' script
   * Attack: ``
   * Evidence: `text/html`
   * Other Info: ``
+* URL: http://localhost:8000/%3Fname=abc
+  * Node Name: `http://localhost:8000/ (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
 * URL: http://localhost:8000/WEB-INF/applicationContext.xml
   * Node Name: `http://localhost:8000/WEB-INF/applicationContext.xml`
   * Method: `GET`
@@ -294,6 +490,13 @@ Raised by the 'Alert on Unexpected Content Types' script
   * Other Info: ``
 * URL: http://localhost:8000/assets/_virtual_mf-localSharedImportMap___mfe_internal__shell__mf_owner__1-CVY2nkq2.js
   * Node Name: `http://localhost:8000/assets/_virtual_mf-localSharedImportMap___mfe_internal__shell__mf_owner__1-CVY2nkq2.js`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/javascript`
+  * Other Info: ``
+* URL: http://localhost:8000/assets/_virtual_mf___mfe_internal__shell__mf_owner__180295816046911__loadShare___mf_0_app_mf_1_ui__loadShare__.js-CgrDWrej.js
+  * Node Name: `http://localhost:8000/assets/_virtual_mf___mfe_internal__shell__mf_owner__180295816046911__loadShare___mf_0_app_mf_1_ui__loadShare__.js-CgrDWrej.js`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -369,8 +572,22 @@ Raised by the 'Alert on Unexpected Content Types' script
   * Attack: ``
   * Evidence: `text/css`
   * Other Info: ``
+* URL: http://localhost:8000/assets/index-DRmAvmIN.js
+  * Node Name: `http://localhost:8000/assets/index-DRmAvmIN.js`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/javascript`
+  * Other Info: ``
 * URL: http://localhost:8000/assets/mf-entry-bootstrap-0-feb606b9.js
   * Node Name: `http://localhost:8000/assets/mf-entry-bootstrap-0-feb606b9.js`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/javascript`
+  * Other Info: ``
+* URL: http://localhost:8000/assets/pendingShares-BTwO0WiD.js
+  * Node Name: `http://localhost:8000/assets/pendingShares-BTwO0WiD.js`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -397,6 +614,167 @@ Raised by the 'Alert on Unexpected Content Types' script
   * Attack: ``
   * Evidence: `text/javascript`
   * Other Info: ``
+* URL: http://localhost:8000/auth
+  * Node Name: `http://localhost:8000/auth`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth (class.module.classLoader.DefaultAssertio...)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth%3Fname=abc
+  * Node Name: `http://localhost:8000/auth (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/
+  * Node Name: `http://localhost:8000/auth/`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/.env
+  * Node Name: `http://localhost:8000/auth/.env`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/.htaccess
+  * Node Name: `http://localhost:8000/auth/.htaccess`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth/login (class.module.classLoader.DefaultAssertio...)({email,password})`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/login (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout
+  * Node Name: `http://localhost:8000/auth/logout`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth/logout (class.module.classLoader.DefaultAssertio...)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/logout (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/me
+  * Node Name: `http://localhost:8000/auth/me`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/me%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth/me (class.module.classLoader.DefaultAssertio...)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/me%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/me (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/me/
+  * Node Name: `http://localhost:8000/auth/me/`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh
+  * Node Name: `http://localhost:8000/auth/refresh`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth/refresh (class.module.classLoader.DefaultAssertio...)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/refresh (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/register
+  * Node Name: `http://localhost:8000/auth/register`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/register%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/register (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/trace.axd
+  * Node Name: `http://localhost:8000/auth/trace.axd`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/chats
+  * Node Name: `http://localhost:8000/chats`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
 * URL: http://localhost:8000/remoteEntry.js
   * Node Name: `http://localhost:8000/remoteEntry.js`
   * Method: `GET`
@@ -411,9 +789,107 @@ Raised by the 'Alert on Unexpected Content Types' script
   * Attack: ``
   * Evidence: `text/css`
   * Other Info: ``
+* URL: https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+  * Node Name: `https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `font/woff2`
+  * Other Info: ``
+* URL: http://localhost:8000/auth
+  * Node Name: `http://localhost:8000/auth ()(class.module.classLoader.DefaultAssertio...)`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login ()(class.module.classLoader.DefaultAssertio...)`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login ()({email,password})`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login/
+  * Node Name: `http://localhost:8000/auth/login/ ()({email,password})`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout
+  * Node Name: `http://localhost:8000/auth/logout`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout
+  * Node Name: `http://localhost:8000/auth/logout ()(class.module.classLoader.DefaultAssertio...)`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout/
+  * Node Name: `http://localhost:8000/auth/logout/`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/me
+  * Node Name: `http://localhost:8000/auth/me ()(class.module.classLoader.DefaultAssertio...)`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh
+  * Node Name: `http://localhost:8000/auth/refresh`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh
+  * Node Name: `http://localhost:8000/auth/refresh ()(class.module.classLoader.DefaultAssertio...)`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh/
+  * Node Name: `http://localhost:8000/auth/refresh/`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/register
+  * Node Name: `http://localhost:8000/auth/register ()({email,password})`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/register/
+  * Node Name: `http://localhost:8000/auth/register/ ()({email,password})`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `text/html`
+  * Other Info: ``
 
 
-Instances: 46
+Instances: 87
 
 ### Solution
 
@@ -434,61 +910,61 @@ Instances: 46
 
 ### Description
 
-A response code of 404 was returned by the server.
+A response code of 400 was returned by the server.
 This may indicate that the application is failing to handle unexpected input correctly.
 Raised by the 'Alert on HTTP Response Code Error' script
 
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000`
   * Method: `DELETE`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/`
   * Method: `DELETE`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com`
   * Method: `DELETE`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com/`
   * Method: `DELETE`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/membership
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/membership`
   * Method: `DELETE`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/membership/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/membership/`
   * Method: `DELETE`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001`
   * Method: `DELETE`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/`
   * Method: `DELETE`
   * Parameter: ``
   * Attack: ``
@@ -690,15 +1166,15 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/.zap7489843599946276394
-  * Node Name: `http://localhost:8000/.zap7489843599946276394`
+* URL: http://localhost:8000/.zap8715059627894257786
+  * Node Name: `http://localhost:8000/.zap8715059627894257786`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/6138332625923732704
-  * Node Name: `http://localhost:8000/6138332625923732704`
+* URL: http://localhost:8000/3116085420186910137
+  * Node Name: `http://localhost:8000/3116085420186910137`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -823,8 +1299,8 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/5076124016492858104
-  * Node Name: `http://localhost:8000/api/5076124016492858104`
+* URL: http://localhost:8000/api/7544018835351251487
+  * Node Name: `http://localhost:8000/api/7544018835351251487`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -844,659 +1320,372 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/8568855732056654017
-  * Node Name: `http://localhost:8000/api/chats/8568855732056654017`
+* URL: http://localhost:8000/api/chats/8552843404898878798
+  * Node Name: `http://localhost:8000/api/chats/8552843404898878798`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api
-  * Node Name: `http://localhost:8000/api/chats/api`
+* URL: http://localhost:8000/api/chats/actuator/health
+  * Node Name: `http://localhost:8000/api/chats/actuator/health`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api (class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api (name)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000 (class.module.classLoader.DefaultAssertio...)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/
-  * Node Name: `http://localhost:8000/api/chats/api/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000 (class.module.classLoader.DefaultAssertio...)({title,model,reasoning,webFetch})`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/.env
-  * Node Name: `http://localhost:8000/api/chats/api/.env`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000%3Fname=abc
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000 (name)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/.htaccess
-  * Node Name: `http://localhost:8000/api/chats/api/.htaccess`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/7555061156892546331
-  * Node Name: `http://localhost:8000/api/chats/api/7555061156892546331`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/.env
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/.env`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats
-  * Node Name: `http://localhost:8000/api/chats/api/chats`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/.htaccess
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/.htaccess`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats (class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/2888710240473487333
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/2888710240473487333`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats (class.module.classLoader.DefaultAssertio...)({title,provider,model,reasoning,webFetch})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats (name)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members (class.module.classLoader.DefaultAssertio...)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members (class.module.classLoader.DefaultAssertio...)({email})`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/.env
-  * Node Name: `http://localhost:8000/api/chats/api/chats/.env`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members%3Fname=abc
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members (name)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/.htaccess
-  * Node Name: `http://localhost:8000/api/chats/api/chats/.htaccess`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/635616154438384259
-  * Node Name: `http://localhost:8000/api/chats/api/chats/635616154438384259`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/.env
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/.env`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/actuator/health
-  * Node Name: `http://localhost:8000/api/chats/api/chats/actuator/health`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/.htaccess
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/.htaccess`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/4820970587462648085
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/4820970587462648085`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000 (class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000 (class.module.classLoader.DefaultAssertio...)({title,model,reasoning,webFetch})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com (class.module.classLoader.DefaultAssertio...)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000 (name)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com%3Fname=abc
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com (name)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/trace.axd
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/trace.axd`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/.env
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/.env`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/membership
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/membership`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/.htaccess
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/.htaccess`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/membership%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/membership (class.module.classLoader.DefaultAssertio...)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/318815392073807757
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/318815392073807757`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/membership%3Fname=abc
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/membership (name)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members (class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages (class.module.classLoader.DefaultAssertio...)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members (class.module.classLoader.DefaultAssertio...)({email})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages (class.module.classLoader.DefaultAssertio...)({content,attachmentIds:[]})`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members (name)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages%3Fname=abc
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages (name)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/.env
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/.env`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/.env
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/.env`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/.htaccess
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/.htaccess`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/.htaccess
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/.htaccess`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/5352152536385244725
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/5352152536385244725`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/1588051417055196589
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/1588051417055196589`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com (class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (class.module.classLoader.DefaultAssertio...)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com (name)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (class.module.classLoader.DefaultAssertio...)({content})`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/trace.axd
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/trace.axd`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3Fname=abc
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (name)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership (class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.env
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.env`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership (name)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.htaccess
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.htaccess`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/1412578336953986700
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/1412578336953986700`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages (class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages (class.module.classLoader.DefaultAssertio...)({content,attachmentIds:[]})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (class.module.classLoader.DefaultAssertio...)(multipart:file)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages (name)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments%3Fname=abc
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (name)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/.env
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/.env`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry (class.module.classLoader.DefaultAssertio...)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/.htaccess
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/.htaccess`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry%3Fname=abc
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry (name)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/2015696079616334422
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/2015696079616334422`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/trace.axd
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/trace.axd`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/trace.axd
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/trace.axd`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/stop
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/stop`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (class.module.classLoader.DefaultAssertio...)({content})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/stop%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/stop (class.module.classLoader.DefaultAssertio...)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (name)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/stop%3Fname=abc
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/stop (name)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.env
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.env`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.htaccess
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/.htaccess`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/5588273347120242136
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/5588273347120242136`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (class.module.classLoader.DefaultAssertio...)(multipart:file)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (name)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry (class.module.classLoader.DefaultAssertio...)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry (name)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/trace.axd
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/trace.axd`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/trace.axd
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/trace.axd`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop (class.module.classLoader.DefaultAssertio...)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop (name)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/trace.axd
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/trace.axd`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/trace.axd
-  * Node Name: `http://localhost:8000/api/chats/api/chats/trace.axd`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/trace.axd
-  * Node Name: `http://localhost:8000/api/chats/api/trace.axd`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth
-  * Node Name: `http://localhost:8000/api/chats/auth`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/auth (class.module.classLoader.DefaultAssertio...)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/auth (name)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/
-  * Node Name: `http://localhost:8000/api/chats/auth/`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/.env
-  * Node Name: `http://localhost:8000/api/chats/auth/.env`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/.htaccess
-  * Node Name: `http://localhost:8000/api/chats/auth/.htaccess`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/8438439942353217264
-  * Node Name: `http://localhost:8000/api/chats/auth/8438439942353217264`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/login
-  * Node Name: `http://localhost:8000/api/chats/auth/login`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/login%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/auth/login (class.module.classLoader.DefaultAssertio...)({email,password})`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/login%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/auth/login (name)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/logout
-  * Node Name: `http://localhost:8000/api/chats/auth/logout`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/logout%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/auth/logout (class.module.classLoader.DefaultAssertio...)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/logout%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/auth/logout (name)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/me
-  * Node Name: `http://localhost:8000/api/chats/auth/me`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/me%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/auth/me (class.module.classLoader.DefaultAssertio...)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/me%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/auth/me (name)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/me/
-  * Node Name: `http://localhost:8000/api/chats/auth/me/`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/refresh
-  * Node Name: `http://localhost:8000/api/chats/auth/refresh`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/refresh%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/auth/refresh (class.module.classLoader.DefaultAssertio...)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/refresh%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/auth/refresh (name)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/register
-  * Node Name: `http://localhost:8000/api/chats/auth/register`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/register%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
-  * Node Name: `http://localhost:8000/api/chats/auth/register (class.module.classLoader.DefaultAssertio...)({email,password})`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/register%3Fname=abc
-  * Node Name: `http://localhost:8000/api/chats/auth/register (name)`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/trace.axd
-  * Node Name: `http://localhost:8000/api/chats/auth/trace.axd`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/trace.axd
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/trace.axd`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -1522,6 +1711,174 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
+  * Other Info: ``
+* URL: http://localhost:8000/auth
+  * Node Name: `http://localhost:8000/auth`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `404`
+  * Other Info: ``
+* URL: http://localhost:8000/auth
+  * Node Name: `http://localhost:8000/auth`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth (class.module.classLoader.DefaultAssertio...)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth%3Fname=abc
+  * Node Name: `http://localhost:8000/auth (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/
+  * Node Name: `http://localhost:8000/auth/`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/.env
+  * Node Name: `http://localhost:8000/auth/.env`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/.htaccess
+  * Node Name: `http://localhost:8000/auth/.htaccess`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/6575658657320942095
+  * Node Name: `http://localhost:8000/auth/6575658657320942095`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `404`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth/login (class.module.classLoader.DefaultAssertio...)({email,password})`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/login (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout
+  * Node Name: `http://localhost:8000/auth/logout`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth/logout (class.module.classLoader.DefaultAssertio...)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/logout (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/me
+  * Node Name: `http://localhost:8000/auth/me`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/me%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth/me (class.module.classLoader.DefaultAssertio...)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/me%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/me (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/me/
+  * Node Name: `http://localhost:8000/auth/me/`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh
+  * Node Name: `http://localhost:8000/auth/refresh`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh%3Fclass.module.classLoader.DefaultAssertionStatus=nonsense
+  * Node Name: `http://localhost:8000/auth/refresh (class.module.classLoader.DefaultAssertio...)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/refresh (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/register
+  * Node Name: `http://localhost:8000/auth/register`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/register%3Fname=abc
+  * Node Name: `http://localhost:8000/auth/register (name)`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/trace.axd
+  * Node Name: `http://localhost:8000/auth/trace.axd`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `429`
   * Other Info: ``
 * URL: http://localhost:8000/composer.json
   * Node Name: `http://localhost:8000/composer.json`
@@ -1733,36 +2090,43 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/zap8957442621241650730
-  * Node Name: `http://localhost:8000/zap8957442621241650730`
+* URL: http://localhost:8000/zap8860088088733281767
+  * Node Name: `http://localhost:8000/zap8860088088733281767`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000 ()({title,model,reasoning,webFetch})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000 ()({title,model,reasoning,webFetch})`
+  * Method: `PATCH`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `400`
+  * Other Info: ``
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000 ()({title,model,reasoning,webFetch})`
   * Method: `PATCH`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/ ()({title,model,reasoning,webFetch})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/ ()({title,model,reasoning,webFetch})`
   * Method: `PATCH`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 ()({content})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 ()({content})`
   * Method: `PATCH`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/ ()({content})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/ ()({content})`
   * Method: `PATCH`
   * Parameter: ``
   * Attack: ``
@@ -1776,14 +2140,14 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Evidence: `404`
   * Other Info: ``
 * URL: http://localhost:8000/%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/ (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+  * Node Name: `http://localhost:8000/ (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
 * URL: http://localhost:8000/%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/ (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+  * Node Name: `http://localhost:8000/ (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
@@ -1797,14 +2161,14 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Evidence: `404`
   * Other Info: ``
 * URL: http://localhost:8000/api%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+  * Node Name: `http://localhost:8000/api (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
 * URL: http://localhost:8000/api%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+  * Node Name: `http://localhost:8000/api (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
@@ -1824,534 +2188,527 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats
+  * Node Name: `http://localhost:8000/api/chats ()({title,provider,model,reasoning,webFetch})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `400`
   * Other Info: ``
 * URL: http://localhost:8000/api/chats%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+  * Node Name: `http://localhost:8000/api/chats (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api
-  * Node Name: `http://localhost:8000/api/chats/api ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
-  * Method: `POST`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000 ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats
-  * Node Name: `http://localhost:8000/api/chats/api/chats ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000 ()(multipart:1,0)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats
-  * Node Name: `http://localhost:8000/api/chats/api/chats ()({title,provider,model,reasoning,webFetch})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members ()(aaa)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/ ()({title,provider,model,reasoning,webFetch})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000 ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members ()({email})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000 ()(multipart:1,0)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members ()({email})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/ ()({email})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members ()({email})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members/member@example.com (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/ ()({email})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/membership
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/membership ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/membership%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/membership (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/membership%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/membership (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages ()(aaa)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages ()({content,attachmentIds:[]})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages ()({content,attachmentIds:[]})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/ ()({content,attachmentIds:[]})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/ ()({content,attachmentIds:[]})`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(aaa)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001 (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:file)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:file)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:file)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:rtobject)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments/ ()(multipart:file)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments/ ()(multipart:file)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry/`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/retry/`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/stop
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/stop`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/stop
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/stop ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/stop%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/stop (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/stop%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/stop (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/stop/
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/stop/`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop/
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop/`
+* URL: http://localhost:8000/auth
+  * Node Name: `http://localhost:8000/auth ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth
-  * Node Name: `http://localhost:8000/api/chats/auth ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/auth%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/auth%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/login
-  * Node Name: `http://localhost:8000/api/chats/auth/login ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login ()({email,password})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `401`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/login
-  * Node Name: `http://localhost:8000/api/chats/auth/login ()({email,password})`
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login ()({email,password})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/login%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/login (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/auth/login%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth/login (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `401`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/login%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/login (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/auth/login%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth/login (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `401`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/login/
-  * Node Name: `http://localhost:8000/api/chats/auth/login/ ()({email,password})`
+* URL: http://localhost:8000/auth/login/
+  * Node Name: `http://localhost:8000/auth/login/ ()({email,password})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/logout
-  * Node Name: `http://localhost:8000/api/chats/auth/logout`
+* URL: http://localhost:8000/auth/logout
+  * Node Name: `http://localhost:8000/auth/logout`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/logout
-  * Node Name: `http://localhost:8000/api/chats/auth/logout ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/auth/logout
+  * Node Name: `http://localhost:8000/auth/logout ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/logout%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/logout (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/auth/logout/
+  * Node Name: `http://localhost:8000/auth/logout/`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/logout%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/logout (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/auth/me
+  * Node Name: `http://localhost:8000/auth/me ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/logout/
-  * Node Name: `http://localhost:8000/api/chats/auth/logout/`
+* URL: http://localhost:8000/auth/me%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth/me (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/me
-  * Node Name: `http://localhost:8000/api/chats/auth/me ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/auth/me%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth/me (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/me%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/me (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/auth/refresh
+  * Node Name: `http://localhost:8000/auth/refresh`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `401`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/me%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/me (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/auth/refresh
+  * Node Name: `http://localhost:8000/auth/refresh`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/refresh
-  * Node Name: `http://localhost:8000/api/chats/auth/refresh`
+* URL: http://localhost:8000/auth/refresh
+  * Node Name: `http://localhost:8000/auth/refresh ()(class.module.classLoader.DefaultAssertio...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/refresh
-  * Node Name: `http://localhost:8000/api/chats/auth/refresh ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/auth/refresh%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth/refresh (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `401`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/refresh%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/refresh (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/auth/refresh%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth/refresh (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `401`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/refresh%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/refresh (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/auth/refresh/
+  * Node Name: `http://localhost:8000/auth/refresh/`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/refresh/
-  * Node Name: `http://localhost:8000/api/chats/auth/refresh/`
+* URL: http://localhost:8000/auth/register
+  * Node Name: `http://localhost:8000/auth/register ()({email,password})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/register
-  * Node Name: `http://localhost:8000/api/chats/auth/register ()(class.module.classLoader.DefaultAssertio...)`
+* URL: http://localhost:8000/auth/register
+  * Node Name: `http://localhost:8000/auth/register ()({email,password})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `409`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/register
-  * Node Name: `http://localhost:8000/api/chats/auth/register ()({email,password})`
+* URL: http://localhost:8000/auth/register
+  * Node Name: `http://localhost:8000/auth/register ()({email,password})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/register%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/register (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo 0v4mlfujibgt...)`
+* URL: http://localhost:8000/auth/register%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth/register (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('cmd.exe /C echo w3tythto241j...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/register%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
-  * Node Name: `http://localhost:8000/api/chats/auth/register (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo 0v4mlfujibgt22dvb5b6',$...)`
+* URL: http://localhost:8000/auth/register%3F-d+allow_url_include%253d1+-d+auto_prepend_file%253dphp://input
+  * Node Name: `http://localhost:8000/auth/register (-d allow_url_include=1 -d auto_prepend_f...)(<?php exec('echo w3tythto241jxzbn9uz7',$...)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `400`
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/auth/register/
-  * Node Name: `http://localhost:8000/api/chats/auth/register/ ()({email,password})`
+* URL: http://localhost:8000/auth/register/
+  * Node Name: `http://localhost:8000/auth/register/ ()({email,password})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `404`
+  * Evidence: `429`
   * Other Info: ``
 
 
-Instances: 273
+Instances: 256
 
 ### Solution
 
@@ -2378,8 +2735,8 @@ Instances: 273
 
 The given request has been identified as an authentication request. The 'Other Info' field contains a set of key=value lines which identify any relevant fields. If the request is in a context which has an Authentication Method set to "Auto-Detect" then this rule will change the authentication to match the request identified.
 
-* URL: http://localhost:8000/api/chats/auth/login
-  * Node Name: `http://localhost:8000/api/chats/auth/login ()({email,password})`
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login ()({email,password})`
   * Method: `POST`
   * Parameter: `email`
   * Attack: ``
@@ -2404,6 +2761,42 @@ This is an informational alert rather than a vulnerability and so there is nothi
 
 #### Source ID: 3
 
+### [ Information Disclosure - Suspicious Comments ](https://www.zaproxy.org/docs/alerts/10027/)
+
+
+
+##### Informational (Medium)
+
+### Description
+
+The response appears to contain suspicious comments which may help an attacker.
+
+* URL: http://localhost:8000/api/chats
+  * Node Name: `http://localhost:8000/api/chats`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `:"\"/><xsl:value-of select=\"system-property('`
+  * Other Info: `The following pattern was used: \bSELECT\b and was detected in likely comment: "<!--","ownerId":"cmust3sfd000hr701qu5e0meg","ownerEmail":"dast-api@dast.example.com","provider":"openai","model":"claude-sonnet-", see evidence field for the suspicious comment/snippet.`
+
+
+Instances: 1
+
+### Solution
+
+Remove all comments that return information that may help an attacker and fix any underlying problems they refer to.
+
+### Reference
+
+
+
+#### CWE Id: [ 615 ](https://cwe.mitre.org/data/definitions/615.html)
+
+
+#### WASC Id: 13
+
+#### Source ID: 3
+
 ### [ Non-Storable Content ](https://www.zaproxy.org/docs/alerts/10049/)
 
 
@@ -2414,23 +2807,44 @@ This is an informational alert rather than a vulnerability and so there is nothi
 
 The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.
 
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000`
   * Method: `DELETE`
   * Parameter: ``
   * Attack: ``
   * Evidence: `DELETE `
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com`
-  * Method: `DELETE`
+* URL: http://localhost:8000/api/chats
+  * Node Name: `http://localhost:8000/api/chats ()({title,provider,model,reasoning,webFetch})`
+  * Method: `POST`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `DELETE `
+  * Evidence: `201`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login ()({email,password})`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `401`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/refresh
+  * Node Name: `http://localhost:8000/auth/refresh`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `401`
+  * Other Info: ``
+* URL: http://localhost:8000/auth/register
+  * Node Name: `http://localhost:8000/auth/register ()({email,password})`
+  * Method: `POST`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `400`
   * Other Info: ``
 
+Instances: Systemic
 
-Instances: 2
 
 ### Solution
 
@@ -2472,44 +2886,44 @@ It must have a status code that is defined as cacheable by default (200, 203, 20
 
 The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where "shared" caching servers such as "proxy" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.
 
-* URL: http://localhost:8000/api/chats/api/chats
-  * Node Name: `http://localhost:8000/api/chats/api/chats`
+* URL: http://localhost:8000/api/chats
+  * Node Name: `http://localhost:8000/api/chats`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: http://localhost:8000/api/chats/auth/me
-  * Node Name: `http://localhost:8000/api/chats/auth/me`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: http://localhost:8000/api/chats/api/chats
-  * Node Name: `http://localhost:8000/api/chats/api/chats ()({title,provider,model,reasoning,webFetch})`
+* URL: http://localhost:8000/auth/me
+  * Node Name: `http://localhost:8000/auth/me`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: ``
+  * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members ()({email})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: http://localhost:8000/api/chats/auth/login
-  * Node Name: `http://localhost:8000/api/chats/auth/login ()({email,password})`
-  * Method: `POST`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: ``
-  * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: http://localhost:8000/api/chats/auth/register
-  * Node Name: `http://localhost:8000/api/chats/auth/register ()({email,password})`
+* URL: http://localhost:8000/auth/logout
+  * Node Name: `http://localhost:8000/auth/logout`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
 
-Instances: Systemic
 
+Instances: 5
 
 ### Solution
 
@@ -2544,36 +2958,36 @@ This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers 
 
 Check for differences in response based on fuzzed User Agent (eg. mobile sites, access as a Search Engine Crawler). Compares the response statuscode and the hashcode of the response body with the original response.
 
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/membership
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/membership`
   * Method: `DELETE`
   * Parameter: `Header User-Agent`
   * Attack: `Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)`
   * Evidence: ``
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/members/member@example.com`
-  * Method: `DELETE`
-  * Parameter: `Header User-Agent`
-  * Attack: `Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)`
-  * Evidence: ``
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/membership`
-  * Method: `DELETE`
-  * Parameter: `Header User-Agent`
-  * Attack: `Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)`
-  * Evidence: ``
-  * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments ()(multipart:file)`
+* URL: http://localhost:8000/api/chats/cm0example0000000000000000/members
+  * Node Name: `http://localhost:8000/api/chats/cm0example0000000000000000/members ()({email})`
   * Method: `POST`
   * Parameter: `Header User-Agent`
   * Attack: `Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)`
   * Evidence: ``
   * Other Info: ``
-* URL: http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop
-  * Node Name: `http://localhost:8000/api/chats/api/chats/cm0example0000000000000000/stop`
+* URL: http://localhost:8000/auth/login
+  * Node Name: `http://localhost:8000/auth/login ()({email,password})`
+  * Method: `POST`
+  * Parameter: `Header User-Agent`
+  * Attack: `Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)`
+  * Evidence: ``
+  * Other Info: ``
+* URL: http://localhost:8000/auth/logout
+  * Node Name: `http://localhost:8000/auth/logout`
+  * Method: `POST`
+  * Parameter: `Header User-Agent`
+  * Attack: `Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)`
+  * Evidence: ``
+  * Other Info: ``
+* URL: http://localhost:8000/auth/register
+  * Node Name: `http://localhost:8000/auth/register ()({email,password})`
   * Method: `POST`
   * Parameter: `Header User-Agent`
   * Attack: `Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)`
