@@ -34,38 +34,39 @@ Blockers: none
 
 | Tool | Version | Install |
 |---|---|---|
-| macOS / Ubuntu | … | — |
-| Node | `node -v` → … | … |
-| pnpm | `pnpm -v` → … | `corepack enable` |
-| Docker | `docker --version` → … | … |
-| Semgrep CE | … | `docker pull semgrep/semgrep` |
+| macOS (local) / Ubuntu (CI) | macOS 26.3 / `ubuntu-latest` | — |
+| Node | `node -v` → v24.9.0 | `.nvmrc` |
+| pnpm | `pnpm -v` → 10.4.0 | `corepack enable` |
+| Docker | `docker --version` → 29.4.0 | OrbStack or Docker Desktop |
+| Semgrep CE | `semgrep --version` → 1.140.0 (image `semgrep/semgrep:1.140.0`) | `docker pull semgrep/semgrep:1.140.0` |
 
 ## 3. Steps
 
-### US1 · <story summary> ([AICHAT-<key>](https://ipca-grupo11.atlassian.net/browse/AICHAT-<key>))
+### US1 · Choose the SAST tool and record the decision ([AICHAT-35](https://ipca-grupo11.atlassian.net/browse/AICHAT-35))
 
-**What and why.** …
+**What and why.** We compared Semgrep CE and CodeQL for a private repository. CodeQL needs GitHub Code Security (Advanced Security) on private repos, which we do not have. Semgrep CE is free, runs in about 15 seconds without a build and supports custom YAML rules. Its SARIF cannot go to the Security tab (that also needs GHAS), so we keep it as an artifact and write a job summary. The owner approved Semgrep CE on 2026-10-03.
 
 **Files.**
-- `path/to/file` (new): …
+- `docs/AICHAT-27/SAST.md` (new): the decision table, severity policy, scope, local run, waiver rules and the required-check note.
+- `docs/AICHAT-27/evidence/00-environment.*`: tool versions.
 
 **How to run.**
 
 ```sh
-<one command from the repo root>
+docker run --rm semgrep/semgrep:1.140.0 semgrep --version
 ```
 
 **How to repeat it manually.**
 
-1. …
-2. …
-3. Expected output: …
+1. Start Docker.
+2. Run the command above.
+3. Expected output: `1.140.0`.
 
-**Result.** …
+**Result.** Decision recorded in `docs/AICHAT-27/SAST.md`; the image tag is pinned to `1.140.0`.
 
-![<caption>](evidence/01-<what>.png)
+![Tool versions](evidence/00-environment.png)
 
-**Problems and fixes.** …
+**Problems and fixes.** Docker was not running at first; we started OrbStack and pulled the pinned image.
 
 ### US2 · …
 
