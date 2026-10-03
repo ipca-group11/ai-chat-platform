@@ -8,17 +8,20 @@ pod's own unit tests — that is each pod's own responsibility (see AC-94 below)
 ## What's in here
 
 - `coverage-thresholds.ts` — the raw `{ lines, statements, functions, branches }: 80`
-  object.
+  object, plus `appCoverageThresholds` (branches 75, for `apps/*`) and
+  `e2eCoverageThresholds` (branches 70).
 - `vitest.preset.ts` — `coveragePreset(options)` (a ready-to-use `test.coverage` fragment:
-  `v8` provider, `text`+`lcov` reporters, the shared thresholds, and sane default excludes
+  `v8` provider, `text`+`lcov`+`json-summary` reporters (the last writes
+  `coverage/coverage-summary.json`), the shared thresholds (overridable with
+  `thresholds`), and sane default excludes
   for spec/test/story files) and `vitestPreset(options)` (a full `UserConfig` fragment
   adding a `node` test environment on top).
 
 ## Which projects must apply the thresholds
 
-Per `STACK.md` decision #6: every `services/*` project (`auth-service`,
-`conversation-service`) and `packages/ui`. Frontend `apps/mfe-*`/`apps/shell` and other
-`packages/*` are encouraged but not required to opt in.
+Every Node test project (AICHAT-34): `services/*`, `packages/*`, `apps/*` and `e2e`.
+`testing/k6` is exempt (k6 runtime, no Node source). The package is consumed from its
+built `dist/`, which Nx builds before every `test` target (`dependsOn: ^build`).
 
 ## How to opt a project's `test` target into failing on an unmet threshold
 

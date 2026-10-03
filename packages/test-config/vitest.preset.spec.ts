@@ -36,6 +36,21 @@ describe("coveragePreset", () => {
   });
 });
 
+describe("coveragePreset reporters and overrides", () => {
+  it("AICHAT-81: emits text, lcov and json-summary reports", () => {
+    expect(coveragePreset().reporter).toEqual(["text", "lcov", "json-summary"]);
+  });
+
+  it("AICHAT-81: merges threshold overrides over the 80% default", () => {
+    expect(coveragePreset({ thresholds: { branches: 75 } }).thresholds).toEqual({
+      lines: 80,
+      statements: 80,
+      functions: 80,
+      branches: 75,
+    });
+  });
+});
+
 describe("vitestPreset", () => {
   it("AC-97: defaults to a node test environment with the coverage preset applied", () => {
     const config = vitestPreset();
