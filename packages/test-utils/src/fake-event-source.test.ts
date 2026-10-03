@@ -76,6 +76,18 @@ describe("FakeEventSource", () => {
     expect(listener.mock.calls[0]![0]).not.toBeInstanceOf(MessageEvent);
   });
 
+  it("error() without a payload is a dropped connection, with a payload a server error event", () => {
+    const listener = vi.fn();
+    new EventSource("/stream").addEventListener("error", listener);
+
+    FakeEventSource.last.error();
+    FakeEventSource.last.error({ type: "error", messageId: "m1", message: "Boom" });
+
+    expect(listener.mock.calls[0]![0]).not.toBeInstanceOf(MessageEvent);
+    const served = listener.mock.calls[1]![0] as MessageEvent<string>;
+    expect(JSON.parse(served.data)).toEqual({ type: "error", messageId: "m1", message: "Boom" });
+  });
+
   it("marks the connection closed", () => {
     const source = new EventSource("/stream");
 

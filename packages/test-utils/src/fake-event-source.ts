@@ -4,7 +4,8 @@ type Listener = (event: Event) => void;
 
 /**
  * A stand-in for the browser `EventSource` (jsdom has none). Every instance is kept in
- * `FakeEventSource.instances`, and a test pushes server events with `emit`.
+ * `FakeEventSource.instances`, and a test pushes server events with `emit`, fails the stream with
+ * `error` and checks `closed` after the code under test calls `close()`.
  *
  *   const FakeSource = installFakeEventSource();
  *   openStream("chat-1");
@@ -59,6 +60,15 @@ export class FakeEventSource {
     const event = new Event("error");
     this.onerror?.(event);
     this.dispatch("error", event);
+  }
+
+  /**
+   * Fails the stream. Without arguments it is a dropped connection (same as `emitTransportError`);
+   * with a payload it is the `event: error` the server sends for a provider failure.
+   */
+  error(data?: unknown): void {
+    if (data === undefined) this.emitTransportError();
+    else this.emit("error", data);
   }
 
   private dispatch(type: string, event: Event): void {

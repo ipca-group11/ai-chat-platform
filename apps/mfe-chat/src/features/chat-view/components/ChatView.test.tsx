@@ -1,10 +1,11 @@
-import { screen, waitFor } from "@testing-library/react";
+import { act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
-import { installFakeEventSource, renderWithClient } from "@platform/test-utils";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { FakeEventSource, installFakeEventSource, renderWithClient } from "@platform/test-utils";
 import { http, HttpResponse, recordRequests, server } from "@platform/test-utils/msw";
 import type { Chat, Message } from "../../../shared/types";
 import { __resetShowReasoningForTests } from "../model/show-reasoning";
+import { __resetStreamRegistryForTests } from "../model/stream-registry";
 import { ChatView } from "./ChatView";
 
 const chat: Chat = {
@@ -45,6 +46,11 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
     installFakeEventSource();
   });
 
+  afterEach(() => {
+    // The registry lives at module level; without this the next test finds the stream already open.
+    __resetStreamRegistryForTests();
+  });
+
   it("renders chat header, history and the composer once loaded", async () => {
     serveChat(chat, [message]);
 
@@ -53,6 +59,16 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
     expect(await screen.findByText("My chat")).toBeInTheDocument();
     expect(await screen.findByText("Hi")).toBeInTheDocument();
     expect(screen.getByLabelText("Message")).toBeInTheDocument();
+  });
+
+  it("AC-52: shows a token pushed by the stream as soon as it arrives", async () => {
+    serveChat(chat, [message]);
+    renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
+    await screen.findByText("Hi");
+
+    act(() => FakeEventSource.last.emit("token", { messageId: "msg-9", token: "Hello there" }));
+
+    expect(await screen.findByText("Hello there")).toBeInTheDocument();
   });
 
   it("AC-54: stops a streaming message and AC-73: retries a failed one", async () => {
