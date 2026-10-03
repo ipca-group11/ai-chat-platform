@@ -1,0 +1,3 @@
+$ bash -c sed -n 1,31p .github/workflows/dast.yml
+
+[exit 0]
