@@ -191,7 +191,39 @@ pnpm test:scripts && pnpm typecheck:scripts
 
 **Problems and fixes.** The first version printed `+0.00 kB` for changes of a few bytes, which reads as no change; sizes below 1 kB now show in bytes. The base build needs its own `pnpm install` in the second worktree, which adds about a minute to pull request runs; it is the price of an exact before and after, and Nx and pnpm caches of the runner keep it low.
 
-### US5 · …
+### US5 · Verify shared dependencies load once at runtime ([AICHAT-119](https://ipca-grupo11.atlassian.net/browse/AICHAT-119))
+
+**What and why.** Module Federation shares react, react-dom, the router and Query as singletons. If a remote cannot use the shell's copy it loads its own fallback, and the user downloads the library twice. The e2e suite is not allowed to run for this epic, so we wrote `scripts/ci/shared-deps.ts`, a small check that is not a test run: it signs in a throw-away account, opens `/chats` in headless Chromium (the Playwright library that `e2e/` already has installed), keeps the body of every JavaScript response and looks for one marker string of each library in the bodies (`react.memo_cache_sentinel` for react and react-dom, `No QueryClient set` for Query, `tsr-scroll-restoration` for the router). One file with the marker means one copy; more than one, or none, is reported as `MISMATCH` and the script exits with 1. With `--list` it also prints every JS request, and it lists chunks that have the same name but are loaded from several URLs (these are not shared libraries, see the result). The helpers (`countCopies`, `duplicateChunks`, `formatResult`) have unit tests. It runs by hand against the mock stack and is not part of CI (decision in the DoR review).
+
+**Files.**
+- `scripts/ci/shared-deps.ts`, `scripts/ci/shared-deps.test.ts` (new): the check and 4 unit tests (one copy, a second copy as mismatch, duplicate chunk names, report text).
+
+**How to run.**
+
+```sh
+pnpm mock:up llm                       # set AUTH_SERVICE_PORT, CONVERSATION_SERVICE_PORT, GRAFANA_PORT, PROMETHEUS_PORT if 4001, 4002, 3300, 9090 are busy
+CHECK_PASSWORD='<a password for the throw-away account>' node scripts/ci/shared-deps.ts --list
+pnpm mock:down
+```
+
+**How to repeat it manually.**
+
+1. Start the stack as above and open `http://localhost:8000/register`, create an account and sign in.
+2. Open the browser developer tools, tab Network, filter `JS`, and load `http://localhost:8000/chats`.
+3. Look for file names with `prebuild` in them (the remotes' own copies of react-dom, the router and Query, hosts `localhost:3001` to `3003`): expected none. The libraries come once, from `localhost:8000`, in the `loadShare` chunks of the shell.
+
+**Result.** On `/chats` the browser requests 51 JavaScript files. React with react-dom, `@tanstack/react-query` and `@tanstack/react-router` are each in exactly one file, all three served by the shell (`localhost:8000`), and none of the 35 requests to the remotes (`localhost:3001` to `3003`) is a `prebuild` fallback: **the shared dependencies load once, no mismatch**. The remote `mfe-chat` asks only for the small `loadShare` wrappers that connect to the shell's copy. Two things that are not shared-library duplicates showed up and are worth a ticket for the platform owner:
+
+- every container brings its own copy of the federation runtime helpers: `utils-*.js` (about 65 KB raw, 19 KB gzip) is downloaded four times (shell and the three remotes), plus `vite-preload-helper`, `rolldown-runtime` and `helpers` four times each, so about 57 KB gzip is downloaded twice or more;
+- `remoteEntry.js` of `mfe-auth` and `mfe-settings` (and their helpers) are fetched on `/chats` as well, because the shell registers all remotes at start-up, not only the one the route needs.
+
+This also explains the budget: the "shared-library copies" group of the remotes (up to 137 kB gzip) is emitted but never downloaded while the shell provides the libraries, which is why US1 keeps it apart from the application chunks.
+
+![JS requests on /chats and the shared-once verdict](evidence/07-shared-deps-once.png)
+
+![Unit tests of the check](evidence/08-shared-deps-unit-tests.png)
+
+**Problems and fixes.** The first idea, counting `prebuild` and `loadShare` in the file names, is not enough: the shell's own `loadShare` chunk is the real copy, while in a remote it is only a wrapper, so a name count would flag a false duplicate. Looking at the code of the response is stricter and does not depend on the naming of the Module Federation plugin. The `__FEDERATION__` share state of the page reported every entry as `loaded: false` after the page was idle, so it could not be used as evidence. Ports 4001, 4002, 3300 and 9090 were busy on the development machine (another project), so the stack ran on 14001, 14002, 13300 and 19090; the stack was removed afterwards (`pnpm mock:down`).
 
 ## 4. How to run everything
 
