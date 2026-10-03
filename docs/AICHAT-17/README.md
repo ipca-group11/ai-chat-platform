@@ -13,6 +13,7 @@ title: "AICHAT-17 · [Foundations] Unit testing"
 | Depends on | AICHAT-34 (coverage thresholds) |
 | Related | AICHAT-18 (deep state testing of Composer, ChatView, ProviderList), AICHAT-23 (route-level tests of controllers) |
 | Layer | **All source files of the monorepo**: `apps/*`, `packages/*`, `services/*`, `e2e/src` helpers |
+| Policy | [UNIT-TEST-POLICY.md](UNIT-TEST-POLICY.md) · exempt list [`unit-test-exempt.json`](../../packages/workspace-config/unit-test-exempt.json) |
 
 ## 1. Goal
 
