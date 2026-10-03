@@ -11,6 +11,7 @@ Every baseline finding was either fixed or listed here with a reason. Baseline: 
 | W3 | `detected-bcrypt-hash` | `services/auth-service/src/features/session/model.ts` | 1 | Waived with `nosemgrep` | Dummy hash compared when the email is unknown, so unknown-email and wrong-password take the same time. It protects nothing. |
 | W4 | `dockerfile ... missing-user` | `observability/alloy.Dockerfile`, `observability/loki.Dockerfile` | 2 | Waived with `nosemgrep` | Observability images from Grafana. Adding `USER` could break write access to the named volumes. We will test a non-root user in a separate change. |
 | W5 | `aichat.secret-with-literal-default-zod` (**F1**) | `services/conversation-service/src/shared/env.ts` (`JWT_SECRET`) | 1 | Waived with `nosemgrep`, **not fixed here** | **Severity High.** If `JWT_SECRET` is missing, conversation-service starts with a public value and accepts tokens signed with it. Owner decision: ticketed as [AICHAT-210](https://ipca-grupo11.atlassian.net/browse/AICHAT-210) and fixed there (make the variable required, as auth-service does). Remove the `nosemgrep` line when that ticket is done. |
+| W10 | `njsscan ... node_api_key` | `scripts/record-llm-fixtures.mjs` (AICHAT-25) | 2 | Waived with `nosemgrep` (reason in the comment) | False positive: `"ollama"` is the placeholder key a local Ollama server ignores; real keys only come from the environment. |
 
 ## WARNING and INFO findings (reported, not blocking, accepted)
 

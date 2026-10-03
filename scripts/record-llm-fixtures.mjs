@@ -34,6 +34,8 @@ const PROMPTS = {
 const providers = {
   anthropic: {
     url: () => `${env("ANTHROPIC_BASE_URL", "http://localhost:11434")}/v1/messages`,
+    // Ollama ignores the key; "ollama" is a placeholder, not a secret (AICHAT-27 WAIVERS.md, W10).
+    // nosemgrep: node_api_key
     key: () => env("ANTHROPIC_API_KEY", "ollama"),
     headers: (key) => ({ "x-api-key": key, "anthropic-version": "2023-06-01" }),
     body: (prompt, maxTokens) => ({
@@ -46,6 +48,8 @@ const providers = {
   },
   openai: {
     url: () => `${env("OPENAI_BASE_URL", "http://localhost:11434")}/v1/chat/completions`,
+    // Ollama ignores the key; "ollama" is a placeholder, not a secret (AICHAT-27 WAIVERS.md, W10).
+    // nosemgrep: node_api_key
     key: () => env("OPENAI_API_KEY", "ollama"),
     headers: (key) => ({ Authorization: `Bearer ${key}` }),
     body: (prompt, maxTokens) => ({
