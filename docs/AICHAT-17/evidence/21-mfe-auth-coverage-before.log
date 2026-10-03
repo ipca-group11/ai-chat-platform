@@ -1,0 +1,38 @@
+$ cd apps/mfe-auth && pnpm exec vitest run --coverage
+
+ RUN  v5.0.1 /private/tmp/claude-501/u17-fe/apps/mfe-auth
+      Coverage enabled with v8
+
+
+ Test Files  6 passed (6)
+      Tests  22 passed (22)
+   Start at  15:09:25
+   Duration  2.23s (environment 39%, setup 18%, import 18%, tests 15%, transform 8%, worker 3%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   92.23 |     75.4 |    93.1 |   92.23 |                   
+ ...ures/login/api |    90.9 |      100 |   83.33 |    90.9 |                   
+  session.ts       |   88.88 |      100 |      75 |   88.88 | 43                
+ ...gin/components |     100 |    78.57 |     100 |     100 |                   
+  LoginForm.tsx    |     100 |    83.33 |     100 |     100 | 28,81             
+  LogoutButton.tsx |     100 |       50 |     100 |     100 | 13                
+ ...ter/components |     100 |       90 |     100 |     100 |                   
+  RegisterForm.tsx |     100 |       90 |     100 |     100 | 33                
+ shared            |   86.48 |    66.66 |     100 |   86.48 |                   
+  api-client.ts    |   85.71 |    65.51 |     100 |   85.71 | 67,78-84          
+  correlation.ts   |      75 |       75 |     100 |      75 | 16                
+ shared/components |      50 |      100 |      50 |      50 |                   
+  AuthCard.tsx     |      50 |      100 |      50 |      50 | 20-21             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 92.23% ( 95/103 )
+Branches     : 75.4% ( 46/61 )
+Functions    : 93.1% ( 27/29 )
+Lines        : 92.23% ( 95/103 )
+================================================================================
+
+[exit 0]

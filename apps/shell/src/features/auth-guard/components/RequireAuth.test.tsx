@@ -8,8 +8,8 @@ import {
   createRoute,
   createRouter,
 } from '@tanstack/react-router';
-import { RequireAuth } from './components/RequireAuth';
-import * as apiClientModule from '../../shared/http/apiClient';
+import { RequireAuth } from './RequireAuth';
+import * as apiClientModule from '../../../shared/http/apiClient';
 
 /**
  * Builds a tiny router (protected route + `/login`) so `RequireAuth`'s
