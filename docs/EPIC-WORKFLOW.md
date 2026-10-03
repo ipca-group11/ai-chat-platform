@@ -112,8 +112,9 @@ For every story of the epic, in order (US1, US2, …):
    - *Result*: numbers (tests, findings, coverage, timings) and the evidence images.
    - *Problems* hit and how they were solved.
 5. Tick the acceptance criteria in the Jira story; push and open a PR from the epic branch into
-   `integration/testing-epics` (`AICHAT-<story>: <summary>`), link the PR in the story.
-6. After review and merge, move the story to **Done**.
+   `integration/testing-epics` (`AICHAT-<n>: <summary>`), link the PR in the story.
+6. As soon as the PR checks pass, merge it into `integration/testing-epics` (merge commit, branch kept) and move
+   the stories to **Done**. Team review happens once, on the final PR to `main` (§6).
 
 A failing check that is **expected** (a deliberate drop in coverage, a planted fake secret, a bundle over its limit)
 is captured as evidence too: it proves the gate works.
