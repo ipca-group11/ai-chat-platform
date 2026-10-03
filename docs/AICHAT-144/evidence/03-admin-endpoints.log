@@ -1,0 +1,10 @@
+$ cd testing/mock-server && (PORT=4010 SEED=1 npx tsx src/main.ts & PID=$!; sleep 3; echo "--- GET /__admin/health"; curl -s localhost:4010/__admin/health; echo; echo "--- GET /__admin/scenarios"; curl -s localhost:4010/__admin/scenarios; echo; echo "--- POST /__admin/reset"; curl -s -X POST localhost:4010/__admin/reset; echo; kill $PID)
+mock-server listening on http://localhost:4010
+--- GET /__admin/health
+{"status":"ok"}
+--- GET /__admin/scenarios
+{"scenarios":[]}
+--- POST /__admin/reset
+{"status":"reset"}
+
+[exit 0]
