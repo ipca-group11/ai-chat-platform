@@ -5,6 +5,7 @@ coverage/
 .nx/cache/
 .nx/workspace-data/
 *.log
+!docs/**/evidence/*.log
 .env
 # Real credentials for the deployed environment (see docs/CREDENTIALS.md). Never commit.
 .env.credentials
