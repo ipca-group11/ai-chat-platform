@@ -1,4 +1,5 @@
 import http from "k6/http";
+import type { Response } from "k6/http";
 import { check, sleep } from "k6";
 import { SharedArray } from "k6/data";
 import { Trend, Rate } from "k6/metrics";
@@ -9,7 +10,7 @@ import { Trend, Rate } from "k6/metrics";
  * token within about 1 second" (FR7/UC6) and "0% dropped/failed streams across 5
  * concurrent chats" are continuously measurable against a running stack.
  *
- * Usage: `k6 run testing/k6/streaming-load.js` against a local `docker compose up` stack
+ * Usage: `k6 run testing/k6/streaming-load.ts` against a local `docker compose up` stack
  * (see README.md for details and env var overrides).
  */
 
@@ -47,7 +48,12 @@ export const options = {
  * Pre-seed these via `testing/k6/README.md`'s seed script, or let the scenario register
  * them lazily on first use (default; see `registerOrLogin` below).
  */
-const users = new SharedArray("k6-users", () => {
+interface TestUser {
+  email: string;
+  password: string;
+}
+
+const users = new SharedArray<TestUser>("k6-users", () => {
   const count = Math.max(VUS, 5);
   return Array.from({ length: count }, (_, i) => ({
     email: `k6-user-${i}@loadtest.example.com`,
@@ -55,7 +61,7 @@ const users = new SharedArray("k6-users", () => {
   }));
 });
 
-function registerOrLogin(user) {
+function registerOrLogin(user: TestUser): Response["cookies"] {
   const registerRes = http.post(
     `${BASE_URL}/auth/register`,
     JSON.stringify({ email: user.email, password: user.password }),
@@ -79,19 +85,20 @@ function registerOrLogin(user) {
   return loginRes.cookies;
 }
 
-function cookieHeader(cookies) {
+function cookieHeader(cookies: Response["cookies"] | undefined): string {
   return Object.entries(cookies || {})
-    .map(([name, jar]) => `${name}=${jar[0] && jar[0].value}`)
+    .map(([name, jar]) => `${name}=${jar[0]?.value}`)
     .join("; ");
 }
 
-function createChat(cookieHeaderValue) {
+function createChat(cookieHeaderValue: string): string | undefined {
   const res = http.post(`${CHAT_BASE_URL}/chats`, null, {
     headers: { Cookie: cookieHeaderValue },
     tags: { stage: "create_chat" },
   });
   check(res, { "create chat: 201": (r) => r.status === 201 });
-  return res.json("id");
+  const id = res.json("id");
+  return typeof id === "string" ? id : undefined;
 }
 
 /**
@@ -99,9 +106,9 @@ function createChat(cookieHeaderValue) {
  * first token (`data:` event) arrives. Uses k6's chunked-response callback rather than a
  * WebSocket, since `conversation-service`'s stream is plain `text/event-stream` over HTTP.
  */
-function sendAndStream(cookieHeaderValue, chatId) {
+function sendAndStream(cookieHeaderValue: string, chatId: string): void {
   const start = Date.now();
-  let firstTokenAt = null;
+  let firstTokenAt: number | null = null;
   let streamCompleted = false;
 
   const res = http.post(
@@ -117,15 +124,16 @@ function sendAndStream(cookieHeaderValue, chatId) {
   // k6's http module buffers the full body by default; for streams it still resolves once
   // the connection closes, but the body contains every SSE event with byte offsets we can
   // scan to approximate first-token latency without a streaming HTTP client.
-  if (res.status === 200 && res.body) {
-    const firstDataIndex = res.body.indexOf("data:");
+  const body = typeof res.body === "string" ? res.body : "";
+  if (res.status === 200 && body) {
+    const firstDataIndex = body.indexOf("data:");
     if (firstDataIndex >= 0) {
       // Approximate: k6 doesn't expose per-chunk timestamps via the plain http module, so
       // first-token latency here is measured as time-to-first-byte of the response, which
       // is a reasonable proxy since the server begins writing the stream on the first
       // generated token.
       firstTokenAt = res.timings.waiting;
-      streamCompleted = res.body.includes("event: done") || res.body.trim().length > 0;
+      streamCompleted = body.includes("event: done") || body.trim().length > 0;
     }
   }
 
@@ -134,13 +142,14 @@ function sendAndStream(cookieHeaderValue, chatId) {
   streamSuccessRate.add(streamCompleted);
 
   check(res, {
-    "stream: got a response body": (r) => !!r.body && r.body.length > 0,
+    "stream: got a response body": (r) => !!r.body && (typeof r.body === "string" ? r.body.length : r.body.byteLength) > 0,
     "stream: status 200": (r) => r.status === 200,
   });
 }
 
 export default function streamingLoadTest() {
   const user = users[__VU % users.length];
+  if (!user) return;
   const cookies = registerOrLogin(user);
   const cookieHeaderValue = cookieHeader(cookies);
 

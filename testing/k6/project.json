@@ -3,14 +3,24 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "testing/k6",
   "projectType": "application",
-  "tags": ["type:perf", "scope:shared"],
+  "tags": [
+    "type:perf",
+    "scope:shared"
+  ],
   "targets": {
     "perf": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "k6 run testing/k6/streaming-load.js"
+        "command": "k6 run testing/k6/streaming-load.ts"
       },
       "cache": false
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.json --noEmit",
+        "cwd": "testing/k6"
+      }
     },
     "test": {
       "executor": "nx:run-commands",

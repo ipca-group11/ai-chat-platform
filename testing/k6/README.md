@@ -1,6 +1,6 @@
 # K6 streaming load test
 
-`streaming-load.js` is the single source of truth for the ~1s first-token and
+`streaming-load.ts` is the single source of truth for the ~1s first-token and
 5-concurrent-stream performance NFRs (FR7/UC6, AC-62/AC-96, `docs/pods/quality-observability/PLAN.md`
 task O6). It drives >=5 virtual users through register/login -> create chat -> send message
 -> consume the SSE stream, recording a `time_to_first_token` trend metric and a
@@ -18,7 +18,7 @@ task O6). It drives >=5 virtual users through register/login -> create chat -> s
 
 ```bash
 # Directly:
-k6 run testing/k6/streaming-load.js
+k6 run testing/k6/streaming-load.ts
 
 # Via Nx:
 pnpm exec nx run k6:perf
@@ -26,7 +26,7 @@ pnpm exec nx run k6:perf
 # Against non-default ports/hosts:
 K6_BASE_URL=http://localhost:3001 K6_CHAT_BASE_URL=http://localhost:3002 \
   K6_VUS=5 K6_ITERATIONS=3 \
-  k6 run testing/k6/streaming-load.js
+  k6 run testing/k6/streaming-load.ts
 ```
 
 ## What it measures
