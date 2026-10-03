@@ -1,0 +1,82 @@
+# ZAP baseline rules for the DAST scan (AICHAT-28, docs/AICHAT-28/WORKLOG.md, US1).
+# Passed to zap-baseline.py with -c. Columns, separated by TABs: rule id, action, rule name, reason.
+#
+# Severity policy
+#   FAIL    High risk. The scan exits 1 and the dast job fails.
+#   WARN    Medium risk. Listed in the report and the job summary; the job passes (exit 2 is accepted).
+#   IGNORE  Low and Informational risk, and false positives. Every IGNORE carries its reason in the last column.
+# An IGNOREd rule is left out of ZAP's console summary and exit code; the full report still lists its alerts.
+#
+# To add a false positive: take the rule id from the report, add a line with IGNORE and the reason, and
+# say in the pull request why the alert is not a real weakness. A rule that is not listed here is WARN.
+# Use tabs, not spaces: zap-baseline.py rejects a line with fewer than three tab-separated columns.
+10062	FAIL	(PII Disclosure)	High: personal data (card or ID numbers) in a response
+10034	FAIL	(Heartbleed OpenSSL Vulnerability (Indicative))	High: vulnerable TLS library
+10057	FAIL	(Username Hash Found)	High: user name hashes in a response
+10115	FAIL	(Script Served From Malicious Domain (polyfill))	High: script served from a compromised host
+10028	FAIL	(Off-site Redirect)	High: open redirect to another site
+90002	FAIL	(Java Serialization Object)	High: serialized Java objects accepted from the client
+# False positive: Retire.js reads the Module Federation chunk mf-entry-bootstrap-<hash>.js as the Bootstrap library. Only that file is out of scope; any other file still warns.
+10003	OUTOFSCOPE	http://localhost:\d+/assets/mf-entry-bootstrap-.*
+10003	WARN	(Vulnerable JS Library (Powered by Retire.js))	Medium: update the library, ticket it
+10020	WARN	(Anti-clickjacking Header)	Medium: Caddyfile header fix, see AICHAT-28 work log US4
+10038	WARN	(Content Security Policy (CSP) Header Not Set)	Medium: Caddyfile header fix, see AICHAT-28 work log US4
+10055	WARN	(CSP)	Medium: weak CSP directives
+10098	WARN	(Cross-Domain Misconfiguration)	Medium: CORS allow-list must stay narrow
+10202	WARN	(Absence of Anti-CSRF Tokens)	Medium: sessions use SameSite cookies and JSON bodies, review per finding
+10105	WARN	(Weak Authentication Method)	Medium: sign-in over HTTP basic or digest
+10108	WARN	(Reverse Tabnabbing)	Medium: external links need rel=noopener
+10033	WARN	(Directory Browsing)	Medium: directory listing enabled
+10040	WARN	(Secure Pages Include Mixed Content)	Medium: HTTP resources on HTTPS pages
+3	WARN	(Session ID in URL Rewrite)	Medium: session id in the URL
+10099	WARN	(Source Code Disclosure)	Medium: source code in a response
+10024	WARN	(Information Disclosure - Sensitive Information in URL)	Medium: sensitive data in a query string
+90001	WARN	(Insecure JSF ViewState)	Medium: not used by this stack
+90003	WARN	(Sub Resource Integrity Attribute Missing)	Medium: known finding, the Google Fonts stylesheet in index.html cannot use SRI (Google serves different CSS per browser). Any other external script or style is new
+90022	WARN	(Application Error Disclosure)	Medium: stack traces or error pages with internals
+10011	IGNORE	(Cookie Without Secure Flag)	False positive on the local stack: compose.yaml sets COOKIE_SECURE=false because the scan runs over plain HTTP. In production Caddy serves HTTPS and Secure is on
+10010	IGNORE	(Cookie No HttpOnly Flag)	Low risk, below the gate by the severity policy. Did not fire in the first scan (auth-service sets HttpOnly)
+10054	IGNORE	(Cookie without SameSite Attribute)	Low risk, below the gate by the severity policy. Did not fire in the first scan
+90033	IGNORE	(Loosely Scoped Cookie)	Low risk, below the gate by the severity policy. Did not fire in the first scan
+10021	IGNORE	(X-Content-Type-Options Header Missing)	Low: vite preview does not send it; ticketed to the deploy owner (Caddyfile), see AICHAT-28 work log US4
+10035	IGNORE	(Strict-Transport-Security Header)	Low: HSTS only means something over HTTPS; the local scan is HTTP. Ticketed for the Caddyfile
+10063	IGNORE	(Permissions Policy Header Not Set)	Low: ticketed to the deploy owner (Caddyfile), see AICHAT-28 work log US4
+90004	IGNORE	(Insufficient Site Isolation Against Spectre Vulnerability)	Low: cross-origin isolation headers are not needed by this app; ticketed with the headers
+10036	IGNORE	(HTTP Server Response Header)	Low: server banner of vite preview, no version detail; Caddy removes Server in production
+10037	IGNORE	(Server Leaks Information via X-Powered-By)	Low: Express services call disable(x-powered-by); only dev servers can send it
+10039	IGNORE	(X-Backend-Server Header Information Leak)	Low: no such header is sent
+10015	IGNORE	(Re-examine Cache-control Directives)	Low risk, below the gate by the severity policy. Did not fire in the first scan
+10017	IGNORE	(Cross-Domain JavaScript Source File Inclusion)	Low risk, below the gate by the severity policy. The micro frontends load from the other local ports by design (Module Federation)
+10019	IGNORE	(Content-Type Header Missing)	Low risk, below the gate by the severity policy. Did not fire in the first scan
+10023	IGNORE	(Information Disclosure - Debug Error Messages)	Low risk, below the gate by the severity policy. Did not fire in the first scan
+10029	IGNORE	(Cookie Poisoning)	Low: the app does not read cookie values into pages
+10041	IGNORE	(HTTP to HTTPS Insecure Transition in Form Post)	Low: the app has no HTML form posts
+10056	IGNORE	(X-Debug-Token Information Leak)	Low: no such header is sent
+10052	IGNORE	(X-ChromeLogger-Data (XCOLD) Header Information Leak)	Low: no such header is sent
+10061	IGNORE	(X-AspNet-Version Response Header)	Low: not an ASP.NET stack
+10096	IGNORE	(Timestamp Disclosure)	Low risk, below the gate by the severity policy. Timestamps of chats and messages are part of the API contract
+10110	IGNORE	(Dangerous JS Functions)	Low risk, below the gate by the severity policy. Bundled library code is reviewed by SAST (AICHAT-27)
+2	IGNORE	(Private IP Disclosure)	Low: internal addresses of the compose network, not reachable from outside
+10009	IGNORE	(In Page Banner Information Leak)	Informational: no server banner in pages
+10025	IGNORE	(Information Disclosure - Sensitive Information in HTTP Referrer Header)	Informational: no secrets in URLs
+10026	IGNORE	(HTTP Parameter Override)	Informational: not used by this stack
+10027	IGNORE	(Information Disclosure - Suspicious Comments)	Informational: matches words in minified bundles, no secrets (secret scan covers the source)
+10030	IGNORE	(User Controllable Charset)	Informational: no charset taken from input
+10031	IGNORE	(User Controllable HTML Element Attribute (Potential XSS))	Informational: reflection check is covered by React escaping and the SAST rules
+10032	IGNORE	(Viewstate)	Informational: not an ASP.NET stack
+10042	IGNORE	(HTTPS to HTTP Insecure Transition in Form Post)	Informational: the app has no HTML form posts
+10043	IGNORE	(User Controllable JavaScript Event (XSS))	Informational: covered by React escaping and the SAST rules
+10044	IGNORE	(Big Redirect Detected (Potential Sensitive Information Leak))	Informational: no large redirects
+10049	IGNORE	(Content Cacheability)	Informational: describes caching, not a weakness
+10050	IGNORE	(Retrieved from Cache)	Informational: describes caching, not a weakness
+10097	IGNORE	(Hash Disclosure)	Informational: hashes of built assets in file names
+10109	IGNORE	(Modern Web Application)	Informational: describes the app (a single page app), not a weakness
+10111	IGNORE	(Authentication Request Identified)	Informational: describes the sign-in request
+10112	IGNORE	(Session Management Response Identified)	Informational: describes the session cookies
+10113	IGNORE	(Verification Request Identified)	Informational: describes a verification request
+10116	IGNORE	(ZAP is Out of Date)	Informational: the image version is pinned on purpose, bumped by hand
+50001	IGNORE	(Script Passive Scan Rules)	Informational: no custom passive scripts are loaded
+90011	IGNORE	(Charset Mismatch)	Informational: header and meta charset differ in a static page
+90030	IGNORE	(WSDL File Detection)	Informational: no WSDL in this stack
+
+120000	IGNORE	(Information Disclosure - Information in Browser localStorage and sessionStorage)	Informational: lists what the app keeps in browser storage (UI preferences); tokens are httpOnly cookies, not storage
