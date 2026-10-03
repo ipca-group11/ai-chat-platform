@@ -75,6 +75,11 @@ jobs:
             VITE_MFE_SETTINGS_URL=https://${{ vars.DOMAIN }}:3003
             VITE_FARO_URL=https://${{ vars.DOMAIN }}/collect
             VITE_APP_VERSION=${{ env.SHA }}
+          # Attestations travel with the image in GHCR (AICHAT-53): the SPDX SBOM and the
+          # SLSA provenance. Check with `docker buildx imagetools inspect <image> --format
+          # '{{ json .SBOM }}'` (or `.Provenance`).
+          sbom: true
+          provenance: mode=max
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
 
