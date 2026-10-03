@@ -6,8 +6,8 @@ $ gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD
     ○ ░
     ░    gitleaks
 
-4:47PM INF 15 commits scanned.
-4:47PM INF scanned ~73720 bytes (73.72 KB) in 89ms
-4:47PM INF no leaks found
+4:49PM INF 17 commits scanned.
+4:49PM INF scanned ~118939 bytes (118.94 KB) in 118ms
+4:49PM INF no leaks found
 
 [exit 0]
