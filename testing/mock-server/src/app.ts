@@ -2,6 +2,7 @@ import express, { type Express } from "express";
 import { createAdminRouter } from "./admin/admin.router.js";
 import { buildDataset } from "./data/datasets.js";
 import type { Dataset } from "./data/types.js";
+import { createRequestLog } from "./core/request-log.js";
 import { loadConfig, type MockConfig } from "./config.js";
 import { latency, randomErrors } from "./middleware.js";
 import { createRng } from "./prng.js";
@@ -41,6 +42,9 @@ export function createApp(config: MockConfig = loadConfig(), modules: MockModule
     },
   };
 
+  const requests = createRequestLog();
+  ctx.onReset(requests.clear);
+
   const app = express();
   app.disable("x-powered-by");
 
@@ -49,11 +53,11 @@ export function createApp(config: MockConfig = loadConfig(), modules: MockModule
     store.load(config.dataset);
     for (const hook of resetHooks) hook();
   };
-  app.use("/__admin", express.json(), createAdminRouter({ ctx, reset }));
+  app.use("/__admin", express.json(), createAdminRouter({ ctx, reset, requests }));
 
   for (const mock of modules) {
     if (mock.scenarios) ctx.scenarios.register(...mock.scenarios);
-    app.use(mock.mountPath, latency(config), randomErrors(config, rng), mock.createRouter(ctx));
+    app.use(mock.mountPath, requests.middleware(mock.name), latency(config), randomErrors(config, rng), mock.createRouter(ctx));
   }
 
   app.use((req, res) => {
