@@ -1,0 +1,6 @@
+$ cd testing/mock-server && (PORT=4110 TOKENS=12 TOKEN_INTERVAL_MS=40 TTFT_MS=200 npx tsx src/main.ts > /dev/null & PID=$!; sleep 3; F=../../services/conversation-service/src/test-utils/fixtures/llm; curl -sN localhost:4110/anthropic/v1/messages -H content-type:application/json -H 'X-Mock-Scenario: replay:thinking' -d '{"messages":[]}' > /tmp/replay-a.sse; cmp $F/anthropic/thinking.sse /tmp/replay-a.sse && echo "anthropic/thinking.sse identical ($(wc -c < /tmp/replay-a.sse) bytes)"; curl -sN localhost:4110/anthropic/v1/messages -H content-type:application/json -H 'X-Mock-Scenario: replay:overloaded-midstream' -d '{"messages":[]}' > /tmp/replay-b.sse; cmp $F/anthropic/overloaded-midstream.sse /tmp/replay-b.sse && echo "anthropic/overloaded-midstream.sse identical ($(wc -c < /tmp/replay-b.sse) bytes)"; curl -sN localhost:4110/openai/v1/chat/completions -H content-type:application/json -H 'X-Mock-Scenario: replay:reasoning' -d '{"messages":[]}' > /tmp/replay-c.sse; cmp $F/openai/reasoning.sse /tmp/replay-c.sse && echo "openai/reasoning.sse identical ($(wc -c < /tmp/replay-c.sse) bytes)"; kill $PID)
+anthropic/thinking.sse identical (    1556 bytes)
+anthropic/overloaded-midstream.sse identical (     594 bytes)
+openai/reasoning.sse identical (     961 bytes)
+
+[exit 0]

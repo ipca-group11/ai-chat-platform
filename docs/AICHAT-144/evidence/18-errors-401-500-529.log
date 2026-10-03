@@ -1,0 +1,13 @@
+$ cd testing/mock-server && (PORT=4110 TOKENS=12 TOKEN_INTERVAL_MS=40 TTFT_MS=200 npx tsx src/main.ts > /dev/null & PID=$!; sleep 3; for s in error-401 error-500 error-529; do echo "--- anthropic $s"; curl -s localhost:4110/anthropic/v1/messages -H content-type:application/json -H "X-Mock-Scenario: $s" -d '{"messages":[]}'; echo; done; echo '--- openai error-429'; curl -si localhost:4110/openai/v1/chat/completions -H content-type:application/json -H 'X-Mock-Scenario: error-429' -d '{"messages":[]}' | grep -iE '^HTTP|retry-after|^\{'; kill $PID)
+--- anthropic error-401
+{"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_mocka087ea00b349"}
+--- anthropic error-500
+{"type":"error","error":{"type":"api_error","message":"Internal server error"},"request_id":"req_mock8706c4fb2627"}
+--- anthropic error-529
+{"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_mockf7e79d47f666"}
+--- openai error-429
+HTTP/1.1 429 Too Many Requests
+retry-after: 2
+{"error":{"message":"Rate limit reached for requests: Limit 3, Used 3, Requested 1. Please try again later.","type":"requests","param":null,"code":"rate_limit_exceeded"}}
+
+[exit 0]

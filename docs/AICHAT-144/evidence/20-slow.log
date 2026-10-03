@@ -1,0 +1,7 @@
+$ cd testing/mock-server && (PORT=4110 TOKENS=12 TOKEN_INTERVAL_MS=40 TTFT_MS=200 npx tsx src/main.ts > /dev/null & PID=$!; sleep 3; TIMEFORMAT='first token after %Rs'; exec 2>&1; echo 'normal (TTFT_MS=200):'; time (curl -sN localhost:4110/openai/v1/chat/completions -H content-type:application/json -d '{"model":"gpt-4o","stream":true,"messages":[{"role":"user","content":"hi"}]}' | head -n 1 > /dev/null); echo 'slow:'; time (curl -sN localhost:4110/openai/v1/chat/completions -H content-type:application/json -H 'X-Mock-Scenario: slow' -d '{"model":"gpt-4o","stream":true,"messages":[{"role":"user","content":"hi"}]}' | head -n 1 > /dev/null); kill $PID)
+normal (TTFT_MS=200):
+first token after 0.290s
+slow:
+first token after 5.259s
+
+[exit 0]

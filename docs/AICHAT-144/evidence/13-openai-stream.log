@@ -1,0 +1,31 @@
+$ cd testing/mock-server && (PORT=4110 TOKENS=12 TOKEN_INTERVAL_MS=40 TTFT_MS=200 npx tsx src/main.ts > /dev/null & PID=$!; sleep 3; curl -sN localhost:4110/openai/v1/chat/completions -H content-type:application/json -d '{"model":"gpt-4o","stream":true,"messages":[{"role":"user","content":"hi"}]}' | sed -E 's/.*("model".*)/\1/'; kill $PID)
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"role":"assistant","content":"As "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"arrives "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"tests "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"is "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"repeatable "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"can "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"that "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"change "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"picked "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"seed "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"to "},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"stay."},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: [DONE]
+
+
+[exit 0]
