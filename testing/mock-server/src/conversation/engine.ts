@@ -148,7 +148,7 @@ export class ConversationEngine {
     } else {
       trigger.status = "complete";
       reply = {
-        id: nextId("msg", ctx.store.data.messages.map((message) => message.id)),
+        id: nextId(ctx, "msg", ctx.store.data.messages.map((message) => message.id)),
         chatId,
         role: "assistant",
         content: "",

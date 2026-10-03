@@ -384,6 +384,18 @@ describe("queue: edit, cancel, stop and retry", () => {
     expect(messages.slice(4).map((m) => m.role)).toEqual(["user", "assistant"]);
   });
 
+  it("does not reuse the id of a canceled message", async () => {
+    const { app } = setup(slow);
+    const { as } = await signIn(app);
+    const id = await firstChatId(as);
+    await as("post", `/chats/${id}/messages`).send({ content: "first" });
+    const second = await as("post", `/chats/${id}/messages`).send({ content: "second" });
+    await as("delete", `/chats/${id}/messages/${second.body.message.id}`);
+    const third = await as("post", `/chats/${id}/messages`).send({ content: "third" });
+    expect(third.body.message.id).not.toBe(second.body.message.id);
+    await settled(as, id);
+  });
+
   it("answers 409 for a message that already started, 404 for one that is not the user's", async () => {
     const { app } = setup(slow);
     const { as } = await signIn(app);

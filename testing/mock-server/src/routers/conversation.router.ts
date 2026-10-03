@@ -105,7 +105,7 @@ function createConversationRouter(ctx: MockContext): Router {
     const input = parse(createChatSchema, req.body);
     const now = nowIso();
     const created = {
-      id: nextId("chat", ctx.store.data.chats.map((c) => c.id)),
+      id: nextId(ctx, "chat", ctx.store.data.chats.map((c) => c.id)),
       ownerId: user.id,
       title: input.title,
       provider: input.provider,
@@ -186,7 +186,7 @@ function createConversationRouter(ctx: MockContext): Router {
     const input = parse(sendMessageSchema, req.body);
     const owned = ctx.store.data.attachments.filter((a) => input.attachmentIds.includes(a.id) && a.ownerId === user.id);
     const record: StoredMessage = {
-      id: nextId("msg", ctx.store.data.messages.map((m) => m.id)),
+      id: nextId(ctx, "msg", ctx.store.data.messages.map((m) => m.id)),
       chatId: target.id,
       role: "user",
       content: input.content,
@@ -316,7 +316,7 @@ function createConversationRouter(ctx: MockContext): Router {
       throw new HttpError(400, "ATTACHMENT_TOO_LARGE", `File "${name}" exceeds the 10 MB size limit`);
     }
     const attachment: chat.Attachment = {
-      id: nextId("att", ctx.store.data.attachments.map((a) => a.id)),
+      id: nextId(ctx, "att", ctx.store.data.attachments.map((a) => a.id)),
       messageId,
       ownerId: user.id,
       originalFilename: name,

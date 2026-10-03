@@ -13,13 +13,21 @@ export type StoredMessage = chat.Message & {
 
 export const nowIso = (): string => new Date().toISOString();
 
-/** `prefix_00042`: one above the highest id with that prefix in `ids`. */
-export function nextId(prefix: string, ids: Iterable<string>): string {
-  let highest = 0;
+const issued = new WeakMap<object, Map<string, number>>();
+
+/**
+ * `prefix_00042`: one above the highest id with that prefix in `ids`. Ids are not reused after a
+ * delete or cancel; the count starts again with the next dataset (seed or reset).
+ */
+export function nextId(ctx: MockContext, prefix: string, ids: Iterable<string>): string {
+  const counters = issued.get(ctx.store.data) ?? new Map<string, number>();
+  issued.set(ctx.store.data, counters);
+  let highest = counters.get(prefix) ?? 0;
   for (const id of ids) {
     const match = new RegExp(`^${prefix}_(\\d+)$`).exec(id);
     if (match) highest = Math.max(highest, Number(match[1]));
   }
+  counters.set(prefix, highest + 1);
   return `${prefix}_${String(highest + 1).padStart(5, "0")}`;
 }
 
