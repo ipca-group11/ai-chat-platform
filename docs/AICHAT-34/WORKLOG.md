@@ -181,6 +181,40 @@ cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.js
 
 **Problems and fixes.** The first run failed for `apps/mfe-auth` as described; we fixed the script and the guard passed. The deliberately broken case (`packages/ui` without `--coverage`) failed as expected and was reverted. The guard reads the files directly instead of calling the Nx CLI, so it stays fast and does not depend on the Nx daemon.
 
+### US5 · Coverage report on each PR and proof that a drop fails CI ([AICHAT-132](https://ipca-grupo11.atlassian.net/browse/AICHAT-132))
+
+**What and why.** Thresholds already fail the `test` target, but a reviewer only sees a red job. We added a small Node script that reads every project's `coverage/coverage-summary.json` (the `json-summary` reporter) and writes one Markdown table to the GitHub job summary: project, lines, branches, functions, statements. The CI step uses `if: always()`, so the table still appears when a threshold fails the test step. The script has no dependencies. Thresholds stay in each project's own Vitest config: 80 for services and packages, 80 (75 branches) for MFEs and shell, 80 (70 branches) for e2e.
+
+**Files.**
+- `scripts/ci/coverage-summary.mjs`: finds `**/coverage/coverage-summary.json` (skips `node_modules`, `.git`, `.nx`, `dist`) and writes the table to `$GITHUB_STEP_SUMMARY`, or to stdout when it is unset.
+- `scripts/ci/coverage-summary.test.mjs`: `node --test` unit test for the table formatting.
+- `.github/workflows/ci.yml`: new `Coverage summary` step after `nx affected`.
+- `docs/AICHAT-34/evidence/20-coverage-summary-local.{log,png}`
+
+**How to run.**
+```bash
+pnpm exec nx affected -t test        # writes coverage/coverage-summary.json per project
+node scripts/ci/coverage-summary.mjs # table on stdout
+node --test scripts/ci/coverage-summary.test.mjs
+```
+
+**How to repeat it manually.** Create two fixtures such as `/tmp/fx/packages/ui/coverage/coverage-summary.json` and `/tmp/fx/services/auth/coverage/coverage-summary.json`, each with `{"total":{"lines":{"pct":92.5},"branches":{"pct":81.25},"functions":{"pct":100},"statements":{"pct":93.1}}}`, then run `node scripts/ci/coverage-summary.mjs /tmp/fx`. Set `GITHUB_STEP_SUMMARY=/tmp/out.md` to check the file output.
+
+**Result.** The table lists one row per project with two decimals; missing metrics show `n/a` and an empty run prints a "no coverage-summary.json found" row. Both unit tests pass.
+
+![](evidence/20-coverage-summary-local.png)
+
+**Problems and fixes.** `node --test scripts/ci/` (directory argument) fails on this Node version, so the test is run by file path. The script only runs its `main` when executed directly, so the test can import the formatter without side effects. Projects that do not yet emit the summary file are simply absent from the table until the reporter lands.
+
+**Failing-PR proof.** To show that a coverage drop fails CI:
+1. Branch off `integration/testing-epics`: `git switch -c test/coverage-drop-proof`.
+2. Lower coverage in one project: either delete a test file in a project with thresholds, or raise a threshold above the current value (for example `lines: 100`) in its Vitest config.
+3. Commit, push, and open a **draft** PR into `integration/testing-epics`.
+4. Wait for CI. The `nx affected` step must fail on the coverage threshold, and the `Coverage summary` step must still show the table in the job summary.
+5. Link the failed run here, then close the PR without merging and delete the branch.
+
+PR: #<to fill>
+
 ### US6 · Narrow coverage excludes ([AICHAT-139](https://ipca-grupo11.atlassian.net/browse/AICHAT-139))
 
 **What and why.** `apps/mfe-chat` excluded the whole `src/app/**` folder, which holds routes, pages, `ChatWorkspace`, `auth-context`, `use-media-query` and the `split-panes` logic. A broad exclude hides untested logic (`split-panes.ts` has a test that did not count). We narrowed it to the one real bootstrap file, `src/app/remote-entry.tsx` (Module Federation mount, no logic of its own).
