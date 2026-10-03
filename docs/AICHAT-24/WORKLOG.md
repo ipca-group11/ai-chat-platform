@@ -213,6 +213,7 @@ pnpm exec nx run k6:test && pnpm test:scripts  # unit tests of the scenarios and
 
 ## 7. Notes for the report
 
+- **Checks before the pull request.** `pnpm exec nx affected -t lint typecheck test build --base=origin/integration/testing-epics`: 8 projects and 6 dependencies, all green. `pnpm sast`: no finding. `gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD`: no leaks (an earlier version of the k6 summaries held the session cookies of the test accounts from `setup()`; `run.sh` now removes them and the commits were redone).
 - **Found.** The platform saturates on the CPU of conversation-service, not on memory; the shell proxy is next. The sign-in limit (300 per 15 minutes per address, no `trust proxy`) would be shared by all users behind the proxy.
 - **Not done.** No run on the real VM and no mixed scenario (users and streams together); the limits are per container, so the numbers are a floor. Soak recorded with 5 minutes, defined for 30.
 - **Fixed on the way.** Flaky mock server tests; the k6 script rewritten; stack ports configurable by environment.
