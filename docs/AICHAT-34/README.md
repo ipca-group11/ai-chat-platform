@@ -72,7 +72,9 @@ Other observations:
 - Baseline: `nx run-many -t test` passes on all 15 projects (2026-10-03). **Coverage numbers for shell, ui, mfe-auth are unknown** because they are not computed in CI. Measure them before switching enforcement on, or CI breaks.
 - `nx affected` only tests changed projects, so a project's threshold is only checked when that project changes. That is fine for a gate; a weekly full run (`nx run-many -t test`) catches drift from shared-package changes.
 
-## 5. Thresholds (proposal, DoR)
+## 5. Thresholds (approved 2026-10-03)
+
+**Status:** approved by the owner on 2026-10-03.
 
 STACK.md decision #6 sets **80% lines/statements/functions/branches** for `services/*` and `packages/ui`, and says frontends are "encouraged". Proposal:
 
@@ -85,6 +87,17 @@ STACK.md decision #6 sets **80% lines/statements/functions/branches** for `servi
 | `testing/k6` | exempt (k6 runtime, not Node) | | | |
 
 If a project is below the threshold today: set its threshold at the **current value (rounded down)** with a dated TODO, then raise it with AICHAT-17/18 work ("ratchet"), instead of lowering the global bar.
+
+### Measured values (2026-10-03, `vitest run --coverage`, before any change)
+
+| Project | Target (L/B/F/S) | Measured lines | Measured branches | Measured functions | Measured statements | Meets target? |
+|---|---|---|---|---|---|---|
+| `apps/shell` | 80/75/80/80 | 70.51 | 60.97 | 62.12 | 68.71 | No, ratchet |
+| `packages/ui` | 80/80/80/80 | 97.20 | 80.48 | 92.06 | 97.20 | Yes |
+| `apps/mfe-auth` | 80/75/80/80 | 92.23 | 75.40 | 93.10 | 92.23 | Yes |
+| `e2e` (2 helper files) | 80/70/80/80 | 82.05 | 77.77 | 81.25 | 80.95 | Yes |
+
+Ratchet policy in practice: a project below its target gets a threshold equal to its current value rounded down, written next to the threshold as `// TODO(AICHAT-17, 2026-10-03): raise to <target>`. Thresholds only go up. Today only `apps/shell` needs it (lines 70, branches 60, functions 62, statements 68).
 
 ## 6. Implementation plan (steps)
 

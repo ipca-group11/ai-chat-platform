@@ -1,0 +1,21 @@
+$ node scripts/ci/coverage-summary.mjs
+## Coverage per project
+
+| Project | Lines | Branches | Functions | Statements |
+| --- | ---: | ---: | ---: | ---: |
+| apps/mfe-auth | 92.23% | 75.40% | 93.10% | 92.23% |
+| apps/mfe-chat | 91.86% | 85.21% | 89.71% | 89.87% |
+| apps/mfe-settings | 100.00% | 92.13% | 100.00% | 100.00% |
+| apps/shell | 70.51% | 60.97% | 62.12% | 68.71% |
+| e2e | 82.05% | 77.77% | 81.25% | 80.95% |
+| packages/eslint-config | 100.00% | 92.00% | 100.00% | 100.00% |
+| packages/observability | 100.00% | 93.75% | 100.00% | 100.00% |
+| packages/pact-config | 100.00% | 100.00% | 100.00% | 100.00% |
+| packages/shared-types | 96.07% | 85.36% | 100.00% | 96.07% |
+| packages/test-config | 100.00% | 100.00% | 100.00% | 100.00% |
+| packages/ui | 97.20% | 80.48% | 92.06% | 97.20% |
+| packages/workspace-config | 100.00% | 88.00% | 100.00% | 100.00% |
+| services/auth-service | 95.19% | 85.89% | 94.11% | 94.85% |
+| services/conversation-service | 98.61% | 88.98% | 97.38% | 97.93% |
+
+[exit 0]

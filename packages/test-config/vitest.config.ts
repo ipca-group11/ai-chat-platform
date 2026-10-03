@@ -5,6 +5,6 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["*.spec.ts"],
-    coverage: coveragePreset({ include: ["*.ts"], exclude: ["vitest.config.ts"] }),
+    coverage: coveragePreset({ include: ["*.js"] }),
   },
 });

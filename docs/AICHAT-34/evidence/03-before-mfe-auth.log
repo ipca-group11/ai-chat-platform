@@ -1,0 +1,21 @@
+$ cd apps/mfe-auth && pnpm exec vitest run --coverage --coverage.reporter=text-summary
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-auth
+      Coverage enabled with v8
+
+
+ Test Files  6 passed (6)
+      Tests  22 passed (22)
+   Start at  11:20:56
+   Duration  2.27s (environment 43%, import 22%, tests 16%, setup 12%, transform 6%, worker 2%)
+
+ % Coverage report from v8
+
+=============================== Coverage summary ===============================
+Statements   : 92.23% ( 95/103 )
+Branches     : 75.4% ( 46/61 )
+Functions    : 93.1% ( 27/29 )
+Lines        : 92.23% ( 95/103 )
+================================================================================
+
+[exit 0]

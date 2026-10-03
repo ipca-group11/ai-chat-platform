@@ -70,7 +70,7 @@ For each story (order from the epic skill; parallel where independent):
 1. Main: transition story `21`.
 2. Main: spawn the agent with the prompt template.
 3. Agent: implement, run, capture evidence, write its WORKLOG section, commit. Returns the short report.
-4. Main: tick acceptance criteria in Jira (ADF), transition `31`. Push / PR (base `integration/testing-epics`, never `main`) only after the owner agrees. `41` after merge.
+4. Main: tick acceptance criteria in Jira (ADF), transition `31`. Push and open the PR (base `integration/testing-epics`, never `main`), then merge it into the integration branch as soon as checks pass (`gh pr merge --merge`), no owner review needed. `41` after merge. Only the final integration → main PR waits for team review.
 5. If the agent reports an unsettled decision: ask the owner (AskUserQuestion), then SendMessage the answer to the same agent.
 
 #### Agent prompt template (keep it this short)

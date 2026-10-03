@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { coveragePreset } from '@platform/test-config';
 import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -42,24 +43,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     css: true,
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html'],
+    coverage: coveragePreset({
       include: ['src/**/*.{ts,tsx}'],
-      exclude: [
-        'src/**/*.stories.tsx',
-        'src/**/*.test.{ts,tsx}',
-        'src/**/*.d.ts',
-        'src/test/**',
-        'src/index.ts',
-        'src/components/**/index.ts',
-      ],
-      thresholds: {
-        lines: 80,
-        statements: 80,
-        functions: 80,
-        branches: 80,
-      },
-    },
+      exclude: ['src/test/**', 'src/index.ts', 'src/components/**/index.ts'],
+    }),
   },
 });

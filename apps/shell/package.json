@@ -10,7 +10,7 @@
     "serve": "vite preview --port 5000",
     "lint": "eslint src",
     "typecheck": "tsc -b --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -26,6 +26,7 @@
     "@eslint/js": "^10.0.1",
     "@module-federation/vite": "^1.22.1",
     "@platform/eslint-config": "workspace:*",
+    "@platform/test-config": "workspace:*",
     "@tanstack/router-cli": "^1.167.38",
     "@tanstack/router-plugin": "^1.168.40",
     "@testing-library/dom": "^10.4.2",

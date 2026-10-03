@@ -1,0 +1,12 @@
+$ cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.js
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/workspace-config
+
+
+ Test Files  1 passed (1)
+      Tests  25 passed (25)
+   Start at  11:34:54
+   Duration  129ms (transform 46%, import 27%, tests 20%, worker 7%)
+
+
+[exit 0]

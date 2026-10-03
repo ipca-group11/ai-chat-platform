@@ -1,0 +1,66 @@
+$ pnpm nx run mfe-auth:test --skip-nx-cache
+
+> llm-chat-workspace@1.0.0 nx /Users/truezone/Projects/ai-chat-platform
+> nx run mfe-auth\:test --skip-nx-cache
+
+
+ NX   Running target test for project mfe-auth and 3 tasks it depends on:
+
+
+✔  nx run eslint-config:build
+✔  nx run test-config:build
+✔  nx run ui:build
+
+> nx run mfe-auth:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-auth
+      Coverage enabled with v8
+
+
+ Test Files  6 passed (6)
+      Tests  22 passed (22)
+   Start at  11:25:43
+   Duration  2.09s (environment 39%, import 25%, tests 18%, setup 9%, transform 6%, worker 2%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   92.23 |     75.4 |    93.1 |   92.23 |                   
+ ...ures/login/api |    90.9 |      100 |   83.33 |    90.9 |                   
+  session.ts       |   88.88 |      100 |      75 |   88.88 | 43                
+ ...gin/components |     100 |    78.57 |     100 |     100 |                   
+  LoginForm.tsx    |     100 |    83.33 |     100 |     100 | 28,81             
+  LogoutButton.tsx |     100 |       50 |     100 |     100 | 13                
+ ...ter/components |     100 |       90 |     100 |     100 |                   
+  RegisterForm.tsx |     100 |       90 |     100 |     100 | 33                
+ shared            |   86.48 |    66.66 |     100 |   86.48 |                   
+  api-client.ts    |   85.71 |    65.51 |     100 |   85.71 | 67,78-84          
+  correlation.ts   |      75 |       75 |     100 |      75 | 16                
+ shared/components |      50 |      100 |      50 |      50 |                   
+  AuthCard.tsx     |      50 |      100 |      50 |      50 | 20-21             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 92.23% ( 95/103 )
+Branches     : 75.4% ( 46/61 )
+Functions    : 93.1% ( 27/29 )
+Lines        : 92.23% ( 95/103 )
+================================================================================
+
+
+
+ NX   Successfully ran target test for project mfe-auth and 3 tasks it depends on
+
+
+Output of 3 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      5.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.1s (4 tasks)
+  Recoverable time:  <1ms
+
+[exit 0]

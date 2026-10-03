@@ -6,6 +6,7 @@
   "type": "module",
   "devDependencies": {
     "@platform/eslint-config": "workspace:*",
+    "@platform/test-config": "workspace:*",
     "@types/node": "^24.13.6",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.11.0",

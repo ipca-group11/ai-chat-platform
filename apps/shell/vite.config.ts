@@ -1,3 +1,4 @@
+import { coveragePreset, appCoverageThresholds } from '@platform/test-config';
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
@@ -80,14 +81,15 @@ export default defineConfig({
     // in sandboxed/CI environments without a warm Vite cache; give tests
     // that dynamically import it (e.g. remoteWiring.test.ts) headroom.
     testTimeout: 15000,
-    coverage: {
-      reporter: ['text', 'html'],
+    coverage: coveragePreset({
       thresholds: {
-        lines: 80,
-        statements: 80,
-        functions: 80,
-        branches: 80,
+        ...appCoverageThresholds,
+        // Ratchet (AICHAT-34): current values rounded down, raised with AICHAT-17/18 work.
+        lines: 70, // TODO(AICHAT-17, 2026-10-03): raise to 80
+        branches: 60, // TODO(AICHAT-17, 2026-10-03): raise to 75
+        functions: 62, // TODO(AICHAT-17, 2026-10-03): raise to 80
+        statements: 68, // TODO(AICHAT-17, 2026-10-03): raise to 80
       },
-    },
+    }),
   },
 });
