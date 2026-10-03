@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import { anthropicMessage, anthropicReply, anthropicStream, messageId } from "../llm/anthropic.js";
 import { planScenario, scenarioDefinitions } from "../llm/scenarios.js";
-import { selectScenario } from "../llm/select.js";
+import { availableScenarios, selectScenario } from "../llm/select.js";
 import { openEventStream, writeFrames } from "../llm/sse.js";
 import type { MockModule } from "../registry.js";
 
@@ -25,12 +25,12 @@ export const anthropicMock: MockModule = {
         res.status(400).json(errorBody("invalid_request_error", "messages: Field required"));
         return;
       }
-      const model = typeof request.model === "string" && request.model ? request.model : DEFAULT_MODEL;
+      const requestedModel = typeof request.model === "string" && request.model ? request.model : DEFAULT_MODEL;
 
-      const name = selectScenario(req);
+      const { scenario: name, model } = selectScenario(req, requestedModel);
       const plan = planScenario("anthropic", name, ctx.config);
       if (!plan) {
-        res.status(400).json(errorBody("invalid_request_error", `Unknown mock scenario "${name}"`));
+        res.status(400).json(errorBody("invalid_request_error", `Unknown mock scenario "${name}". Available: ${availableScenarios(ctx, "anthropic")}`));
         return;
       }
 

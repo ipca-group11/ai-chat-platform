@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import { completionId, openAiCompletion, openAiReply, openAiStream } from "../llm/openai.js";
 import { planScenario, scenarioDefinitions } from "../llm/scenarios.js";
-import { selectScenario } from "../llm/select.js";
+import { availableScenarios, selectScenario } from "../llm/select.js";
 import { openEventStream, writeFrames } from "../llm/sse.js";
 import type { MockModule } from "../registry.js";
 
@@ -27,12 +27,12 @@ export const openaiMock: MockModule = {
         res.status(400).json(errorBody("Missing required parameter: 'messages'.", "missing_required_parameter", "messages"));
         return;
       }
-      const model = typeof request.model === "string" && request.model ? request.model : DEFAULT_MODEL;
+      const requestedModel = typeof request.model === "string" && request.model ? request.model : DEFAULT_MODEL;
 
-      const name = selectScenario(req);
+      const { scenario: name, model } = selectScenario(req, requestedModel);
       const plan = planScenario("openai", name, ctx.config);
       if (!plan) {
-        res.status(400).json(errorBody(`Unknown mock scenario "${name}"`, "unknown_scenario"));
+        res.status(400).json(errorBody(`Unknown mock scenario "${name}". Available: ${availableScenarios(ctx, "openai")}`, "unknown_scenario"));
         return;
       }
 
