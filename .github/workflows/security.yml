@@ -62,6 +62,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # sast-summary.ts runs on Node's built-in TypeScript support, so the runner needs the pinned Node.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
       - name: Scan with Semgrep CE (pinned image)
         run: scripts/ci/semgrep.sh semgrep-results
 
@@ -70,7 +75,7 @@ jobs:
       - name: Summary table and merge gate
         run: |
           set +e
-          node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif > semgrep-results/summary.md
+          node scripts/ci/sast-summary.ts semgrep-results/semgrep.sarif > semgrep-results/summary.md
           code=$?
           cat semgrep-results/summary.md
           cat semgrep-results/summary.md >> "$GITHUB_STEP_SUMMARY"
