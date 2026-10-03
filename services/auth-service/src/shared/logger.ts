@@ -44,8 +44,8 @@ export function buildLoggerOptions(level: string): LoggerOptions {
   };
 }
 
-export function createLogger(destination?: DestinationStream) {
-  const options = buildLoggerOptions(env.LOG_LEVEL);
+export function createLogger(destination?: DestinationStream, level: string = env.LOG_LEVEL) {
+  const options = buildLoggerOptions(level);
   return destination ? pino(options, destination) : pino(options);
 }
 
