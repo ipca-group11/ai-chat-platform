@@ -1,0 +1,22 @@
+$ bash -c echo '--- headers of the shell (first lines)'; curl -s -D - -o /dev/null http://localhost:8000/ | head -4; echo; echo '--- security headers present on the shell page:'; curl -s -D - -o /dev/null http://localhost:8000/ | grep -ciE 'content-security-policy|x-frame-options|x-content-type-options|strict-transport|permissions-policy'; echo; echo '--- metrics through the shell proxy (no sign-in)'; curl -s -o /dev/null -w '/api/metrics: %{http_code}\n' http://localhost:8000/api/metrics; curl -s http://localhost:8000/api/metrics | head -2; echo; echo '--- legacy docker-compose.yml'; grep -nE 'POSTGRES_PASSWORD|GF_SECURITY_ADMIN_PASSWORD|5432:5432|:latest' docker-compose.yml | head
+
+HTTP/1.1 200 OK
+Vary: Origin
+Content-Type: text/html
+Cache-Control: no-cache
+
+--- security headers present on the shell page:
+0
+
+--- metrics through the shell proxy (no sign-in)
+/api/metrics: 200
+# HELP process_cpu_user_seconds_total Total user CPU time spent in seconds.
+# TYPE process_cpu_user_seconds_total counter
+
+--- legacy docker-compose.yml
+26:      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-llmchat_local_dev}
+158:    image: prom/prometheus:latest
+171:    image: grafana/grafana:latest
+175:      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+
+[exit 0]
