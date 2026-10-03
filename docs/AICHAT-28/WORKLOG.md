@@ -11,8 +11,8 @@ title: "AICHAT-28 · DAST: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-28-dast` |
 | Started / finished | 2026-10-03 / 2026-10-03 |
-| Pull requests | not opened yet (branch ready for review) |
-| Status | In Progress (all five stories done on the branch) |
+| Pull requests | [#18](https://github.com/ipca-group11/ai-chat-platform/pull/18) |
+| Status | Done, merged into `integration/testing-epics` |
 
 ## 1. DoR review
 
