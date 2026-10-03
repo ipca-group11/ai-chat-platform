@@ -1,0 +1,29 @@
+$ pnpm --dir services/conversation-service exec vitest run src/integration/unexpected-errors.spec.ts --reporter=verbose; pnpm --dir services/auth-service exec vitest run src/integration/unexpected-errors.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/integration/unexpected-errors.spec.ts > unexpected errors > chats router: GET /chats returns a safe 500 when the repository fails 20ms
+ ✓ src/integration/unexpected-errors.spec.ts > unexpected errors > messages router: GET /chats/:chatId/messages returns a safe 500 when the message repository fails 8ms
+ ✓ src/integration/unexpected-errors.spec.ts > unexpected errors > streaming router: GET /chats/:chatId/stream returns a safe 500 when the access check fails 2ms
+ ✓ src/integration/unexpected-errors.spec.ts > unexpected errors > attachments router: POST …/attachments returns a safe 500 when saving the record fails 7ms
+ ✓ src/integration/unexpected-errors.spec.ts > unexpected errors > a body that is not valid JSON returns 500 (pinned: should be 400) and still leaks nothing 3ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  16:46:00
+   Duration  404ms (import 44%, transform 42%, tests 12%, setup 1%, worker 1%)
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+ ✓ src/integration/unexpected-errors.spec.ts > unexpected errors > register router: POST /auth/register returns a safe 500 when the database fails 23ms
+ ✓ src/integration/unexpected-errors.spec.ts > unexpected errors > session router: POST /auth/login returns a safe 500 when the database fails 3ms
+ ✓ src/integration/unexpected-errors.spec.ts > unexpected errors > session router: GET /auth/me returns a safe 500 when the database fails 4ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  16:46:01
+   Duration  357ms (import 53%, transform 34%, tests 11%, setup 1%, worker 1%)
+
+
+[exit 0]

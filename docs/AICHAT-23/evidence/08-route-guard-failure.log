@@ -1,0 +1,40 @@
+$ F=services/conversation-service/src/integration/routes.spec.ts; sed -i '' 's#"POST /chats/:chatId/stop ·#"stop (title no longer names the route) ·#' $F; pnpm --dir services/conversation-service exec vitest run src/integration/route-inventory.spec.ts; rc=$?; git checkout -- $F; echo reverted; exit $rc
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/route-inventory.spec.ts (3 tests | 1 failed) 6ms
+   ❯ route inventory (3)
+     × each entry points to a spec with a test titled after the route 4ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  16:46:06
+   Duration  414ms (import 51%, transform 45%, tests 2%, setup 1%, worker 1%)
+
+reverted
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/route-inventory.spec.ts > route inventory > each entry points to a spec with a test titled after the route
+AssertionError: no test titled "<route> …" found for: POST /chats/:chatId/stop: expected [ 'POST /chats/:chatId/stop' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "POST /chats/:chatId/stop",
++ ]
+
+ ❯ src/integration/route-inventory.spec.ts:60:86
+     58|       .filter(([route, file]) => !hasTestTitled(file, route))
+     59|       .map(([route]) => route);
+     60|     expect(untested, `no test titled "<route> …" found for: ${untested…
+       |                                                                                      ^
+     61|   });
+     62| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

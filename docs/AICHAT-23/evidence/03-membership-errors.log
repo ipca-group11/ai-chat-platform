@@ -1,0 +1,21 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/membership-errors.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/integration/membership-errors.spec.ts > POST /chats/:id/members errors > 400 CANNOT_INVITE_SELF when the owner invites their own email 30ms
+ ✓ src/integration/membership-errors.spec.ts > POST /chats/:id/members errors > 409 ALREADY_A_MEMBER when the email was already invited 5ms
+ ✓ src/integration/membership-errors.spec.ts > POST /chats/:id/members errors > 404 CHAT_NOT_FOUND for a non-owner: a member and a stranger cannot invite 7ms
+ ✓ src/integration/membership-errors.spec.ts > DELETE /chats/:id/members/:email errors > 403 FORBIDDEN when a member removes someone other than themselves 6ms
+ ✓ src/integration/membership-errors.spec.ts > DELETE /chats/:id/members/:email errors > 404 MEMBER_NOT_FOUND when the owner removes an email that is not a member 5ms
+ ✓ src/integration/membership-errors.spec.ts > DELETE /chats/:id/members/:email errors > 404 CHAT_NOT_FOUND for a user who is not in the chat at all 5ms
+ ✓ src/integration/membership-errors.spec.ts > DELETE /chats/:id/membership errors > 404 CHAT_NOT_FOUND when the caller is not a member 4ms
+ ✓ src/integration/membership-errors.spec.ts > DELETE /chats/:id/membership errors > 404 MEMBER_NOT_FOUND when the owner tries to leave their own chat (owners delete instead) 4ms
+ ✓ src/integration/membership-errors.spec.ts > GET /chats/:id/members errors > 404 CHAT_NOT_FOUND for a user who is not in the chat 6ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  16:45:53
+   Duration  478ms (import 42%, transform 38%, tests 18%, setup 1%, worker 1%)
+
+
+[exit 0]

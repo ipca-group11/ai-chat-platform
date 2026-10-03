@@ -1,0 +1,22 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/message-state-errors.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/integration/message-state-errors.spec.ts > PATCH /chats/:chatId/messages/:messageId errors > 409 MESSAGE_NOT_EDITABLE once the message is being processed 32ms
+ ✓ src/integration/message-state-errors.spec.ts > PATCH /chats/:chatId/messages/:messageId errors > 404 MESSAGE_NOT_FOUND for an unknown message id 6ms
+ ✓ src/integration/message-state-errors.spec.ts > PATCH /chats/:chatId/messages/:messageId errors > 404 MESSAGE_NOT_FOUND when a member edits a message written by someone else 15ms
+ ✓ src/integration/message-state-errors.spec.ts > PATCH /chats/:chatId/messages/:messageId errors > 400 VALIDATION_ERROR for an empty or missing content 8ms
+ ✓ src/integration/message-state-errors.spec.ts > DELETE /chats/:chatId/messages/:messageId errors > 409 MESSAGE_NOT_CANCELABLE once the message is being processed, and it is kept 5ms
+ ✓ src/integration/message-state-errors.spec.ts > DELETE /chats/:chatId/messages/:messageId errors > 404 MESSAGE_NOT_FOUND for an unknown message id 4ms
+ ✓ src/integration/message-state-errors.spec.ts > POST /chats/:chatId/messages/:messageId/retry errors > 409 MESSAGE_NOT_RETRYABLE for a message that has not failed 6ms
+ ✓ src/integration/message-state-errors.spec.ts > POST /chats/:chatId/messages/:messageId/retry errors > 409 MESSAGE_NOT_RETRYABLE for a failed message that belongs to another chat 7ms
+ ✓ src/integration/message-state-errors.spec.ts > POST /chats/:chatId/messages/:messageId/retry errors > 409 MESSAGE_NOT_RETRYABLE for an unknown message id (pinned: not a 404) 4ms
+ ✓ src/integration/message-state-errors.spec.ts > POST /chats/:chatId/messages/:messageId/retry errors > 404 CHAT_NOT_FOUND for an unknown chat 4ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  16:45:55
+   Duration  780ms (transform 45%, import 40%, tests 14%, setup 1%, worker 1%)
+
+
+[exit 0]
