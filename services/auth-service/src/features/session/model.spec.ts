@@ -10,7 +10,7 @@ import {
   rotateRefreshToken,
   verifyCredentials,
 } from "./model.js";
-import { fakePrisma, makeUser } from "./test-fakes.js";
+import { fakePrisma, makeUser } from "../../test-utils/fake-prisma.js";
 
 function hashForTest(token: string): string {
   return createHash("sha256").update(token).digest("hex");
