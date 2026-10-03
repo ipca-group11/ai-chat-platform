@@ -1,40 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
+import { ScriptedProvider, fakeProviderRegistry } from "../../test-utils/fake-provider-registry.js";
 import { FakeMessagesRepository } from "../../test-utils/fake-messages-repository.js";
 import { ChatsService } from "../chats/index.js";
 import {
   ProviderError,
   type ProviderRegistry,
   type LlmProvider,
-  type LlmStreamChunk,
   type SendMessageContext,
-  type SendMessageOptions,
 } from "../llm-adapters/index.js";
 import { ChatEventBus } from "../streaming/index.js";
 import { createMessageProcessor } from "./processor.js";
 import type { SseEvent } from "../../shared/contracts/chat.js";
 import { asUser } from "../../test-utils/principal.js";
-
-class ScriptedProvider implements LlmProvider {
-  readonly id = "anthropic" as const;
-  constructor(private readonly script: (context: SendMessageContext, options?: SendMessageOptions) => AsyncIterable<LlmStreamChunk>) {}
-  sendMessage(context: SendMessageContext, options?: SendMessageOptions): AsyncIterable<LlmStreamChunk> {
-    return this.script(context, options);
-  }
-  supportsVision(): boolean {
-    return false;
-  }
-  supportsReasoning(): boolean {
-    return false;
-  }
-  supportsWebFetch(): boolean {
-    return false;
-  }
-}
-
-function registryOf(provider: LlmProvider): ProviderRegistry {
-  return { get: () => provider };
-}
 
 async function collectEvents(bus: ChatEventBus, chatId: string, run: () => Promise<void>): Promise<SseEvent[]> {
   const events: SseEvent[] = [];
@@ -72,7 +50,7 @@ describe("createMessageProcessor", () => {
     const processor = createMessageProcessor({
       messagesRepo,
       chatsService,
-      providerRegistry: registryOf(provider),
+      providerRegistry: fakeProviderRegistry(provider),
       bus,
     });
 
@@ -99,7 +77,7 @@ describe("createMessageProcessor", () => {
       reasoning = context.reasoning;
       yield "ok";
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     await processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, new AbortController().signal);
 
@@ -114,7 +92,7 @@ describe("createMessageProcessor", () => {
       yield { type: "reasoning", text: "ing" };
       yield "Answer";
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     const events = await collectEvents(bus, chat.id, () =>
       processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, new AbortController().signal),
@@ -132,7 +110,7 @@ describe("createMessageProcessor", () => {
       yield { type: "reasoning", text: "hidden" };
       yield "Answer";
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     const events = await collectEvents(bus, chat.id, () =>
       processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, new AbortController().signal),
@@ -150,7 +128,7 @@ describe("createMessageProcessor", () => {
       webFetch = context.webFetch;
       yield "ok";
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     await processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, new AbortController().signal);
 
@@ -164,7 +142,7 @@ describe("createMessageProcessor", () => {
       yield { type: "web_fetch", id: "f1", url: "https://example.com", status: "done", title: "Example" };
       yield "Summary";
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     const events = await collectEvents(bus, chat.id, () =>
       processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, new AbortController().signal),
@@ -186,7 +164,7 @@ describe("createMessageProcessor", () => {
       controller.abort();
       throw Object.assign(new Error("aborted"), { name: "AbortError" });
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     await processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, controller.signal);
 
@@ -198,7 +176,7 @@ describe("createMessageProcessor", () => {
     const provider = new ScriptedProvider(async function* () {
       yield "answer";
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     await processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, new AbortController().signal);
 
@@ -221,7 +199,7 @@ describe("createMessageProcessor", () => {
       }
       yield "never-sent";
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     const events = await collectEvents(bus, chat.id, () =>
       processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, controller.signal),
@@ -240,7 +218,7 @@ describe("createMessageProcessor", () => {
       throw new ProviderError("anthropic", "rate limited", { retryable: true });
       yield "";
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     const events = await collectEvents(bus, chat.id, () =>
       processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, new AbortController().signal),
@@ -309,7 +287,7 @@ describe("createMessageProcessor", () => {
     const provider = new ScriptedProvider(async function* () {
       yield "recovered";
     });
-    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: registryOf(provider), bus });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
 
     await processor(chat.id, { messageId: failed.id, content: "", attachmentIds: [], kind: "retry" }, new AbortController().signal);
 

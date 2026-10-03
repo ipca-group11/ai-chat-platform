@@ -1,26 +1,21 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
+import { TEST_JWT_SECRET, tokenFor } from "../../test-utils/auth-token.js";
 import { authMiddleware } from "../../shared/auth-middleware.js";
 import { errorHandler, notFoundHandler } from "../../shared/error-handler.js";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
 import { ChatsService } from "./service.js";
 import { createChatsRouter } from "./routes.js";
 
-const JWT_SECRET = "test-secret";
-
-function tokenFor(userId: string): string {
-  return jwt.sign({ sub: userId, email: `${userId}@example.com` }, JWT_SECRET, { expiresIn: "15m" });
-}
 
 function buildApp() {
   const service = new ChatsService(new FakeChatsRepository());
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
-  app.use(authMiddleware(JWT_SECRET));
+  app.use(authMiddleware(TEST_JWT_SECRET));
   app.use("/chats", createChatsRouter(service));
   app.use(notFoundHandler);
   app.use(errorHandler);
