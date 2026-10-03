@@ -11,8 +11,8 @@ title: "AICHAT-22 · Bundle size budget testing: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-22-bundle-size-budget-testing` |
 | Started / finished | 2026-10-03 / 2026-10-03 |
-| Pull requests | not opened yet (branch not pushed) |
-| Status | Done on the branch, waiting for the pull request into `integration/testing-epics` |
+| Pull requests | [#22](https://github.com/ipca-group11/ai-chat-platform/pull/22) |
+| Status | Done, merged into `integration/testing-epics` |
 
 ## 1. DoR review
 

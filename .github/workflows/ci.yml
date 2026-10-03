@@ -97,3 +97,20 @@ jobs:
           (cd "$RUNNER_TEMP/base" && pnpm install --frozen-lockfile && pnpm exec nx run-many -t build -p shell,mfe-auth,mfe-chat,mfe-settings)
           node scripts/ci/bundle-size.ts snapshot --root "$RUNNER_TEMP/base" --out "$RUNNER_TEMP/base-sizes.json"
           node scripts/ci/bundle-size.ts report "$RUNNER_TEMP/base-sizes.json" "$RUNNER_TEMP/head-sizes.json"
+
+  # Source SBOM of the pnpm workspace (AICHAT-108): lists the npm packages the lockfile
+  # resolves, for SCA on every pull request. Independent of the Nx job.
+  source-sbom:
+    name: source SBOM (pnpm workspace)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          artifact-name: sbom-source.cdx.json
+          output-file: sbom-source.cdx.json
+          upload-artifact-retention: 90
