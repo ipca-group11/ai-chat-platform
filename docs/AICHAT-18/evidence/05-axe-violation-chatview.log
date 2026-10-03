@@ -1,0 +1,55 @@
+$ pnpm --filter @app/mfe-chat exec vitest run src/features/chat-view/components/ChatView.test.tsx -t "accessibility"
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-chat
+
+ ❯ src/features/chat-view/components/ChatView.test.tsx (27 tests | 1 failed | 26 skipped) 133ms
+   ❯ ChatView (AC-46, AC-51..AC-55) (27)
+     ❯ live stream (6)
+       × has no accessibility violations in its main state 130ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 26 skipped (27)
+   Start at  16:17:35
+   Duration  1.56s (import 45%, environment 24%, transform 14%, tests 9%, setup 8%)
+
+undefined
+/Users/truezone/Projects/ai-chat-platform/apps/mfe-chat:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: vitest run src/features/chat-view/components/ChatView.test.tsx -t accessibility
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/chat-view/components/ChatView.test.tsx > ChatView (AC-46, AC-51..AC-55) > live stream > has no accessibility violations in its main state
+Error: expect(received).toHaveNoViolations(expected)
+
+Expected the HTML found at $('.h-8') to have no violations:
+
+<button type="button" tabindex="0" class="inline-flex items-ce...">
+
+Received:
+
+"Buttons must have discernible text (button-name)"
+
+Fix any of the following:
+  Element does not have inner text that is visible to screen readers
+  aria-label attribute does not exist or is empty
+  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty
+  Element has no title attribute
+  Element does not have an implicit (wrapped) <label>
+  Element does not have an explicit <label>
+  Element's default semantics were not overridden with role="none" or role="presentation"
+
+You can find more information on this issue here: 
+https://dequeuniversity.com/rules/axe/4.13/button-name?application=axeAPI
+ ❯ expectNoA11yViolations src/test/a11y.ts:15:60
+     13|  */
+     14| export async function expectNoA11yViolations(container: Element): Prom…
+     15|   (expect(await axe(container)) as unknown as AxeMatchers).toHaveNoVio…
+       |                                                            ^
+     16| }
+     17|
+ ❯ src/features/chat-view/components/ChatView.test.tsx:289:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]
