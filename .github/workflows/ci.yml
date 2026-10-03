@@ -66,3 +66,10 @@ jobs:
           -t ${{ env.NX_AFFECTED_TARGETS }}
           --base=${{ env.NX_BASE }}
           --head=${{ env.NX_HEAD }}
+
+      # Per-project coverage table (from each project's coverage/coverage-summary.json)
+      # in the job summary. Runs even when the test step failed, so a threshold drop
+      # still shows which project fell.
+      - name: Coverage summary
+        if: always()
+        run: node scripts/ci/coverage-summary.mjs
