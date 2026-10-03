@@ -27,7 +27,7 @@ Date: 2026-10-03
 | Line/branch minimum per project | Met | Which thresholds (lines/branches/functions/statements)? | `services/*` and `packages/*` 80/80/80/80; `apps/mfe-*` and `apps/shell` 80/75/80/80; `e2e` helpers 80/70/80/80 | Owner |
 | Projects below the threshold | Met | Fail CI now or ratchet? | Ratchet: threshold set at the current value rounded down with a dated TODO, raised by AICHAT-17/18 | Owner |
 
-Blockers: none / …
+Blockers: none
 
 ## 2. Environment
 
