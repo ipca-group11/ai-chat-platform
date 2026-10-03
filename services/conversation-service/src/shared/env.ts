@@ -10,6 +10,9 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
   UPLOAD_DIR: z.string().default("./data/uploads"),
   MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(10 * 1024 * 1024),
+  // Base URLs of the LLM providers. Tests and the mock server point them elsewhere (AICHAT-43).
+  ANTHROPIC_BASE_URL: z.string().url().default("https://api.anthropic.com"),
+  OPENAI_BASE_URL: z.string().url().default("https://api.openai.com"),
   LOG_LEVEL: z.string().default("info"),
 });
 
