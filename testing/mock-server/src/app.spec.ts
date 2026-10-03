@@ -73,7 +73,8 @@ describe("mock routers", () => {
     const { app } = createApp(config());
     const res = await request(app).get(`${path}/unknown`);
     expect(res.status).toBe(404);
-    expect(res.body.error.code).toBe("not_mocked");
+    // the backend mocks answer like the real services do (NOT_FOUND)
+    expect(["not_mocked", "NOT_FOUND"]).toContain(res.body.error.code);
   });
 
   it("answers 404 JSON outside every mock", async () => {
