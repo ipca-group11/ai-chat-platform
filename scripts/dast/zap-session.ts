@@ -17,8 +17,21 @@ export function cookieHeaderFrom(setCookies: string[]): string {
     .join('; ');
 }
 
-/** ZAP `-z` options: a replacer rule that sets the Cookie header on every request. */
+/** Only the named cookies of a Cookie header value, for example the access token. */
+export function pickCookies(cookie: string, names: string[]): string {
+  return cookie
+    .split(';')
+    .map((pair) => pair.trim())
+    .filter((pair) => names.includes(pair.split('=')[0] ?? ''))
+    .join(';');
+}
+
+/**
+ * ZAP `-z` options: a replacer rule that sets the Cookie header on every request. ZAP splits the option string
+ * on spaces, so the value must not contain any: send only the access token, or join cookies with `;` alone.
+ */
 export function buildReplacerOptions(cookie: string): string {
+  if (/\s/.test(cookie)) throw new Error('the cookie value must not contain whitespace (ZAP splits -z on spaces)');
   const rule = 'replacer.full_list(0)';
   return [
     `-config ${rule}.description=dast-session`,
@@ -60,5 +73,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const email = process.env['DAST_EMAIL'] ?? 'dast-user@dast.example.com';
   const password = process.env['DAST_PASSWORD'] ?? 'DastScan-1234';
   const cookie = await signInSeededUser(base, email, password, Number(process.env['DAST_CHATS'] ?? 3));
-  process.stdout.write(buildReplacerOptions(cookie));
+  // The access token is all the services check; it is valid for ACCESS_TOKEN_TTL_SECONDS (the stack is started with 3600).
+  process.stdout.write(buildReplacerOptions(pickCookies(cookie, ['access_token'])));
 }

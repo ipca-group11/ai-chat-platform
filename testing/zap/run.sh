@@ -9,7 +9,8 @@
 # "false"; warnings pass; any other non-zero code is a scan error and fails. A missing expected URL also fails.
 # Variables (all optional):
 #   ZAP_IMAGE        zaproxy/zap-stable:2.17.0
-#   ZAP_TARGET       http://localhost:8000   the shell, which proxies /auth and /api like Caddy does
+#   ZAP_BASE_URL     http://localhost:8000   the shell, which proxies /auth and /api like Caddy does; the seeded user signs in here
+#   ZAP_TARGET       where the scan starts: $ZAP_BASE_URL/api/chats when AUTH=1, $ZAP_BASE_URL when AUTH=0
 #   ZAP_RULES        testing/zap/rules.tsv   rules file (-c)
 #   ZAP_RESULTS      zap-results
 #   ZAP_NAME         report base name (default: the mode)
@@ -25,11 +26,15 @@ cd "$(dirname "$0")/../.."
 mode="${1:-baseline}"
 case "$mode" in baseline | api) ;; *) echo "usage: $0 baseline|api" >&2; exit 2 ;; esac
 image="${ZAP_IMAGE:-zaproxy/zap-stable:2.17.0}"
-target="${ZAP_TARGET:-http://localhost:8000}"
+base="${ZAP_BASE_URL:-http://localhost:8000}"
 results="${ZAP_RESULTS:-zap-results}"
 name="${ZAP_NAME:-$mode}"
 rules="${ZAP_RULES:-testing/zap/rules.tsv}"
 auth="${AUTH:-1}"
+# The signed-in scan starts at the chats API: its JSON answers raise no alert of their own, but a scan that
+# starts there puts /api/chats in the site tree (and so in the report) as well as the pages the spider reaches.
+if [ "$auth" = "1" ]; then default_target="$base/api/chats"; else default_target="$base"; fi
+target="${ZAP_TARGET:-$default_target}"
 # shellcheck disable=SC2206
 docker_args=(${ZAP_DOCKER_ARGS:---network host})
 
@@ -40,7 +45,7 @@ cp testing/zap/openapi.yaml "$results/openapi.yaml" 2> /dev/null || true
 
 zap_args=(-c rules.tsv -r "$name.html" -J "$name.json" -w "$name.md")
 if [ "$auth" = "1" ]; then
-  opts="$(DAST_BASE_URL="$target" node scripts/dast/zap-session.ts)"
+  opts="$(DAST_BASE_URL="$base" node scripts/dast/zap-session.ts)"
   # The cookie must not appear in a CI log: mask it before anything can print it.
   if [ -n "${GITHUB_ACTIONS:-}" ]; then echo "::add-mask::${opts##*replacement=}"; fi
   zap_args+=(-z "$opts")
@@ -65,7 +70,7 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then cat "$results/$name-summary.md" >> "$
 # ZAP exits 0 (clean or warnings with -I), 1 (a FAIL rule matched), 3 (scan error).
 verdict=0
 if [ "$status" = "1" ]; then
-  echo "A rule set to FAIL in $rules matched."
+  echo "ZAP exited with 1: a rule set to FAIL in $rules matched (see the FAIL lines above)."
   if [ "${FAIL_ACTION:-true}" = "false" ]; then echo "FAIL_ACTION=false: not failing the job."; else verdict=1; fi
 elif [ "$status" != "0" ] && [ "$status" != "2" ]; then
   echo "ZAP ended with exit code $status (scan error)."

@@ -2,6 +2,7 @@
 // Reads the JSON report of a ZAP scan (zap-baseline.py -J / zap-api-scan.py -J), prints a Markdown summary and
 // sets the exit code, so the CI job and a person at a terminal judge a scan the same way.
 //   node scripts/dast/zap-report.ts zap-results/report.json [--expect /chats,/settings] [--fail-on high|medium]
+//   node scripts/dast/zap-report.ts zap-results/report.json --urls        lists the URLs of the report and exits
 // Exit 1: an expected URL is missing from the report, or --fail-on is given and an alert at or above it exists.
 // Without --fail-on the exit code of zap-baseline.py decides (rules.tsv: FAIL), so an alert ignored on purpose never fails.
 // Dependency-free on purpose: it runs on a plain runner before any `pnpm install`.
@@ -93,6 +94,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (!file) {
     console.error('usage: zap-report.ts <report.json> [--expect /chats,/settings] [--fail-on high|medium]');
     process.exit(2);
+  }
+  if (args.includes('--urls')) {
+    console.log(reportedUrls(collectAlerts(JSON.parse(readFileSync(file, 'utf8')) as ZapReport)).join('\n'));
+    process.exit(0);
   }
   const failOn = option('--fail-on');
   const threshold = failOn === 'medium' ? 'medium' : 'high';
