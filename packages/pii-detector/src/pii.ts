@@ -88,9 +88,17 @@ export function findPiiInLines(lines: readonly string[], options: FindPiiOptions
   return lines.flatMap((text, line) => findPii(text, options).map((m) => ({ ...m, line })));
 }
 
-/** One readable line per match, for an assertion message. */
+const SHOWN = 24;
+
+/** One readable line per match, for an assertion message. A long value (a token) is cut, so a
+ * failing test does not print a credential into the CI log. */
 export function describePii(matches: ReadonlyArray<PiiMatch & { line?: number }>): string {
-  return matches.map((m) => `${m.kind} "${m.value}"${m.line === undefined ? "" : ` on line ${m.line + 1}`}`).join("\n");
+  return matches
+    .map((m) => {
+      const value = m.value.length > SHOWN ? `${m.value.slice(0, SHOWN)}... (${m.value.length} characters)` : m.value;
+      return `${m.kind} "${value}"${m.line === undefined ? "" : ` on line ${m.line + 1}`}`;
+    })
+    .join("\n");
 }
 
 /** A destination for pino (or any `write(chunk)` sink) that keeps what was written, one entry per log line. */

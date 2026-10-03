@@ -79,6 +79,8 @@ describe("findPiiInLines, describePii and createLogCapture", () => {
     expect(matches).toEqual([{ kind: "ip", value: "203.0.113.7", index: 3, line: 1 }]);
     expect(describePii(matches)).toBe('ip "203.0.113.7" on line 2');
     expect(describePii([{ kind: "canary", value: "x", index: 0 }])).toBe('canary "x"');
+    const long = "a".repeat(40);
+    expect(describePii([{ kind: "token", value: long, index: 0 }])).toBe(`token "${"a".repeat(24)}... (40 characters)"`);
   });
 
   it("keeps what is written, line by line, and parses it", () => {
