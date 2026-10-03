@@ -12,11 +12,11 @@ concurrency:
 
 env:
   # Matches `.factory/commands.json`'s `test` command exactly.
-  NX_AFFECTED_TARGETS: lint typecheck test build
+  NX_AFFECTED_TARGETS: lint typecheck test build size
 
 jobs:
   affected:
-    name: nx affected (lint, typecheck, test, build)
+    name: nx affected (lint, typecheck, test, build, size)
     runs-on: ubuntu-latest
     steps:
       # Full history so `nx affected` can diff against origin/main (AC-12, AC-13).
@@ -64,6 +64,8 @@ jobs:
           echo "NX_HEAD=HEAD" >> "$GITHUB_ENV"
 
       # Fails the job (and PR) on any lint/typecheck/test/build error (AC-12, AC-13).
+      # `size` (size-limit, gzip budgets per app, apps/*/.size-limit.ts) runs after the app's build and
+      # fails the job when a bundle goes over its limit (AICHAT-83).
       # Vitest coverage thresholds (STACK.md decision #6) are enforced per-project as
       # part of each project's own `test` target, so a coverage regression fails this
       # step too without any separate CI step.
@@ -80,6 +82,21 @@ jobs:
       - name: Coverage summary
         if: always()
         run: node scripts/ci/coverage-summary.ts
+
+      # Bundle size before/after per file in the job summary (AICHAT-101). Builds the base branch in a
+      # second checkout and compares it with the dist folders of this run; apps that were not affected
+      # (no dist) are left out. Informational: it never fails the job, the budget is the `size` target.
+      - name: Bundle size change
+        if: github.event_name == 'pull_request' && !cancelled()
+        continue-on-error: true
+        env:
+          NX_DAEMON: "false"
+        run: |
+          node scripts/ci/bundle-size.ts snapshot --out "$RUNNER_TEMP/head-sizes.json"
+          git worktree add --detach "$RUNNER_TEMP/base" "$NX_BASE"
+          (cd "$RUNNER_TEMP/base" && pnpm install --frozen-lockfile && pnpm exec nx run-many -t build -p shell,mfe-auth,mfe-chat,mfe-settings)
+          node scripts/ci/bundle-size.ts snapshot --root "$RUNNER_TEMP/base" --out "$RUNNER_TEMP/base-sizes.json"
+          node scripts/ci/bundle-size.ts report "$RUNNER_TEMP/base-sizes.json" "$RUNNER_TEMP/head-sizes.json"
 
   # Source SBOM of the pnpm workspace (AICHAT-108): lists the npm packages the lockfile
   # resolves, for SCA on every pull request. Independent of the Nx job.

@@ -1,0 +1,15 @@
+$ node --test scripts/ci/shared-deps.test.ts
+✔ a library whose marker is in one file is loaded once (0.798542ms)
+✔ a marker in a second file, for example a remote fallback, is a mismatch (0.110333ms)
+✔ chunks with the same name but different hashes on several hosts are listed, biggest first (0.25875ms)
+✔ the report says "loaded once" or MISMATCH for every library (0.193708ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 84.776875
+
+[exit 0]

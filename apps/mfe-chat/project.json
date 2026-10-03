@@ -25,6 +25,10 @@
       "options": { "command": "tsc --noEmit && vite build", "cwd": "apps/mfe-chat" },
       "outputs": ["{projectRoot}/dist"]
     },
+    "size": {
+      "executor": "nx:run-commands",
+      "options": { "command": "size-limit", "cwd": "apps/mfe-chat" }
+    },
     "serve": {
       "executor": "nx:run-commands",
       "options": { "command": "vite", "cwd": "apps/mfe-chat" }
