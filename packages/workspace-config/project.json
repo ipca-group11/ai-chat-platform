@@ -17,7 +17,17 @@
       "options": {
         "command": "vitest run --coverage",
         "cwd": "packages/workspace-config"
-      }
+      },
+      "dependsOn": [],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/vitest.workspace.ts",
+        "{workspaceRoot}/apps/**/*",
+        "{workspaceRoot}/services/**/*",
+        "{workspaceRoot}/packages/**/*",
+        "{workspaceRoot}/e2e/**/*",
+        "{workspaceRoot}/scripts/unit-test/**/*"
+      ]
     }
   }
 }

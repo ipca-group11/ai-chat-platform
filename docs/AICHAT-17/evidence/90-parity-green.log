@@ -1,0 +1,12 @@
+$ bash /private/tmp/claude-501/-Users-truezone-Projects-ai-chat-platform/eef7d68d-8a8c-448c-9b92-df26c0f970df/scratchpad/parity-green.sh
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/workspace-config
+
+
+ Test Files  1 passed (1)
+      Tests  81 passed (81)
+   Start at  15:24:38
+   Duration  164ms (transform 71%, import 18%, tests 7%, worker 4%)
+
+
+[exit 0]
