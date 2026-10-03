@@ -10,6 +10,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./msw": "./src/msw/index.ts",
+    "./pii": "./src/pii.ts",
     "./setup": "./src/setup.ts"
   },
   "scripts": {
@@ -28,7 +29,8 @@
     "vitest": "^5.0.1"
   },
   "dependencies": {
-    "@platform/mock-server": "workspace:*"
+    "@platform/mock-server": "workspace:*",
+    "@platform/pii-detector": "workspace:*"
   },
   "devDependencies": {
     "@app/shared-types": "workspace:*",

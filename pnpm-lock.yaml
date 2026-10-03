@@ -505,6 +505,27 @@ importers:
         specifier: 5.0.1
         version: 5.0.1(@opentelemetry/api@1.9.1)(@types/node@24.13.6)(@vitest/coverage-v8@5.0.1)(jsdom@30.1.1(@noble/hashes@1.8.0))(msw@2.15.0(@types/node@24.13.6)(typescript@6.0.3))(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
 
+  packages/pii-detector:
+    devDependencies:
+      '@platform/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@platform/test-config':
+        specifier: workspace:*
+        version: link:../test-config
+      '@types/node':
+        specifier: ^24.13.6
+        version: 24.13.6
+      '@vitest/coverage-v8':
+        specifier: 5.0.1
+        version: 5.0.1(vitest@5.0.1)
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: 5.0.1
+        version: 5.0.1(@opentelemetry/api@1.9.1)(@types/node@24.13.6)(@vitest/coverage-v8@5.0.1)(jsdom@30.1.1(@noble/hashes@1.8.0))(msw@2.15.0(@types/node@24.13.6)(typescript@6.0.3))(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+
   packages/shared-types:
     dependencies:
       zod:
@@ -556,6 +577,9 @@ importers:
       '@platform/mock-server':
         specifier: workspace:*
         version: link:../../testing/mock-server
+      '@platform/pii-detector':
+        specifier: workspace:*
+        version: link:../pii-detector
     devDependencies:
       '@app/shared-types':
         specifier: workspace:*
@@ -795,6 +819,9 @@ importers:
       '@platform/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@platform/pii-detector':
+        specifier: workspace:*
+        version: link:../../packages/pii-detector
       '@platform/test-config':
         specifier: workspace:*
         version: link:../../packages/test-config
@@ -886,6 +913,9 @@ importers:
       '@platform/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@platform/pii-detector':
+        specifier: workspace:*
+        version: link:../../packages/pii-detector
       '@platform/test-config':
         specifier: workspace:*
         version: link:../../packages/test-config
@@ -2516,7 +2546,6 @@ packages:
   '@pact-foundation/pact-core@20.2.0':
     resolution: {integrity: sha512-AKPJomBRHmQ8ilOkCaT2ZpvL2j/GM9CeE3K81w57zy3gwOnN6ZdMyw38ddqIHudTgS6eNQLqBKLbrRsOOKwwtg==}
     engines: {node: '>=22'}
-    cpu: [x64, ia32, arm64]
     os: [darwin, linux, win32]
 
   '@pact-foundation/pact@17.1.4':

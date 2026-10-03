@@ -1,0 +1,21 @@
+$ pnpm -r --no-bail --filter @app/auth-service --filter @app/conversation-service exec vitest run src/integration/pii-metrics.spec.ts
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:29:23
+   Duration  497ms (import 43%, transform 42%, tests 11%, worker 4%)
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:29:23
+   Duration  1.33s (tests 76%, import 14%, transform 8%, worker 1%)
+
+
+[exit 0]
