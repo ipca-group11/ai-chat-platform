@@ -23,8 +23,10 @@ export async function* streamScenarioText(
 ): AsyncGenerator<string, void> {
   const plan = planScenario("anthropic", scenario, ctx.config) ?? planScenario("openai", scenario, ctx.config);
   if (!plan) throw new UnknownScenarioError(scenario);
-  const pacer = new Pacer(ctx.config);
-  for (const token of generateTokens(ctx.config.seed, `${plan.name}/answer`, plan.tokens)) {
+  const pacer = new Pacer(ctx.config, plan.firstTokenDelayMs);
+  const all = generateTokens(ctx.config.seed, `${plan.name}/answer`, plan.tokens);
+  // `drop` ends the text halfway: the caller closes the connection after the last token.
+  for (const token of plan.drop ? all.slice(0, Math.ceil(all.length / 2)) : all) {
     if (options.signal?.aborted) return;
     await pacer.next();
     yield token;

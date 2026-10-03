@@ -12,6 +12,12 @@ export function openEventStream(req: Request, res: Response): AbortSignal {
   return controller.signal;
 }
 
+/** Closes the connection abruptly, once what was written has left, so the client sees a broken stream. */
+export async function dropConnection(res: Response): Promise<void> {
+  if (!res.destroyed && res.headersSent) await new Promise<void>((resolve) => res.write("", () => resolve()));
+  res.destroy();
+}
+
 /** Writes every frame as soon as it is produced. */
 export async function writeFrames(res: Response, frames: AsyncIterable<string>): Promise<void> {
   for await (const frame of frames) {

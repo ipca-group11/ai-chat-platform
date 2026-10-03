@@ -1,8 +1,10 @@
 import express, { Router } from "express";
+import { providerError, requestId } from "../llm/errors.js";
 import { completionId, openAiCompletion, openAiReply, openAiStream } from "../llm/openai.js";
 import { planScenario, scenarioDefinitions } from "../llm/scenarios.js";
 import { availableScenarios, selectScenario } from "../llm/select.js";
-import { openEventStream, writeFrames } from "../llm/sse.js";
+import { dropConnection, openEventStream, writeFrames } from "../llm/sse.js";
+import { sleep } from "../middleware.js";
 import type { MockModule } from "../registry.js";
 
 const DEFAULT_MODEL = "gpt-4o";
@@ -23,16 +25,23 @@ export const openaiMock: MockModule = {
     router.post("/v1/chat/completions", async (req, res) => {
       const body: unknown = req.body;
       const request = typeof body === "object" && body !== null ? (body as Record<string, unknown>) : {};
+      const requestedModel = typeof request.model === "string" && request.model ? request.model : DEFAULT_MODEL;
+      const { scenario: name, model } = selectScenario(req, requestedModel);
+
+      const failure = providerError("openai", name, requestId(ctx.rng));
+      if (failure) {
+        res.status(failure.status).set(failure.headers).json(failure.body);
+        return;
+      }
       if (!Array.isArray(request.messages)) {
         res.status(400).json(errorBody("Missing required parameter: 'messages'.", "missing_required_parameter", "messages"));
         return;
       }
-      const requestedModel = typeof request.model === "string" && request.model ? request.model : DEFAULT_MODEL;
-
-      const { scenario: name, model } = selectScenario(req, requestedModel);
       const plan = planScenario("openai", name, ctx.config);
       if (!plan) {
-        res.status(400).json(errorBody(`Unknown mock scenario "${name}". Available: ${availableScenarios(ctx, "openai")}`, "unknown_scenario"));
+        res
+          .status(400)
+          .json(errorBody(`Unknown mock scenario "${name}". Available: ${availableScenarios(ctx, "openai")}`, "unknown_scenario"));
         return;
       }
 
@@ -40,6 +49,11 @@ export const openaiMock: MockModule = {
       const id = completionId(ctx.rng);
 
       if (request.stream !== true) {
+        if (reply.firstTokenDelayMs > 0) await sleep(reply.firstTokenDelayMs);
+        if (reply.dropped) {
+          res.destroy();
+          return;
+        }
         res.json(openAiCompletion(reply, model, id));
         return;
       }
@@ -49,7 +63,8 @@ export const openaiMock: MockModule = {
         res,
         openAiStream(reply, { model, id, config: ctx.config, includeUsage: options?.include_usage === true, signal }),
       );
-      res.end();
+      if (reply.dropped) await dropConnection(res);
+      else res.end();
     });
 
     return router;

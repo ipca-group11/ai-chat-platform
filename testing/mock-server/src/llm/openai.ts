@@ -12,11 +12,18 @@ export type FinishReason = "stop" | "length";
 export interface OpenAiReply {
   tokens: string[];
   finishReason: FinishReason;
+  /** The connection closes after the tokens, without the finish chunk and `[DONE]`. */
+  dropped: boolean;
+  firstTokenDelayMs: number;
 }
 
 export function openAiReply(plan: ScenarioPlan, seed: string): OpenAiReply {
+  const full = generateTokens(seed, `${plan.name}/answer`, plan.tokens);
+  const tokens = plan.drop ? full.slice(0, Math.ceil(full.length / 2)) : full;
   return {
-    tokens: generateTokens(seed, `${plan.name}/answer`, plan.tokens),
+    tokens,
+    dropped: plan.drop,
+    firstTokenDelayMs: plan.firstTokenDelayMs,
     finishReason: plan.stopReason === "max_tokens" ? "length" : "stop",
   };
 }
@@ -70,7 +77,7 @@ export async function* openAiStream(
   reply: OpenAiReply,
   { model, id, config, includeUsage, signal }: OpenAiStreamOptions,
 ): AsyncGenerator<string, void> {
-  const pacer = new Pacer(config);
+  const pacer = new Pacer(config, reply.firstTokenDelayMs);
   const chunk = (delta: object, finishReason: FinishReason | null) =>
     openAiFrame({
       id,
@@ -88,6 +95,7 @@ export async function* openAiStream(
     yield chunk(first ? { role: "assistant", content: token } : { content: token }, null);
     first = false;
   }
+  if (reply.dropped) return;
   yield chunk({}, reply.finishReason);
   if (includeUsage) {
     yield openAiFrame({

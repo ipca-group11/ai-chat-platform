@@ -17,6 +17,9 @@ export interface AnthropicReply {
   blocks: Block[];
   stopReason: StopReason;
   outputTokens: number;
+  /** The connection closes after the tokens, without closing events. */
+  dropped: boolean;
+  firstTokenDelayMs: number;
 }
 
 /**
@@ -24,7 +27,8 @@ export interface AnthropicReply {
  * caller resumes a paused turn) a pause-turn scenario answers with plain text.
  */
 export function anthropicReply(plan: ScenarioPlan, seed: string, resumed: boolean): AnthropicReply {
-  const answer = generateTokens(seed, `${plan.name}/answer`, plan.tokens);
+  const full = generateTokens(seed, `${plan.name}/answer`, plan.tokens);
+  const answer = plan.drop ? full.slice(0, Math.ceil(full.length / 2)) : full;
   const blocks: Block[] = [];
   let stopReason = plan.stopReason;
   if (plan.thinkingTokens > 0) {
@@ -42,7 +46,7 @@ export function anthropicReply(plan: ScenarioPlan, seed: string, resumed: boolea
     blocks.push({ type: "text", tokens: answer });
   }
   const outputTokens = blocks.reduce((sum, b) => sum + (b.type === "web_fetch" ? 12 : b.tokens.length), 0);
-  return { blocks, stopReason, outputTokens };
+  return { blocks, stopReason, outputTokens, dropped: plan.drop, firstTokenDelayMs: plan.firstTokenDelayMs };
 }
 
 const fetchInput = JSON.stringify({ url: FETCH_URL });
@@ -105,7 +109,7 @@ export async function* anthropicStream(
   reply: AnthropicReply,
   { model, id, config, signal }: AnthropicStreamOptions,
 ): AsyncGenerator<string, void> {
-  const pacer = new Pacer(config);
+  const pacer = new Pacer(config, reply.firstTokenDelayMs);
   yield anthropicFrame("message_start", {
     type: "message_start",
     message: {
@@ -162,6 +166,7 @@ export async function* anthropicStream(
         delta: thinking ? { type: "thinking_delta", thinking: token } : { type: "text_delta", text: token },
       });
     }
+    if (reply.dropped) return;
     if (block.type === "thinking") {
       yield anthropicFrame("content_block_delta", {
         type: "content_block_delta",

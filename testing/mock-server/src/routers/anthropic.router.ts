@@ -1,8 +1,10 @@
 import express, { Router } from "express";
 import { anthropicMessage, anthropicReply, anthropicStream, messageId } from "../llm/anthropic.js";
+import { providerError, requestId } from "../llm/errors.js";
 import { planScenario, scenarioDefinitions } from "../llm/scenarios.js";
 import { availableScenarios, selectScenario } from "../llm/select.js";
-import { openEventStream, writeFrames } from "../llm/sse.js";
+import { dropConnection, openEventStream, writeFrames } from "../llm/sse.js";
+import { sleep } from "../middleware.js";
 import type { MockModule } from "../registry.js";
 
 const DEFAULT_MODEL = "claude-sonnet-4-5";
@@ -21,16 +23,23 @@ export const anthropicMock: MockModule = {
     router.post("/v1/messages", async (req, res) => {
       const body: unknown = req.body;
       const request = typeof body === "object" && body !== null ? (body as Record<string, unknown>) : {};
+      const requestedModel = typeof request.model === "string" && request.model ? request.model : DEFAULT_MODEL;
+      const { scenario: name, model } = selectScenario(req, requestedModel);
+
+      const failure = providerError("anthropic", name, requestId(ctx.rng));
+      if (failure) {
+        res.status(failure.status).set(failure.headers).json(failure.body);
+        return;
+      }
       if (!Array.isArray(request.messages)) {
         res.status(400).json(errorBody("invalid_request_error", "messages: Field required"));
         return;
       }
-      const requestedModel = typeof request.model === "string" && request.model ? request.model : DEFAULT_MODEL;
-
-      const { scenario: name, model } = selectScenario(req, requestedModel);
       const plan = planScenario("anthropic", name, ctx.config);
       if (!plan) {
-        res.status(400).json(errorBody("invalid_request_error", `Unknown mock scenario "${name}". Available: ${availableScenarios(ctx, "anthropic")}`));
+        res
+          .status(400)
+          .json(errorBody("invalid_request_error", `Unknown mock scenario "${name}". Available: ${availableScenarios(ctx, "anthropic")}`));
         return;
       }
 
@@ -39,12 +48,18 @@ export const anthropicMock: MockModule = {
       const id = messageId(ctx.rng);
 
       if (request.stream !== true) {
+        if (reply.firstTokenDelayMs > 0) await sleep(reply.firstTokenDelayMs);
+        if (reply.dropped) {
+          res.destroy();
+          return;
+        }
         res.json(anthropicMessage(reply, model, id));
         return;
       }
       const signal = openEventStream(req, res);
       await writeFrames(res, anthropicStream(reply, { model, id, config: ctx.config, signal }));
-      res.end();
+      if (reply.dropped) await dropConnection(res);
+      else res.end();
     });
 
     return router;
