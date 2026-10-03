@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRemoteRoute } from './createRemoteRoute';
-import { RemoteErrorBoundary } from './components/RemoteErrorBoundary';
+import { createRemoteRoute } from '../createRemoteRoute';
+import { RemoteErrorBoundary } from './RemoteErrorBoundary';
 
 describe('RemoteErrorBoundary / createRemoteRoute', () => {
   it('AC-27/AC-28: a failed remote import renders a scoped fallback instead of a full-app crash', async () => {

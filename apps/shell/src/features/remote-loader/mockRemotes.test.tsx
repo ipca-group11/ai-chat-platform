@@ -1,12 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { http, server } from '@platform/test-utils/msw';
 import { createRemoteRoute } from './createRemoteRoute';
 
 /**
  * Remotes served by the mock server (testing/mock-server, `/remotes/<name>/remoteEntry.js`).
  * To try the same flow against the real mock, start it (`pnpm exec nx serve mock-server`) and
  * point `VITE_MFE_CHAT_URL` at `http://localhost:4010/remotes/<404|broken-js|slow|ok>`.
- * Here `fetch` answers what the mock answers, so the test needs no running server.
+ * Here MSW answers what the mock answers, so the test needs no running server.
  */
 const MOCK_BASE = 'http://localhost:4010/remotes';
 
@@ -30,18 +31,15 @@ function loaderFor(name: string) {
 }
 
 function stubMockServer() {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(async (url: string) => {
-      const name = new URL(url).pathname.split('/')[2] ?? '';
-      return (mockAnswers[name] ?? mockAnswers['404']!)();
-    }),
+  server.use(
+    http.get(`${MOCK_BASE}/:name/remoteEntry.js`, ({ params }) =>
+      (mockAnswers[String(params.name)] ?? mockAnswers['404']!)(),
+    ),
   );
 }
 
 describe('RemoteFallback with the mock server remotes', () => {
   afterEach(() => {
-    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 

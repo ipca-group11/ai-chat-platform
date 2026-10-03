@@ -53,6 +53,8 @@ export default defineConfig({
       target: 'react',
       autoCodeSplitting: true,
       routesDirectory: './src/routes',
+      // Unit tests live next to the route files and must not become routes.
+      routeFileIgnorePattern: '\\.test\\.',
       generatedRouteTree: './src/routeTree.gen.ts',
     }),
     react(),
@@ -82,14 +84,9 @@ export default defineConfig({
     // that dynamically import it (e.g. remoteWiring.test.ts) headroom.
     testTimeout: 15000,
     coverage: coveragePreset({
-      thresholds: {
-        ...appCoverageThresholds,
-        // Ratchet (AICHAT-34): current values rounded down, raised with AICHAT-17/18 work.
-        lines: 70, // TODO(AICHAT-17, 2026-10-03): raise to 80
-        branches: 60, // TODO(AICHAT-17, 2026-10-03): raise to 75
-        functions: 62, // TODO(AICHAT-17, 2026-10-03): raise to 80
-        statements: 68, // TODO(AICHAT-17, 2026-10-03): raise to 80
-      },
+      exclude: ['src/shared/test/**'],
+      // Standard thresholds (AICHAT-34 ratchet closed by AICHAT-17: 80/75/80/80).
+      thresholds: appCoverageThresholds,
     }),
   },
 });
