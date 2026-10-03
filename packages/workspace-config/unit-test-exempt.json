@@ -78,11 +78,6 @@
       "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
     },
     {
-      "path": "apps/shell/src/features/auth-guard/model/session.ts",
-      "category": "type-only",
-      "reason": "Only exports the Session and AuthMeResponse interfaces; nothing exists at run time."
-    },
-    {
       "path": "apps/shell/src/features/remote-loader/index.ts",
       "category": "barrel",
       "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."

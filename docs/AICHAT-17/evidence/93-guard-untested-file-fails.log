@@ -1,0 +1,40 @@
+$ bash /private/tmp/claude-501/-Users-truezone-Projects-ai-chat-platform/eef7d68d-8a8c-448c-9b92-df26c0f970df/scratchpad/guard-fail.sh
+--- added apps/mfe-chat/src/shared/untested-demo.ts (no test, no exempt entry) ---
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/workspace-config
+
+ ❯ src/source-files.test.js (11 tests | 1 failed | 9 skipped) 69ms
+   ❯ unit-test guard on this repository (2)
+     × finds no source file without a test or an exempt entry, and no stale exempt entry 42ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed | 9 skipped (11)
+   Start at  15:26:05
+   Duration  214ms (tests 54%, import 30%, transform 15%, worker 2%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/source-files.test.js > unit-test guard on this repository > finds no source file without a test or an exempt entry, and no stale exempt entry
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "apps/mfe-chat/src/shared/untested-demo.ts: no unit test and no entry in packages/workspace-config/unit-test-exempt.json; add a test next to it (or an exempt entry if it qualifies)",
++ ]
+
+ ❯ src/source-files.test.js:20:29
+     18| describe("unit-test guard on this repository", () => {
+     19|   it("finds no source file without a test or an exempt entry, and no s…
+     20|     expect(guardProblems()).toEqual([]);
+       |                             ^
+     21|   });
+     22|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]
