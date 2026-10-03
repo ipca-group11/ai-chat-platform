@@ -1,0 +1,2 @@
+hand-written from https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/web-fetch-tool
+Not recorded from a live API: written to match the documented wire format.

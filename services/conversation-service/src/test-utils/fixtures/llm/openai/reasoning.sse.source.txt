@@ -1,0 +1,2 @@
+hand-written from https://platform.openai.com/docs/api-reference/chat-streaming
+Not recorded from a live API: written to match the documented wire format.

@@ -1,0 +1,24 @@
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"role":"assistant","content":"1"},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"content":" "},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"content":"2"},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"content":" "},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"content":"3"},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"content":" "},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"content":"4"},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"content":" "},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"content":"5"},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{"content":" "},"finish_reason":null}]}
+
+data: {"id":"REDACTED","object":"chat.completion.chunk","created":0,"model":"llama3.2:1b","system_fingerprint":"fp_REDACTED","choices":[{"index":0,"delta":{},"finish_reason":"length"}]}
+
+data: [DONE]
+
