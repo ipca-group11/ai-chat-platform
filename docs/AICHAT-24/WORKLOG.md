@@ -11,8 +11,8 @@ title: "AICHAT-24 · Load testing: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-24-load-testing` |
 | Started / finished | 2026-10-03 / 2026-10-03 |
-| Pull requests | #… |
-| Status | Done, pull request to open |
+| Pull requests | [#17](https://github.com/ipca-group11/ai-chat-platform/pull/17) |
+| Status | Done, merged into `integration/testing-epics` |
 
 ## 1. DoR review
 
