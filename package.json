@@ -13,6 +13,7 @@
     "dev:mock": "bash scripts/dev-mock.sh",
     "mock:up": "bash scripts/mock-compose.sh up",
     "mock:down": "bash scripts/mock-compose.sh down",
+    "load:up": "LOAD=1 bash scripts/mock-compose.sh up llm",
     "nx": "nx",
     "lint": "nx run-many -t lint",
     "typecheck": "nx run-many -t typecheck",
