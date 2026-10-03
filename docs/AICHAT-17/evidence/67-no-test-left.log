@@ -1,0 +1,4 @@
+$ node scripts/unit-test/source-files.mjs --list | grep NO-TEST | grep -E 'apps/mfe-settings|services/|packages/|e2e/' | wc -l
+       0
+
+[exit 0]
