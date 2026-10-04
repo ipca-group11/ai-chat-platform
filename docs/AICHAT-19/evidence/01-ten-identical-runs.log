@@ -1,0 +1,15 @@
+$ node scripts/visual/determinism.ts 10
+committed baselines: 18 images, sha256 31b7708b9620
+run 1: exit 0, images changed: 0, sha256 31b7708b9620 identical
+run 2: exit 0, images changed: 0, sha256 31b7708b9620 identical
+run 3: exit 0, images changed: 0, sha256 31b7708b9620 identical
+run 4: exit 0, images changed: 0, sha256 31b7708b9620 identical
+run 5: exit 0, images changed: 0, sha256 31b7708b9620 identical
+run 6: exit 0, images changed: 0, sha256 31b7708b9620 identical
+run 7: exit 0, images changed: 0, sha256 31b7708b9620 identical
+run 8: exit 0, images changed: 0, sha256 31b7708b9620 identical
+run 9: exit 0, images changed: 0, sha256 31b7708b9620 identical
+run 10: exit 0, images changed: 0, sha256 31b7708b9620 identical
+all 10 runs produced identical images
+
+[exit 0]
