@@ -188,6 +188,41 @@
       "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
     },
     {
+      "path": "packages/ui/src/avatar.ts",
+      "category": "barrel",
+      "reason": "Per-component entry (@app/ui/avatar, AICHAT-239): only re-exports, no logic. Its exports are checked in index.test.ts and the component is tested in its own module."
+    },
+    {
+      "path": "packages/ui/src/dialog.ts",
+      "category": "barrel",
+      "reason": "Per-component entry (@app/ui/dialog, AICHAT-239): only re-exports, no logic. Its exports are checked in index.test.ts and the component is tested in its own module."
+    },
+    {
+      "path": "packages/ui/src/dropdown-menu.ts",
+      "category": "barrel",
+      "reason": "Per-component entry (@app/ui/dropdown-menu, AICHAT-239): only re-exports, no logic. Its exports are checked in index.test.ts and the component is tested in its own module."
+    },
+    {
+      "path": "packages/ui/src/select.ts",
+      "category": "barrel",
+      "reason": "Per-component entry (@app/ui/select, AICHAT-239): only re-exports, no logic. Its exports are checked in index.test.ts and the component is tested in its own module."
+    },
+    {
+      "path": "packages/ui/src/tabs.ts",
+      "category": "barrel",
+      "reason": "Per-component entry (@app/ui/tabs, AICHAT-239): only re-exports, no logic. Its exports are checked in index.test.ts and the component is tested in its own module."
+    },
+    {
+      "path": "packages/ui/src/toast.ts",
+      "category": "barrel",
+      "reason": "Per-component entry (@app/ui/toast, AICHAT-239): only re-exports, no logic. Its exports are checked in index.test.ts and the component is tested in its own module."
+    },
+    {
+      "path": "packages/ui/src/tooltip.ts",
+      "category": "barrel",
+      "reason": "Per-component entry (@app/ui/tooltip, AICHAT-239): only re-exports, no logic. Its exports are checked in index.test.ts and the component is tested in its own module."
+    },
+    {
       "path": "services/auth-service/src/features/account/index.ts",
       "category": "barrel",
       "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
