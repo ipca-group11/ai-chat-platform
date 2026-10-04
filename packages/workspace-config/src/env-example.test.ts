@@ -22,7 +22,7 @@ function referencedEnvVars(content: string) {
 
 describe("AC-7: .env.example lists every environment variable needed by every service, with safe local defaults", () => {
   const env = parseDotenv(readRepoFile(".env.example"));
-  const compose = parse(readRepoFile("docker-compose.yml"));
+  const compose = parse(readRepoFile("compose.yaml"));
 
   it("AC-7: every variable is non-empty (a safe local default is present)", () => {
     expect(Object.keys(env).length).toBeGreaterThan(0);
@@ -31,7 +31,7 @@ describe("AC-7: .env.example lists every environment variable needed by every se
     }
   });
 
-  it("AC-7: every ${VAR:-default} referenced from docker-compose.yml is documented in .env.example", () => {
+  it("AC-7: every ${VAR:-default} referenced from compose.yaml is documented in .env.example", () => {
     const referenced = new Set<string>();
     for (const service of Object.values<{ environment?: Record<string, unknown>; ports?: unknown[] }>(compose.services)) {
       for (const value of Object.values(service.environment ?? {})) {

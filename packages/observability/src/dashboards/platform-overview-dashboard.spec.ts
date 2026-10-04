@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 /**
  * Structural checks on the Grafana dashboard (O3, AC-92) that this pod owns under
  * `observability/grafana/provisioning/dashboards/`. These don't render the dashboard (that
- * needs a real Grafana + Prometheus, see docker-compose.yml, platform-foundation-owned),
+ * needs a real Grafana + Prometheus, see compose.yaml, platform-foundation-owned),
  * but they pin down the contract: the provider config points Grafana at this folder, and
  * the dashboard JSON visualizes request rate, latency, error rate, and active-stream
  * metrics for every service scraped by Prometheus, using the exact metric names this
@@ -37,7 +37,7 @@ describe("Grafana dashboard provider config (AC-92)", () => {
 describe("docker-compose auto-start contract (AC-93)", () => {
   // AC-93 ("Prometheus and Grafana start automatically as part of `docker compose up`")
   // is platform-foundation's compose wiring, not this pod's file to own or test directly
-  // (docker-compose.yml isn't part of this pod - see PLAN.md "Ownership"/"Cross-pod
+  // (compose.yaml isn't part of this pod - see PLAN.md "Ownership"/"Cross-pod
   // dependencies"). What this pod *can* pin down and test is the provisioning-path
   // contract that compose file must honor for AC-92's dashboard to actually appear once
   // both are merged: Grafana must be started with this folder mounted at the path below.

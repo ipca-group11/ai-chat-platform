@@ -139,14 +139,14 @@ into `features/<other>/**` internals.
 
 ## 5. Docker / Compose conventions (US-2 AC-5, AC-6)
 
-`docker-compose.yml` (owned by this pod) expects, by path convention:
+`compose.yaml` (owned by this pod) expects, by path convention:
 
 - `apps/<name>/Dockerfile` for `shell`, `mfe-auth`, `mfe-chat`, `mfe-settings`.
 - `services/<name>/Dockerfile` for `auth-service`, `conversation-service`.
 
 Each Dockerfile's build context is the repo root (so it can `COPY` the shared
 `packages/*`); the image's `CMD` should serve on the port below via the `PORT` env var
-(already set by `docker-compose.yml`; default it in your own app/service too so `pnpm
+(already set by `compose.yaml`; default it in your own app/service too so `pnpm
 dev` outside Docker still works):
 
 | Service | Port | Health check | Metrics |
@@ -164,7 +164,7 @@ dev` outside Docker still works):
 
 `services/*` **must** implement `/health` and `/metrics` at those exact paths —
 `observability/prometheus.yml` (this pod) scrapes `/metrics` on `auth-service:4001` and
-`conversation-service:4002`, and `docker-compose.yml`'s healthchecks poll `/health`.
+`conversation-service:4002`, and `compose.yaml`'s healthchecks poll `/health`.
 
 ## 6. CI (US-4)
 

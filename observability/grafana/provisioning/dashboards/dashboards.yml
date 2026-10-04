@@ -1,6 +1,6 @@
-# Grafana dashboard provider config (AC-92/AC-93). Mounted into the Grafana container at
-# /etc/grafana/provisioning/dashboards by platform-foundation's docker-compose.yml (that
-# pod owns docker-compose.yml and the rest of observability/**: datasource provisioning,
+# Grafana dashboard provider config (AC-92/AC-93). Baked into the Grafana image at
+# /etc/grafana/provisioning/dashboards by platform-foundation's grafana.Dockerfile (that
+# pod owns compose.yaml and the rest of observability/**: datasource provisioning,
 # prometheus.yml, folder scaffolding). Auto-provisions any dashboard JSON dropped directly
 # into this folder - the `quality-observability` pod owns the actual dashboard JSON
 # (`platform-overview.json`, US-28) and may add/replace files here with no manual "import

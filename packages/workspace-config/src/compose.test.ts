@@ -1,8 +1,10 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
-import { readRepoFile } from "./repo.ts";
+import { readRepoFile, repoRoot } from "./repo.ts";
 
-const compose = parse(readRepoFile("docker-compose.yml"));
+const compose = parse(readRepoFile("compose.yaml"));
 
 describe("AC-5: a single `docker compose up` starts every app, service, Postgres, and Ollama", () => {
   it.each([
@@ -14,7 +16,7 @@ describe("AC-5: a single `docker compose up` starts every app, service, Postgres
     "conversation-service",
     "postgres",
     "ollama",
-  ])("AC-5: docker-compose.yml defines a `%s` service", (service) => {
+  ])("AC-5: compose.yaml defines a `%s` service", (service) => {
     expect(compose.services).toHaveProperty(service);
   });
 
@@ -38,14 +40,15 @@ describe("AC-5: a single `docker compose up` starts every app, service, Postgres
 });
 
 describe("AC-6: Docker Compose also starts Prometheus and Grafana pre-wired to scrape the services", () => {
-  it("AC-6: docker-compose.yml defines prometheus and grafana services", () => {
+  it("AC-6: compose.yaml defines prometheus and grafana services", () => {
     expect(compose.services).toHaveProperty("prometheus");
     expect(compose.services).toHaveProperty("grafana");
   });
 
-  it("AC-6: prometheus mounts observability/prometheus.yml as its scrape config", () => {
-    const volumes = compose.services.prometheus.volumes ?? [];
-    expect(volumes.some((v: string) => v.startsWith("./observability/prometheus.yml:"))).toBe(true);
+  it("AC-6: the prometheus image bakes in observability/prometheus.yml as its scrape config", () => {
+    const dockerfile = compose.services.prometheus.build.dockerfile;
+    expect(dockerfile).toBe("observability/prometheus.Dockerfile");
+    expect(readRepoFile(dockerfile)).toMatch(/^COPY observability\/prometheus\.yml \/etc\/prometheus\/prometheus\.yml$/m);
   });
 
   it("AC-6: prometheus.yml scrapes auth-service and conversation-service /metrics", () => {
@@ -60,14 +63,30 @@ describe("AC-6: Docker Compose also starts Prometheus and Grafana pre-wired to s
   });
 
   it("AC-6: grafana is pre-wired with a provisioned Prometheus datasource", () => {
-    expect(compose.services.grafana).toBeDefined();
-    const volumes = compose.services.grafana.volumes ?? [];
-    expect(volumes.some((v: string) => v.includes("observability/grafana/provisioning"))).toBe(true);
+    const dockerfile = compose.services.grafana.build.dockerfile;
+    expect(dockerfile).toBe("observability/grafana.Dockerfile");
+    expect(readRepoFile(dockerfile)).toMatch(/^COPY observability\/grafana\/provisioning /m);
 
     const datasource = parse(
       readRepoFile("observability/grafana/provisioning/datasources/datasource.yml"),
     );
     const datasources = datasource.datasources ?? [];
     expect(datasources.some((d: { type: string }) => d.type === "prometheus")).toBe(true);
+  });
+});
+
+describe("compose.yaml is the only local compose file (AICHAT-231)", () => {
+  it("the legacy docker-compose.yml is gone", () => {
+    expect(existsSync(join(repoRoot, "docker-compose.yml"))).toBe(false);
+  });
+
+  it("every published port is bound to 127.0.0.1", () => {
+    for (const [name, service] of Object.entries<{ ports?: unknown[] }>(compose.services)) {
+      for (const port of service.ports ?? []) expect(String(port), name).toMatch(/^127\.0\.0\.1:/);
+    }
+  });
+
+  it("postgres is not published at all", () => {
+    expect(compose.services.postgres.ports).toBeUndefined();
   });
 });

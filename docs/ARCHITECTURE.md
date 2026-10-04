@@ -30,7 +30,7 @@ packages/ui/                -> platform (all pods may propose components via PR)
 packages/shared-types/      -> platform (all pods may propose contract changes via PR)
 packages/eslint-config/     -> platform
 packages/tsconfig/          -> platform
-docker-compose.yml, .env.example, .github/workflows/ -> platform
+compose.yaml, .env.example, .github/workflows/ -> platform
 docs/                        -> shared (architect + each pod owns its docs/pods/<pod>/ subfolder)
 ```
 

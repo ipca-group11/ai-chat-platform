@@ -41,9 +41,9 @@ file names and Pact Broker application names predictable across every pod.
 ## Optional local Pact Broker
 
 For teams wanting contract verification enforced in CI beyond local file-based pacts, add
-the `pactfoundation/pact-broker` Docker image as a service in `docker-compose.yml` and set
+the `pactfoundation/pact-broker` Docker image as a service in `compose.yaml` and set
 `PACT_BROKER_URL`/`PACT_BROKER_TOKEN` in CI. This is **not** wired up by this package —
-`docker-compose.yml` is `platform-foundation`-owned, so this is proposed as a PR to that
+`compose.yaml` is `platform-foundation`-owned, so this is proposed as a PR to that
 pod rather than edited here directly (see this pod's PLAN.md, task O5 and "Cross-pod
 dependencies"). Until then, `pactBrokerConfig()` returns `undefined` and contract tests run
 against local files only.

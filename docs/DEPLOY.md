@@ -3,9 +3,9 @@
 This is a browser-rendered microfrontend app (Module Federation) with two backend APIs,
 Postgres, and Prometheus/Grafana. There is no local LLM: replies come from a hosted
 provider (Anthropic, or OpenAI) using the API key each user enters in Settings. `compose.yaml` at the repo root builds and runs
-all of it. `docker-compose.yml` is a separate, pre-existing dev-environment file (kept for
-`packages/workspace-config`'s own test suite); **use `compose.yaml`** for the standardized
-local deploy described here.
+all of it. It is the only local compose file: the older `docker-compose.yml` (Postgres and
+Grafana published on every interface, Grafana's default `admin` password, `:latest` images)
+was removed in AICHAT-231.
 
 ## Run it
 
