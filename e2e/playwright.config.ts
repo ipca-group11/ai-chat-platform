@@ -83,6 +83,10 @@ export default defineConfig({
         locale: "en-GB",
         timezoneId: "UTC",
         colorScheme: "light",
+        launchOptions: {
+          // Same pixels on a busy machine: software rendering on one raster thread, no LCD text, no font hinting.
+          args: ["--disable-gpu", "--disable-lcd-text", "--font-render-hinting=none", "--force-color-profile=srgb", "--disable-skia-runtime-opts", "--num-raster-threads=1"],
+        },
         screenshot: "off",
         video: "off",
         trace: "off",
