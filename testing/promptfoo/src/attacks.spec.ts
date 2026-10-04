@@ -27,8 +27,8 @@ describe("attack set (README section 5)", () => {
     }
   });
 
-  it("only marks the text and PDF attachments as a known gap", () => {
-    expect(ATTACKS.filter((a) => a.knownGap).map((a) => a.id)).toEqual(["A2a", "A2b"]);
+  it("plays the text file and the PDF attacks: attachments reach the model since AICHAT-244", () => {
+    expect(ATTACKS.filter((a) => a.surface === "file").map((a) => a.id)).toEqual(["A2a", "A2b"]);
   });
 
   it("sends the web attacks to pages the team hosts", () => {

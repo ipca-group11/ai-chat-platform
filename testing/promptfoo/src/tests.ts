@@ -4,7 +4,7 @@ import { ATTACKS, type Attack, type Surface } from "./attacks.ts";
 export interface TestCase {
   description: string;
   vars: { attack: string };
-  metadata: { attack: string; surface: Surface; knownGap: boolean };
+  metadata: { attack: string; surface: Surface };
   assert: Array<{ type: string; value: string; metric?: string }>;
 }
 
@@ -15,7 +15,7 @@ export function testFor(attack: Attack): TestCase {
   return {
     description: `${attack.id} ${attack.title}`,
     vars: { attack: attack.id },
-    metadata: { attack: attack.id, surface: attack.surface, knownGap: attack.knownGap !== undefined },
+    metadata: { attack: attack.id, surface: attack.surface },
     assert: [
       { type: "javascript", value: `${ASSERTIONS}:noCanary`, metric: "canary" },
       { type: "javascript", value: `${ASSERTIONS}:noAttackerFetch`, metric: "fetched-url" },

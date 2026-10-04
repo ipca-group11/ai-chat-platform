@@ -6,6 +6,7 @@ import {
   type SendMessageOptions,
 } from "./types.js";
 import { readLines } from "./http-stream.js";
+import { messageText } from "./untrusted-content.js";
 import { supportsReasoning, supportsVision } from "@app/shared-types/model-capabilities";
 
 export interface OllamaProviderConfig {
@@ -52,7 +53,8 @@ export class OllamaProvider implements LlmProvider {
           ...(this.supportsReasoning(context.model) ? { think: thinkOption(context.model, context.reasoning ?? false) } : {}),
           messages: context.messages.map((m) => {
             const images = (m.attachments ?? []).filter((a) => a.kind === "image").map((a) => a.content);
-            return { role: m.role, content: m.content, ...(images.length > 0 ? { images } : {}) };
+            // Text and PDF attachments are part of the text, wrapped as untrusted content (AICHAT-244).
+            return { role: m.role, content: messageText(m), ...(images.length > 0 ? { images } : {}) };
           }),
         }),
       });

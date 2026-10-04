@@ -6,6 +6,7 @@ import {
   type SendMessageOptions,
 } from "./types.js";
 import { readSseData } from "./http-stream.js";
+import { messageText } from "./untrusted-content.js";
 import { supportsReasoning, supportsVision } from "@app/shared-types/model-capabilities";
 
 export interface OpenAiProviderConfig {
@@ -104,16 +105,18 @@ function reasoningEffort(model: string, reasoning: boolean): string {
 }
 
 /** Images are sent as multimodal `content` parts (AC-70); text-only messages keep the
- * plain string shape for backward-compatible request bodies. */
+ * plain string shape for backward-compatible request bodies. Text and PDF attachments are part
+ * of the text, wrapped as untrusted content (AICHAT-244). */
 function toOpenAiMessage(message: SendMessageContext["messages"][number]) {
   const images = (message.attachments ?? []).filter((a) => a.kind === "image");
+  const text = messageText(message);
   if (images.length === 0) {
-    return { role: message.role, content: message.content };
+    return { role: message.role, content: text };
   }
   return {
     role: message.role,
     content: [
-      { type: "text", text: message.content },
+      { type: "text", text },
       ...images.map((image) => ({
         type: "image_url",
         image_url: { url: `data:${image.mimeType};base64,${image.content}` },

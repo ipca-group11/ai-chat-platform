@@ -24,9 +24,8 @@ describe("testFor", () => {
     }
   });
 
-  it("marks the known gaps in the metadata", () => {
-    expect(testFor(attackById("A2a")).metadata.knownGap).toBe(true);
-    expect(testFor(attackById("A1")).metadata.knownGap).toBe(false);
+  it("names the attack and its surface in the metadata", () => {
+    expect(testFor(attackById("A2a")).metadata).toEqual({ attack: "A2a", surface: "file" });
   });
 });
 

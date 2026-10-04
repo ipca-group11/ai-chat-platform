@@ -7,6 +7,7 @@ import {
   type SendMessageOptions,
 } from "./types.js";
 import { readSseData } from "./http-stream.js";
+import { messageText } from "./untrusted-content.js";
 import { isUrlAllowed, webFetchDomainParams, type WebFetchDomainPolicy } from "./web-fetch-domains.js";
 import { supportsReasoning, supportsVision, supportsWebFetch, thinkingStyle, webFetchToolType } from "@app/shared-types/model-capabilities";
 
@@ -281,16 +282,18 @@ function reasoningParams(model: string, reasoning: boolean): Record<string, unkn
 }
 
 /** Images are sent as multimodal `content` blocks (AC-70); text-only messages keep the
- * plain string shape. */
+ * plain string shape. Text and PDF attachments are part of the text, wrapped as untrusted
+ * content (AICHAT-244). */
 function toAnthropicMessage(message: SendMessageContext["messages"][number]) {
   const images = (message.attachments ?? []).filter((a) => a.kind === "image");
+  const text = messageText(message);
   if (images.length === 0) {
-    return { role: message.role, content: message.content };
+    return { role: message.role, content: text };
   }
   return {
     role: message.role,
     content: [
-      { type: "text", text: message.content },
+      { type: "text", text },
       ...images.map((image) => ({
         type: "image",
         source: { type: "base64", media_type: image.mimeType, data: image.content },

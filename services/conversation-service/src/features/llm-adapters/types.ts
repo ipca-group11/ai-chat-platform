@@ -1,5 +1,7 @@
 import type { Provider } from "../../shared/contracts/chat.js";
 
+/** `text`: the extracted text of a text or PDF file, sent inside the message text as untrusted
+ * content (`untrusted-content.ts`, AICHAT-244). `image`: sent as an image part. */
 export interface LlmMessageAttachment {
   kind: "text" | "image";
   /** Extracted text content (text/pdf attachments) or base64-encoded bytes (images). */

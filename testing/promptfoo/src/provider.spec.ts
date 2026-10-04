@@ -51,13 +51,10 @@ describe("AppApiProvider", () => {
     expect(await failing.callApi("A7a", { vars: { attack: "A7a" } })).toEqual({ error: "boom" });
   });
 
-  it("does not play a known gap (text and PDF attachments) unless asked to", async () => {
+  it("plays the text file and PDF attacks (AICHAT-244: attachments reach the model)", async () => {
     const { provider, run } = make({ REDTEAM_MODEL: "claude-haiku-4-5@ok" });
-    expect(await provider.callApi("A2a", { vars: { attack: "A2a" } })).toMatchObject({ error: expect.stringContaining("known gap") });
-    expect(run).not.toHaveBeenCalled();
-    const included = make({ REDTEAM_MODEL: "claude-haiku-4-5@ok", REDTEAM_INCLUDE_GAPS: "1" });
-    await included.provider.callApi("A2a", { vars: { attack: "A2a" } });
-    expect(included.run).toHaveBeenCalledOnce();
+    expect(await provider.callApi("A2b", { vars: { attack: "A2b" } })).toMatchObject({ output: "answer", metadata: { attack: "A2b", surface: "file" } });
+    expect(run).toHaveBeenCalledOnce();
   });
 
   it("charges a live model to the cap and stops when the cap would be passed, the mock is free", async () => {

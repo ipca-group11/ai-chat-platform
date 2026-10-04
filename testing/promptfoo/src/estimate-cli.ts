@@ -8,7 +8,7 @@ import { selectAttacks } from "./tests.ts";
 export function describeEstimate(env: NodeJS.ProcessEnv, repeat: number): { text: string; withinCap: boolean } {
   const model = env["REDTEAM_MODEL"] ?? "claude-haiku-4-5";
   const cap = Math.min(capFromEnv(env), MAX_BUDGET_USD);
-  const attacks = selectAttacks(env["REDTEAM_SURFACES"]).filter((a) => !a.knownGap || env["REDTEAM_INCLUDE_GAPS"] === "1");
+  const attacks = selectAttacks(env["REDTEAM_SURFACES"]);
   const run = estimateRunUsd(attacks, model, repeat, env["PAGES_BASE_URL"]);
   const lines = run.perAttack.map((a) => `  ${a.id.padEnd(4)} ${a.usd.toFixed(4)} USD`);
   const withinCap = run.totalUsd <= cap;

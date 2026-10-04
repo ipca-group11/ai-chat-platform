@@ -13,7 +13,7 @@
 #      before it is made and stops the run when the next call would pass it. The code refuses a cap above 2 USD.
 #   2. The "Estimate the cost" step runs the same estimate first and fails the job before any call when it is above the cap.
 #   3. promptfoo runs one call at a time (maxConcurrency 1), without cache, with the repeat count below.
-# Expected cost with the defaults (claude-haiku-4-5, 9 attacks x 2): about 0.30 USD. Haiku 4.5 list price is 1 USD per
+# Expected cost with the defaults (claude-haiku-4-5, 11 attacks x 2): about 0.34 USD. Haiku 4.5 list price is 1 USD per
 # million input tokens and 5 per million output tokens; the grader of the llm-rubric checks is the same model.
 #
 # WEB ATTACKS (A3 to A5): Anthropic fetches the pages from its own servers, so the pages must be on a public URL. Set the

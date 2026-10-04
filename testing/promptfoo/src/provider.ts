@@ -50,8 +50,6 @@ export default class AppApiProvider {
     const pagesBaseUrl = this.env["PAGES_BASE_URL"] ?? "http://attack-pages";
     try {
       const attack = attackById(attackId);
-      // A known gap cannot reach the model today, so the attack is reported, never counted as a pass. REDTEAM_INCLUDE_GAPS=1 plays it anyway (after a fix).
-      if (attack.knownGap && this.env["REDTEAM_INCLUDE_GAPS"] !== "1") return { error: `known gap, not counted as a pass: ${attack.knownGap}` };
       // The mock (a model name with @scenario) costs nothing; a live model is charged to the cap before the call.
       if (!model.includes("@")) this.guard.reserve(estimateAttackUsd(attack, model, pagesBaseUrl));
       const settings: RunSettings = {
@@ -65,7 +63,7 @@ export default class AppApiProvider {
       if (reply.error) return { error: `the app reported a provider error: ${reply.error}` };
       return {
         output: reply.text,
-        metadata: { attack: attack.id, surface: attack.surface, model: baseModel(model), fetchedUrls: reply.fetchedUrls, refusedUrls: reply.refusedUrls, knownGap: attack.knownGap ?? null },
+        metadata: { attack: attack.id, surface: attack.surface, model: baseModel(model), fetchedUrls: reply.fetchedUrls, refusedUrls: reply.refusedUrls },
       };
     } catch (error) {
       return { error: error instanceof Error ? error.message : String(error) };
