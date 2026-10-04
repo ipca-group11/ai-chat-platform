@@ -3,7 +3,9 @@ import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
 import type { ErasureClient } from "../shared/erasure-client.js";
 import { buildTestApp } from "../test-utils/build-test-app.js";
-import { loginVia, PASSWORD, registerVia } from "../test-utils/session-helpers.js";
+import { issueTokens } from "../features/session/index.js";
+import { makeUser } from "../test-utils/fake-prisma.js";
+import { PASSWORD } from "../test-utils/session-helpers.js";
 
 function fakeErasure() {
   const calls: Array<{ userId: string; email: string }> = [];
@@ -19,8 +21,12 @@ function fakeErasure() {
 
 async function signedIn(options: Parameters<typeof buildTestApp>[1] = {}) {
   const t = buildTestApp(undefined, options);
-  const user = await registerVia(t.app, "ana@example.com");
-  const cookies = await loginVia(t.app, "ana@example.com");
+  // Seeded directly (a cheap password hash) instead of through register and login: bcrypt at the real cost
+  // would make these tests slow when the machine is busy.
+  const user = await makeUser("ana@example.com", PASSWORD);
+  t.prisma.__addUser(user);
+  const tokens = await issueTokens(t.prisma, user);
+  const cookies = [`access_token=${tokens.accessToken}`, `refresh_token=${tokens.refreshToken}`];
   return { ...t, user, cookies };
 }
 

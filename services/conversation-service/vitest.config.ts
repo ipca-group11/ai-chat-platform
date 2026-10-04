@@ -10,7 +10,7 @@ export default defineConfig({
     setupFiles: ["src/test-utils/setup-no-network.ts"],
     coverage: coveragePreset({
       include: ["src/**/*.ts"],
-      exclude: ["src/server.ts", "src/shared/prisma.ts", "src/test-utils/**"],
+      exclude: ["src/server.ts", "src/shared/prisma.ts", "src/test-utils/**", "src/test-db/**"],
     }),
   },
 });
