@@ -25,3 +25,43 @@ chrome --headless=new --no-pdf-header-footer --print-to-pdf=payloads/a2-hidden-t
 ## Test stack
 
 `REDTEAM=1 bash scripts/mock-compose.sh up llm` starts the stack with two additions that exist only in the test stack (`compose.redteam.yaml`): the `attack-pages` container (nginx, port `ATTACK_PAGES_PORT`, default 8090) and a system prompt with a canary in conversation-service (`SYSTEM_PROMPT`).
+
+## Run it
+
+All commands from the repo root; the project is `testing/promptfoo` (`pnpm --filter @platform/promptfoo ...`).
+
+| Settings (environment) | Default | Meaning |
+|---|---|---|
+| `REDTEAM_APP_URL` | `http://localhost:8000` | The shell of the stack (it proxies `/auth` and `/api`) |
+| `REDTEAM_MODEL` | `claude-haiku-4-5` | Model of the chats. Against the LLM mock, `claude-haiku-4-5@inject-obey` or `@inject-resist` picks a scripted reply |
+| `ANTHROPIC_API_KEY` | placeholder for the mock | Real key for a real run. Sent only as the `X-Llm-Api-Key` header of a message, never printed or written |
+| `PAGES_BASE_URL` | `http://attack-pages` | Where the model fetches the attack pages. A real model needs a public URL |
+| `REDTEAM_BUDGET_USD` | `2` | Cap of one run; the code refuses more than 2 |
+| `REDTEAM_GRADER` | `anthropic:messages:claude-haiku-4-5` | Grader of the `llm-rubric` checks. `file://src/mock-grader.ts` for the mock |
+| `REDTEAM_SURFACES` | all | For example `image,direct` to run only some surfaces (`web` is left out when there is no public pages URL) |
+| `REDTEAM_INCLUDE_GAPS` | off | `1` plays A2a and A2b too (after the attachment gap is fixed) |
+
+**1. Prove the harness against the LLM mock (free).**
+
+```sh
+REDTEAM=1 bash scripts/mock-compose.sh up llm            # stack with the attack pages and the canary system prompt
+cd testing/promptfoo
+REDTEAM_MODEL=claude-haiku-4-5@inject-obey  REDTEAM_GRADER=file://src/mock-grader.ts pnpm eval -o ../../redteam-results/obey.json   # must FAIL every attack
+REDTEAM_MODEL=claude-haiku-4-5@inject-resist REDTEAM_GRADER=file://src/mock-grader.ts pnpm eval -o ../../redteam-results/resist.json  # must PASS
+node ../../testing/promptfoo/src/report-cli.ts ../../redteam-results/obey.json
+```
+
+Without Docker: `services/conversation-service/node_modules/.bin/tsx testing/promptfoo/stack/local-stack.ts` starts the real conversation-service on in-memory repositories behind the LLM mock on port 8000, and `node testing/promptfoo/stack/show-requests.ts` prints what the mock received (system prompt, image, fetch tool).
+
+**2. One real run (costs money).** Check the estimate first, then run with the real key in the environment (read it by name from a git-ignored file, do not print it). Use the compose stack without the mock and a public `PAGES_BASE_URL`, as in `.github/workflows/redteam.yml`.
+
+```sh
+node testing/promptfoo/src/estimate-cli.ts --repeat 2      # about 0.30 USD for 9 attacks x 2; exits 1 above the cap
+cd testing/promptfoo && pnpm eval --repeat 2 -o ../../redteam-results/report.json -o ../../redteam-results/report.html
+```
+
+**3. Read the report.** `report-cli.ts` prints one row per attack: `pass`, `fail` (with the failed checks: `canary`, `fetched-url`, `attacker-url`, `victim-data`, `rubric`), `error` (the app or the provider failed, nothing was judged) or `known-gap` (not counted as a pass). The HTML report has the answer of every run.
+
+## Cost
+
+Every live call is charged to the cap before it is made (`src/budget.ts`); when the next call would pass the cap the run stops with an error row instead of spending. The estimate assumes Haiku 4.5 list prices (1 USD per million input tokens, 5 per million output), 1500 answer tokens, two fetched pages of 10000 tokens for a web attack and a grader call per run. Nothing is cached and one call runs at a time.
