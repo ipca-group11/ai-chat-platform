@@ -19,6 +19,12 @@ describe("parseEnv", () => {
     expect(env.MAX_UPLOAD_BYTES).toBe(1048576);
   });
 
+  it("has no system prompt unless SYSTEM_PROMPT is set (AICHAT-26)", () => {
+    expect(parseEnv({}).SYSTEM_PROMPT).toBeUndefined();
+    expect(parseEnv({ SYSTEM_PROMPT: "Be brief." }).SYSTEM_PROMPT).toBe("Be brief.");
+    expect(() => parseEnv({ SYSTEM_PROMPT: "" })).toThrow();
+  });
+
   it("AC-45: rejects an invalid NODE_ENV value", () => {
     expect(() => parseEnv({ NODE_ENV: "not-a-real-env" })).toThrow();
   });

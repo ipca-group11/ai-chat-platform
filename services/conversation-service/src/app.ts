@@ -69,7 +69,7 @@ export function createApp(
   const queueManager =
     overrides.queueManager ??
     new QueueManager(
-      createMessageProcessor({ messagesRepo, chatsService, providerRegistry, bus, buildLlmMessages }),
+      createMessageProcessor({ messagesRepo, chatsService, providerRegistry, bus, buildLlmMessages, systemPrompt: env.SYSTEM_PROMPT }),
       (chatId, entry, error) => {
         logger.error({ chatId, messageId: entry.messageId, err: error }, "queue processor threw unexpectedly");
       },

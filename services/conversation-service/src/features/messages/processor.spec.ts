@@ -69,6 +69,28 @@ describe("createMessageProcessor", () => {
     expect(assistantMessages[0]?.status).toBe("sent");
   });
 
+  it("adds the system prompt before the history, and nothing when there is none (AICHAT-26)", async () => {
+    const roles = async (systemPrompt?: string): Promise<string[]> => {
+      const { chatsService, messagesRepo, bus, chat, userMessage } = await setupChatWithUserMessage();
+      let captured: string[] = [];
+      const provider = new ScriptedProvider(async function* (context) {
+        captured = context.messages.map((m) => `${m.role}:${m.content}`);
+        yield "ok";
+      });
+      const processor = createMessageProcessor({
+        messagesRepo,
+        chatsService,
+        providerRegistry: fakeProviderRegistry(provider),
+        bus,
+        ...(systemPrompt ? { systemPrompt } : {}),
+      });
+      await processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, new AbortController().signal);
+      return captured;
+    };
+    expect(await roles("Rules.")).toEqual(["system:Rules.", "user:hello"]);
+    expect(await roles()).toEqual(["user:hello"]);
+  });
+
   it("passes the chat's reasoning toggle to the provider", async () => {
     const { chatsService, messagesRepo, bus, chat, userMessage } = await setupChatWithUserMessage();
     await chatsService.update("user-1", chat.id, { reasoning: true });
