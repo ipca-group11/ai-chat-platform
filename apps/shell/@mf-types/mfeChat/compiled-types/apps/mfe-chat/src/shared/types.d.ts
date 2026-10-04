@@ -8,9 +8,10 @@
  * replaced with imports from `@app/shared-types` — no other file in this app
  * should re-declare these shapes, so that swap is a one-line change per import.
  */
-export type Provider = "ollama" | "openai" | "anthropic";
-export declare const PROVIDERS: readonly Provider[];
-export declare const PROVIDER_MODELS: Record<Provider, readonly string[]>;
+import { PROVIDER_MODELS, PROVIDERS, type Provider } from "@app/shared-types/model-capabilities";
+import type { SseEvent, WebFetch as SharedWebFetch } from "@app/shared-types/stream-events";
+export { PROVIDER_MODELS, PROVIDERS };
+export type { Provider };
 export interface Chat {
     id: string;
     title: string;
@@ -26,7 +27,8 @@ export interface Chat {
     createdAt: string;
     updatedAt: string;
 }
-export type MessageRole = "user" | "assistant";
+/** `system` only appears when the service stores a system message; the chat shows user and assistant turns. */
+export type MessageRole = "user" | "assistant" | "system";
 /**
  * `sent`: persisted, not queued/streaming (user messages land here immediately;
  * assistant messages land here once the response is complete).
@@ -52,18 +54,13 @@ export interface Message {
     status: MessageStatus;
     /** Provider error text, set when `status` is `failed` (conversation-service `MessageDto.error`). */
     error?: string | null;
+    /** The model stopped at its output token limit, so the answer is cut off (AICHAT-212). */
+    truncated?: boolean;
     createdAt: string;
 }
-/** A page the model fetched while writing a reply (conversation-service `WebFetchDto`).
+/** A page the model fetched while writing a reply (`@app/shared-types/stream-events`).
  * `fetching` only while the reply streams; saved replies hold `done` or `error`. */
-export interface WebFetch {
-    id: string;
-    url: string;
-    status: "fetching" | "done" | "error";
-    title?: string;
-    /** Why the fetch failed, e.g. `url_not_accessible`. */
-    errorCode?: string;
-}
+export type WebFetch = SharedWebFetch;
 export type ChatMemberRole = "owner" | "member";
 /** Entry of `GET /chats/:id/members`; the owner comes first. */
 export interface ChatMember {
@@ -81,39 +78,9 @@ export interface Attachment {
     size: number;
     kind: AttachmentKind;
 }
-/** Events on `GET /chats/:id/stream`, as published by conversation-service
- * (services/conversation-service/src/shared/contracts/chat.ts `SseEvent`). */
-export type SSEEvent = {
-    type: "message";
-    message: Message;
-} | {
-    type: "queued";
-    messageId: string;
-} | {
-    type: "started";
-    messageId: string;
-} | {
-    type: "token";
-    messageId: string;
-    token: string;
-} | {
-    type: "reasoning";
-    messageId: string;
-    token: string;
-} | {
-    type: "web_fetch";
-    messageId: string;
-    fetch: WebFetch;
-} | {
-    type: "done";
-    messageId: string;
-    stopped?: boolean;
-} | {
-    type: "error";
-    messageId: string;
-    message: string;
-    retryable: boolean;
-};
+/** Events on `GET /chats/:id/stream`, as published by conversation-service. The type is the
+ * one of `@app/shared-types/stream-events` (AICHAT-221); no local copy, so it cannot drift. */
+export type SSEEvent = SseEvent;
 /** `X-Correlation-Id` per docs/STACK.md decision #8 (defined by `platform`, reused here). */
 export declare const CORRELATION_HEADER = "X-Correlation-Id";
 /**

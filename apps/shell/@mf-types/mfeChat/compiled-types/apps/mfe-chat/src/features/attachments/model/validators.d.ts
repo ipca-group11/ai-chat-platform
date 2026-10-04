@@ -14,4 +14,6 @@ export interface FileValidationError {
  * with a clear, specific error message.
  */
 export declare function validateAttachmentFile(file: File): FileValidationError | null;
+/** AC-68: shown when the client or the server (413) rejects a file for its size. */
+export declare function tooLargeMessage(file: Pick<File, "name">): string;
 export declare function attachmentKindFromMime(mimeType: string): AttachmentKind;
