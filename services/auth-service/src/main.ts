@@ -8,7 +8,7 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Express, type Request } from "express";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 import { collectDefaultMetrics, register as metricsRegister } from "prom-client";
@@ -39,6 +39,10 @@ export interface AppDeps {
   erasure?: ErasureClient;
   /** Account deletions per client and hour (default 10). */
   deletionsPerHour?: number;
+  /** Requests per client address and 15 minutes (default 300). */
+  requestsPerWindow?: number;
+  /** Express `trust proxy` (default TRUST_PROXY, 1 hop: Caddy). */
+  trustProxy?: number | string;
 }
 
 function defaultErasureClient(): ErasureClient | undefined {
@@ -52,6 +56,10 @@ export function createApp(deps: AppDeps = {}): Express {
   const app = express();
 
   app.disable("x-powered-by");
+  // Behind Caddy every request comes from the proxy's address. Trusting the hops in front of the service
+  // makes req.ip the real client (the address the last trusted proxy saw), so the limiter below counts
+  // each client on its own instead of everyone together (AICHAT-222).
+  app.set("trust proxy", deps.trustProxy ?? env.TRUST_PROXY);
   app.use(helmet());
   app.use(httpMetricsMiddleware);
   app.use(
@@ -63,9 +71,11 @@ export function createApp(deps: AppDeps = {}): Express {
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,
-      limit: 300,
+      limit: deps.requestsPerWindow ?? 300,
       standardHeaders: true,
       legacyHeaders: false,
+      // Keyed on the client address resolved through `trust proxy` (IPv6 grouped by /56).
+      keyGenerator: (req) => ipKeyGenerator(req.ip ?? "unknown"),
     }),
   );
   app.use(express.json());

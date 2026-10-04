@@ -19,6 +19,14 @@ const envSchema = z.object({
   CONVERSATION_SERVICE_URL: z.string().url().optional(),
   // How often the retention job runs, in minutes; 0 turns it off.
   RETENTION_INTERVAL_MINUTES: z.coerce.number().int().min(0).default(360),
+  // Express `trust proxy` (AICHAT-222): how many proxies in front of the service append X-Forwarded-For
+  // (Caddy in the deployment), or a comma-separated list of trusted proxy addresses/subnets. "true" is
+  // refused: it trusts any X-Forwarded-For a client sends and lets it pick its own rate-limit key.
+  TRUST_PROXY: z
+    .string()
+    .default("1")
+    .refine((value) => value.trim().toLowerCase() !== "true", "TRUST_PROXY=true is not allowed, give a hop count or addresses")
+    .transform((value): number | string => (/^\d+$/.test(value.trim()) ? Number(value) : value)),
   COOKIE_SECURE: z
     .string()
     .default("true")
@@ -39,6 +47,8 @@ export type Env = {
   CONVERSATION_SERVICE_URL?: string;
   /** Minutes between retention runs; 0 = off. */
   RETENTION_INTERVAL_MINUTES: number;
+  /** Express `trust proxy`: proxy hop count, or trusted proxy addresses. */
+  TRUST_PROXY: number | string;
   COOKIE_SECURE: boolean;
   LOG_LEVEL: string;
 };
@@ -56,6 +66,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     INTERNAL_SERVICE_TOKEN: parsed.INTERNAL_SERVICE_TOKEN,
     CONVERSATION_SERVICE_URL: parsed.CONVERSATION_SERVICE_URL,
     RETENTION_INTERVAL_MINUTES: parsed.RETENTION_INTERVAL_MINUTES,
+    TRUST_PROXY: parsed.TRUST_PROXY,
     COOKIE_SECURE: parsed.COOKIE_SECURE,
     LOG_LEVEL: parsed.LOG_LEVEL,
   };
