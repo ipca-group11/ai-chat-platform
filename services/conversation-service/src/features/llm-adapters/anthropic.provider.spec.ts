@@ -9,6 +9,31 @@ describe("AnthropicProvider", () => {
     expect(provider.id).toBe("anthropic");
   });
 
+  it("AICHAT-212: stop reasons that cut the answer off mark it as truncated", async () => {
+    const run = async (stopReason: string) => {
+      const fetchImpl = vi.fn().mockResolvedValue(
+        mockStreamResponse([
+          `data: ${JSON.stringify({ type: "content_block_delta", delta: { type: "text_delta", text: "1 2" } })}\n\n`,
+          `data: ${JSON.stringify({ type: "message_delta", delta: { stop_reason: stopReason } })}\n\n`,
+          `data: ${JSON.stringify({ type: "message_stop" })}\n\n`,
+        ]),
+      );
+      const chunks: unknown[] = [];
+      for await (const chunk of new AnthropicProvider({ fetchImpl }).sendMessage({
+        messages: [{ role: "user", content: "count" }],
+        model: "claude-haiku-4-5",
+        apiKey: "anthropic-test",
+      })) {
+        chunks.push(chunk);
+      }
+      return chunks;
+    };
+
+    expect(await run("max_tokens")).toEqual(["1 2", { type: "truncated" }]);
+    expect(await run("model_context_window_exceeded")).toEqual(["1 2", { type: "truncated" }]);
+    expect(await run("end_turn")).toEqual(["1 2"]);
+  });
+
   it("AC-52: streams tokens parsed from content_block_delta SSE events", async () => {
     const fetchImpl = vi.fn().mockResolvedValue(
       mockStreamResponse([

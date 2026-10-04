@@ -27,6 +27,7 @@ const message = {
   webFetches: [],
   attachments: [],
   status: "sent" as const,
+  truncated: false,
   createdAt: now,
 };
 
@@ -45,6 +46,11 @@ describe("DTO schemas", () => {
   it("accepts a message with every optional part empty and keeps error optional", () => {
     expect(messageDtoSchema.safeParse(message).success).toBe(true);
     expect(messageDtoSchema.safeParse({ ...message, error: null }).success).toBe(true);
+  });
+
+  it("requires the truncated flag on a message (AICHAT-212)", () => {
+    expect(messageDtoSchema.safeParse({ ...message, truncated: true }).success).toBe(true);
+    expect(messageDtoSchema.safeParse({ ...message, truncated: undefined }).success).toBe(false);
   });
 
   it("rejects a message with an unknown role or a missing author", () => {
@@ -81,6 +87,11 @@ describe("SSE event schemas", () => {
   it("allows done with or without stopped", () => {
     expect(sseDoneEventSchema.safeParse({ type: "done", messageId: "m" }).success).toBe(true);
     expect(sseDoneEventSchema.safeParse({ type: "done", messageId: "m", stopped: true }).success).toBe(true);
+  });
+
+  it("allows done with truncated (AICHAT-212)", () => {
+    expect(sseDoneEventSchema.safeParse({ type: "done", messageId: "m", truncated: true }).success).toBe(true);
+    expect(sseDoneEventSchema.safeParse({ type: "done", messageId: "m", truncated: "yes" }).success).toBe(false);
   });
 
   it("requires retryable on error events", () => {

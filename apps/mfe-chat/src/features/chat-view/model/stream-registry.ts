@@ -53,7 +53,7 @@ export function ensureChatStream(chatId: string, queryClient: QueryClient): void
         queryClient,
         chatId,
         messageId,
-        (m) => ({ ...m, content: "", reasoning: null, webFetches: [], status: "streaming", error: null }),
+        (m) => ({ ...m, content: "", reasoning: null, webFetches: [], status: "streaming", error: null, truncated: false }),
         () => assistantMessage(messageId, {})
       );
       // The user message moved from queued -> sent server-side.
@@ -97,13 +97,14 @@ export function ensureChatStream(chatId: string, queryClient: QueryClient): void
     },
     // AC-55: the completed response is saved server-side; mark it done locally and
     // refetch so the cache matches what was persisted.
-    onDone: ({ messageId }) => {
+    // AICHAT-212: `truncated` means the model hit its output limit and the answer is cut off.
+    onDone: ({ messageId, truncated }) => {
       upsertMessage(
         queryClient,
         chatId,
         messageId,
-        (m) => ({ ...m, status: "sent" }),
-        () => assistantMessage(messageId, { status: "sent" })
+        (m) => ({ ...m, status: "sent", truncated: truncated === true }),
+        () => assistantMessage(messageId, { status: "sent", truncated: truncated === true })
       );
       // AC-59: the next queued message (if any) may now be picked up server-side;
       // refetch so its status (queued -> streaming) is reflected in the UI.

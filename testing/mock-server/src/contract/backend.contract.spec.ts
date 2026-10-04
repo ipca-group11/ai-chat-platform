@@ -217,7 +217,7 @@ const DRIFT: Record<string, Diff[]> = {
   chat: ["extra ownerEmail"],
   // The services answer with the stored record; shared-types describes an earlier shape.
   member: [],
-  message: ["extra attachments", "extra authorEmail", "extra authorId", "extra error", "status: invalid_value"],
+  message: ["extra attachments", "extra authorEmail", "extra authorId", "extra error", "extra truncated", "status: invalid_value"],
   attachment: [
     "extra filename",
     "extra kind",

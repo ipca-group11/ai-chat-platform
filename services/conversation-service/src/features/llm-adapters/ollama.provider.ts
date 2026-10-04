@@ -79,6 +79,7 @@ export class OllamaProvider implements LlmProvider {
         const parsed = JSON.parse(line) as {
           message?: { content?: string; thinking?: string };
           done?: boolean;
+          done_reason?: string;
           error?: string;
         };
         if (parsed.error) {
@@ -88,7 +89,11 @@ export class OllamaProvider implements LlmProvider {
         if (thinking) yield { type: "reasoning", text: thinking };
         const token = parsed.message?.content;
         if (token) yield token;
-        if (parsed.done) return;
+        if (parsed.done) {
+          // `length`: the answer hit num_predict (or the context size) and was cut off (AICHAT-212).
+          if (parsed.done_reason === "length") yield { type: "truncated" };
+          return;
+        }
       }
     } catch (cause) {
       if (cause instanceof ProviderError) throw cause;

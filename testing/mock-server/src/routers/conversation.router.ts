@@ -419,7 +419,9 @@ export const conversationMock: MockModule = {
         ? "Streamed answer of TOKENS tokens (default)"
         : name === "long"
           ? "Streamed answer ten times as long (the LLM mock long scenario)"
-          : "Answer fails after two tokens; the message ends as failed and can be retried",
+          : name === "truncated"
+            ? "Answer cut off at the output token limit; done carries truncated: true and the message is marked truncated"
+            : "Answer fails after two tokens; the message ends as failed and can be retried",
     })),
   ],
   createRouter: createConversationRouter,

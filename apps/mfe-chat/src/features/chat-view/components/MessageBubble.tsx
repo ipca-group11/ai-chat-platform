@@ -1,7 +1,7 @@
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button, cn } from "@app/ui";
-import { Bot, Paperclip, Square, User } from "lucide-react";
+import { Bot, Paperclip, Scissors, Square, User } from "lucide-react";
 import type { Message } from "../../../shared/types";
 import { MessageError } from "./MessageError";
 import { ReasoningSection } from "./ReasoningSection";
@@ -105,6 +105,18 @@ export function MessageBubble({ message, currentUserId, onStop, onRetry, retryin
               </li>
             ))}
           </ul>
+        ) : null}
+
+        {message.role === "assistant" && message.truncated && !streaming ? (
+          // AICHAT-212: the model stopped at its output token limit; say so instead of passing it off as complete.
+          <p
+            role="note"
+            data-testid={`message-truncated-${message.id}`}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground"
+          >
+            <Scissors className="size-3" aria-hidden="true" />
+            Answer cut off: the model reached its output limit.
+          </p>
         ) : null}
 
         {streaming ? (

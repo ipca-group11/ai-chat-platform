@@ -22,6 +22,8 @@ const WEB_FETCH_MAX_CONTENT_TOKENS = 25000;
 /** Server tools run in a server-side loop that stops with `pause_turn` after a set number
  * of steps; the turn is resumed by sending it back, at most this many times. */
 const MAX_PAUSE_CONTINUATIONS = 3;
+/** Stop reasons that mean the answer was cut off rather than finished (AICHAT-212). */
+const TRUNCATING_STOP_REASONS = new Set(["max_tokens", "model_context_window_exceeded"]);
 
 export interface AnthropicProviderConfig {
   baseUrl?: string;
@@ -88,6 +90,10 @@ export class AnthropicProvider implements LlmProvider {
       const response = await this.post({ ...request, messages }, context.apiKey, options.signal);
       const turn = yield* streamTurn(response);
       replyBlocks.push(...turn.blocks);
+      if (turn.stopReason && TRUNCATING_STOP_REASONS.has(turn.stopReason)) {
+        yield { type: "truncated" };
+        return;
+      }
       if (turn.stopReason !== "pause_turn" || continuation >= MAX_PAUSE_CONTINUATIONS) return;
     }
   }

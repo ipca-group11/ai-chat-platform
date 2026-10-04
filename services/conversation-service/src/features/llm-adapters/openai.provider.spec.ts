@@ -25,7 +25,7 @@ describe("OpenAiProvider", () => {
       model: "gpt-4o-mini",
       apiKey: "sk-test",
     })) {
-      tokens.push(token);
+      if (typeof token === "string") tokens.push(token);
     }
 
     expect(tokens.join("")).toBe("Hello");
@@ -76,7 +76,7 @@ describe("OpenAiProvider", () => {
           model: "gpt-4o-mini",
           apiKey: "sk-test",
         })) {
-          tokens.push(token);
+          if (typeof token === "string") tokens.push(token);
         }
       } catch (err) {
         return { tokens, err: err as ProviderError };

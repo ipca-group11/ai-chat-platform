@@ -1,4 +1,10 @@
-import { ProviderError, type LlmProvider, type SendMessageContext, type SendMessageOptions } from "./types.js";
+import {
+  ProviderError,
+  type LlmProvider,
+  type LlmStreamChunk,
+  type SendMessageContext,
+  type SendMessageOptions,
+} from "./types.js";
 import { readSseData } from "./http-stream.js";
 import { supportsReasoning, supportsVision } from "@app/shared-types/model-capabilities";
 
@@ -34,7 +40,7 @@ export class OpenAiProvider implements LlmProvider {
   }
 
   /** Chat Completions never returns OpenAI's reasoning text, so only the answer streams. */
-  async *sendMessage(context: SendMessageContext, options: SendMessageOptions = {}): AsyncIterable<string> {
+  async *sendMessage(context: SendMessageContext, options: SendMessageOptions = {}): AsyncIterable<LlmStreamChunk> {
     if (!context.apiKey) {
       throw new ProviderError("openai", "Missing OpenAI API key", { retryable: false, statusCode: 401 });
     }
@@ -68,7 +74,7 @@ export class OpenAiProvider implements LlmProvider {
 
     for await (const data of readSseData(response.body)) {
       const parsed = JSON.parse(data) as {
-        choices?: Array<{ delta?: { content?: string } }>;
+        choices?: Array<{ delta?: { content?: string }; finish_reason?: string | null }>;
         error?: { message?: string; type?: string };
       };
       // A failure after the stream started arrives as a `data: {"error": ...}` event with no
@@ -78,8 +84,11 @@ export class OpenAiProvider implements LlmProvider {
           retryable: parsed.error.type !== "invalid_request_error",
         });
       }
-      const token = parsed.choices?.[0]?.delta?.content;
+      const choice = parsed.choices?.[0];
+      const token = choice?.delta?.content;
       if (token) yield token;
+      // `length`: the answer hit max_tokens (or the context window) and was cut off (AICHAT-212).
+      if (choice?.finish_reason === "length") yield { type: "truncated" };
     }
   }
 }

@@ -9,6 +9,8 @@ export type StoredMessage = chat.Message & {
   authorId?: string;
   authorEmail?: string | null;
   error?: string | null;
+  /** The model stopped at its output token limit (AICHAT-212). */
+  truncated?: boolean;
 };
 
 export const nowIso = (): string => new Date().toISOString();
@@ -118,6 +120,7 @@ export function toMessageDto(ctx: MockContext, record: StoredMessage): MessageDt
     attachments: attachments.map(toAttachmentDto),
     status: STATUS_OF[record.status],
     error: record.error ?? (record.status === "failed" ? "The provider returned an error" : null),
+    truncated: record.truncated ?? false,
     createdAt: record.createdAt,
   };
 }

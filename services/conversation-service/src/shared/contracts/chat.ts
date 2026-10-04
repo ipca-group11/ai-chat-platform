@@ -57,6 +57,8 @@ export const messageDtoSchema = z.object({
   attachments: z.array(attachmentDtoSchema),
   status: messageStatusSchema,
   error: z.string().nullable().optional(),
+  /** The model stopped at its output token limit, so the answer is cut off (AICHAT-212). */
+  truncated: z.boolean(),
   createdAt: z.string(),
 });
 export type MessageDto = z.infer<typeof messageDtoSchema>;
@@ -128,6 +130,8 @@ export const sseDoneEventSchema = z.object({
   type: z.literal("done"),
   messageId: z.string(),
   stopped: z.boolean().optional(),
+  /** The model stopped at its output token limit; the saved answer is cut off (AICHAT-212). */
+  truncated: z.boolean().optional(),
 });
 export type SseDoneEvent = z.infer<typeof sseDoneEventSchema>;
 

@@ -27,14 +27,11 @@ sidecar `<file>.source.txt` that starts with `hand-written from <doc URL>`.
 Manual only, never in CI. See `docs/AICHAT-25/WORKLOG.md` (US1) for the commands and for
 recording against the real APIs with keys. Review the git diff before committing.
 
-## Known defects the replay shows
+## Defects the replay showed (fixed)
 
-The tests assert today's behaviour and carry an `it.todo` for the expected one.
+The replay first pinned these defects; the tests now assert the fixed behaviour.
 
-| Ticket | Defect | Fixtures |
-|---|---|---|
-| [AICHAT-212](https://ipca-grupo11.atlassian.net/browse/AICHAT-212) | `max_tokens` / `length` truncation is not surfaced | `anthropic/max-tokens.sse`, `openai/max-tokens.sse` |
-
-Fixed: [AICHAT-211](https://ipca-grupo11.atlassian.net/browse/AICHAT-211) (`openai/error-midstream.sse`): the
-mid-stream `error` event now fails the answer with a retryable `ProviderError`; the partial text is kept and
-the message is saved as `failed`, so the user can retry it.
+| Ticket | Defect | Fix | Fixtures |
+|---|---|---|---|
+| [AICHAT-211](https://ipca-grupo11.atlassian.net/browse/AICHAT-211) | OpenAI mid-stream errors were swallowed, a failed answer looked complete | The `error` event raises a retryable `ProviderError`; the partial text is saved as `failed` and can be retried | `openai/error-midstream.sse` |
+| [AICHAT-212](https://ipca-grupo11.atlassian.net/browse/AICHAT-212) | `max_tokens` / `length` truncation was not surfaced | The adapters yield a `truncated` chunk; the reply is saved with `truncated: true` and the chat shows that it was cut off | `anthropic/max-tokens.sse`, `openai/max-tokens.sse` |

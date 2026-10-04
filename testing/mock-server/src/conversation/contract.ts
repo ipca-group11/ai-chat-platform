@@ -44,6 +44,7 @@ export const messageDtoSchema = z.object({
   attachments: z.array(attachmentDtoSchema),
   status: messageStatusSchema,
   error: z.string().nullable().optional(),
+  truncated: z.boolean(),
   createdAt: z.string(),
 });
 export type MessageDto = z.infer<typeof messageDtoSchema>;
@@ -77,7 +78,12 @@ export const sseEventSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("token"), messageId: z.string(), token: z.string() }),
   z.object({ type: z.literal("reasoning"), messageId: z.string(), token: z.string() }),
   z.object({ type: z.literal("web_fetch"), messageId: z.string(), fetch: webFetchDtoSchema }),
-  z.object({ type: z.literal("done"), messageId: z.string(), stopped: z.boolean().optional() }),
+  z.object({
+    type: z.literal("done"),
+    messageId: z.string(),
+    stopped: z.boolean().optional(),
+    truncated: z.boolean().optional(),
+  }),
   z.object({ type: z.literal("error"), messageId: z.string(), message: z.string(), retryable: z.boolean() }),
 ]);
 export type SseEvent = z.infer<typeof sseEventSchema>;

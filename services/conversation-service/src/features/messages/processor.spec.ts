@@ -11,6 +11,7 @@ import {
 } from "../llm-adapters/index.js";
 import { ChatEventBus } from "../streaming/index.js";
 import { createMessageProcessor } from "./processor.js";
+import { TRUNCATED_MARKER, toMessageDto } from "./service.js";
 import type { SseEvent } from "../../shared/contracts/chat.js";
 import { asUser } from "../../test-utils/principal.js";
 
@@ -278,6 +279,44 @@ describe("createMessageProcessor", () => {
       message: "The server had an error",
       retryable: true,
     });
+  });
+
+  it("AICHAT-212: an answer cut off at the output limit is saved and announced as truncated", async () => {
+    const { chatsService, messagesRepo, bus, chat, userMessage } = await setupChatWithUserMessage();
+    const provider = new ScriptedProvider(async function* () {
+      yield "1 2 3 ";
+      yield { type: "truncated" };
+    });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
+
+    const events = await collectEvents(bus, chat.id, () =>
+      processor(chat.id, { messageId: userMessage.id, content: "count", attachmentIds: [] }, new AbortController().signal),
+    );
+
+    const assistant = messagesRepo.all().find((m) => m.role === "assistant");
+    expect({ content: assistant?.content, status: assistant?.status, error: assistant?.error }).toEqual({
+      content: "1 2 3 ",
+      status: "sent",
+      error: TRUNCATED_MARKER,
+    });
+    expect(events.find((e) => e.type === "done")).toEqual({ type: "done", messageId: assistant?.id, truncated: true });
+    expect(toMessageDto(assistant!)).toMatchObject({ status: "sent", truncated: true, error: null });
+  });
+
+  it("AICHAT-212: a complete answer is not marked as truncated", async () => {
+    const { chatsService, messagesRepo, bus, chat, userMessage } = await setupChatWithUserMessage();
+    const provider = new ScriptedProvider(async function* () {
+      yield "done";
+    });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
+
+    const events = await collectEvents(bus, chat.id, () =>
+      processor(chat.id, { messageId: userMessage.id, content: "hi", attachmentIds: [] }, new AbortController().signal),
+    );
+
+    const assistant = messagesRepo.all().find((m) => m.role === "assistant");
+    expect(events.find((e) => e.type === "done")).toEqual({ type: "done", messageId: assistant?.id });
+    expect(toMessageDto(assistant!)).toMatchObject({ truncated: false, error: null });
   });
 
   it("AC-50: subsequent messages use the chat's persisted provider and model, even after it changes", async () => {

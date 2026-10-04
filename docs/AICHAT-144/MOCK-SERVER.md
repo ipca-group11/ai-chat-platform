@@ -61,6 +61,7 @@ A scenario is picked per request. LLM mocks: model name suffix (`claude-sonnet-4
 | `ok` | conversation | Streamed answer of `TOKENS` tokens (text from the LLM mock `ok`) |
 | `long` | conversation | Ten times as long (text from the LLM mock `long`) |
 | `error` | conversation | Answer fails after two tokens; the message ends `failed` and can be retried |
+| `truncated` | conversation | Answer cut off at the output token limit (text from the LLM mock `max-tokens`); `done` has `truncated: true` and the message `truncated: true` (AICHAT-212) |
 | `session-expired` | auth, conversation | 401 `UNAUTHENTICATED`; the auth mock also clears the cookies |
 | `error-500` | auth, conversation | 500 `INTERNAL_ERROR` |
 | `slow` | auth, conversation | Answer held back 3 s (or `delayMs` of the fault) |

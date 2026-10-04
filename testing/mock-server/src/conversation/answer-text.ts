@@ -2,7 +2,7 @@ import type { MockContext } from "../registry.js";
 import { streamScenarioText } from "../llm/stream.js";
 
 /** Scenarios the conversation mock knows for a streamed answer. */
-export const ANSWER_SCENARIOS = ["ok", "long", "error"] as const;
+export const ANSWER_SCENARIOS = ["ok", "long", "error", "truncated"] as const;
 export type AnswerScenario = (typeof ANSWER_SCENARIOS)[number];
 
 export function isAnswerScenario(value: string | undefined): value is AnswerScenario {
@@ -12,8 +12,9 @@ export function isAnswerScenario(value: string | undefined): value is AnswerScen
 /**
  * The LLM mock scenario that supplies the text of each chat scenario. `error` reuses the `ok`
  * text: the conversation engine ends it with a provider error after the second token.
+ * `truncated` is the `max-tokens` text: the engine saves it marked as cut off (AICHAT-212).
  */
-const LLM_SCENARIO: Record<AnswerScenario, string> = { ok: "ok", long: "long", error: "ok" };
+const LLM_SCENARIO: Record<AnswerScenario, string> = { ok: "ok", long: "long", error: "ok", truncated: "max-tokens" };
 
 /** Name of the LLM scenario behind a chat scenario; fails with the list of valid names otherwise. */
 export function llmScenarioFor(scenario: string): string {

@@ -24,7 +24,7 @@ const mfeChatFields = {
   token: ["type", "messageId", "token"],
   reasoning: ["type", "messageId", "token"],
   web_fetch: ["type", "messageId", "fetch"],
-  done: ["type", "messageId", "stopped"],
+  done: ["type", "messageId", "stopped", "truncated"],
   error: ["type", "messageId", "message", "retryable"],
 } as const satisfies { [K in EventType]: readonly FieldsOf<K>[] };
 
@@ -71,6 +71,7 @@ describe("SSE event drift between mfe-chat and shared-types", () => {
           "done": {
             "onlyInMfeChat": [
               "stopped",
+              "truncated",
             ],
             "onlyInSharedTypes": [],
           },

@@ -68,11 +68,12 @@ describe.each(LAYOUTS)("recorded replay, %s", (_name, layout) => {
       ]);
     });
 
-    it("max-tokens.sse (recorded): the truncated text is streamed like a complete answer", async () => {
+    it("max-tokens.sse (recorded): streams the text, then marks the answer as truncated (AICHAT-212)", async () => {
       const { provider } = anthropic(replaySse("anthropic", "max-tokens", layout));
       const chunks = await collect(provider, context(ANTHROPIC_MODEL));
-      // AICHAT-212: stop_reason max_tokens is not surfaced, the answer simply ends.
-      expect(chunks.join("")).toBe("1 2 3 4 5 ");
+      expect(chunks.filter((c) => typeof c === "string").join("")).toBe("1 2 3 4 5 ");
+      expect(chunks.at(-1)).toEqual({ type: "truncated" });
+      expect(chunks.filter((c) => typeof c !== "string")).toHaveLength(1);
     });
 
     it("web-fetch-error.sse: reports fetching, then the error code, then the answer", async () => {
@@ -157,11 +158,17 @@ describe.each(LAYOUTS)("recorded replay, %s", (_name, layout) => {
       expect((requests[0]?.body as { reasoning_effort: string }).reasoning_effort).toBe("high");
     });
 
-    it("max-tokens.sse (recorded): the truncated text is streamed like a complete answer", async () => {
+    it("max-tokens.sse (recorded): streams the text, then marks the answer as truncated (AICHAT-212)", async () => {
       const { provider } = openai(replaySse("openai", "max-tokens", layout));
       const chunks = await collect(provider, context("gpt-4o"));
-      // AICHAT-212: finish_reason length is ignored, the answer simply ends.
-      expect(chunks.join("")).toBe("1 2 3 4 5 ");
+      expect(chunks.filter((c) => typeof c === "string").join("")).toBe("1 2 3 4 5 ");
+      expect(chunks.at(-1)).toEqual({ type: "truncated" });
+      expect(chunks.filter((c) => typeof c !== "string")).toHaveLength(1);
+    });
+
+    it("text.sse (recorded): a finished answer is not marked as truncated", async () => {
+      const { provider } = openai(replaySse("openai", "text", layout));
+      expect((await collect(provider, context("gpt-4o"))).every((c) => typeof c === "string")).toBe(true);
     });
 
     it("error-midstream.sse: partial text, then a retryable ProviderError (AICHAT-211)", async () => {
@@ -180,10 +187,6 @@ describe.each(LAYOUTS)("recorded replay, %s", (_name, layout) => {
       });
     });
   });
-});
-
-describe("expected behaviour once the defects are fixed", () => {
-  it.todo("AICHAT-212: stop_reason max_tokens (Anthropic) and finish_reason length (OpenAI) mark the answer as incomplete");
 });
 
 describe("HTTP errors", () => {

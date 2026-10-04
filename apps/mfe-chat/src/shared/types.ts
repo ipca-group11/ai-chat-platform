@@ -59,6 +59,8 @@ export interface Message {
   status: MessageStatus;
   /** Provider error text, set when `status` is `failed` (conversation-service `MessageDto.error`). */
   error?: string | null;
+  /** The model stopped at its output token limit, so the answer is cut off (AICHAT-212). */
+  truncated?: boolean;
   createdAt: string;
 }
 
@@ -103,7 +105,7 @@ export type SSEEvent =
   | { type: "token"; messageId: string; token: string }
   | { type: "reasoning"; messageId: string; token: string }
   | { type: "web_fetch"; messageId: string; fetch: WebFetch }
-  | { type: "done"; messageId: string; stopped?: boolean }
+  | { type: "done"; messageId: string; stopped?: boolean; truncated?: boolean }
   | { type: "error"; messageId: string; message: string; retryable: boolean };
 
 /** `X-Correlation-Id` per docs/STACK.md decision #8 (defined by `platform`, reused here). */

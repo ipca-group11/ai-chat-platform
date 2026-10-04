@@ -41,6 +41,20 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.messages("chat-1") });
   });
 
+  it("AICHAT-212: a done event with truncated marks the reply as cut off; a plain done does not", () => {
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    const source = FakeEventSource.instances[0]!;
+
+    source.emit("token", { messageId: "msg-assistant-1", token: "1 2 3" });
+    source.emit("done", { type: "done", messageId: "msg-assistant-1", truncated: true });
+    source.emit("done", { type: "done", messageId: "msg-assistant-2" });
+
+    const messages = client.getQueryData<Message[]>(queryKeys.messages("chat-1"));
+    expect(messages?.[0]).toMatchObject({ id: "msg-assistant-1", status: "sent", truncated: true });
+    expect(messages?.[1]).toMatchObject({ id: "msg-assistant-2", status: "sent", truncated: false });
+  });
+
   it("AC-72/AC-74: on a provider error, marks the message failed without throwing and refetches so the queue can proceed", () => {
     const client = createTestQueryClient();
     const invalidateSpy = vi.spyOn(client, "invalidateQueries");

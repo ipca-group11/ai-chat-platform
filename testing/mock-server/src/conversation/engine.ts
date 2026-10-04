@@ -133,7 +133,7 @@ export class ConversationEngine {
     let reply: StoredMessage;
     if (entry.kind === "retry") {
       reply = trigger;
-      Object.assign(reply, { content: "", reasoning: null, webFetches: undefined, status: "streaming", error: null });
+      Object.assign(reply, { content: "", reasoning: null, webFetches: undefined, status: "streaming", error: null, truncated: false });
     } else {
       trigger.status = "complete";
       reply = {
@@ -184,7 +184,15 @@ export class ConversationEngine {
     if (findMessage(ctx, reply.id) !== reply) return;
     reply.status = "complete";
     chat.updatedAt = nowIso();
-    this.publish(chatId, { type: "done", messageId: reply.id, ...(run.aborted ? { stopped: true } : {}) });
+    if (run.aborted) {
+      this.publish(chatId, { type: "done", messageId: reply.id, stopped: true });
+    } else if (entry.scenario === "truncated") {
+      // Like the service: the answer is kept, marked as cut off at the output limit (AICHAT-212).
+      reply.truncated = true;
+      this.publish(chatId, { type: "done", messageId: reply.id, truncated: true });
+    } else {
+      this.publish(chatId, { type: "done", messageId: reply.id });
+    }
   }
 }
 

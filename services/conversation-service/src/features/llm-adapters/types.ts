@@ -51,7 +51,14 @@ export interface LlmWebFetchChunk {
   errorCode?: string;
 }
 
-export type LlmStreamChunk = string | LlmReasoningChunk | LlmWebFetchChunk;
+/** The answer was cut off because the model reached its output token limit (Anthropic
+ * `stop_reason: max_tokens`, OpenAI `finish_reason: length`, Ollama `done_reason: length`).
+ * Yielded once, after the last text, so the reply is not saved as a complete answer. */
+export interface LlmTruncatedChunk {
+  type: "truncated";
+}
+
+export type LlmStreamChunk = string | LlmReasoningChunk | LlmWebFetchChunk | LlmTruncatedChunk;
 
 export interface SendMessageOptions {
   signal?: AbortSignal;

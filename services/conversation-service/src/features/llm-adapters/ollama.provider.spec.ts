@@ -23,7 +23,7 @@ describe("OllamaProvider", () => {
 
     const tokens: string[] = [];
     for await (const token of provider.sendMessage({ messages: [{ role: "user", content: "hi" }], model: "llama3.2:1b" })) {
-      tokens.push(token);
+      if (typeof token === "string") tokens.push(token);
     }
 
     expect(tokens.join("")).toBe("Hello");
@@ -31,6 +31,28 @@ describe("OllamaProvider", () => {
       "http://localhost:11434/api/chat",
       expect.objectContaining({ method: "POST" }),
     );
+  });
+
+  it("AICHAT-212: done_reason length marks the answer as truncated; stop does not", async () => {
+    const run = async (doneReason: string) => {
+      const fetchImpl = vi.fn().mockResolvedValue(
+        mockStreamResponse([
+          `${JSON.stringify({ message: { content: "1 2" }, done: false })}\n`,
+          `${JSON.stringify({ message: { content: "" }, done: true, done_reason: doneReason })}\n`,
+        ]),
+      );
+      const chunks: unknown[] = [];
+      for await (const chunk of new OllamaProvider({ baseUrl: "http://localhost:11434", fetchImpl }).sendMessage({
+        messages: [{ role: "user", content: "count" }],
+        model: "llama3.2:1b",
+      })) {
+        chunks.push(chunk);
+      }
+      return chunks;
+    };
+
+    expect(await run("length")).toEqual(["1 2", { type: "truncated" }]);
+    expect(await run("stop")).toEqual(["1 2"]);
   });
 
   it("AC-72: throws a retryable ProviderError on 5xx responses", async () => {

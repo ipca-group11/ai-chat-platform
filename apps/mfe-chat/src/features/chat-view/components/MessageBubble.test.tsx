@@ -39,6 +39,21 @@ describe("MessageBubble", () => {
     expect(blocked.map((el) => el.textContent)).toEqual(["[image not loaded: status]", "[image not loaded]"]);
   });
 
+  it("says when a reply was cut off at the model's output limit (AICHAT-212)", () => {
+    bubble({ content: "1 2 3", truncated: true });
+
+    expect(screen.getByRole("note")).toHaveTextContent("Answer cut off: the model reached its output limit.");
+    expect(screen.getByText("1 2 3")).toBeInTheDocument();
+  });
+
+  it("shows no cut-off note on a complete or still streaming reply", () => {
+    bubble({ content: "complete" });
+    expect(screen.queryByRole("note")).not.toBeInTheDocument();
+
+    bubble({ id: "m2", content: "partial", status: "streaming", truncated: true });
+    expect(screen.queryByTestId("message-truncated-m2")).not.toBeInTheDocument();
+  });
+
   it("still renders links of a reply as links", () => {
     bubble({ content: "See [the docs](https://example.com/docs)" });
 

@@ -474,6 +474,21 @@ describe("queue: edit, cancel, stop and retry", () => {
     stream.close();
   });
 
+  it("marks an answer cut off at the output limit as truncated (AICHAT-212)", async () => {
+    const { app } = setup();
+    const { as, cookie } = await signIn(app);
+    const id = await firstChatId(as);
+    const stream = await openStream(app, cookie, id);
+    await as("post", `/chats/${id}/messages`).set("X-Mock-Scenario", "truncated").send({ content: "count to a million" });
+    await stream.until((e) => e.some((x) => x.type === "done"));
+    expect(stream.events.at(-1)).toMatchObject({ type: "done", truncated: true });
+
+    const answer = (await settled(as, id)).at(-1) as MessageDto;
+    expect(answer).toMatchObject({ role: "assistant", status: "sent", truncated: true, error: null });
+    expect(answer.content.length).toBeGreaterThan(0);
+    stream.close();
+  });
+
   it("refuses to retry a message that did not fail", async () => {
     const { app } = setup();
     const { as } = await signIn(app);
@@ -657,6 +672,7 @@ describe("errors", () => {
       "conversation/session-expired",
       "conversation/slow",
       "conversation/stream-drop",
+      "conversation/truncated",
     ]);
   });
 });

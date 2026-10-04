@@ -236,6 +236,16 @@ export class MessagesService {
 
 const savedWebFetches = z.array(webFetchDtoSchema);
 
+/**
+ * Stored in the `error` column of a `sent` assistant reply that the model cut off at its output
+ * token limit (AICHAT-212). Reuses the existing column (no schema change): a `sent` message has no
+ * error otherwise. The DTO turns it into `truncated: true` and `error: null`.
+ */
+export const TRUNCATED_MARKER = "truncated:max_tokens";
+
+const isTruncated = (message: Pick<MessageRecord, "status" | "error">): boolean =>
+  message.status === "sent" && message.error === TRUNCATED_MARKER;
+
 export function toMessageDto(message: MessageRecord): MessageDto {
   return {
     id: message.id,
@@ -247,7 +257,8 @@ export function toMessageDto(message: MessageRecord): MessageDto {
     reasoning: message.reasoning ?? null,
     webFetches: savedWebFetches.safeParse(message.webFetches ?? []).data ?? [],
     status: message.status,
-    error: message.error ?? null,
+    error: isTruncated(message) ? null : (message.error ?? null),
+    truncated: isTruncated(message),
     attachments: message.attachments.map((a) => ({
       id: a.id,
       messageId: a.messageId ?? message.id,

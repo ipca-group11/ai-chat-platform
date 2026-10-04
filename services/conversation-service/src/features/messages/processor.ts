@@ -3,7 +3,7 @@ import { ProviderError, type ProviderRegistry, type LlmMessage } from "../llm-ad
 import type { QueueEntry, QueueProcessor } from "../queue/index.js";
 import type { ChatEventBus } from "../streaming/index.js";
 import type { WebFetchDto } from "../../shared/contracts/chat.js";
-import type { MessageRecord, MessagesRepository } from "./service.js";
+import { TRUNCATED_MARKER, type MessageRecord, type MessagesRepository } from "./service.js";
 
 /** Converts persisted messages into the LLM adapter's context shape. Ignores
  * attachments by default; the attachments feature supplies a richer implementation
@@ -69,6 +69,8 @@ export function createMessageProcessor(deps: CreateMessageProcessorDeps): QueueP
     const provider = deps.providerRegistry.get(chat.provider);
     let content = "";
     let reasoning = "";
+    // The model hit its output limit: the reply is kept but marked as cut off (AICHAT-212).
+    let truncated = false;
     // Null rather than "" so replies without reasoning don't render an empty section.
     const webFetches = new Map<string, WebFetchDto>();
     // What gets saved with the reply. A fetch still in flight when the reply ends (stopped
@@ -86,6 +88,8 @@ export function createMessageProcessor(deps: CreateMessageProcessorDeps): QueueP
         if (typeof chunk === "string") {
           content += chunk;
           deps.bus.publish(chatId, { type: "token", messageId: assistantMessage.id, token: chunk });
+        } else if (chunk.type === "truncated") {
+          truncated = true;
         } else if (chunk.type === "web_fetch") {
           const { type: _type, ...fetch } = chunk;
           webFetches.set(fetch.id, fetch);
@@ -97,8 +101,12 @@ export function createMessageProcessor(deps: CreateMessageProcessorDeps): QueueP
           deps.bus.publish(chatId, { type: "reasoning", messageId: assistantMessage.id, token: chunk.text });
         }
       }
-      await deps.messagesRepo.updateContent(assistantMessage.id, { ...saved(), status: "sent" });
-      deps.bus.publish(chatId, { type: "done", messageId: assistantMessage.id });
+      await deps.messagesRepo.updateContent(assistantMessage.id, {
+        ...saved(),
+        status: "sent",
+        ...(truncated ? { error: TRUNCATED_MARKER } : {}),
+      });
+      deps.bus.publish(chatId, { type: "done", messageId: assistantMessage.id, ...(truncated ? { truncated } : {}) });
     } catch (err) {
       if (isAbortError(err)) {
         // AC-54: partial response saved to history.
