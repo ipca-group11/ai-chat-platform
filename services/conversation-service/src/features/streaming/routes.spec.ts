@@ -36,7 +36,7 @@ describe("streaming routes", () => {
 
   it("AC-46: user B opening user A's chat stream receives 403 or 404", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-a"), { title: "A's chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-a"), { title: "A's chat", provider: "ollama", model: "llama3.2:1b" });
     const tokenB = tokenFor("user-b");
 
     const res = await request(app).get(`/chats/${chat.id}/stream`).set("Cookie", [`access_token=${tokenB}`]);
@@ -47,7 +47,7 @@ describe("streaming routes", () => {
   it("AC-52: an authenticated owner receives events published for their chat over SSE", async () => {
     const { chatsService } = buildApp();
     const bus = new ChatEventBus();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const token = tokenFor("user-1");
 
     const streamApp = express();

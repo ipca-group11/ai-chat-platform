@@ -1,7 +1,7 @@
 /**
  * Polls a set of `/health` endpoints before the E2E suite starts, so specs
  * fail fast with a clear "stack not ready" error instead of racing a
- * slow-starting `docker compose up` (Postgres migrations, image builds,
+ * slow-starting `docker compose up` (Postgres migrations, Ollama model pull,
  * etc.) with flaky timeouts inside the first test.
  */
 

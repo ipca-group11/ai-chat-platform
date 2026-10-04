@@ -20,6 +20,7 @@ const TITLES = ["Trip planning", "Refactor ideas", "Release notes", "Budget revi
 const MODELS = {
   anthropic: ["claude-sonnet-4-5", "claude-haiku-4-5"],
   openai: ["gpt-4o-mini", "gpt-4.1"],
+  ollama: ["llama3.2:1b"],
 } as const;
 const FILE_TYPES: Array<{ mimeType: chat.AttachmentMimeType; ext: string }> = [
   { mimeType: "text/plain", ext: "txt" },

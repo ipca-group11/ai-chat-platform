@@ -9,12 +9,14 @@
  * Every lookup lower-cases the model id first.
  */
 
-export type Provider = "openai" | "anthropic";
+export type Provider = "ollama" | "openai" | "anthropic";
 
-export const PROVIDERS: readonly Provider[] = ["anthropic", "openai"];
+export const PROVIDERS: readonly Provider[] = ["anthropic", "openai", "ollama"];
 
 /** The models the UI offers per provider. */
 export const PROVIDER_MODELS: Record<Provider, readonly string[]> = {
+  // Local models served by Ollama; no API key needed.
+  ollama: ["llama3.2:1b", "llama3.2:3b", "llama3.1:8b", "qwen3:4b", "qwen3:8b", "deepseek-r1:8b"],
   openai: ["gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-5-mini", "o4-mini"],
   anthropic: [
     "claude-opus-5-5",
@@ -29,10 +31,14 @@ export const PROVIDER_MODELS: Record<Provider, readonly string[]> = {
 export const VISION_MODEL_HINTS: Record<Provider, readonly string[]> = {
   anthropic: ["claude-3", "claude-4", "claude-opus", "claude-sonnet", "claude-haiku"],
   openai: ["gpt-4o", "gpt-4-vision", "gpt-4.1", "gpt-5", "o4"],
+  ollama: ["llava", "vision", "bakllava"],
 };
 
 /** OpenAI reasoning models: the o-series (o1, o3, o4-mini, ...) and GPT-5 and later. */
 export const OPENAI_REASONING_MODEL_PATTERN = /^(o\d|gpt-[5-9])/;
+
+/** Ollama thinking models (its `think` option); sending it to any other model is an error. */
+export const OLLAMA_REASONING_MODEL_HINTS: readonly string[] = ["qwen3", "deepseek-r1", "gpt-oss", "magistral", "phi4-reasoning"];
 
 /**
  * How each Claude generation turns thinking on and off (first match wins, so the more
@@ -94,9 +100,10 @@ export function webFetchToolType(model: string): string | undefined {
 }
 
 export function supportsReasoning(provider: Provider, model: string): boolean {
-  return provider === "anthropic"
-    ? thinkingStyle(model) !== undefined
-    : OPENAI_REASONING_MODEL_PATTERN.test(model.toLowerCase());
+  const lower = model.toLowerCase();
+  if (provider === "anthropic") return thinkingStyle(model) !== undefined;
+  if (provider === "ollama") return OLLAMA_REASONING_MODEL_HINTS.some((hint) => lower.includes(hint));
+  return OPENAI_REASONING_MODEL_PATTERN.test(lower);
 }
 
 /** Only Anthropic offers a web fetch tool. */

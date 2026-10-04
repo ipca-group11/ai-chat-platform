@@ -33,9 +33,9 @@ test.describe("configuration", () => {
       await expect(apiKeyField(page, "OpenAI")).toHaveValue("");
     });
 
-    await test.step("AC-77: only key-based providers are listed (no local/keyless provider)", async () => {
-      await expect(page.getByText(/ollama/i)).toHaveCount(0);
-      await expect(page.getByText(/no key|not required|no api key needed/i)).toHaveCount(0);
+    await test.step("AC-77: Ollama is shown as not requiring a key", async () => {
+      await expect(page.getByText(/ollama/i)).toBeVisible();
+      await expect(page.getByText(/no key|not required|no api key needed/i)).toBeVisible();
     });
   });
 
