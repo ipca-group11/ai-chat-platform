@@ -1,0 +1,8 @@
+$ gh run view 37119733470 --log-failed | cut -f3- | sed 's/\x1b\[[0-9;]*m//g' | grep -E 'Finding|Secret|RuleID|File|leaks found|exit' | head -20
+2026-10-03T11:28:02.1691246Z   echo "### Secret scan (gitleaks ${GITLEAKS_VERSION})"
+2026-10-03T11:28:02.1692547Z   if [ "$code" -eq 0 ]; then echo "Result: no leaks found."; else echo "Result: **leaks found** (values are redacted in the log). The merge is blocked."; fi
+2026-10-03T11:28:02.1693667Z exit "$code"
+2026-10-03T11:28:02.7326119Z 11:28AM WRN leaks found: 1
+2026-10-03T11:28:02.7345801Z ##[error]Process completed with exit code 1.
+
+[exit 0]

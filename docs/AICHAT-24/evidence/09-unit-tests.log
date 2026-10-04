@@ -1,0 +1,29 @@
+$ pnpm exec nx run k6:test --skip-nx-cache 2>&1 | tail -12; pnpm test:scripts 2>&1 | grep -E '✔|ℹ (tests|pass|fail)'
+   Duration  150ms (transform 59%, import 20%, tests 13%, worker 8%)
+
+
+
+
+ NX   Successfully ran target test for project k6
+
+
+  Run duration:      684ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     587ms (1 task)
+  Recoverable time:  <1ms
+✔ formats one row per project with two decimals (2.031833ms)
+✔ shows n/a for missing metrics and a placeholder when empty (2.572417ms)
+✔ collects findings, resolves severity from the rule and skips suppressed ones (1.677ms)
+✔ table groups by rule, lists ERROR first and shows file:line (0.282083ms)
+✔ long location lists are cut (0.123791ms)
+✔ summary says blocked with ERROR and clean without (0.190708ms)
+  ✔ parses docker sizes in binary and decimal units (0.53075ms)
+  ✔ turns a docker stats row into a CSV line with the share of the limit (0.229875ms)
+  ✔ renders Prometheus metrics labelled with the compose service (0.451584ms)
+  ✔ gives a share of 0 when the container has no limit it reports (0.097625ms)
+✔ docker-stats-sampler (2.033583ms)
+ℹ tests 10
+ℹ pass 10
+ℹ fail 0
+
+[exit 0]

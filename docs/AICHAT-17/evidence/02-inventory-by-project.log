@@ -1,0 +1,19 @@
+$ node scripts/unit-test/source-files.mjs
+project                           files  own-test  exempt  neither
+apps/mfe-auth                        20         6       3       11
+apps/mfe-chat                        49        24       7       18
+apps/mfe-settings                    14        11       3        0
+apps/shell                           29         3      13       13
+e2e                                   7         2       0        5
+packages/eslint-config                6         1       1        4
+packages/observability               11         8       3        0
+packages/pact-config                  3         2       1        0
+packages/shared-types                18        12       5        1
+packages/test-config                  3         2       1        0
+packages/ui                          19        18       0        1
+packages/workspace-config             1         1       0        0
+services/auth-service                19        13       4        2
+services/conversation-service        46        28       9        9
+total                               245       131      50       64
+
+[exit 0]

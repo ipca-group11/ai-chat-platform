@@ -1,0 +1,34 @@
+$ pnpm exec nx run-many -t lint typecheck test build -p mock-server conversation-service --skip-nx-cache
+
+ NX   Running targets lint, typecheck, test, build for 2 projects and 4 tasks they depend on:
+
+- mock-server
+- conversation-service
+
+
+✔  nx run eslint-config:build
+✔  nx run test-config:build
+✔  nx run conversation-service:prisma-generate
+✔  nx run shared-types:build
+✔  nx run conversation-service:lint
+✔  nx run mock-server:test
+✔  nx run mock-server:lint
+✔  nx run conversation-service:test
+✔  nx run conversation-service:typecheck
+✔  nx run mock-server:build
+✔  nx run mock-server:typecheck
+✔  nx run conversation-service:build
+
+
+
+ NX   Successfully ran targets lint, typecheck, test, build for 2 projects and 4 tasks they depend on
+
+
+Output of 12 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      7.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     6.5s (2 tasks)
+  Recoverable time:  1.1s (14% of the run)
+
+[exit 0]

@@ -1,0 +1,12 @@
+$ cd services/conversation-service && pnpm exec vitest run src/shared/async-handler.spec.ts src/features/chats/controller.spec.ts src/features/messages/controller.spec.ts src/features/attachments/controller.spec.ts
+
+ RUN  v5.0.1 /private/tmp/claude-501/u17-backend/services/conversation-service
+
+
+ Test Files  4 passed (4)
+      Tests  29 passed (29)
+   Start at  15:16:13
+   Duration  234ms (import 52%, transform 39%, tests 5%, setup 3%, worker 2%)
+
+
+[exit 0]

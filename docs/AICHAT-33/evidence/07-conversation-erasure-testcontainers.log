@@ -1,0 +1,25 @@
+$ cd services/conversation-service && pnpm exec vitest run --config vitest.db.config.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "test", schema "public" at "localhost:32789"
+
+🚀  Your database is now in sync with your Prisma schema. Done in 136ms
+
+ ✓ src/test-db/erasure.db.spec.ts > erasing a user in conversation-service > deletes the chats they own, for everyone, with messages, attachments and files 66ms
+ ✓ src/test-db/erasure.db.spec.ts > erasing a user in conversation-service > removes their membership, messages, attachments and files in other users' chats, and leaves the rest 41ms
+ ✓ src/test-db/erasure.db.spec.ts > erasing a user in conversation-service > leaves no row that references the user's id or email 44ms
+ ✓ src/test-db/erasure.db.spec.ts > erasing a user in conversation-service > matches the email case-insensitively 38ms
+ ✓ src/test-db/erasure.db.spec.ts > erasing a user in conversation-service > can be repeated: the second run finds nothing and succeeds 41ms
+ ✓ src/test-db/erasure.db.spec.ts > erasing a user in conversation-service > deletes the rows even when a file is already gone 36ms
+ ✓ src/test-db/erasure.db.spec.ts > erasing a user in conversation-service > does not touch a user who has no data 32ms
+ ✓ src/test-db/smoke.db.spec.ts > Testcontainers Postgres (conversation schema) > has the schema applied by prisma db push 26ms
+
+ Test Files  2 passed (2)
+      Tests  8 passed (8)
+   Start at  07:14:50
+   Duration  4.09s (tests 54%, import 28%, transform 16%, setup 1%, worker 1%)
+
+
+[exit 0]

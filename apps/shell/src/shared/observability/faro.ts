@@ -1,4 +1,5 @@
-import { getWebInstrumentations, initializeFaro, type Faro } from '@grafana/faro-web-sdk';
+import { getWebInstrumentations, initializeFaro, LogLevel, type Faro } from '@grafana/faro-web-sdk';
+import { scrubTransportItem } from './faro-scrub';
 
 /**
  * Grafana Faro real-user monitoring for the whole app. The shell is the only page the
@@ -26,6 +27,8 @@ export function initFaro(config: FaroConfig = readConfig()): Faro | null {
       environment: config.environment || 'production',
     },
     instrumentations: getWebInstrumentations({ captureConsole: true }),
+    consoleInstrumentation: { disabledLevels: [LogLevel.TRACE, LogLevel.DEBUG, LogLevel.LOG, LogLevel.INFO] },
+    beforeSend: scrubTransportItem,
   });
 }
 

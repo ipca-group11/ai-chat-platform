@@ -1,0 +1,14 @@
+$ pnpm --dir apps/mfe-chat exec vitest run src/shared/sse-drift.test.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-chat
+
+ ✓ src/shared/sse-drift.test.ts > SSE event drift between mfe-chat and shared-types > lists every field of the mfe-chat events 1ms
+ ✓ src/shared/sse-drift.test.ts > SSE event drift between mfe-chat and shared-types > pins today's drift: event names and fields that differ 3ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  17:28:28
+   Duration  909ms (environment 60%, setup 22%, transform 11%, import 6%, tests 1%, worker 1%)
+
+
+[exit 0]

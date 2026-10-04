@@ -1,25 +1,38 @@
 import type { TestUserConfig } from "vitest/config";
-import { coverageThresholds } from "./coverage-thresholds.js";
+import { coverageThresholds } from "./coverage-thresholds.ts";
+import type { CoverageThresholds } from "./coverage-thresholds.ts";
 
 export interface CoveragePresetOptions {
   /** Glob(s) of source files coverage should be computed over. */
   include?: string[];
   /** Additional excludes, appended to the default test-file/story excludes. */
   exclude?: string[];
+  /** Threshold overrides merged over the 80% default. */
+  thresholds?: Partial<CoverageThresholds>;
 }
 
-const DEFAULT_COVERAGE_EXCLUDES = [
+export interface CoveragePreset {
+  provider: "v8";
+  reporter: Array<"text" | "lcov" | "json-summary">;
+  include?: string[];
+  exclude: string[];
+  thresholds: CoverageThresholds;
+}
+
+const DEFAULT_COVERAGE_EXCLUDES: string[] = [
   "**/*.spec.ts",
   "**/*.test.ts",
   "**/*.spec.tsx",
   "**/*.test.tsx",
+  "**/*.spec.js",
+  "**/*.test.js",
   "**/*.stories.tsx",
   "**/*.d.ts",
 ];
 
 /**
  * Coverage section of a Vitest config (`STACK.md` decision #6, AC-97): `v8` provider,
- * text + lcov reporters (lcov for CI artifact upload), and the shared 80%
+ * text + lcov + json-summary reporters (lcov for CI artifact upload, json-summary for the CI summary), and the shared 80%
  * line/statement/function/branch thresholds from `coverage-thresholds.ts`.
  *
  * Usage in a project's own `vitest.config.ts`:
@@ -36,13 +49,14 @@ const DEFAULT_COVERAGE_EXCLUDES = [
  * });
  * ```
  */
-export function coveragePreset(options: CoveragePresetOptions = {}) {
+export function coveragePreset(options: CoveragePresetOptions = {}): CoveragePreset {
   return {
-    provider: "v8" as const,
-    reporter: ["text", "lcov"] as Array<"text" | "lcov">,
+    provider: "v8",
+    // json-summary writes coverage/coverage-summary.json, read by the CI summary.
+    reporter: ["text", "lcov", "json-summary"],
     ...(options.include ? { include: options.include } : {}),
     exclude: [...DEFAULT_COVERAGE_EXCLUDES, ...(options.exclude ?? [])],
-    thresholds: coverageThresholds,
+    thresholds: { ...coverageThresholds, ...options.thresholds },
   };
 }
 

@@ -1,0 +1,17 @@
+$ ls -1 sbom-results | wc -l; ls -lh sbom-results | awk 'NR>1{print $5, $9}'
+      13
+2.2M sbom-alloy.cdx.json
+2.4M sbom-auth-service.cdx.json
+290K sbom-caddy.cdx.json
+2.5M sbom-conversation-service.cdx.json
+2.3M sbom-grafana.cdx.json
+641K sbom-loki.cdx.json
+2.4M sbom-mfe-auth.cdx.json
+2.6M sbom-mfe-chat.cdx.json
+2.4M sbom-mfe-settings.cdx.json
+316K sbom-postgres.cdx.json
+531K sbom-prometheus.cdx.json
+2.4M sbom-shell.cdx.json
+3.0M sbom-source.cdx.json
+
+[exit 0]

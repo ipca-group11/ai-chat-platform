@@ -1,0 +1,37 @@
+$ sed -n 1,34p .github/workflows/dast.yml
+# DAST with OWASP ZAP (AICHAT-28). Starts the compose stack with the LLM mock (same steps as e2e.yml, without
+# Playwright) and scans it with the pinned zaproxy/zap-stable image through testing/zap/run.sh.
+#
+# baseline  zap-baseline.py with the AJAX spider, signed in as a seeded user. Rules: testing/zap/rules.tsv.
+#           A rule set to FAIL (High risk) fails the job (FAIL_ACTION=true); Medium only warns.
+#
+# api-scan  zap-api-scan.py, an active scan of the REST API from testing/zap/openapi.yaml (a small spec written from the
+#           Express routes; the AICHAT-12 spec replaces it). Runs weekly (Monday 04:00 UTC) and on demand, never on a pull
+#           request: an active scan sends attack payloads and creates data, so it only ever targets this throw-away stack.
+#
+# Required check: the job is named "dast / baseline". Branch protection is not available on this private
+# free-plan repository (HTTP 403), so the team rule is: do not merge into main while "dast / baseline" is red.
+# Production is never scanned.
+name: dast
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [integration/testing-epics, main]
+  workflow_dispatch: {}
+  # Only the api-scan job runs on the schedule.
+  schedule:
+    - cron: "0 4 * * 1"
+
+concurrency:
+  group: dast-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Pinned: a newer image brings new rules and changes the findings, so bump it on purpose.
+
+[exit 0]

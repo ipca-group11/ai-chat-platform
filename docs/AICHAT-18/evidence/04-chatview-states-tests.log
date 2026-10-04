@@ -1,0 +1,16 @@
+$ pnpm --filter @app/mfe-chat exec vitest run src/features/chat-view
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-chat
+
+
+ Test Files  10 passed (10)
+      Tests  121 passed (121)
+   Start at  16:17:19
+   Duration  3.67s (environment 38%, import 22%, tests 16%, setup 15%, transform 10%)
+
+Environment  jsdom was created 10 times · 6.87s total, 38% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+
+[exit 0]

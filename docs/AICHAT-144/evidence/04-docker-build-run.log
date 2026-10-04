@@ -1,0 +1,8 @@
+$ docker build -q -f testing/mock-server/Dockerfile -t ai-chat-mock-server . && docker run -d --rm --name mock-ev -p 4010:4010 -e SEED=7 ai-chat-mock-server && sleep 12 && docker inspect --format "container health: {{.State.Health.Status}}, user: {{.Config.User}}" mock-ev && curl -s localhost:4010/__admin/health; echo; docker stop mock-ev
+sha256:62213cb2a12aec1b0b05a58944b607c6bd0aa14d937d56dcff0eb7311435cf4e
+3a6a390d0435f7dd6937dc76d6c45b8f5cf504803ef80225d801ed7afeacd27c
+container health: healthy, user: app
+{"status":"ok"}
+mock-ev
+
+[exit 0]

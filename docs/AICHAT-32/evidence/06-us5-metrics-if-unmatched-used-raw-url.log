@@ -1,0 +1,559 @@
+$ pnpm -r --no-bail --filter @app/auth-service --filter @app/conversation-service exec vitest run src/integration/pii-metrics.spec.ts
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/pii-metrics.spec.ts (2 tests | 2 failed) 49ms
+   ❯ conversation-service /metrics carries no PII (2)
+     × stays clean after traffic on matched and unmatched routes 43ms
+     × labels a route nobody handles as unmatched, never with the raw URL 5ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  21:29:20
+   Duration  495ms (import 42%, transform 41%, tests 12%, worker 5%)
+
+undefined
+ ❯ src/integration/pii-metrics.spec.ts (2 tests | 2 failed) 860ms
+   ❯ auth-service /metrics carries no PII (2)
+     × stays clean after traffic on matched and unmatched routes 854ms
+     × labels a route nobody handles as unmatched, never with the raw URL 5ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  21:29:20
+   Duration  1.24s (tests 74%, import 15%, transform 9%, worker 2%)
+
+undefined
+ ERR_PNPM_RECURSIVE_FAIL  
+
+
+Summary: 2 fails, 0 passes
+
+/Users/truezone/Projects/ai-chat-platform/services/auth-service:
+ ERROR  Command failed with exit code 1: vitest run src/integration/pii-metrics.spec.ts
+
+/Users/truezone/Projects/ai-chat-platform/services/conversation-service:
+ ERROR  Command failed with exit code 1: vitest run src/integration/pii-metrics.spec.ts
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/pii-metrics.spec.ts > conversation-service /metrics carries no PII > stays clean after traffic on matched and unmatched routes
+AssertionError: expected 'email "guest.metrics@pii-canary... (3…' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ email "guest.metrics@pii-canary... (36 characters)"
++ canary "guest.metrics@pii-canary... (36 characters)"
++ canary "PII-CANARY-7f3a"
++ ip "203.0.113.77"
++ canary "203.0.113.77"
+
+ ❯ src/integration/pii-metrics.spec.ts:39:54
+     37|     const text = await scrape(app);
+     38|     expect(text).toContain("/chats/:id/members/:email");
+     39|     expect(describePii(findPii(text, { canaries }))).toBe("");
+       |                                                      ^
+     40|   });
+     41|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/integration/pii-metrics.spec.ts > conversation-service /metrics carries no PII > labels a route nobody handles as unmatched, never with the raw URL
+AssertionError: expected '# HELP process_cpu_user_seconds_total…' to match /http_requests_total\{[^}]*route="unma…/
+
+- Expected:
+/http_requests_total\{[^}]*route="unmatched"[^}]*status="404"[^}]*\} \d+/
+
++ Received:
+"# HELP process_cpu_user_seconds_total Total user CPU time spent in seconds.
+# TYPE process_cpu_user_seconds_total counter
+process_cpu_user_seconds_total 0.00441
+
+# HELP process_cpu_system_seconds_total Total system CPU time spent in seconds.
+# TYPE process_cpu_system_seconds_total counter
+process_cpu_system_seconds_total 0.000768
+
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 0.005178
+
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1791059361
+
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 108134400
+
+# HELP nodejs_eventloop_lag_seconds Lag of event loop in seconds.
+# TYPE nodejs_eventloop_lag_seconds gauge
+nodejs_eventloop_lag_seconds 0
+
+# HELP nodejs_eventloop_lag_min_seconds The minimum recorded event loop delay.
+# TYPE nodejs_eventloop_lag_min_seconds gauge
+nodejs_eventloop_lag_min_seconds 9223372036.854776
+
+# HELP nodejs_eventloop_lag_max_seconds The maximum recorded event loop delay.
+# TYPE nodejs_eventloop_lag_max_seconds gauge
+nodejs_eventloop_lag_max_seconds 0
+
+# HELP nodejs_eventloop_lag_mean_seconds The mean of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_mean_seconds gauge
+nodejs_eventloop_lag_mean_seconds Nan
+
+# HELP nodejs_eventloop_lag_stddev_seconds The standard deviation of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_stddev_seconds gauge
+nodejs_eventloop_lag_stddev_seconds Nan
+
+# HELP nodejs_eventloop_lag_p50_seconds The 50th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p50_seconds gauge
+nodejs_eventloop_lag_p50_seconds 5.11e-7
+
+# HELP nodejs_eventloop_lag_p90_seconds The 90th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p90_seconds gauge
+nodejs_eventloop_lag_p90_seconds 5.11e-7
+
+# HELP nodejs_eventloop_lag_p99_seconds The 99th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p99_seconds gauge
+nodejs_eventloop_lag_p99_seconds 5.11e-7
+
+# HELP nodejs_active_resources Number of active resources that are currently keeping the event loop alive, grouped by async resource type.
+# TYPE nodejs_active_resources gauge
+nodejs_active_resources{type=\"PipeWrap\"} 3
+nodejs_active_resources{type=\"TCPServerWrap\"} 1
+nodejs_active_resources{type=\"TCPSocketWrap\"} 2
+nodejs_active_resources{type=\"Timeout\"} 1
+nodejs_active_resources{type=\"Immediate\"} 1
+
+# HELP nodejs_active_resources_total Total number of active resources.
+# TYPE nodejs_active_resources_total gauge
+nodejs_active_resources_total 8
+
+# HELP nodejs_active_handles Number of active libuv handles grouped by handle type. Every handle type is C++ class name.
+# TYPE nodejs_active_handles gauge
+nodejs_active_handles{type=\"Pipe\"} 1
+nodejs_active_handles{type=\"Socket\"} 4
+nodejs_active_handles{type=\"Server\"} 1
+
+# HELP nodejs_active_handles_total Total number of active handles.
+# TYPE nodejs_active_handles_total gauge
+nodejs_active_handles_total 6
+
+# HELP nodejs_active_requests Number of active libuv requests grouped by request type. Every request type is C++ class name.
+# TYPE nodejs_active_requests gauge
+
+# HELP nodejs_active_requests_total Total number of active requests.
+# TYPE nodejs_active_requests_total gauge
+nodejs_active_requests_total 0
+
+# HELP nodejs_heap_size_total_bytes Process heap size from Node.js in bytes.
+# TYPE nodejs_heap_size_total_bytes gauge
+nodejs_heap_size_total_bytes 60243968
+
+# HELP nodejs_heap_size_used_bytes Process heap size used from Node.js in bytes.
+# TYPE nodejs_heap_size_used_bytes gauge
+nodejs_heap_size_used_bytes 34680704
+
+# HELP nodejs_external_memory_bytes Node.js external memory size in bytes.
+# TYPE nodejs_external_memory_bytes gauge
+nodejs_external_memory_bytes 3485518
+
+# HELP nodejs_heap_space_size_total_bytes Process heap space size total from Node.js in bytes.
+# TYPE nodejs_heap_space_size_total_bytes gauge
+nodejs_heap_space_size_total_bytes{space=\"read_only\"} 0
+nodejs_heap_space_size_total_bytes{space=\"new\"} 33554432
+nodejs_heap_space_size_total_bytes{space=\"old\"} 18759680
+nodejs_heap_space_size_total_bytes{space=\"code\"} 2097152
+nodejs_heap_space_size_total_bytes{space=\"shared\"} 0
+nodejs_heap_space_size_total_bytes{space=\"trusted\"} 3325952
+nodejs_heap_space_size_total_bytes{space=\"shared_trusted\"} 0
+nodejs_heap_space_size_total_bytes{space=\"new_large_object\"} 0
+nodejs_heap_space_size_total_bytes{space=\"large_object\"} 2506752
+nodejs_heap_space_size_total_bytes{space=\"code_large_object\"} 0
+nodejs_heap_space_size_total_bytes{space=\"shared_large_object\"} 0
+nodejs_heap_space_size_total_bytes{space=\"shared_trusted_large_object\"} 0
+nodejs_heap_space_size_total_bytes{space=\"trusted_large_object\"} 0
+
+# HELP nodejs_heap_space_size_used_bytes Process heap space size used from Node.js in bytes.
+# TYPE nodejs_heap_space_size_used_bytes gauge
+nodejs_heap_space_size_used_bytes{space=\"read_only\"} 0
+nodejs_heap_space_size_used_bytes{space=\"new\"} 9634032
+nodejs_heap_space_size_used_bytes{space=\"old\"} 17923256
+nodejs_heap_space_size_used_bytes{space=\"code\"} 1850656
+nodejs_heap_space_size_used_bytes{space=\"shared\"} 0
+nodejs_heap_space_size_used_bytes{space=\"trusted\"} 2874368
+nodejs_heap_space_size_used_bytes{space=\"shared_trusted\"} 0
+nodejs_heap_space_size_used_bytes{space=\"new_large_object\"} 0
+nodejs_heap_space_size_used_bytes{space=\"large_object\"} 2402296
+nodejs_heap_space_size_used_bytes{space=\"code_large_object\"} 0
+nodejs_heap_space_size_used_bytes{space=\"shared_large_object\"} 0
+nodejs_heap_space_size_used_bytes{space=\"shared_trusted_large_object\"} 0
+nodejs_heap_space_size_used_bytes{space=\"trusted_large_object\"} 0
+
+# HELP nodejs_heap_space_size_available_bytes Process heap space size available from Node.js in bytes.
+# TYPE nodejs_heap_space_size_available_bytes gauge
+nodejs_heap_space_size_available_bytes{space=\"read_only\"} 0
+nodejs_heap_space_size_available_bytes{space=\"new\"} 7142160
+nodejs_heap_space_size_available_bytes{space=\"old\"} 822456
+nodejs_heap_space_size_available_bytes{space=\"code\"} 246240
+nodejs_heap_space_size_available_bytes{space=\"shared\"} 0
+nodejs_heap_space_size_available_bytes{space=\"trusted\"} 451152
+nodejs_heap_space_size_available_bytes{space=\"shared_trusted\"} 0
+nodejs_heap_space_size_available_bytes{space=\"new_large_object\"} 16777216
+nodejs_heap_space_size_available_bytes{space=\"large_object\"} 0
+nodejs_heap_space_size_available_bytes{space=\"code_large_object\"} 0
+nodejs_heap_space_size_available_bytes{space=\"shared_large_object\"} 0
+nodejs_heap_space_size_available_bytes{space=\"shared_trusted_large_object\"} 0
+nodejs_heap_space_size_available_bytes{space=\"trusted_large_object\"} 0
+
+# HELP nodejs_version_info Node.js version info.
+# TYPE nodejs_version_info gauge
+nodejs_version_info{version=\"v24.21.0\",major=\"24\",minor=\"21\",patch=\"0\"} 1
+
+# HELP nodejs_gc_duration_seconds Garbage collection duration by kind, one of major, minor, incremental or weakcb.
+# TYPE nodejs_gc_duration_seconds histogram
+
+# HELP http_requests_total Total HTTP requests
+# TYPE http_requests_total counter
+http_requests_total{method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+
+# HELP http_request_duration_seconds Duration of HTTP requests in seconds
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+http_request_duration_seconds_sum{method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 0.000302959
+http_request_duration_seconds_count{method=\"GET\",route=\"/nope/guest.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 1
+
+# HELP active_streams Open SSE chat stream connections
+# TYPE active_streams gauge
+active_streams 0
+"
+
+ ❯ src/integration/pii-metrics.spec.ts:48:18
+     46|
+     47|     const text = await scrape(app);
+     48|     expect(text).toMatch(/http_requests_total\{[^}]*route="unmatched"[…
+       |                  ^
+     49|     expect(text).not.toContain("/nope");
+     50|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/pii-metrics.spec.ts > auth-service /metrics carries no PII > stays clean after traffic on matched and unmatched routes
+AssertionError: expected 'email "ana.metrics@pii-canary.e... (3…' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ email "ana.metrics@pii-canary.e... (34 characters)"
++ canary "ana.metrics@pii-canary.e... (34 characters)"
++ canary "PII-CANARY-7f3a"
++ ip "203.0.113.77"
++ canary "203.0.113.77"
+
+ ❯ src/integration/pii-metrics.spec.ts:37:54
+     35|     const text = await scrape(app);
+     36|     expect(text).toContain("http_requests_total");
+     37|     expect(describePii(findPii(text, { canaries }))).toBe("");
+       |                                                      ^
+     38|   });
+     39|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/integration/pii-metrics.spec.ts > auth-service /metrics carries no PII > labels a route nobody handles as unmatched, never with the raw URL
+AssertionError: expected '# HELP http_requests_total Total HTTP…' to match /http_requests_total\{[^}]*route="unma…/
+
+- Expected:
+/http_requests_total\{[^}]*route="unmatched"[^}]*status="404"[^}]*\} \d+/
+
++ Received:
+"# HELP http_requests_total Total HTTP requests
+# TYPE http_requests_total counter
+http_requests_total{method=\"POST\",route=\"/auth/register\",status=\"201\"} 1
+http_requests_total{method=\"POST\",route=\"/auth/login\",status=\"200\"} 1
+http_requests_total{method=\"POST\",route=\"/auth/login\",status=\"401\"} 1
+http_requests_total{method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_requests_total{method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_requests_total{method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_requests_total{method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+
+# HELP http_request_duration_seconds Duration of HTTP requests in seconds
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{le=\"0.005\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 0
+http_request_duration_seconds_bucket{le=\"0.01\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 0
+http_request_duration_seconds_bucket{le=\"0.025\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 0
+http_request_duration_seconds_bucket{le=\"0.05\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 0
+http_request_duration_seconds_bucket{le=\"0.1\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 0
+http_request_duration_seconds_bucket{le=\"0.25\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 0
+http_request_duration_seconds_bucket{le=\"0.5\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 1
+http_request_duration_seconds_bucket{le=\"1\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 1
+http_request_duration_seconds_bucket{le=\"2.5\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 1
+http_request_duration_seconds_bucket{le=\"5\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 1
+http_request_duration_seconds_bucket{le=\"10\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 1
+http_request_duration_seconds_bucket{le=\"+Inf\",method=\"POST\",route=\"/auth/register\",status=\"201\"} 1
+http_request_duration_seconds_sum{method=\"POST\",route=\"/auth/register\",status=\"201\"} 0.283819042
+http_request_duration_seconds_count{method=\"POST\",route=\"/auth/register\",status=\"201\"} 1
+http_request_duration_seconds_bucket{le=\"0.005\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 0
+http_request_duration_seconds_bucket{le=\"0.01\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 0
+http_request_duration_seconds_bucket{le=\"0.025\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 0
+http_request_duration_seconds_bucket{le=\"0.05\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 0
+http_request_duration_seconds_bucket{le=\"0.1\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 0
+http_request_duration_seconds_bucket{le=\"0.25\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 0
+http_request_duration_seconds_bucket{le=\"0.5\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"1\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"2.5\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"5\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"10\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"+Inf\",method=\"POST\",route=\"/auth/login\",status=\"200\"} 1
+http_request_duration_seconds_sum{method=\"POST\",route=\"/auth/login\",status=\"200\"} 0.272299709
+http_request_duration_seconds_count{method=\"POST\",route=\"/auth/login\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"0.005\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 0
+http_request_duration_seconds_bucket{le=\"0.01\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 0
+http_request_duration_seconds_bucket{le=\"0.025\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 0
+http_request_duration_seconds_bucket{le=\"0.05\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 0
+http_request_duration_seconds_bucket{le=\"0.1\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 0
+http_request_duration_seconds_bucket{le=\"0.25\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 0
+http_request_duration_seconds_bucket{le=\"0.5\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"1\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"2.5\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"5\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"10\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"+Inf\",method=\"POST\",route=\"/auth/login\",status=\"401\"} 1
+http_request_duration_seconds_sum{method=\"POST\",route=\"/auth/login\",status=\"401\"} 0.271444167
+http_request_duration_seconds_count{method=\"POST\",route=\"/auth/login\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_sum{method=\"GET\",route=\"/auth/me\",status=\"401\"} 0.000592041
+http_request_duration_seconds_count{method=\"GET\",route=\"/auth/me\",status=\"401\"} 1
+http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_sum{method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 0.000732667
+http_request_duration_seconds_count{method=\"GET\",route=\"/nope/ana.metrics@pii-canary.example.com?note=PII-CANARY-7f3a\",status=\"404\"} 2
+http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_sum{method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 0.000299833
+http_request_duration_seconds_count{method=\"GET\",route=\"/nope/ana.metrics%40pii-canary.example.com/203.0.113.77\",status=\"404\"} 1
+http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+http_request_duration_seconds_sum{method=\"GET\",route=\"/metrics\",status=\"200\"} 0.001707292
+http_request_duration_seconds_count{method=\"GET\",route=\"/metrics\",status=\"200\"} 1
+
+# HELP auth_service_process_cpu_user_seconds_total Total user CPU time spent in seconds.
+# TYPE auth_service_process_cpu_user_seconds_total counter
+auth_service_process_cpu_user_seconds_total 0.860899
+
+# HELP auth_service_process_cpu_system_seconds_total Total system CPU time spent in seconds.
+# TYPE auth_service_process_cpu_system_seconds_total counter
+auth_service_process_cpu_system_seconds_total 0.007995
+
+# HELP auth_service_process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE auth_service_process_cpu_seconds_total counter
+auth_service_process_cpu_seconds_total 0.868894
+
+# HELP auth_service_process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE auth_service_process_start_time_seconds gauge
+auth_service_process_start_time_seconds 1791059361
+
+# HELP auth_service_process_resident_memory_bytes Resident memory size in bytes.
+# TYPE auth_service_process_resident_memory_bytes gauge
+auth_service_process_resident_memory_bytes 111984640
+
+# HELP auth_service_nodejs_eventloop_lag_seconds Lag of event loop in seconds.
+# TYPE auth_service_nodejs_eventloop_lag_seconds gauge
+auth_service_nodejs_eventloop_lag_seconds 0.001159041
+
+# HELP auth_service_nodejs_eventloop_lag_min_seconds The minimum recorded event loop delay.
+# TYPE auth_service_nodejs_eventloop_lag_min_seconds gauge
+auth_service_nodejs_eventloop_lag_min_seconds 9223372036.854776
+
+# HELP auth_service_nodejs_eventloop_lag_max_seconds The maximum recorded event loop delay.
+# TYPE auth_service_nodejs_eventloop_lag_max_seconds gauge
+auth_service_nodejs_eventloop_lag_max_seconds 0
+
+# HELP auth_service_nodejs_eventloop_lag_mean_seconds The mean of the recorded event loop delays.
+# TYPE auth_service_nodejs_eventloop_lag_mean_seconds gauge
+auth_service_nodejs_eventloop_lag_mean_seconds Nan
+
+# HELP auth_service_nodejs_eventloop_lag_stddev_seconds The standard deviation of the recorded event loop delays.
+# TYPE auth_service_nodejs_eventloop_lag_stddev_seconds gauge
+auth_service_nodejs_eventloop_lag_stddev_seconds Nan
+
+# HELP auth_service_nodejs_eventloop_lag_p50_seconds The 50th percentile of the recorded event loop delays.
+# TYPE auth_service_nodejs_eventloop_lag_p50_seconds gauge
+auth_service_nodejs_eventloop_lag_p50_seconds 5.11e-7
+
+# HELP auth_service_nodejs_eventloop_lag_p90_seconds The 90th percentile of the recorded event loop delays.
+# TYPE auth_service_nodejs_eventloop_lag_p90_seconds gauge
+auth_service_nodejs_eventloop_lag_p90_seconds 5.11e-7
+
+# HELP auth_service_nodejs_eventloop_lag_p99_seconds The 99th percentile of the recorded event loop delays.
+# TYPE auth_service_nodejs_eventloop_lag_p99_seconds gauge
+auth_service_nodejs_eventloop_lag_p99_seconds 5.11e-7
+
+# HELP auth_service_nodejs_active_resources Number of active resources that are currently keeping the event loop alive, grouped by async resource type.
+# TYPE auth_service_nodejs_active_resources gauge
+auth_service_nodejs_active_resources{type=\"PipeWrap\"} 3
+auth_service_nodejs_active_resources{type=\"TCPServerWrap\"} 1
+auth_service_nodejs_active_resources{type=\"TCPSocketWrap\"} 2
+auth_service_nodejs_active_resources{type=\"Timeout\"} 1
+auth_service_nodejs_active_resources{type=\"Immediate\"} 1
+
+# HELP auth_service_nodejs_active_resources_total Total number of active resources.
+# TYPE auth_service_nodejs_active_resources_total gauge
+auth_service_nodejs_active_resources_total 8
+
+# HELP auth_service_nodejs_active_handles Number of active libuv handles grouped by handle type. Every handle type is C++ class name.
+# TYPE auth_service_nodejs_active_handles gauge
+auth_service_nodejs_active_handles{type=\"Pipe\"} 1
+auth_service_nodejs_active_handles{type=\"Socket\"} 4
+auth_service_nodejs_active_handles{type=\"Server\"} 1
+
+# HELP auth_service_nodejs_active_handles_total Total number of active handles.
+# TYPE auth_service_nodejs_active_handles_total gauge
+auth_service_nodejs_active_handles_total 6
+
+# HELP auth_service_nodejs_active_requests Number of active libuv requests grouped by request type. Every request type is C++ class name.
+# TYPE auth_service_nodejs_active_requests gauge
+
+# HELP auth_service_nodejs_active_requests_total Total number of active requests.
+# TYPE auth_service_nodejs_active_requests_total gauge
+auth_service_nodejs_active_requests_total 0
+
+# HELP auth_service_nodejs_heap_size_total_bytes Process heap size from Node.js in bytes.
+# TYPE auth_service_nodejs_heap_size_total_bytes gauge
+auth_service_nodejs_heap_size_total_bytes 60407808
+
+# HELP auth_service_nodejs_heap_size_used_bytes Process heap size used from Node.js in bytes.
+# TYPE auth_service_nodejs_heap_size_used_bytes gauge
+auth_service_nodejs_heap_size_used_bytes 34102840
+
+# HELP auth_service_nodejs_external_memory_bytes Node.js external memory size in bytes.
+# TYPE auth_service_nodejs_external_memory_bytes gauge
+auth_service_nodejs_external_memory_bytes 3470238
+
+# HELP auth_service_nodejs_heap_space_size_total_bytes Process heap space size total from Node.js in bytes.
+# TYPE auth_service_nodejs_heap_space_size_total_bytes gauge
+auth_service_nodejs_heap_space_size_total_bytes{space=\"read_only\"} 0
+auth_service_nodejs_heap_space_size_total_bytes{space=\"new\"} 33554432
+auth_service_nodejs_heap_space_size_total_bytes{space=\"old\"} 18497536
+auth_service_nodejs_heap_space_size_total_bytes{space=\"code\"} 2359296
+auth_service_nodejs_heap_space_size_total_bytes{space=\"shared\"} 0
+auth_service_nodejs_heap_space_size_total_bytes{space=\"trusted\"} 3588096
+auth_service_nodejs_heap_space_size_total_bytes{space=\"shared_trusted\"} 0
+auth_service_nodejs_heap_space_size_total_bytes{space=\"new_large_object\"} 0
+auth_service_nodejs_heap_space_size_total_bytes{space=\"large_object\"} 2211840
+auth_service_nodejs_heap_space_size_total_bytes{space=\"code_large_object\"} 196608
+auth_service_nodejs_heap_space_size_total_bytes{space=\"shared_large_object\"} 0
+auth_service_nodejs_heap_space_size_total_bytes{space=\"shared_trusted_large_object\"} 0
+auth_service_nodejs_heap_space_size_total_bytes{space=\"trusted_large_object\"} 0
+
+# HELP auth_service_nodejs_heap_space_size_used_bytes Process heap space size used from Node.js in bytes.
+# TYPE auth_service_nodejs_heap_space_size_used_bytes gauge
+auth_service_nodejs_heap_space_size_used_bytes{space=\"read_only\"} 0
+auth_service_nodejs_heap_space_size_used_bytes{space=\"new\"} 8768544
+auth_service_nodejs_heap_space_size_used_bytes{space=\"old\"} 17903760
+auth_service_nodejs_heap_space_size_used_bytes{space=\"code\"} 1901024
+auth_service_nodejs_heap_space_size_used_bytes{space=\"shared\"} 0
+auth_service_nodejs_heap_space_size_used_bytes{space=\"trusted\"} 3212944
+auth_service_nodejs_heap_space_size_used_bytes{space=\"shared_trusted\"} 0
+auth_service_nodejs_heap_space_size_used_bytes{space=\"new_large_object\"} 0
+auth_service_nodejs_heap_space_size_used_bytes{space=\"large_object\"} 2136056
+auth_service_nodejs_heap_space_size_used_bytes{space=\"code_large_object\"} 184416
+auth_service_nodejs_heap_space_size_used_bytes{space=\"shared_large_object\"} 0
+auth_service_nodejs_heap_space_size_used_bytes{space=\"shared_trusted_large_object\"} 0
+auth_service_nodejs_heap_space_size_used_bytes{space=\"trusted_large_object\"} 0
+
+# HELP auth_service_nodejs_heap_space_size_available_bytes Process heap space size available from Node.js in bytes.
+# TYPE auth_service_nodejs_heap_space_size_available_bytes gauge
+auth_service_nodejs_heap_space_size_available_bytes{space=\"read_only\"} 0
+auth_service_nodejs_heap_space_size_available_bytes{space=\"new\"} 8007648
+auth_service_nodejs_heap_space_size_available_bytes{space=\"old\"} 575760
+auth_service_nodejs_heap_space_size_available_bytes{space=\"code\"} 457984
+auth_service_nodejs_heap_space_size_available_bytes{space=\"shared\"} 0
+auth_service_nodejs_heap_space_size_available_bytes{space=\"trusted\"} 374488
+auth_service_nodejs_heap_space_size_available_bytes{space=\"shared_trusted\"} 0
+auth_service_nodejs_heap_space_size_available_bytes{space=\"new_large_object\"} 16777216
+auth_service_nodejs_heap_space_size_available_bytes{space=\"large_object\"} 0
+auth_service_nodejs_heap_space_size_available_bytes{space=\"code_large_object\"} 0
+auth_service_nodejs_heap_space_size_available_bytes{space=\"shared_large_object\"} 0
+auth_service_nodejs_heap_space_size_available_bytes{space=\"shared_trusted_large_object\"} 0
+auth_service_nodejs_heap_space_size_available_bytes{space=\"trusted_large_object\"} 0
+
+# HELP auth_service_nodejs_version_info Node.js version info.
+# TYPE auth_service_nodejs_version_info gauge
+auth_service_nodejs_version_info{version=\"v24.21.0\",major=\"24\",minor=\"21\",patch=\"0\"} 1
+
+# HELP auth_service_nodejs_gc_duration_seconds Garbage collection duration by kind, one of major, minor, incremental or weakcb.
+# TYPE auth_service_nodejs_gc_duration_seconds histogram
+"
+
+ ❯ src/integration/pii-metrics.spec.ts:46:18
+     44|
+     45|     const text = await scrape(app);
+     46|     expect(text).toMatch(/http_requests_total\{[^}]*route="unmatched"[…
+       |                  ^
+     47|     expect(text).not.toContain("/nope");
+     48|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+[exit 1]

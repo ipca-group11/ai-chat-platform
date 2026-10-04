@@ -1,0 +1,15 @@
+$ tail -n 12 zap-first/us5-api-scan.log
+	http://localhost:8000/WEB-INF/applicationContext.xml (200 OK)
+	http://localhost:8000/WEB-INF/classes/1/0.class (200 OK)
+	http://localhost:8000/WEB-INF/classes/fonts/googleapis/com.class (200 OK)
+	http://localhost:8000/WEB-INF/classes/fonts/gstatic/com.class (200 OK)
+WARN-NEW: HTTP Only Site [10106] x 1 
+	http://localhost:8000/api/chats/cm0example0000000000000000 (0)
+WARN-NEW: Format String Error [30002] x 1 
+	http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (500 Internal Server Error)
+FAIL-NEW: Cross Site Scripting Weakness (Persistent in JSON Response) [40014] x 2 High: stored script injection
+	http://localhost:8000/api/chats (200 OK)
+	http://localhost:8000/api/chats (200 OK)
+FAIL-NEW: 1	FAIL-INPROG: 0	WARN-NEW: 4	WARN-INPROG: 0	INFO: 0	IGNORE: 0	PASS: 115
+
+[exit 0]

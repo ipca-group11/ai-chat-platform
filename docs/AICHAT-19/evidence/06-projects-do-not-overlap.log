@@ -1,0 +1,11 @@
+$ cd e2e && echo "visual project:" && pnpm exec playwright test --list --project=visual --reporter=list | tail -3 && echo "chromium project (the e2e suite):" && pnpm exec playwright test --list --project=chromium --reporter=list | grep -c "visual/" ; pnpm exec playwright test --list --project=chromium --reporter=list | tail -2
+visual project:
+  [visual] › ../visual/screens.spec.ts:117:5 › remote-failure-fallback (light)
+  [visual] › ../visual/screens.spec.ts:117:5 › remote-failure-fallback (dark)
+Total: 18 tests in 1 file
+chromium project (the e2e suite):
+0
+  [chromium] › shell.spec.ts:63:3 › shell › US-9: Microfrontend failure isolation
+Total: 34 tests in 8 files
+
+[exit 0]

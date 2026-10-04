@@ -1,0 +1,6 @@
+$ cd apps/mfe-chat && ./node_modules/.bin/vitest run src/features/chat-view/components/MessageBubble.test.tsx --reporter=verbose 2>&1 | grep -E "image|link|Tests"
+ ✓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > does not load a markdown image in a reply, so a hidden instruction cannot send data out in an image URL 7ms
+ ✓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > still renders links of a reply as links 15ms
+      Tests  24 passed (24)
+
+[exit 0]

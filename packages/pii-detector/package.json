@@ -1,0 +1,28 @@
+{
+  "name": "@platform/pii-detector",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "description": "Finds emails, IP addresses, session tokens and planted canaries in text. Used by the telemetry tests (service logs, /metrics, Faro); also available as @platform/test-utils/pii.",
+  "main": "./src/pii.ts",
+  "types": "./src/pii.ts",
+  "exports": {
+    ".": "./src/pii.ts"
+  },
+  "scripts": {
+    "build": "echo 'pii-detector ships TypeScript source used by Vitest; nothing to build'",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@platform/eslint-config": "workspace:*",
+    "@platform/test-config": "workspace:*",
+    "@types/node": "^24.13.6",
+    "@vitest/coverage-v8": "5.0.1",
+    "typescript": "6.0.3",
+    "vitest": "5.0.1"
+  }
+}

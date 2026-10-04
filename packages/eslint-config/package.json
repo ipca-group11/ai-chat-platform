@@ -4,12 +4,12 @@
   "private": true,
   "license": "UNLICENSED",
   "type": "module",
-  "main": "./src/index.js",
+  "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.js",
-    "./base": "./src/base.js",
-    "./react": "./src/react.js",
-    "./node": "./src/node.js"
+    ".": "./src/index.ts",
+    "./base": "./src/base.ts",
+    "./react": "./src/react.ts",
+    "./node": "./src/node.ts"
   },
   "dependencies": {
     "@eslint/js": "^10.0.1",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/node": "^24.13.6",
     "@vitest/coverage-v8": "^5.0.1",
+    "@vitest/eslint-plugin": "^1.6.27",
     "eslint": "^10.11.0",
     "typescript": "6.0.3",
     "vitest": "^5.0.1"

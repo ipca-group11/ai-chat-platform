@@ -1,0 +1,99 @@
+$ pnpm --filter @app/shell exec vitest run src/shared/observability/faro-collect.test.ts
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/shell
+
+stdout | src/shared/observability/faro-collect.test.ts
+console log with message content PII-CANARY-7f3a
+console info with message content PII-CANARY-7f3a
+console debug with message content PII-CANARY-7f3a
+
+ ❯ src/shared/observability/faro-collect.test.ts (3 tests | 3 failed) 299ms
+   ❯ Faro payloads sent to /collect (3)
+     × carry no email, IP address, token or canary 8ms
+     × do not send console.log, info or debug output at all 8ms
+     × carry no user identity 4ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  21:30:58
+   Duration  1.02s (environment 38%, tests 33%, setup 18%, transform 6%, import 4%, worker 1%)
+
+undefined
+/Users/truezone/Projects/ai-chat-platform/apps/shell:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: vitest run src/shared/observability/faro-collect.test.ts
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./module-federation.config" without a file extension (vite.config.ts:6:36). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+stderr | src/shared/observability/faro-collect.test.ts
+console error for ana.faro@pii-canary.example.com from 203.0.113.77 with eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl
+console warning at /chats/c1?token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/shared/observability/faro-collect.test.ts > Faro payloads sent to /collect > carry no email, IP address, token or canary
+AssertionError: expected 'email "ana.faro@pii-canary.exam... (3…' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ email "ana.faro@pii-canary.exam... (31 characters)"
++ canary "ana.faro@pii-canary.exam... (31 characters)"
++ canary "PII-CANARY-7f3a"
++ ip "203.0.113.77"
++ canary "203.0.113.77"
++ token "eyJhbGciOiJIUzI1NiJ9.eyJ... (50 characters)"
++ canary "eyJhbGciOiJIUzI1NiJ9.eyJ... (50 characters)"
+
+ ❯ src/shared/observability/faro-collect.test.ts:64:67
+     62| describe('Faro payloads sent to /collect', () => {
+     63|   it('carry no email, IP address, token or canary', () => {
+     64|     expect(describePii(findPii(bodies.join('\n'), { canaries }))).toBe…
+       |                                                                   ^
+     65|   });
+     66|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/shared/observability/faro-collect.test.ts > Faro payloads sent to /collect > do not send console.log, info or debug output at all
+AssertionError: expected '{"meta":{"sdk":{"name":"faro-web","ve…' not to contain 'console info with'
+
+- Expected
++ Received
+
+- console info with
++ {"meta":{"sdk":{"name":"faro-web","version":"2.12.1"},"app":{"name":"llm-chat","version":"test","environment":"test"},"browser":{"name":"WebKit","version":"537.36","os":"unknown unknown","userAgent":"Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/30.1.1","language":"en-US","mobile":false,"brands":"unknown","viewportWidth":"1024","viewportHeight":"768"},"page":{"url":"http://localhost:3000/chats/c1?email=ana.faro@pii-canary.example.com&note=PII-CANARY-7f3a#PII-CANARY-7f3a"},"session":{"id":"vqSTDP2xsz"}},"events":[{"name":"session_start","domain":"browser","timestamp":"2026-10-03T20:30:59.329Z"}]}
++ {"meta":{"sdk":{"name":"faro-web","version":"2.12.1"},"app":{"name":"llm-chat","version":"test","environment":"test"},"browser":{"name":"WebKit","version":"537.36","os":"unknown unknown","userAgent":"Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/30.1.1","language":"en-US","mobile":false,"brands":"unknown","viewportWidth":"1024","viewportHeight":"768"},"page":{"url":"http://localhost:3000/chats/c1?email=ana.faro@pii-canary.example.com&note=PII-CANARY-7f3a#PII-CANARY-7f3a"},"session":{"id":"vqSTDP2xsz"},"user":{"id":"user-1","email":"ana.faro@pii-canary.example.com","username":"ana","attributes":{"phone":"203.0.113.77"}}},"logs":[{"message":"request failed for ana.faro@pii-canary.example.com from 203.0.113.77","level":"warn","context":{"email":"ana.faro@pii-canary.example.com","url":"/x/ana.faro@pii-canary.example.com?q=PII-CANARY-7f3a"},"timestamp":"2026-10-03T20:30:59.330Z"},{"message":"console warning at /chats/c1?token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl","level":"warn","timestamp":"2026-10-03T20:30:59.332Z"},{"message":"console info with message content PII-CANARY-7f3a","level":"info","timestamp":"2026-10-03T20:30:59.332Z"}],"exceptions":[{"type":"Error","value":"bad ana.faro@pii-canary.example.com with eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl at https://app.example.test/chats/c1/members/ana.faro@pii-canary.example.com?note=PII-CANARY-7f3a","timestamp":"2026-10-03T20:30:59.330Z","stacktrace":{"frames":[{"filename":"https://app.example.test/chats/c1/members/ana.faro@pii-canary.example.com?note=PII-CANARY-7f3a","function":"Error: bad ana.faro@pii-canary.example.com with eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl at "},{"filename":"/Users/truezone/Projects/ai-chat-platform/apps/shell/src/shared/observability/faro-collect.test.ts","function":"?","lineno":37,"colno":22},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"wrapper","lineno":2141,"colno":28},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":1623,"colno":11},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":2153,"colno":5},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":3299,"colno":20},{"filename":"<anonymous>","function":"new Promise"},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"runWithTimeout","lineno":3257,"colno":10},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":3584,"colno":52},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"run","lineno":1348,"colno":20},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"limiterFn","lineno":1358,"colno":59}]}},{"type":"Error","value":"console.error: console error for ana.faro@pii-canary.example.com from 203.0.113.77 with eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl","timestamp":"2026-10-03T20:30:59.331Z","stacktrace":{"frames":[{"filename":"/Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/@grafana+faro-web-sdk@2.12.1/node_modules/@grafana/faro-web-sdk/dist/cjs/instrumentations/console/instrumentation.js","function":"?","lineno":27,"colno":26},{"filename":"/Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/@grafana+faro-core@2.12.1/node_modules/@grafana/faro-core/dist/cjs/utils/reactive.js","function":"?","lineno":16,"colno":44},{"filename":"<anonymous>","function":"Array.forEach"},{"filename":"/Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/@grafana+faro-core@2.12.1/node_modules/@grafana/faro-core/dist/cjs/utils/reactive.js","function":"Observable.notify","lineno":16,"colno":20},{"filename":"/Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/@grafana+faro-web-sdk@2.12.1/node_modules/@grafana/faro-web-sdk/dist/cjs/instrumentations/_internal/monitors/consoleMonitor.js","function":"Console.console.<computed> [as error]","lineno":21,"colno":23},{"filename":"/Users/truezone/Projects/ai-chat-platform/apps/shell/src/shared/observability/faro-collect.test.ts","function":"?","lineno":40,"colno":11},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"wrapper","lineno":2141,"colno":28},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":1623,"colno":11},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":2153,"colno":5},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":3299,"colno":20}]}}],"events":[{"name":"chat_opened","domain":"browser","attributes":{"url":"/chats/c1/members/ana.faro@pii-canary.example.com?x=PII-CANARY-7f3a","email":"ana.faro@pii-canary.example.com","ip":"203.0.113.77"},"timestamp":"2026-10-03T20:30:59.331Z"}],"measurements":[{"type":"chat_render","values":{"ms":12},"timestamp":"2026-10-03T20:30:59.331Z","context":{"page":"https://app.example.test/chats/c1?email=ana.faro@pii-canary.example.com"}}]}
+
+ ❯ src/shared/observability/faro-collect.test.ts:69:35
+     67|   it('do not send console.log, info or debug output at all', () => {
+     68|     expect(bodies.join('\n')).not.toContain('console log with');
+     69|     expect(bodies.join('\n')).not.toContain('console info with');
+       |                                   ^
+     70|     expect(bodies.join('\n')).not.toContain('console debug with');
+     71|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/shared/observability/faro-collect.test.ts > Faro payloads sent to /collect > carry no user identity
+AssertionError: expected '{"meta":{"sdk":{"name":"faro-web","ve…' not to contain '"username"'
+
+- Expected
++ Received
+
+- "username"
++ {"meta":{"sdk":{"name":"faro-web","version":"2.12.1"},"app":{"name":"llm-chat","version":"test","environment":"test"},"browser":{"name":"WebKit","version":"537.36","os":"unknown unknown","userAgent":"Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/30.1.1","language":"en-US","mobile":false,"brands":"unknown","viewportWidth":"1024","viewportHeight":"768"},"page":{"url":"http://localhost:3000/chats/c1?email=ana.faro@pii-canary.example.com&note=PII-CANARY-7f3a#PII-CANARY-7f3a"},"session":{"id":"vqSTDP2xsz"}},"events":[{"name":"session_start","domain":"browser","timestamp":"2026-10-03T20:30:59.329Z"}]}
++ {"meta":{"sdk":{"name":"faro-web","version":"2.12.1"},"app":{"name":"llm-chat","version":"test","environment":"test"},"browser":{"name":"WebKit","version":"537.36","os":"unknown unknown","userAgent":"Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/30.1.1","language":"en-US","mobile":false,"brands":"unknown","viewportWidth":"1024","viewportHeight":"768"},"page":{"url":"http://localhost:3000/chats/c1?email=ana.faro@pii-canary.example.com&note=PII-CANARY-7f3a#PII-CANARY-7f3a"},"session":{"id":"vqSTDP2xsz"},"user":{"id":"user-1","email":"ana.faro@pii-canary.example.com","username":"ana","attributes":{"phone":"203.0.113.77"}}},"logs":[{"message":"request failed for ana.faro@pii-canary.example.com from 203.0.113.77","level":"warn","context":{"email":"ana.faro@pii-canary.example.com","url":"/x/ana.faro@pii-canary.example.com?q=PII-CANARY-7f3a"},"timestamp":"2026-10-03T20:30:59.330Z"},{"message":"console warning at /chats/c1?token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl","level":"warn","timestamp":"2026-10-03T20:30:59.332Z"},{"message":"console info with message content PII-CANARY-7f3a","level":"info","timestamp":"2026-10-03T20:30:59.332Z"}],"exceptions":[{"type":"Error","value":"bad ana.faro@pii-canary.example.com with eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl at https://app.example.test/chats/c1/members/ana.faro@pii-canary.example.com?note=PII-CANARY-7f3a","timestamp":"2026-10-03T20:30:59.330Z","stacktrace":{"frames":[{"filename":"https://app.example.test/chats/c1/members/ana.faro@pii-canary.example.com?note=PII-CANARY-7f3a","function":"Error: bad ana.faro@pii-canary.example.com with eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl at "},{"filename":"/Users/truezone/Projects/ai-chat-platform/apps/shell/src/shared/observability/faro-collect.test.ts","function":"?","lineno":37,"colno":22},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"wrapper","lineno":2141,"colno":28},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":1623,"colno":11},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":2153,"colno":5},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":3299,"colno":20},{"filename":"<anonymous>","function":"new Promise"},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"runWithTimeout","lineno":3257,"colno":10},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":3584,"colno":52},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"run","lineno":1348,"colno":20},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"limiterFn","lineno":1358,"colno":59}]}},{"type":"Error","value":"console.error: console error for ana.faro@pii-canary.example.com from 203.0.113.77 with eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1MSJ9.c2lnbmF0dXJl","timestamp":"2026-10-03T20:30:59.331Z","stacktrace":{"frames":[{"filename":"/Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/@grafana+faro-web-sdk@2.12.1/node_modules/@grafana/faro-web-sdk/dist/cjs/instrumentations/console/instrumentation.js","function":"?","lineno":27,"colno":26},{"filename":"/Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/@grafana+faro-core@2.12.1/node_modules/@grafana/faro-core/dist/cjs/utils/reactive.js","function":"?","lineno":16,"colno":44},{"filename":"<anonymous>","function":"Array.forEach"},{"filename":"/Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/@grafana+faro-core@2.12.1/node_modules/@grafana/faro-core/dist/cjs/utils/reactive.js","function":"Observable.notify","lineno":16,"colno":20},{"filename":"/Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/@grafana+faro-web-sdk@2.12.1/node_modules/@grafana/faro-web-sdk/dist/cjs/instrumentations/_internal/monitors/consoleMonitor.js","function":"Console.console.<computed> [as error]","lineno":21,"colno":23},{"filename":"/Users/truezone/Projects/ai-chat-platform/apps/shell/src/shared/observability/faro-collect.test.ts","function":"?","lineno":40,"colno":11},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"wrapper","lineno":2141,"colno":28},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":1623,"colno":11},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":2153,"colno":5},{"filename":"file:///Users/truezone/Projects/ai-chat-platform/node_modules/.pnpm/vitest@5.0.1_@opentelemetry+api@1.9.1_@types+node@24.13.6_@vitest+coverage-v8@5.0.1_jsd_bc09014504576561adb490700ae98771/node_modules/vitest/dist/chunks/run.C5UmxDPh.js","function":"?","lineno":3299,"colno":20}]}}],"events":[{"name":"chat_opened","domain":"browser","attributes":{"url":"/chats/c1/members/ana.faro@pii-canary.example.com?x=PII-CANARY-7f3a","email":"ana.faro@pii-canary.example.com","ip":"203.0.113.77"},"timestamp":"2026-10-03T20:30:59.331Z"}],"measurements":[{"type":"chat_render","values":{"ms":12},"timestamp":"2026-10-03T20:30:59.331Z","context":{"page":"https://app.example.test/chats/c1?email=ana.faro@pii-canary.example.com"}}]}
+
+ ❯ src/shared/observability/faro-collect.test.ts:75:22
+     73|   it('carry no user identity', () => {
+     74|     const sent = bodies.join('\n');
+     75|     expect(sent).not.toContain('"username"');
+       |                      ^
+     76|     expect(sent).not.toContain('"user"');
+     77|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+[exit 1]

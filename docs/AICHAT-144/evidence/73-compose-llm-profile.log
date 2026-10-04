@@ -1,0 +1,40 @@
+$ COMPOSE_FILE=compose.yaml:compose.mock.yaml docker compose --profile llm ps --format 'table {{.Service}}\t{{.Status}}' && curl -s localhost:4010/__admin/health && echo && bash scripts/ci/mock-chat-smoke.sh ok
+SERVICE                STATUS
+alloy                  Up 5 minutes
+auth-service           Up 5 minutes (healthy)
+conversation-service   Up 5 minutes (healthy)
+grafana                Up 4 minutes
+loki                   Up 5 minutes
+mfe-auth               Up 5 minutes (healthy)
+mfe-chat               Up 5 minutes (healthy)
+mfe-settings           Up 5 minutes (healthy)
+mock-server            Up 5 minutes (healthy)
+postgres               Up 5 minutes (healthy)
+prometheus             Up 5 minutes
+shell                  Up 4 minutes (healthy)
+{"status":"ok"}
+== register and sign in as smoke.1791031658@mock.test
+{"id":"cmuse08a70003rz01xw1vqupv","email":"smoke.1791031658@mock.test"}
+== create a chat (model claude-sonnet-4-5@ok)
+{"chat":{"id":"cmuse08ig0005ph01aetruo7i","title":"Smoke","ownerId":"cmuse08a70003rz01xw1vqupv","ownerEmail":"smoke.1791031658@mock.test","provider":"anthropic","model":"claude-sonnet-4-5@ok","reasoning":false,"webFetch":false,"createdAt":"2026-10-03T12:47:38.775Z","updatedAt":"2026-10-03T12:47:38.775Z"}}
+== open the stream and send a message
+{"message":{"id":"cmuse09c20007ph01izx019cz","chatId":"cmuse08ig0005ph01aetruo7i","authorId":"cmuse08a70003rz01xw1vqupv","authorEmail":"smoke.1791031658@mock.test","role":"user","content":"Say hello","reasoning":null,"webFetches":[],"status":"sent","error":null,"attachments":[],"createdAt":"2026-10-03T12:47:39.842Z"}}
+== stream events
+data: {"type":"message","message":{"id":"cmuse09c20007ph01izx019cz","chatId":"cmuse08ig0005ph01aetruo7i","authorId":"cmuse08a70003rz01xw1vqupv","authorEmail":"s
+data: {"type":"started","messageId":"cmuse09ct0009ph0125o1xdl0"}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"As "}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"arrives "}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"tests "}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"is "}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"repeatable "}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"can "}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"that "}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"change "}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"picked "}
+data: {"type":"token","messageId":"cmuse09ct0009ph0125o1xdl0","token":"seed "}
+...
+token events: 40
+done event received
+curl: (28) Operation timed out after 12005 milliseconds with 4251 bytes received
+
+[exit 0]

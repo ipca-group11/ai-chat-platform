@@ -1,35 +1,19 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { http, HttpResponse, recordRequests, server } from "@platform/test-utils/msw";
+import { describe, expect, it } from "vitest";
 import { AuthError, fetchCurrentUser } from "./auth";
 
-function jsonResponse(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
 describe("fetchCurrentUser", () => {
-  beforeEach(() => {
-    vi.stubGlobal("fetch", vi.fn());
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   it("AC-78: calls GET /auth/me with credentials included so the session cookie is sent", async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse({ id: "user-1", email: "a@b.com" }));
+    const requests = recordRequests();
 
     await fetchCurrentUser();
 
-    expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/auth/me"),
-      expect.objectContaining({ method: "GET", credentials: "include" }),
-    );
+    expect(requests.map((r) => `${r.method} ${new URL(r.url).pathname}`)).toEqual(["GET /auth/me"]);
+    expect(requests[0]!.credentials).toBe("include");
   });
 
   it("AC-78: resolves with the current user id and email", async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse({ id: "user-1", email: "a@b.com" }));
+    server.use(http.get("*/auth/me", () => HttpResponse.json({ id: "user-1", email: "a@b.com" })));
 
     const user = await fetchCurrentUser();
 
@@ -37,7 +21,7 @@ describe("fetchCurrentUser", () => {
   });
 
   it("throws an AuthError with the response status when unauthenticated", async () => {
-    vi.mocked(fetch).mockResolvedValue(new Response("", { status: 401, statusText: "Unauthorized" }));
+    server.use(http.get("*/auth/me", () => new HttpResponse(null, { status: 401, statusText: "Unauthorized" })));
 
     await expect(fetchCurrentUser()).rejects.toThrow(AuthError);
     await expect(fetchCurrentUser()).rejects.toMatchObject({ status: 401 });

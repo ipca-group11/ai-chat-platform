@@ -1,0 +1,152 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`conversation-service error bodies > HttpError 400 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "BAD_REQUEST",
+      "message": "message for BAD_REQUEST",
+    },
+  },
+  "status": 400,
+}
+`;
+
+exports[`conversation-service error bodies > HttpError 401 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "UNAUTHORIZED",
+      "message": "message for UNAUTHORIZED",
+    },
+  },
+  "status": 401,
+}
+`;
+
+exports[`conversation-service error bodies > HttpError 403 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "FORBIDDEN",
+      "message": "message for FORBIDDEN",
+    },
+  },
+  "status": 403,
+}
+`;
+
+exports[`conversation-service error bodies > HttpError 404 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "CHAT_NOT_FOUND",
+      "message": "message for CHAT_NOT_FOUND",
+    },
+  },
+  "status": 404,
+}
+`;
+
+exports[`conversation-service error bodies > HttpError 409 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "CONFLICT",
+      "message": "message for CONFLICT",
+    },
+  },
+  "status": 409,
+}
+`;
+
+exports[`conversation-service error bodies > HttpError 422 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "UNPROCESSABLE",
+      "message": "message for UNPROCESSABLE",
+    },
+  },
+  "status": 422,
+}
+`;
+
+exports[`conversation-service error bodies > HttpError 500 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "INTERNAL_ERROR",
+      "message": "message for INTERNAL_ERROR",
+    },
+  },
+  "status": 500,
+}
+`;
+
+exports[`conversation-service error bodies > unexpected error is redacted to a 500 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "INTERNAL_ERROR",
+      "message": "An unexpected error occurred",
+    },
+  },
+  "status": 500,
+}
+`;
+
+exports[`conversation-service error bodies > unknown route 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "NOT_FOUND",
+      "message": "Resource not found",
+    },
+  },
+  "status": 404,
+}
+`;
+
+exports[`conversation-service error bodies > upload rejected by multer 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "ATTACHMENT_UPLOAD_ERROR",
+      "message": "File too large",
+    },
+  },
+  "status": 400,
+}
+`;
+
+exports[`conversation-service error bodies > validation error carries the field errors 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "fieldErrors": {
+        "model": [
+          "Invalid input: expected string, received undefined",
+        ],
+        "title": [
+          "Too small: expected string to have >=1 characters",
+        ],
+      },
+      "message": "Request validation failed",
+    },
+  },
+  "status": 400,
+}
+`;

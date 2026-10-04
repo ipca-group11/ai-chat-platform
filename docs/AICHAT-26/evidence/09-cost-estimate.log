@@ -1,0 +1,16 @@
+$ node testing/promptfoo/src/estimate-cli.ts --repeat 2; echo; REDTEAM_BUDGET_USD=0.05 node testing/promptfoo/src/estimate-cli.ts --repeat 2 | tail -1
+  A1   0.0101 USD
+  A3   0.0295 USD
+  A4   0.0295 USD
+  A5   0.0295 USD
+  A6   0.0101 USD
+  A7a  0.0095 USD
+  A7b  0.0095 USD
+  A7c  0.0095 USD
+  A8   0.0095 USD
+model claude-haiku-4-5, 9 attacks x 2 = 18 runs
+estimate 0.293 USD, cap 2 USD: within the cap
+
+estimate 0.293 USD, cap 0.05 USD: ABOVE THE CAP, the run would stop early
+
+[exit 0]

@@ -1,3 +1,4 @@
+import { parseEnv } from "../../shared/env.js";
 import type { Provider } from "../../shared/contracts/chat.js";
 import { AnthropicProvider } from "./anthropic.provider.js";
 import { OpenAiProvider } from "./openai.provider.js";
@@ -12,10 +13,12 @@ export interface ProviderRegistry {
  * new provider means adding one adapter class + one entry here — no other module needs
  * to change (AC-65).
  */
-export function createProviderRegistry(): ProviderRegistry {
+export function createProviderRegistry(source: NodeJS.ProcessEnv = process.env): ProviderRegistry {
+  // `ANTHROPIC_BASE_URL` / `OPENAI_BASE_URL` override the real API hosts (AICHAT-43).
+  const env = parseEnv(source);
   const providers: Record<Provider, LlmProvider> = {
-    openai: new OpenAiProvider(),
-    anthropic: new AnthropicProvider(),
+    openai: new OpenAiProvider({ baseUrl: env.OPENAI_BASE_URL }),
+    anthropic: new AnthropicProvider({ baseUrl: env.ANTHROPIC_BASE_URL }),
   };
 
   return {

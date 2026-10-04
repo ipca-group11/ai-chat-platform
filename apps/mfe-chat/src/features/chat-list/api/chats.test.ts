@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { waitFor } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { createTestQueryClient, renderHookWithClient } from "@platform/test-utils";
+import { http, HttpResponse, recordRequests, server } from "@platform/test-utils/msw";
 import { useChat, useChats, useCreateChat, useDeleteChat, useUpdateChat } from "./chats";
 import type { Chat } from "../../../shared/types";
 
@@ -15,23 +16,19 @@ const chatA: Chat = {
 };
 
 describe("useChats (AC-42, AC-47)", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it("AC-42: lists the current user's chats", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([chatA])));
+    server.use(http.get("*/chats", () => HttpResponse.json({ chats: [chatA] })));
 
-    const { result } = renderHook(() => useChats(), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChats());
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([chatA]);
   });
 
   it("AC-47: never fabricates chats beyond what the server returns (empty list stays empty)", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse([])));
+    server.use(http.get("*/chats", () => HttpResponse.json({ chats: [] })));
 
-    const { result } = renderHook(() => useChats(), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChats());
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([]);
@@ -39,57 +36,49 @@ describe("useChats (AC-42, AC-47)", () => {
 });
 
 describe("useChat (AC-43, AC-46)", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it("AC-43: fetches a single chat so it can be restored after reload/relogin", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(chatA)));
+    server.use(http.get("*/chats/:chatId", () => HttpResponse.json({ chat: chatA })));
 
-    const { result } = renderHook(() => useChat("chat-1"), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChat("chat-1"));
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(chatA);
   });
 
   it("AC-46: surfaces a 403 without retrying so the UI can show a clear not-found/error state", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ message: "Forbidden" }, 403)));
+    server.use(http.get("*/chats/:chatId", () => HttpResponse.json({ message: "Forbidden" }, { status: 403 })));
+    const requests = recordRequests();
 
-    const { result } = renderHook(() => useChat("chat-owned-by-another-user"), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChat("chat-owned-by-another-user"));
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error?.status).toBe(403);
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(requests).toHaveLength(1);
   });
 
   it("AC-46: surfaces a 404 without retrying", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ message: "Not found" }, 404)));
+    server.use(http.get("*/chats/:chatId", () => HttpResponse.json({ message: "Not found" }, { status: 404 })));
+    const requests = recordRequests();
 
-    const { result } = renderHook(() => useChat("missing-chat"), { wrapper: withQueryClient() });
+    const { result } = renderHookWithClient(() => useChat("missing-chat"));
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error?.status).toBe(404);
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(requests).toHaveLength(1);
   });
 });
 
 describe("useCreateChat (AC-42, AC-48, AC-49)", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it("AC-42/AC-48/AC-49: creates a chat with the chosen provider/model and adds it to the cached list", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(chatA, 201));
-    vi.stubGlobal("fetch", fetchMock);
+    server.use(http.post("*/chats", () => HttpResponse.json({ chat: chatA }, { status: 201 })));
+    const requests = recordRequests();
 
-    const wrapper = withQueryClient();
-    const { result } = renderHook(() => useCreateChat(), { wrapper });
+    const { result } = renderHookWithClient(() => useCreateChat());
 
     result.current.mutate({ title: "First chat", provider: "anthropic", model: "claude-3-5-haiku-latest" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(JSON.parse(init.body as string)).toEqual({
+    expect(await requests[0]!.json()).toEqual({
       title: "First chat",
       provider: "anthropic",
       model: "claude-3-5-haiku-latest",
@@ -98,19 +87,14 @@ describe("useCreateChat (AC-42, AC-48, AC-49)", () => {
 });
 
 describe("useUpdateChat (AC-42, AC-48, AC-49)", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it("AC-42/AC-48/AC-49: renames a chat and updates both the single-chat and list caches", async () => {
     const renamed: Chat = { ...chatA, title: "Renamed" };
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(renamed)));
+    server.use(http.patch("*/chats/:chatId", () => HttpResponse.json({ chat: renamed })));
 
-    const client = (await import("../../../test/utils")).createTestQueryClient();
+    const client = createTestQueryClient();
     client.setQueryData(["chats"], [chatA]);
-    const wrapper = withQueryClient(client);
 
-    const { result } = renderHook(() => useUpdateChat(), { wrapper });
+    const { result } = renderHookWithClient(() => useUpdateChat(), { queryClient: client });
     result.current.mutate({ chatId: chatA.id, title: "Renamed" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -120,20 +104,12 @@ describe("useUpdateChat (AC-42, AC-48, AC-49)", () => {
 });
 
 describe("useDeleteChat (AC-44)", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it("AC-44: removes the deleted chat's cached data so it no longer appears or loads", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
-    vi.stubGlobal("fetch", fetchMock);
-
-    const client = (await import("../../../test/utils")).createTestQueryClient();
+    const client = createTestQueryClient();
     client.setQueryData(["chats"], [chatA]);
     client.setQueryData(["chats", chatA.id], chatA);
 
-    const wrapper = withQueryClient(client);
-    const { result } = renderHook(() => useDeleteChat(), { wrapper });
+    const { result } = renderHookWithClient(() => useDeleteChat(), { queryClient: client });
 
     result.current.mutate(chatA.id);
 

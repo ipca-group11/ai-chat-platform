@@ -15,6 +15,8 @@ FROM base AS deps
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages ./packages
 COPY apps/mfe-settings/package.json ./apps/mfe-settings/package.json
+# the test helpers (a dev dependency of the app) import the mock-server data factories
+COPY testing/mock-server/package.json ./testing/mock-server/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
@@ -34,6 +36,8 @@ COPY --from=build /workspace/apps/mfe-settings/node_modules ./apps/mfe-settings/
 COPY --from=build /workspace/apps/mfe-settings/dist ./apps/mfe-settings/dist
 COPY --from=build /workspace/apps/mfe-settings/package.json ./apps/mfe-settings/package.json
 COPY --from=build /workspace/apps/mfe-settings/vite.config.ts ./apps/mfe-settings/vite.config.ts
+# vite.config.ts imports the shared coverage preset, so `vite preview` needs it at runtime
+COPY --from=build /workspace/packages/test-config ./packages/test-config
 
 RUN addgroup -S app && adduser -S app -G app && chown -R app:app /workspace
 USER app

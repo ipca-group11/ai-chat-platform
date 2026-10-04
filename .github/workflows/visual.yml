@@ -1,0 +1,63 @@
+# Visual regression (AICHAT-19). Builds the shell and the three remotes, then runs the `visual` Playwright project inside the
+# Playwright Docker image that matches the installed @playwright/test version (the same command as `pnpm --filter e2e visual`).
+# The apps are served from their production builds, every API call is mocked and the clock is frozen, so no compose stack is
+# needed. A screenshot that differs from its baseline fails the job and the diff images are uploaded as an artifact.
+#
+# Intended change of the UI: update the baselines in the same Docker image and commit them, see docs/AICHAT-19/RUNNING.md.
+#
+# Required check: the job is named "visual / screenshots". Branch protection is not available on this private free-plan
+# repository (HTTP 403), so the team rule is: do not merge while "visual / screenshots" is red.
+name: visual
+
+on:
+  pull_request:
+    branches: [integration/testing-epics, main]
+    paths:
+      - "apps/**"
+      - "packages/ui/**"
+      - "e2e/src/visual/**"
+      - "e2e/playwright.config.ts"
+      - ".github/workflows/visual.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: visual-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    name: screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the shell and the remotes
+        run: pnpm exec nx run-many -t build -p shell mfe-auth mfe-chat mfe-settings
+
+      # Same command as on a developer machine. Exit code 1 when a screenshot differs from its baseline.
+      - name: Compare screenshots with the baselines (Playwright Docker image)
+        run: pnpm --filter e2e run visual
+
+      # test-results holds expected, actual and diff PNGs of every failed screen.
+      - name: Upload the diff images
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-diff
+          path: e2e/test-results/
+          if-no-files-found: ignore
+          retention-days: 14

@@ -1,23 +1,31 @@
 import { Router } from "express";
 import { auth } from "../../shared/contracts/index.js";
 import { HttpError } from "../../shared/error-middleware.js";
-import { prisma } from "../../shared/prisma.js";
+import type { PrismaClient } from "../../generated/prisma-client/index.js";
+import { prisma as defaultPrisma } from "../../shared/prisma.js";
 import { registerUser } from "./model.js";
 
-export const registerRouter: Router = Router();
+/** Builds the register router around the given Prisma client (injectable for tests). */
+export function createRegisterRouter(prisma: PrismaClient): Router {
+  const registerRouter: Router = Router();
 
-registerRouter.post("/register", async (req, res, next) => {
-  try {
-    const parsed = auth.registerRequestSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const fieldErrors = parsed.error.flatten().fieldErrors as Record<string, string[]>;
-      throw new HttpError(400, "VALIDATION_ERROR", "Invalid registration details", fieldErrors);
+  registerRouter.post("/register", async (req, res, next) => {
+    try {
+      const parsed = auth.registerRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        const fieldErrors = parsed.error.flatten().fieldErrors as Record<string, string[]>;
+        throw new HttpError(400, "VALIDATION_ERROR", "Invalid registration details", fieldErrors);
+      }
+
+      const user = await registerUser(prisma, parsed.data);
+
+      res.status(201).json({ id: user.id, email: user.email });
+    } catch (err) {
+      next(err);
     }
+  });
 
-    const user = await registerUser(prisma, parsed.data);
+  return registerRouter;
+}
 
-    res.status(201).json({ id: user.id, email: user.email });
-  } catch (err) {
-    next(err);
-  }
-});
+export const registerRouter: Router = createRegisterRouter(defaultPrisma);

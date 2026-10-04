@@ -12,11 +12,11 @@ concurrency:
 
 env:
   # Matches `.factory/commands.json`'s `test` command exactly.
-  NX_AFFECTED_TARGETS: lint typecheck test build
+  NX_AFFECTED_TARGETS: lint typecheck test build size
 
 jobs:
   affected:
-    name: nx affected (lint, typecheck, test, build)
+    name: nx affected (lint, typecheck, test, build, size)
     runs-on: ubuntu-latest
     steps:
       # Full history so `nx affected` can diff against origin/main (AC-12, AC-13).
@@ -34,6 +34,13 @@ jobs:
       # Matches `.factory/commands.json`'s `install` command.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # The repository scripts (scripts/**, mock-server build) are TypeScript run by Node directly:
+      # typecheck them and run their own tests.
+      - name: Typecheck and test the scripts
+        run: |
+          pnpm typecheck:scripts
+          pnpm test:scripts
 
       # Nx Cloud isn't configured for this repo yet; a GitHub Actions cache keyed on
       # nx.json + the lockfile stands in for it so unaffected projects are replayed
@@ -57,6 +64,8 @@ jobs:
           echo "NX_HEAD=HEAD" >> "$GITHUB_ENV"
 
       # Fails the job (and PR) on any lint/typecheck/test/build error (AC-12, AC-13).
+      # `size` (size-limit, gzip budgets per app, apps/*/.size-limit.ts) runs after the app's build and
+      # fails the job when a bundle goes over its limit (AICHAT-83).
       # Vitest coverage thresholds (STACK.md decision #6) are enforced per-project as
       # part of each project's own `test` target, so a coverage regression fails this
       # step too without any separate CI step.
@@ -66,3 +75,67 @@ jobs:
           -t ${{ env.NX_AFFECTED_TARGETS }}
           --base=${{ env.NX_BASE }}
           --head=${{ env.NX_HEAD }}
+
+      # Per-project coverage table (from each project's coverage/coverage-summary.json)
+      # in the job summary. Runs even when the test step failed, so a threshold drop
+      # still shows which project fell.
+      - name: Coverage summary
+        if: always()
+        run: node scripts/ci/coverage-summary.ts
+
+      # Bundle size before/after per file in the job summary (AICHAT-101). Builds the base branch in a
+      # second checkout and compares it with the dist folders of this run; apps that were not affected
+      # (no dist) are left out. Informational: it never fails the job, the budget is the `size` target.
+      - name: Bundle size change
+        if: github.event_name == 'pull_request' && !cancelled()
+        continue-on-error: true
+        env:
+          NX_DAEMON: "false"
+        run: |
+          node scripts/ci/bundle-size.ts snapshot --out "$RUNNER_TEMP/head-sizes.json"
+          git worktree add --detach "$RUNNER_TEMP/base" "$NX_BASE"
+          (cd "$RUNNER_TEMP/base" && pnpm install --frozen-lockfile && pnpm exec nx run-many -t build -p shell,mfe-auth,mfe-chat,mfe-settings)
+          node scripts/ci/bundle-size.ts snapshot --root "$RUNNER_TEMP/base" --out "$RUNNER_TEMP/base-sizes.json"
+          node scripts/ci/bundle-size.ts report "$RUNNER_TEMP/base-sizes.json" "$RUNNER_TEMP/head-sizes.json"
+
+  # Database tests (AICHAT-116): a real Postgres from Testcontainers, the schema applied with
+  # `prisma db push`. Kept out of the `test` target so the unit loop needs no Docker; the GitHub
+  # runner has Docker. Runs for both services that own a Prisma schema on every pull request.
+  test-db:
+    name: test-db (Testcontainers Postgres)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Pull the Postgres image (same version as compose.yaml)
+        run: docker pull postgres:16-alpine
+
+      - name: nx test-db
+        run: pnpm exec nx run-many -t test-db -p auth-service,conversation-service --parallel=1
+
+  # Source SBOM of the pnpm workspace (AICHAT-108): lists the npm packages the lockfile
+  # resolves, for SCA on every pull request. Independent of the Nx job.
+  source-sbom:
+    name: source SBOM (pnpm workspace)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SBOM (CycloneDX)
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          artifact-name: sbom-source.cdx.json
+          output-file: sbom-source.cdx.json
+          upload-artifact-retention: 90

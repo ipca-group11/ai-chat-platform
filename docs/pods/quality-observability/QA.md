@@ -18,13 +18,13 @@ runs:
   (45 + 9 + 17 + 18 + 6 = 95 tests passing, 0 failing).
 - `pnpm exec tsc -p tsconfig.json --noEmit` (the `typecheck` target) in every
   `packages/*` project and `e2e` — all clean, no errors.
-- `lint` could not be verified in isolation: every project's `eslint.config.js` imports
+- `lint` could not be verified in isolation: every project's `eslint.config.ts` imports
   `@platform/eslint-config` (platform-foundation-owned), which does not exist outside a
   full monorepo checkout (`eslint` itself isn't even resolvable without the workspace
   root hoisting it). This is an environment/integration limitation of this isolated
   worktree, not a finding against this pod's own code.
 - The Playwright specs under `e2e/src/tests/*.spec.ts` (UC1-UC8) and the K6 script
-  (`testing/k6/streaming-load.js`) were **not executed** against a live stack — no
+  (`testing/k6/streaming-load.ts`) were **not executed** against a live stack — no
   `docker compose` stack, browsers, or `k6` binary are available in this sandbox, and per
   this pod's own `PLAN.md` these deliberately run outside the fast `nx affected` loop
   (full stack + Ollama required). Their **content and CI wiring** were verified instead

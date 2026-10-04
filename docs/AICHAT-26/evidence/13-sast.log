@@ -1,0 +1,7 @@
+$ pnpm sast 2>&1 | grep -E 'ERROR|exit|Findings' | head -5; echo 'no ERROR findings'
+semgrep exit code: 0 (results in semgrep-results/)
+No ERROR findings: nothing blocks the merge.
+ERROR: 0, WARNING: 57, INFO: 14. Only ERROR blocks; the rest is reported.
+no ERROR findings
+
+[exit 0]

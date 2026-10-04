@@ -1,0 +1,105 @@
+$ pnpm nx run mfe-chat:test --skip-nx-cache
+
+> llm-chat-workspace@1.0.0 nx /Users/truezone/Projects/ai-chat-platform
+> nx run mfe-chat\:test --skip-nx-cache
+
+
+ NX   Running target test for project mfe-chat and 3 tasks it depends on:
+
+
+✔  nx run eslint-config:build
+✔  nx run test-config:build
+✔  nx run ui:build
+
+> nx run mfe-chat:test
+
+> cross-env NODE_ENV=test vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-chat
+      Coverage enabled with v8
+
+
+ Test Files  24 passed (24)
+      Tests  122 passed (122)
+   Start at  11:26:37
+   Duration  6.22s (environment 37%, tests 23%, import 23%, setup 8%, transform 6%, worker 3%)
+
+Environment  jsdom was created 24 times · 13.72s total, 37% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   89.87 |    85.21 |   89.71 |   91.86 |                   
+ app               |   81.15 |    80.11 |   84.84 |   82.92 |                   
+  ...Workspace.tsx |   87.75 |    88.88 |   84.21 |    87.5 | 42,62,69,87,115   
+  auth-context.tsx |   33.33 |     12.5 |   66.66 |   35.71 | 23-53,59          
+  routes.tsx       |    62.5 |        0 |      60 |   71.42 | 37-38             
+  split-panes.ts   |    87.7 |    83.92 |   93.54 |    91.3 | ...83-188,198,205 
+  ...edia-query.ts |      50 |       50 |   66.66 |      50 | 8-10,17           
+ ...nts/components |   91.66 |      100 |   83.33 |    90.9 |                   
+  ...entPicker.tsx |   83.33 |      100 |   66.66 |   83.33 | 41                
+ ...achments/hooks |    90.9 |       70 |   83.33 |    91.3 |                   
+  ...ttachments.ts |    90.9 |       70 |   83.33 |    91.3 | 59-60             
+ ...achments/model |     100 |    88.88 |     100 |     100 |                   
+  ...pabilities.ts |     100 |    83.33 |     100 |     100 | 18                
+  validators.ts    |     100 |    91.66 |     100 |     100 | 20                
+ .../chat-list/api |   96.29 |    72.72 |     100 |   95.45 |                   
+  chats.ts         |   96.29 |    72.72 |     100 |   95.45 | 22                
+ ...ist/components |   90.16 |    90.19 |   83.87 |   92.98 |                   
+  ChatList.tsx     |   77.77 |      100 |      60 |   81.25 | 59,101-103        
+  ChatListItem.tsx |     100 |       96 |     100 |     100 | 44                
+  ...hatDialog.tsx |   88.88 |       75 |   85.71 |   94.11 | 35                
+  ...delSelect.tsx |     100 |       50 |     100 |     100 | 37                
+ ...at-members/api |   95.45 |    66.66 |   93.75 |     100 |                   
+  members.ts       |   95.45 |    66.66 |   93.75 |     100 | 22                
+ ...ers/components |   89.47 |    79.31 |   88.88 |   93.75 |                   
+  ...ersDialog.tsx |   89.47 |    79.31 |   88.88 |   93.75 | 42                
+ .../chat-view/api |   96.87 |       75 |      96 |     100 |                   
+  messages.ts      |   96.87 |       75 |      96 |     100 | 16,43,93          
+ ...iew/components |   92.95 |     88.5 |      88 |   92.42 |                   
+  ChatView.tsx     |      95 |    87.61 |   81.81 |   94.59 | 189-202           
+  ...ageBubble.tsx |    87.5 |    94.73 |   66.66 |    87.5 | 86                
+  MessageError.tsx |     100 |    66.66 |     100 |     100 | 23-25             
+  WebFetchList.tsx |   81.81 |    72.22 |     100 |   81.81 | 24,34             
+ ...hat-view/model |   91.54 |    76.47 |    87.5 |   94.91 |                   
+  ...-reasoning.ts |      90 |      100 |    87.5 |   94.11 | 18                
+  ...m-registry.ts |   92.15 |    73.33 |    87.5 |   95.23 | 47,56             
+ ...ser/components |     100 |       95 |     100 |     100 |                   
+  Composer.tsx     |     100 |       95 |     100 |     100 | 56                
+ shared            |   91.25 |    84.61 |    92.3 |    94.2 |                   
+  api-client.ts    |   97.56 |    89.74 |     100 |     100 | 25-40,74,95       
+  auth.ts          |   16.66 |    33.33 |       0 |      20 | 17-23             
+  sse.ts           |      95 |      100 |      90 |     100 |                   
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 89.87% ( 639/711 )
+Branches     : 85.21% ( 536/629 )
+Functions    : 89.71% ( 279/311 )
+Lines        : 91.86% ( 553/602 )
+================================================================================
+
+
+
+ NX   Successfully ran target test for project mfe-chat and 3 tasks it depends on
+
+
+Output of 3 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      9.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     9.5s (4 tasks)
+  Recoverable time:  <1ms
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+
+[exit 0]

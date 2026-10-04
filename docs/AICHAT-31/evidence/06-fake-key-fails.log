@@ -1,0 +1,8 @@
+$ sh scripts/ci/secret-scan-proof.sh
+committed a fake key in throw-away branch tmp/secret-proof-67166
+gitleaks exit code: 1 (non-zero fails the CI job)
+12:25PM INF 1 commits scanned.
+12:25PM INF scanned ~41 bytes (41 bytes) in 47.3ms
+12:25PM WRN leaks found: 1
+
+[exit 1]

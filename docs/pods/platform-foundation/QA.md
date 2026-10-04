@@ -23,7 +23,7 @@ Verdict: PASS
   `packages/tsconfig/*.json`, `@platform/eslint-config`'s exported presets) — these files
   had no test coverage before and are owned exclusively by this pod, so this is the right
   place for them per `docs/pods/platform-foundation/PLAN.md`'s ownership list.
-- Fixed one pre-existing gap: `packages/eslint-config/src/rules/feature-folder-boundaries.test.js`
+- Fixed one pre-existing gap: `packages/eslint-config/src/rules/feature-folder-boundaries.test.ts`
   exercised AC-11 correctly (via ESLint's `RuleTester`) but only referenced "AC-11" in
   code comments, not in any test/describe name. Renamed the outer `describe` block to
   include "AC-11" so it satisfies "at least one test whose name includes its id"; no
@@ -36,20 +36,20 @@ Verdict: PASS
 
 | AC | Text (abridged) | Status | Test(s) |
 |----|---|---|---|
-| AC-1 | pnpm-workspace.yaml defines apps/, services/, packages/ | PASS | `packages/workspace-config/src/pnpm-workspace.test.js` — `AC-1: declares a \`packages\` list`, `AC-1: includes apps/*, services/*, and packages/* globs` |
-| AC-2 | Nx project graph covers every app/service/package | PASS* | `packages/workspace-config/src/nx-config.test.js` — `AC-2: \`nx show projects\` resolves without error...`, `AC-2: nx.json does not restrict project discovery to an explicit, incomplete project list` |
-| AC-3 | Every project defines lint/typecheck/test/build targets (+serve/storybook) | PASS | `packages/workspace-config/src/nx-config.test.js` — `AC-3: nx.json targetDefaults declares a %s target` (×6), `AC-3: build depends on upstream builds (^build)...`, `AC-3: serve and storybook are never cached...`, `AC-3: CONVENTIONS.md documents the required project.json target shape...` |
-| AC-4 | Nx tags enforce module boundaries | PASS | `packages/workspace-config/src/nx-config.test.js` — `AC-4: base eslint preset wires up @nx/enforce-module-boundaries`, `AC-4: type:app and type:service may only depend on type:package`, `AC-4: type:package may only depend on other type:package...`, `AC-4: every package this pod owns is tagged type:package, scope:shared` |
-| AC-5 | `docker compose up` starts shell/mfe-*/auth-service/conversation-service/Postgres/Ollama | PASS* | `packages/workspace-config/src/docker-compose.test.js` — `AC-5: docker-compose.yml defines a \`%s\` service` (×8), `AC-5: auth-service and conversation-service build from their own Dockerfile path`, `AC-5: shell, mfe-auth, mfe-chat, mfe-settings build from their own Dockerfile path`, `AC-5: postgres and ollama have healthchecks...` |
-| AC-6 | Compose also starts Prometheus + Grafana pre-wired to scrape services | PASS | `packages/workspace-config/src/docker-compose.test.js` — `AC-6: docker-compose.yml defines prometheus and grafana services`, `AC-6: prometheus mounts observability/prometheus.yml...`, `AC-6: prometheus.yml scrapes auth-service and conversation-service /metrics`, `AC-6: grafana is pre-wired with a provisioned Prometheus datasource` |
-| AC-7 | .env.example lists every env var with safe local defaults | PASS | `packages/workspace-config/src/env-example.test.js` — `AC-7: every variable is non-empty...`, `AC-7: every \${VAR:-default} referenced from docker-compose.yml is documented in .env.example`, `AC-7: documents core secrets/config every service needs...` |
+| AC-1 | pnpm-workspace.yaml defines apps/, services/, packages/ | PASS | `packages/workspace-config/src/pnpm-workspace.test.ts` — `AC-1: declares a \`packages\` list`, `AC-1: includes apps/*, services/*, and packages/* globs` |
+| AC-2 | Nx project graph covers every app/service/package | PASS* | `packages/workspace-config/src/nx-config.test.ts` — `AC-2: \`nx show projects\` resolves without error...`, `AC-2: nx.json does not restrict project discovery to an explicit, incomplete project list` |
+| AC-3 | Every project defines lint/typecheck/test/build targets (+serve/storybook) | PASS | `packages/workspace-config/src/nx-config.test.ts` — `AC-3: nx.json targetDefaults declares a %s target` (×6), `AC-3: build depends on upstream builds (^build)...`, `AC-3: serve and storybook are never cached...`, `AC-3: CONVENTIONS.md documents the required project.json target shape...` |
+| AC-4 | Nx tags enforce module boundaries | PASS | `packages/workspace-config/src/nx-config.test.ts` — `AC-4: base eslint preset wires up @nx/enforce-module-boundaries`, `AC-4: type:app and type:service may only depend on type:package`, `AC-4: type:package may only depend on other type:package...`, `AC-4: every package this pod owns is tagged type:package, scope:shared` |
+| AC-5 | `docker compose up` starts shell/mfe-*/auth-service/conversation-service/Postgres/Ollama | PASS* | `packages/workspace-config/src/docker-compose.test.ts` — `AC-5: docker-compose.yml defines a \`%s\` service` (×8), `AC-5: auth-service and conversation-service build from their own Dockerfile path`, `AC-5: shell, mfe-auth, mfe-chat, mfe-settings build from their own Dockerfile path`, `AC-5: postgres and ollama have healthchecks...` |
+| AC-6 | Compose also starts Prometheus + Grafana pre-wired to scrape services | PASS | `packages/workspace-config/src/docker-compose.test.ts` — `AC-6: docker-compose.yml defines prometheus and grafana services`, `AC-6: prometheus mounts observability/prometheus.yml...`, `AC-6: prometheus.yml scrapes auth-service and conversation-service /metrics`, `AC-6: grafana is pre-wired with a provisioned Prometheus datasource` |
+| AC-7 | .env.example lists every env var with safe local defaults | PASS | `packages/workspace-config/src/env-example.test.ts` — `AC-7: every variable is non-empty...`, `AC-7: every \${VAR:-default} referenced from docker-compose.yml is documented in .env.example`, `AC-7: documents core secrets/config every service needs...` |
 | AC-8 | shared-types defines API contracts/DTOs consumed by frontends and services | PASS | `packages/shared-types/src/**/*.test.ts` (pre-existing) — e.g. `AC-8: accepts a valid email and policy-compliant password` (`auth/dto.test.ts`), plus one or more `AC-8:`-named tests in each of `auth/{dto,jwt,password-policy}.test.ts`, `chat/{attachment,chat,message,sse}.test.ts`, `http/{correlation-id,error-response}.test.ts` |
-| AC-9 | eslint-config provides a flat ESLint config with typescript-eslint | PASS | `packages/workspace-config/src/eslint-config.test.js` — `AC-9: the %s preset is a flat-config array` (×3), `AC-9: base wires up typescript-eslint's recommended rules`, `AC-9: react and node presets both extend base...`, `AC-9: react preset adds React/JSX rules...` |
-| AC-10 | packages/tsconfig provides shared bases; `tsc --noEmit` passes per project | PASS | `packages/workspace-config/src/tsconfig.test.js` — `AC-10: base.json extends the root tsconfig.base.json...`, `AC-10: react.json extends base.json...`, `AC-10: node.json extends base.json...`, `AC-10: a project extending packages/tsconfig/%s typechecks cleanly` (×3, real `tsc --noEmit` invocations) |
-| AC-11 | Feature folders only import shared/ or other features' index.ts | PASS | `packages/eslint-config/src/rules/feature-folder-boundaries.test.js` — describe block `feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals)`, plus `packages/shared-types/src/index.ts` module doc (AC-8/AC-11) |
-| AC-12 | CI runs `nx affected` for lint/typecheck/test/build on every PR | PASS | `packages/workspace-config/src/ci.test.js` — `AC-12: the workflow triggers on pull_request`, `AC-12: the affected job runs \`nx affected\` with lint, typecheck, test, and build`, `AC-12: matches .factory/commands.json's \`test\` command targets exactly`, `AC-12: checks out full history...` |
-| AC-13 | CI fails the build on any lint/typecheck error | PASS | `packages/workspace-config/src/ci.test.js` — `AC-13: the \`nx affected\` step is a normal (non-continue-on-error) step`, `AC-13: the workflow has a single job so a lint/typecheck failure fails the whole run` |
-| AC-14 | Nx task results are cached in CI | PASS | `packages/workspace-config/src/ci.test.js` — `AC-14: a cache step persists the Nx computation cache directory`, `AC-14: the cache key is derived from nx.json and the lockfile...` |
+| AC-9 | eslint-config provides a flat ESLint config with typescript-eslint | PASS | `packages/workspace-config/src/eslint-config.test.ts` — `AC-9: the %s preset is a flat-config array` (×3), `AC-9: base wires up typescript-eslint's recommended rules`, `AC-9: react and node presets both extend base...`, `AC-9: react preset adds React/JSX rules...` |
+| AC-10 | packages/tsconfig provides shared bases; `tsc --noEmit` passes per project | PASS | `packages/workspace-config/src/tsconfig.test.ts` — `AC-10: base.json extends the root tsconfig.base.json...`, `AC-10: react.json extends base.json...`, `AC-10: node.json extends base.json...`, `AC-10: a project extending packages/tsconfig/%s typechecks cleanly` (×3, real `tsc --noEmit` invocations) |
+| AC-11 | Feature folders only import shared/ or other features' index.ts | PASS | `packages/eslint-config/src/rules/feature-folder-boundaries.test.ts` — describe block `feature-folder-boundaries (AC-11: feature folders only import from shared/ and other features' index.ts, never feature internals)`, plus `packages/shared-types/src/index.ts` module doc (AC-8/AC-11) |
+| AC-12 | CI runs `nx affected` for lint/typecheck/test/build on every PR | PASS | `packages/workspace-config/src/ci.test.ts` — `AC-12: the workflow triggers on pull_request`, `AC-12: the affected job runs \`nx affected\` with lint, typecheck, test, and build`, `AC-12: matches .factory/commands.json's \`test\` command targets exactly`, `AC-12: checks out full history...` |
+| AC-13 | CI fails the build on any lint/typecheck error | PASS | `packages/workspace-config/src/ci.test.ts` — `AC-13: the \`nx affected\` step is a normal (non-continue-on-error) step`, `AC-13: the workflow has a single job so a lint/typecheck failure fails the whole run` |
+| AC-14 | Nx task results are cached in CI | PASS | `packages/workspace-config/src/ci.test.ts` — `AC-14: a cache step persists the Nx computation cache directory`, `AC-14: the cache key is derived from nx.json and the lockfile...` |
 
 \* AC-2 and AC-5 are only *fully* satisfiable once every pod's `apps/*`/`services/*`
 project lands (their Dockerfiles/`project.json` are owned by other pods, per
@@ -68,7 +68,7 @@ pass, consistent with the pod's own plan — not a defect found by this QA pass.
 - `docker` is not installed in this sandbox, so `docker compose config` could not be
   re-run here; `docker-compose.yml`/`.env.example`/`observability/**` are instead verified
   by parsing the real YAML with the `yaml` package in
-  `packages/workspace-config/src/docker-compose.test.js` and `env-example.test.js`.
+  `packages/workspace-config/src/docker-compose.test.ts` and `env-example.test.ts`.
 - `nx affected --base=origin/main` fails in this worktree (`fatal: ambiguous argument
   'origin/main'`) because no remote is configured here; `nx run-many` across all of this
   pod's projects was used instead and is equivalent for a from-scratch, cold-cache run.
@@ -76,11 +76,11 @@ pass, consistent with the pod's own plan — not a defect found by this QA pass.
 ## Files added/changed by this QA pass
 
 - `packages/workspace-config/**` (new): `package.json`, `project.json`,
-  `eslint.config.js`, `vitest.config.ts`, `src/repo.js` (+`repo.test.js`),
-  `src/pnpm-workspace.test.js`, `src/nx-config.test.js`, `src/docker-compose.test.js`,
-  `src/env-example.test.js`, `src/eslint-config.test.js`, `src/tsconfig.test.js`,
-  `src/ci.test.js`.
+  `eslint.config.ts`, `vitest.config.ts`, `src/repo.ts` (+`repo.test.ts`),
+  `src/pnpm-workspace.test.ts`, `src/nx-config.test.ts`, `src/docker-compose.test.ts`,
+  `src/env-example.test.ts`, `src/eslint-config.test.ts`, `src/tsconfig.test.ts`,
+  `src/ci.test.ts`.
 - `pnpm-lock.yaml`: updated for the new `yaml` devDependency of `workspace-config`
   (`pnpm install`, no other changes; `pnpm install --frozen-lockfile` still succeeds).
-- `packages/eslint-config/src/rules/feature-folder-boundaries.test.js`: renamed the outer
+- `packages/eslint-config/src/rules/feature-folder-boundaries.test.ts`: renamed the outer
   `describe` block to include "AC-11" (test behavior unchanged).

@@ -34,6 +34,8 @@ export interface AttachmentsRepository {
     extractedText: string | null;
   }): Promise<AttachmentRecord>;
   findManyByMessageIds(messageIds: string[]): Promise<AttachmentRecord[]>;
+  /** Which of these storage paths are referenced by an attachment row. */
+  findReferencedPaths(storagePaths: string[]): Promise<Set<string>>;
 }
 
 export function createAttachmentsRepository(prisma: PrismaClient): AttachmentsRepository {
@@ -44,6 +46,11 @@ export function createAttachmentsRepository(prisma: PrismaClient): AttachmentsRe
     async findManyByMessageIds(messageIds) {
       if (messageIds.length === 0) return [];
       return prisma.attachment.findMany({ where: { messageId: { in: messageIds } } });
+    },
+    async findReferencedPaths(storagePaths) {
+      if (storagePaths.length === 0) return new Set();
+      const rows = await prisma.attachment.findMany({ where: { storagePath: { in: storagePaths } }, select: { storagePath: true } });
+      return new Set(rows.map((r) => r.storagePath));
     },
   };
 }

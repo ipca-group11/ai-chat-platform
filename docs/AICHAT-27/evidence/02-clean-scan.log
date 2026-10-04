@@ -1,0 +1,16 @@
+$ scripts/ci/semgrep.sh 2>/dev/null; node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif | cut -c1-170 | head -12
+semgrep exit code: 0 (results in semgrep-results/)
+### SAST (Semgrep CE)
+No ERROR findings: nothing blocks the merge.
+ERROR: 0, WARNING: 23, INFO: 13. Only ERROR blocks; the rest is reported.
+
+| Rule | Severity | Count | Locations |
+|---|---|---|---|
+| `yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag` | WARNING | 14 | `.github/workflows/ci.yml:23`, `.github/workflows/ci
+| `ajinabraham.njsscan.crypto.crypto_node.node_insecure_random_generator` | WARNING | 5 | `apps/mfe-auth/src/shared/correlation.ts:16`, `apps/mfe-chat/src/features/attach
+| `package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age` | WARNING | 1 | `.npmrc:1` |
+| `package_managers.pnpm.pnpm-block-exotic-sub-dependencies.pnpm-block-exotic-sub-dependencies` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `package_managers.pnpm.pnpm-missing-minimum-release-age.pnpm-minimum-release-age` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `package_managers.pnpm.pnpm-trust-policy.pnpm-trust-policy` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+
+[exit 0]

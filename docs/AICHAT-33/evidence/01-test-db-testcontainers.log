@@ -1,0 +1,84 @@
+$ NX_DAEMON=false pnpm exec nx run-many -t test-db -p auth-service,conversation-service --parallel=1 --skip-nx-cache --output-style=static
+
+ NX   Running target test-db for 2 projects and 2 tasks they depend on:
+
+- auth-service
+- conversation-service
+
+
+
+> nx run conversation-service:prisma-generate
+
+> prisma generate
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.1.0) to ./src/generated/prisma-client in 45ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+
+> nx run auth-service:prisma-generate
+
+> prisma generate
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.1.0) to ./src/generated/prisma-client in 33ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+
+> nx run conversation-service:test-db
+
+> vitest run --config vitest.db.config.ts
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "test", schema "public" at "localhost:32775"
+
+🚀  Your database is now in sync with your Prisma schema. Done in 135ms
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  07:03:50
+   Duration  4.05s (import 85%, tests 10%, transform 4%, setup 1%, worker 1%)
+
+
+> nx run auth-service:test-db
+
+> vitest run --config vitest.db.config.ts
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "test", schema "public" at "localhost:32776"
+
+🚀  Your database is now in sync with your Prisma schema. Done in 90ms
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  07:03:54
+   Duration  3.45s (import 86%, tests 9%, transform 4%, setup 1%)
+
+
+
+
+ NX   Successfully ran target test-db for 2 projects and 2 tasks they depend on
+
+
+  Run duration:      9.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.1s (2 tasks)
+  Recoverable time:  4.5s (47% of the run)
+
+[exit 0]

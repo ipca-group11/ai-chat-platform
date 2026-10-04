@@ -1,0 +1,28 @@
+$ cd packages/ui && pnpm exec vitest run --coverage --coverage.reporter=text-summary
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/ui
+      Coverage enabled with v8
+
+
+ Test Files  21 passed (21)
+      Tests  128 passed (128)
+   Start at  11:20:48
+   Duration  6.18s (environment 40%, tests 27%, setup 14%, import 11%, transform 6%, worker 3%)
+
+Environment  jsdom was created 21 times · 13.52s total, 40% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+
+=============================== Coverage summary ===============================
+Statements   : 97.2% ( 174/179 )
+Branches     : 80.48% ( 33/41 )
+Functions    : 92.06% ( 58/63 )
+Lines        : 97.2% ( 174/179 )
+================================================================================
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vite.config.ts:10:20). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+[exit 0]

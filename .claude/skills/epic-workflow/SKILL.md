@@ -36,7 +36,7 @@ of code and all implementation happens in subagents that get **only** what they 
   (JP, AICHAT-17..34 and AICHAT-144). Epics AICHAT-8..16 belong to João Vieira: their epic skill gives the owner accountId; use it.
 - Transitions: `21` In Progress, `31` Review, `41` Done, `11` back to TODO.
 - Impediment flag: `editJiraIssue` fields `{"customfield_10021":[{"value":"Impediment"}]}`.
-- Evidence helper: `node scripts/evidence/term-shot.mjs --out docs/AICHAT-<n>/evidence --name <nn>-<what> -- <cmd>`
+- Evidence helper: `node scripts/evidence/term-shot.ts --out docs/AICHAT-<n>/evidence --name <nn>-<what> -- <cmd>`
   (writes `.log` + terminal-style `.png`, keeps the exit code). Browser evidence: chrome-devtools `take_screenshot`
   with `filePath` into the same folder.
 
@@ -63,7 +63,7 @@ no "Generated with" line in commits or PRs — the owner's instruction overrides
 4. Anything still blocked → flag Impediment, comment what is missing, tell the owner, stop this epic.
 
 ### 3. Setup (main thread)
-`git switch main && git pull && git switch -c <branch from epic skill>`; `mkdir -p docs/AICHAT-<n>/evidence`;
+`git fetch origin && git switch <branch from epic skill> && git merge origin/integration/testing-epics` (epic branches already exist on origin, cut from `integration/testing-epics`); `mkdir -p docs/AICHAT-<n>/evidence`;
 capture versions: `term-shot … --name 00-environment -- "node -v; pnpm -v; docker --version"`.
 
 ### 4. Story loop (subagents)
@@ -71,7 +71,7 @@ For each story (order from the epic skill; parallel where independent):
 1. Main: transition story `21`.
 2. Main: spawn the agent with the prompt template.
 3. Agent: implement, run, capture evidence, write its WORKLOG section, commit. Returns the short report.
-4. Main: tick acceptance criteria in Jira (ADF), transition `31`. Push / PR only after the owner agrees. `41` after merge.
+4. Main: tick acceptance criteria in Jira (ADF), transition `31`. Push and open the PR (base `integration/testing-epics`, never `main`), then merge it into the integration branch as soon as checks pass (`gh pr merge --merge`), no owner review needed. `41` after merge. Only the final integration → main PR waits for team review.
 5. If the agent reports an unsettled decision: ask the owner (AskUserQuestion), then SendMessage the answer to the same agent.
 
 #### Agent prompt template (keep it this short)
@@ -83,13 +83,17 @@ Acceptance criteria:
 Decisions that apply: <1–5 lines from WORKLOG §1>
 Load only this context: <1–3 awk commands from the epic skill's context loaders>; then open only the files those sections reference.
 Do:
-1. Implement the story. Small commits, Conventional Commits, body "Refs: <JIRA-KEY>". No co-author/generated trailers.
-2. Run it. Capture evidence with: node scripts/evidence/term-shot.mjs --out docs/<epic>/evidence --name <nn>-<what> -- <cmd>
+1. Implement the story in TypeScript only (no new .js/.mjs: scripts run as `node script.ts`, tests are .ts, ESLint configs
+   are eslint.config.ts). Small commits, Conventional Commits, body "Refs: <JIRA-KEY>". No co-author/generated trailers.
+2. Run it. Capture evidence with: node scripts/evidence/term-shot.ts --out docs/<epic>/evidence --name <nn>-<what> -- <cmd>
    (also capture an expected failure if the story adds a gate).
 3. Write section "### US<k> · <summary>" in docs/<epic>/WORKLOG.md §3 using the template headings (What and why, Files,
    How to run, How to repeat it manually, Result with ![](evidence/…) images, Problems and fixes). Team voice; never
    mention AI, assistants or tools that wrote the text.
-4. If a decision is missing, stop and report it instead of guessing.
+4. Before finishing run the same gates as CI: `pnpm exec nx affected -t lint typecheck test build --base=origin/integration/testing-epics`,
+   `pnpm sast` (exit 1 = ERROR finding; `semgrep.sh` alone always exits 0) and
+   `gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD`. Use Node 24.21 (`~/.nvm/versions/node/v24.21.0/bin`).
+5. If a decision is missing, stop and report it instead of guessing.
 Report back in ≤10 lines: status (done/blocked), commits, files, evidence files, open question (if any).
 ```
 

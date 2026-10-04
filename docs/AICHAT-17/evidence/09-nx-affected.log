@@ -1,0 +1,103 @@
+$ pnpm exec nx affected -t lint typecheck test build --base=origin/integration/testing-epics
+
+ NX   Running targets lint, typecheck, test, build for 17 projects and 2 tasks they depend on:
+
+- mfe-auth
+- mfe-chat
+- mfe-settings
+- shell
+- e2e
+- test-utils
+- workspace-config
+- conversation-service
+- mock-server
+- eslint-config
+- observability
+- auth-service
+- shared-types
+- pact-config
+- test-config
+- ui
+- k6
+
+
+✔  nx run eslint-config:build  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:prisma-generate  [existing outputs match the cache, left as is]
+✔  nx run test-utils:lint  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:lint  [existing outputs match the cache, left as is]
+✔  nx run mfe-auth:lint  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:lint  [existing outputs match the cache, left as is]
+✔  nx run shell:lint  [existing outputs match the cache, left as is]
+✔  nx run workspace-config:lint  [existing outputs match the cache, left as is]
+✔  nx run test-config:build  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:build  [existing outputs match the cache, left as is]
+✔  nx run shared-types:build  [existing outputs match the cache, left as is]
+✔  nx run ui:build  [existing outputs match the cache, left as is]
+✔  nx run workspace-config:test  [existing outputs match the cache, left as is]
+✔  nx run mock-server:build  [existing outputs match the cache, left as is]
+✔  nx run test-utils:build  [existing outputs match the cache, left as is]
+✔  nx run test-utils:test  [local cache]
+✔  nx run test-utils:typecheck  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-auth:test  [existing outputs match the cache, left as is]
+✔  nx run shell:test  [existing outputs match the cache, left as is]
+✔  nx run shell:typecheck  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:typecheck  [existing outputs match the cache, left as is]
+✔  nx run mfe-auth:typecheck  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:typecheck  [existing outputs match the cache, left as is]
+✔  nx run eslint-config:test
+✔  nx run auth-service:prisma-generate
+✔  nx run test-config:test
+✔  nx run eslint-config:lint
+✔  nx run test-config:lint
+✔  nx run test-config:typecheck
+✔  nx run shared-types:test
+✔  nx run conversation-service:test
+✔  nx run shared-types:lint
+✔  nx run conversation-service:lint
+✔  nx run shared-types:typecheck
+✔  nx run conversation-service:typecheck
+✔  nx run mock-server:lint
+✔  nx run mock-server:typecheck
+✔  nx run ui:typecheck
+✔  nx run ui:lint
+✔  nx run ui:test
+✔  nx run mock-server:test
+✔  nx run mfe-settings:build
+✔  nx run mfe-auth:build
+✔  nx run mfe-chat:build
+✔  nx run auth-service:test
+✔  nx run observability:test
+✔  nx run e2e:typecheck
+✔  nx run pact-config:test
+✔  nx run auth-service:build
+✔  nx run auth-service:lint
+✔  nx run shell:build
+✔  nx run e2e:lint
+✔  nx run auth-service:typecheck
+✔  nx run e2e:test
+✔  nx run observability:lint
+✔  nx run pact-config:lint
+✔  nx run pact-config:typecheck
+✔  nx run pact-config:build
+✔  nx run observability:typecheck
+✔  nx run observability:build
+✔  nx run k6:test
+
+
+
+ NX   Successfully ran targets lint, typecheck, test, build for 17 projects and 2 tasks they depend on
+
+Nx read the output from the cache instead of running the command for 25 out of 63 tasks.
+
+Output of 63 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      32.4s
+  Cache:             25/63 hit (40%)
+  Critical path:     12.0s (4 tasks)
+  Recoverable time:  20.4s (63% of the run)
+
+  Recommendation: Increase parallelism to recover up to 20.3s → https://nx.dev/docs/concepts/ci-concepts/parallelization-distribution?utm_source=nx-cli&utm_medium=cli&utm_campaign=performance-report&utm_content=parallelization.
+
+[exit 0]

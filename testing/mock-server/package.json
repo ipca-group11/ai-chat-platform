@@ -1,0 +1,40 @@
+{
+  "name": "@platform/mock-server",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "./src/data/index.ts",
+  "types": "./src/data/index.ts",
+  "exports": {
+    ".": "./src/data/index.ts",
+    "./server": "./src/app.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "serve": "tsx src/main.ts",
+    "build": "node scripts/build.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@app/shared-types": "workspace:*",
+    "express": "^4.22.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@platform/eslint-config": "workspace:*",
+    "@platform/test-config": "workspace:*",
+    "@types/express": "^4.17.25",
+    "@types/node": "^24.13.6",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "5.0.1",
+    "esbuild": "^0.28.2",
+    "supertest": "^7.2.1",
+    "tsx": "^4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "5.0.1"
+  }
+}

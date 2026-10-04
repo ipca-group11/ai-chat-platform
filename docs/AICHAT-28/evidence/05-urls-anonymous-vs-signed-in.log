@@ -1,0 +1,27 @@
+$ bash -c echo '--- anonymous scan (us1-anonymous.json)'; node scripts/dast/zap-report.ts docs/AICHAT-28/results/us1-anonymous.json --urls; echo; echo '--- signed-in scan (us2-authenticated.json)'; node scripts/dast/zap-report.ts docs/AICHAT-28/results/us2-authenticated.json --urls
+
+http://localhost:8000
+http://localhost:8000/
+http://localhost:8000/assets/index-BTgjxohI.css
+http://localhost:8000/assets/mf-entry-bootstrap-0-feb606b9.js
+http://localhost:8000/assets/vite-preload-helper-B3nfOi5I.js
+http://localhost:8000/chats
+http://localhost:8000/favicon.ico
+http://localhost:8000/login
+http://localhost:8000/register
+http://localhost:8000/robots.txt
+http://localhost:8000/sitemap.xml
+
+--- signed-in scan (us2-authenticated.json)
+http://localhost:8000/
+http://localhost:8000/api
+http://localhost:8000/api/chats
+http://localhost:8000/assets/helpers-CeEy7IUA.js
+http://localhost:8000/assets/index-BTgjxohI.css
+http://localhost:8000/assets/mf-entry-bootstrap-0-feb606b9.js
+http://localhost:8000/chats
+http://localhost:8000/robots.txt
+http://localhost:8000/settings
+http://localhost:8000/sitemap.xml
+
+[exit 0]

@@ -1,27 +1,30 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { configure, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { jsonResponse, withQueryClient } from "../../../test/utils";
+import { describe, expect, it, vi } from "vitest";
+import { renderWithClient } from "@platform/test-utils";
+import { http, HttpResponse, recordRequests, server } from "@platform/test-utils/msw";
 import type { ChatMember } from "../../../shared/types";
 import { MembersDialog } from "./MembersDialog";
+
+// Every findBy/waitFor here waits for an MSW response. The default 1s was not enough when nx ran
+// several projects in parallel; a longer limit costs nothing when the response arrives quickly.
+configure({ asyncUtilTimeout: 5000 });
 
 const owner: ChatMember = { email: "owner@example.com", role: "owner", addedAt: "2026-01-01T00:00:00.000Z" };
 const guest: ChatMember = { email: "guest@example.com", role: "member", addedAt: "2026-01-02T00:00:00.000Z" };
 
 function renderDialog(props: Partial<Parameters<typeof MembersDialog>[0]> = {}) {
-  return render(
-    <MembersDialog chatId="chat-1" chatTitle="Trip" isOwner open onClose={vi.fn()} {...props} />,
-    { wrapper: withQueryClient() }
-  );
+  return renderWithClient(
+    <MembersDialog chatId="chat-1" chatTitle="Trip" isOwner open onClose={vi.fn()} {...props} />);
 }
 
-describe("MembersDialog", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
+const listMembers = (members: ChatMember[]) =>
+  server.use(http.get("*/chats/:chatId/members", () => HttpResponse.json({ members })));
+const seen = (requests: Request[], method: string) => requests.find((r) => r.method === method);
 
+describe("MembersDialog", () => {
   it("lists the owner and members", async () => {
-    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(jsonResponse({ members: [owner, guest] }))));
+    listMembers([owner, guest]);
 
     renderDialog();
 
@@ -31,12 +34,9 @@ describe("MembersDialog", () => {
   });
 
   it("the owner invites someone by email", async () => {
-    const fetchMock = vi.fn((_url: string, init?: RequestInit) =>
-      Promise.resolve(
-        init?.method === "POST" ? jsonResponse({ member: guest }, 201) : jsonResponse({ members: [owner] })
-      )
-    );
-    vi.stubGlobal("fetch", fetchMock);
+    listMembers([owner]);
+    server.use(http.post("*/chats/:chatId/members", () => HttpResponse.json({ member: guest }, { status: 201 })));
+    const requests = recordRequests();
 
     renderDialog();
     await screen.findByText("owner@example.com");
@@ -44,19 +44,18 @@ describe("MembersDialog", () => {
     await userEvent.click(screen.getByRole("button", { name: "Invite" }));
 
     expect(await screen.findByText("guest@example.com")).toBeInTheDocument();
-    const post = fetchMock.mock.calls.find(([, init]) => init?.method === "POST");
-    expect(post?.[0]).toContain("/chats/chat-1/members");
-    expect(JSON.parse(post?.[1]?.body as string)).toEqual({ email: "guest@example.com" });
+    const post = seen(requests, "POST");
+    expect(new URL(post!.url).pathname).toBe("/api/chats/chat-1/members");
+    expect(await post!.json()).toEqual({ email: "guest@example.com" });
   });
 
   it("shows the server error when an invite is rejected", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn((_url: string, init?: RequestInit) =>
-        Promise.resolve(
-          init?.method === "POST"
-            ? jsonResponse({ code: "ALREADY_A_MEMBER", message: "That user is already a member of this chat" }, 409)
-            : jsonResponse({ members: [owner, guest] })
+    listMembers([owner, guest]);
+    server.use(
+      http.post("*/chats/:chatId/members", () =>
+        HttpResponse.json(
+          { code: "ALREADY_A_MEMBER", message: "That user is already a member of this chat" },
+          { status: 409 }
         )
       )
     );
@@ -70,29 +69,24 @@ describe("MembersDialog", () => {
   });
 
   it("the owner removes a member", async () => {
-    const fetchMock = vi.fn((_url: string, init?: RequestInit) =>
-      Promise.resolve(
-        init?.method === "DELETE" ? new Response(null, { status: 204 }) : jsonResponse({ members: [owner, guest] })
-      )
-    );
-    vi.stubGlobal("fetch", fetchMock);
+    listMembers([owner, guest]);
+    server.use(http.delete("*/chats/:chatId/members/:email", () => new HttpResponse(null, { status: 204 })));
+    const requests = recordRequests();
 
     renderDialog();
     await userEvent.click(await screen.findByLabelText("Remove guest@example.com"));
 
     await waitFor(() => expect(screen.queryByText("guest@example.com")).not.toBeInTheDocument());
-    const del = fetchMock.mock.calls.find(([, init]) => init?.method === "DELETE");
-    expect(del?.[0]).toContain(`/chats/chat-1/members/${encodeURIComponent("guest@example.com")}`);
+    expect(new URL(seen(requests, "DELETE")!.url).pathname).toBe(
+      `/api/chats/chat-1/members/${encodeURIComponent("guest@example.com")}`
+    );
   });
 
   it("a member sees no invite form or remove buttons, and can leave", async () => {
     const onLeft = vi.fn();
-    const fetchMock = vi.fn((_url: string, init?: RequestInit) =>
-      Promise.resolve(
-        init?.method === "DELETE" ? new Response(null, { status: 204 }) : jsonResponse({ members: [owner, guest] })
-      )
-    );
-    vi.stubGlobal("fetch", fetchMock);
+    listMembers([owner, guest]);
+    server.use(http.delete("*/chats/:chatId/membership", () => new HttpResponse(null, { status: 204 })));
+    const requests = recordRequests();
 
     renderDialog({ isOwner: false, onLeft });
     await screen.findByText("guest@example.com");
@@ -103,7 +97,6 @@ describe("MembersDialog", () => {
     await userEvent.click(screen.getByRole("button", { name: "Leave chat" }));
 
     await waitFor(() => expect(onLeft).toHaveBeenCalled());
-    const del = fetchMock.mock.calls.find(([, init]) => init?.method === "DELETE");
-    expect(del?.[0]).toContain("/chats/chat-1/membership");
+    expect(new URL(seen(requests, "DELETE")!.url).pathname).toBe("/api/chats/chat-1/membership");
   });
 });

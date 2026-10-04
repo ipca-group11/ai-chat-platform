@@ -1,0 +1,21 @@
+$ cd e2e && pnpm exec vitest run --coverage --coverage.reporter=text-summary
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/e2e
+      Coverage enabled with v8
+
+
+ Test Files  3 passed (3)
+      Tests  18 passed (18)
+   Start at  11:21:00
+   Duration  528ms (import 70%, transform 16%, worker 7%, tests 7%)
+
+ % Coverage report from v8
+
+=============================== Coverage summary ===============================
+Statements   : 80.95% ( 34/42 )
+Branches     : 77.77% ( 21/27 )
+Functions    : 81.25% ( 13/16 )
+Lines        : 82.05% ( 32/39 )
+================================================================================
+
+[exit 0]

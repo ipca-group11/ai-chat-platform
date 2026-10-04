@@ -5,6 +5,7 @@ coverage/
 .nx/cache/
 .nx/workspace-data/
 *.log
+!docs/**/evidence/*.log
 .env
 # Real credentials for the deployed environment (see docs/CREDENTIALS.md). Never commit.
 .env.credentials
@@ -17,3 +18,18 @@ services/*/src/generated/
 # Federation dts generation (repo-rooted tsc pass, see apps/mfe-settings/vite.config.ts)
 packages/shared-types/src/**/*.d.ts
 apps/*/.mf/
+
+# local git worktrees
+.claude/worktrees/
+semgrep-results/
+.vitest/
+zap-results/
+zap-wrk/
+sbom-results/
+
+# Lighthouse CI output (AICHAT-62)
+lighthouse-results/
+.lighthouseci/
+
+# prompt injection test output (AICHAT-26)
+redteam-results/

@@ -1,0 +1,39 @@
+$ cd packages/workspace-config && pnpm exec vitest run src/coverage-guard.test.js
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/workspace-config
+
+ ❯ src/coverage-guard.test.js (25 tests | 1 failed) 12ms
+   ❯ AICHAT-118: every project with a test target enforces coverage (17)
+     × apps/mfe-auth runs --coverage and imports @platform/test-config 5ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 24 passed (25)
+   Start at  11:27:23
+   Duration  135ms (transform 41%, tests 28%, import 24%, worker 6%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/coverage-guard.test.js > AICHAT-118: every project with a test target enforces coverage > apps/mfe-auth runs --coverage and imports @platform/test-config
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "apps/mfe-auth: the package.json test script \"vitest run\" does not run with --coverage",
++ ]
+
+ ❯ src/coverage-guard.test.js:27:44
+     25|
+     26|   it.each(projects)("%s runs --coverage and imports @platform/test-con…
+     27|     expect(checkProject(loadProject(dir))).toEqual([]);
+       |                                            ^
+     28|   });
+     29|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

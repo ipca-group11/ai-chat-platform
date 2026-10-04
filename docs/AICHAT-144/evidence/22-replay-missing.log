@@ -1,0 +1,5 @@
+$ cd testing/mock-server && (PORT=4110 TOKENS=12 TOKEN_INTERVAL_MS=40 TTFT_MS=200 npx tsx src/main.ts > /dev/null & PID=$!; sleep 3; curl -si localhost:4110/anthropic/v1/messages -H content-type:application/json -H 'X-Mock-Scenario: replay:nope' -d '{"messages":[]}' | grep -E '^HTTP|^\{'; kill $PID)
+HTTP/1.1 404 Not Found
+{"type":"error","error":{"type":"not_found_error","message":"Replay fixture \"nope\" not found for anthropic. Available: max-tokens, overloaded-midstream, pause-turn-1, pause-turn-2, text, text-ping, thinking, web-fetch-error"}}
+
+[exit 0]

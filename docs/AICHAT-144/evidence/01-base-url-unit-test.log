@@ -1,0 +1,19 @@
+$ cd services/conversation-service && npx vitest run src/features/llm-adapters/registry.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/features/llm-adapters/registry.spec.ts > createProviderRegistry > AC-64: selects the adapter implementation based on the configured provider 2ms
+ ✓ src/features/llm-adapters/registry.spec.ts > createProviderRegistry > throws a clear error for an unregistered provider id 1ms
+ ✓ src/features/llm-adapters/registry.spec.ts > createProviderRegistry > AC-65: every registered adapter implements the same LlmProvider surface 0ms
+ ✓ src/features/llm-adapters/registry.spec.ts > createProviderRegistry base URLs (AICHAT-43) > keeps the real API hosts when the variables are not set 4ms
+ ✓ src/features/llm-adapters/registry.spec.ts > createProviderRegistry base URLs (AICHAT-43) > reads ANTHROPIC_BASE_URL 0ms
+ ✓ src/features/llm-adapters/registry.spec.ts > createProviderRegistry base URLs (AICHAT-43) > reads OPENAI_BASE_URL 0ms
+ ✓ src/features/llm-adapters/registry.spec.ts > createProviderRegistry base URLs (AICHAT-43) > rejects a base URL that is not a URL 0ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  13:02:06
+   Duration  274ms (transform 59%, import 33%, tests 5%, setup 2%, worker 1%)
+
+
+[exit 0]

@@ -1,0 +1,24 @@
+$ cd testing/promptfoo && ./node_modules/.bin/vitest run --reporter=verbose 2>&1 | grep -v "^$" | grep -v "RTK"
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/testing/promptfoo
+ ✓ src/stack.spec.ts > red-team test stack (compose.redteam.yaml) > plants the same system prompt the assertions look for 1ms
+ ✓ src/stack.spec.ts > red-team test stack (compose.redteam.yaml) > serves the attack pages read-only from the folder the team owns, on loopback only 0ms
+ ✓ src/stack.spec.ts > red-team test stack (compose.redteam.yaml) > is only used on top of the mock stack, never by the plain compose file 1ms
+ ✓ src/stack.spec.ts > red-team test stack (compose.redteam.yaml) > keeps the canary the mock scenario leaks equal to the one the assertions check 0ms
+ ✓ src/attacks.spec.ts > attack set (README section 5) > has unique ids and covers A1 to A8 1ms
+ ✓ src/attacks.spec.ts > attack set (README section 5) > points every payload at a file that exists 0ms
+ ✓ src/attacks.spec.ts > attack set (README section 5) > gives every attack a rubric and a prompt 0ms
+ ✓ src/attacks.spec.ts > attack set (README section 5) > only marks the text and PDF attachments as a known gap 0ms
+ ✓ src/attacks.spec.ts > attack set (README section 5) > sends the web attacks to pages the team hosts 0ms
+ ✓ src/attacks.spec.ts > attack set (README section 5) > finds an attack by id and rejects an unknown id 1ms
+ ✓ src/attacks.spec.ts > payload files > send exfiltration only to attacker.example, which does not exist 1ms
+ ✓ src/attacks.spec.ts > payload files > carry the instruction they are meant to inject 0ms
+ ✓ src/attacks.spec.ts > payload files > do not contain the canary (it lives in the system prompt only) 0ms
+ ✓ src/attacks.spec.ts > payload files > start a PNG and a PDF with the right magic bytes 1ms
+ ✓ src/attacks.spec.ts > URL helpers > lists the hosts of the URLs in a text 0ms
+ ✓ src/attacks.spec.ts > URL helpers > recognises the attacker domain and its subdomains only 0ms
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  05:14:14
+   Duration  112ms (transform 59%, import 21%, tests 12%, worker 8%)
+
+[exit 0]

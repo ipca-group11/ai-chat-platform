@@ -1,0 +1,23 @@
+$ pnpm --dir packages/shared-types exec vitest run src/__fixtures__/dto-snapshots.test.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/shared-types
+
+ ✓ src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > userProfile 5ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > authResponse 1ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > accessTokenClaims 1ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > chat 1ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > chatMember 1ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > message, with web fetches and the default attachment list 1ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > attachment 1ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > testConnectionResponse 0ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > every SSE event, in the order of sseEventSchema 1ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > toErrorResponse snapshots > minimal error 0ms
+ ✓ src/__fixtures__/dto-snapshots.test.ts > toErrorResponse snapshots > validation error with field errors and a correlation id 1ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  17:33:01
+   Duration  201ms (import 45%, transform 29%, worker 15%, tests 10%)
+
+
+[exit 0]

@@ -47,7 +47,7 @@ each container uses at that point. Use a **mock LLM** so tests cost nothing.
 
 ## 4. Discovery: current state
 
-### 4.1 Existing script `testing/k6/streaming-load.js` does not match the API
+### 4.1 Existing script `testing/k6/streaming-load.ts` does not match the API
 - Default `K6_BASE_URL` is `http://localhost:3001`, which is the **mfe-auth static server**, not auth-service (`:4001`, or `/auth` behind the shell `:8000`).
 - `createChat` posts a **`null` body**, but `createChatSchema` requires `title`, `provider` and `model`, so it gets a 400.
 - It reads `res.json("id")`, but the API returns `{ chat: { id } }`.

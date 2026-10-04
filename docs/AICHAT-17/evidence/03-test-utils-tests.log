@@ -1,0 +1,28 @@
+$ cd packages/test-utils && pnpm exec vitest run --coverage
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/test-utils
+      Coverage enabled with v8
+
+
+ Test Files  4 passed (4)
+      Tests  51 passed (51)
+   Start at  15:02:00
+   Duration  1.31s (environment 58%, setup 26%, transform 8%, worker 3%, tests 2%, import 1%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |    95.45 |     100 |     100 |                   
+ src               |     100 |    88.23 |     100 |     100 |                   
+  ...ent-source.ts |     100 |       80 |     100 |     100 | 44,65             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 84/84 )
+Branches     : 95.45% ( 42/44 )
+Functions    : 100% ( 40/40 )
+Lines        : 100% ( 80/80 )
+================================================================================
+
+[exit 0]

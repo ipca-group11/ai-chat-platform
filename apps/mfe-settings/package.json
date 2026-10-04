@@ -23,6 +23,8 @@
   "devDependencies": {
     "@module-federation/vite": "^1.22.1",
     "@platform/eslint-config": "workspace:*",
+    "@platform/test-config": "workspace:*",
+    "@platform/test-utils": "workspace:*",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
@@ -32,8 +34,10 @@
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "^5.0.1",
     "jsdom": "^30.1.1",
+    "msw": "^2.15.0",
     "typescript": "6.0.3",
     "vite": "^8.3.1",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.1",
+    "vitest-axe": "^0.1.0"
   }
 }

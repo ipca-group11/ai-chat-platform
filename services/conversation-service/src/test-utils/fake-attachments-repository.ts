@@ -24,6 +24,11 @@ export class FakeAttachmentsRepository implements AttachmentsRepository {
     return [...this.attachments.values()].filter((a) => messageIds.includes(a.messageId));
   }
 
+  async findReferencedPaths(storagePaths: string[]): Promise<Set<string>> {
+    const wanted = new Set(storagePaths);
+    return new Set([...this.attachments.values()].map((a) => a.storagePath).filter((p) => wanted.has(p)));
+  }
+
   all(): AttachmentRecord[] {
     return [...this.attachments.values()];
   }

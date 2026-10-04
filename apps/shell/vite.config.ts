@@ -1,3 +1,4 @@
+import { coveragePreset, appCoverageThresholds } from '@platform/test-config';
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
@@ -52,6 +53,8 @@ export default defineConfig({
       target: 'react',
       autoCodeSplitting: true,
       routesDirectory: './src/routes',
+      // Unit tests live next to the route files and must not become routes.
+      routeFileIgnorePattern: '\\.test\\.',
       generatedRouteTree: './src/routeTree.gen.ts',
     }),
     react(),
@@ -73,21 +76,17 @@ export default defineConfig({
     env: {
       NODE_ENV: 'test',
     },
-    setupFiles: ['./src/test-setup.ts'],
+    setupFiles: ['./src/test-setup.ts', '@platform/test-utils/setup'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     // Cold-cache transform of module-federation.config.ts (and its
     // @module-federation/vite import) can exceed the 5s default, especially
     // in sandboxed/CI environments without a warm Vite cache; give tests
     // that dynamically import it (e.g. remoteWiring.test.ts) headroom.
     testTimeout: 15000,
-    coverage: {
-      reporter: ['text', 'html'],
-      thresholds: {
-        lines: 80,
-        statements: 80,
-        functions: 80,
-        branches: 80,
-      },
-    },
+    coverage: coveragePreset({
+      exclude: ['src/shared/test/**'],
+      // Standard thresholds (AICHAT-34 ratchet closed by AICHAT-17: 80/75/80/80).
+      thresholds: appCoverageThresholds,
+    }),
   },
 });

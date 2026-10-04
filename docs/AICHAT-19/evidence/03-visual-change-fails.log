@@ -1,0 +1,37 @@
+$ pnpm --filter e2e run visual 2>&1 | grep -v "^npm" | grep -E "✘|passed|failed|Expected|Received|Diff|pixels|ratio" | head -40
+  ✘   1 [visual] › src/visual/screens.spec.ts:117:5 › login (light) (1.9s)
+  ✘   2 [visual] › src/visual/screens.spec.ts:117:5 › login (dark) (1.5s)
+  ✘   3 [visual] › src/visual/screens.spec.ts:117:5 › login-validation-error (light) (1.5s)
+  ✘   4 [visual] › src/visual/screens.spec.ts:117:5 › login-validation-error (dark) (1.5s)
+    Error: expect(page).toHaveScreenshot(expected) failed
+      649 pixels (ratio 0.01 of all image pixels) are different.
+      - 649 pixels (ratio 0.01 of all image pixels) are different.
+      - 649 pixels (ratio 0.01 of all image pixels) are different.
+    Expected: src/visual/__screenshots__/visual/login-light.png
+    Received: test-results/screens-login-light--visual/login-light-actual.png
+    Diff:     test-results/screens-login-light--visual/login-light-diff.png
+    Error: expect(page).toHaveScreenshot(expected) failed
+      652 pixels (ratio 0.01 of all image pixels) are different.
+      - 652 pixels (ratio 0.01 of all image pixels) are different.
+      - 652 pixels (ratio 0.01 of all image pixels) are different.
+    Expected: src/visual/__screenshots__/visual/login-dark.png
+    Received: test-results/screens-login-dark--visual/login-dark-actual.png
+    Diff:     test-results/screens-login-dark--visual/login-dark-diff.png
+    Error: expect(page).toHaveScreenshot(expected) failed
+      649 pixels (ratio 0.01 of all image pixels) are different.
+      - 649 pixels (ratio 0.01 of all image pixels) are different.
+      - 649 pixels (ratio 0.01 of all image pixels) are different.
+    Expected: src/visual/__screenshots__/visual/login-validation-error-light.png
+    Received: test-results/screens-login-validation-error-light--visual/login-validation-error-light-actual.png
+    Diff:     test-results/screens-login-validation-error-light--visual/login-validation-error-light-diff.png
+    Error: expect(page).toHaveScreenshot(expected) failed
+      652 pixels (ratio 0.01 of all image pixels) are different.
+      - 652 pixels (ratio 0.01 of all image pixels) are different.
+      - 652 pixels (ratio 0.01 of all image pixels) are different.
+    Expected: src/visual/__screenshots__/visual/login-validation-error-dark.png
+    Received: test-results/screens-login-validation-error-dark--visual/login-validation-error-dark-actual.png
+    Diff:     test-results/screens-login-validation-error-dark--visual/login-validation-error-dark-diff.png
+  4 failed
+  14 passed (26.9s)
+
+[exit 0]

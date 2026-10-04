@@ -1,0 +1,14 @@
+$ cd e2e && ./node_modules/.bin/vitest run src/ci/redteam-workflow.spec.ts --reporter=verbose 2>&1 | grep -E "✓|×|Tests"
+ ✓ src/ci/redteam-workflow.spec.ts > red-team workflow (AICHAT-26) > runs on a weekly schedule and on demand, never on a pull request or a push 2ms
+ ✓ src/ci/redteam-workflow.spec.ts > red-team workflow (AICHAT-26) > is non-blocking: the job and the promptfoo step may fail without failing the workflow 0ms
+ ✓ src/ci/redteam-workflow.spec.ts > red-team workflow (AICHAT-26) > uses the repository secret, reads it only to test for presence, and skips every later step without it 0ms
+ ✓ src/ci/redteam-workflow.spec.ts > red-team workflow (AICHAT-26) > starts the throw-away test stack with the real provider and tears it down always 0ms
+ ✓ src/ci/redteam-workflow.spec.ts > red-team workflow (AICHAT-26) > uploads the HTML and JSON report even when the run fails 0ms
+ ✓ src/ci/redteam-workflow.spec.ts > red-team workflow (AICHAT-26) > checks the report for the key before the upload 0ms
+ ✓ src/ci/redteam-workflow.spec.ts > red-team workflow (AICHAT-26) > never targets production 0ms
+ ✓ src/ci/redteam-workflow.spec.ts > red-team cost cap (AICHAT-26) > is documented in the workflow header and set to at most 2 USD 0ms
+ ✓ src/ci/redteam-workflow.spec.ts > red-team cost cap (AICHAT-26) > is enforced by the code with the same maximum, and by a cost estimate before the run 0ms
+ ✓ src/ci/redteam-workflow.spec.ts > red-team cost cap (AICHAT-26) > limits promptfoo to one call at a time without a cache 1ms
+      Tests  10 passed (10)
+
+[exit 0]

@@ -2,11 +2,11 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { fakePrisma } from "./test-fakes.js";
-import { makeUser } from "./test-fakes.js";
+import type { fakePrisma } from "../../test-utils/fake-prisma.js";
+import { makeUser } from "../../test-utils/fake-prisma.js";
 
 vi.mock("../../shared/prisma", async () => {
-  const { fakePrisma: buildFakePrisma } = await import("./test-fakes");
+  const { fakePrisma: buildFakePrisma } = await import("../../test-utils/fake-prisma");
   return { prisma: buildFakePrisma() };
 });
 

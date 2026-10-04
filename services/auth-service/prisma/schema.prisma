@@ -22,6 +22,8 @@ model User {
   email         String         @unique
   passwordHash  String
   createdAt     DateTime       @default(now())
+  /// Last sign-in or token refresh. Accounts idle for 24 months are deleted by the retention job.
+  lastActiveAt  DateTime       @default(now())
   refreshTokens RefreshToken[]
 }
 

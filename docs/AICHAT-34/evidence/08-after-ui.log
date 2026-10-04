@@ -1,0 +1,72 @@
+$ pnpm nx run ui:test --skip-nx-cache
+
+> llm-chat-workspace@1.0.0 nx /Users/truezone/Projects/ai-chat-platform
+> nx run ui\:test --skip-nx-cache
+
+
+ NX   Running target test for project ui and 2 tasks it depends on:
+
+
+✔  nx run eslint-config:build
+✔  nx run test-config:build
+
+> nx run ui:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/ui
+      Coverage enabled with v8
+
+
+ Test Files  21 passed (21)
+      Tests  128 passed (128)
+   Start at  11:25:33
+   Duration  5.33s (environment 38%, tests 30%, setup 13%, import 11%, transform 5%, worker 3%)
+
+Environment  jsdom was created 21 times · 10.48s total, 38% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |    97.2 |    80.48 |   92.06 |    97.2 |                   
+ components/alert  |      70 |        0 |       0 |      70 |                   
+  alert.tsx        |      70 |        0 |       0 |      70 | 29,36,48          
+ components/dialog |     100 |       50 |     100 |     100 |                   
+  dialog.tsx       |     100 |       50 |     100 |     100 | 50                
+ .../dropdown-menu |     100 |    57.14 |     100 |     100 |                   
+  ...down-menu.tsx |     100 |    57.14 |     100 |     100 | 51-139            
+ ...nts/form-field |     100 |       90 |     100 |     100 |                   
+  form-field.tsx   |     100 |       90 |     100 |     100 | 26                
+ components/select |   86.66 |      100 |      60 |   86.66 |                   
+  select.tsx       |   86.66 |      100 |      60 |   86.66 | 68,99             
+ components/toast  |     100 |    71.42 |     100 |     100 |                   
+  toast.tsx        |     100 |    71.42 |     100 |     100 | 114-115           
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 97.2% ( 174/179 )
+Branches     : 80.48% ( 33/41 )
+Functions    : 92.06% ( 58/63 )
+Lines        : 97.2% ( 174/179 )
+================================================================================
+
+
+
+ NX   Successfully ran target test for project ui and 2 tasks it depends on
+
+
+Output of 2 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      6.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     6.5s (3 tasks)
+  Recoverable time:  <1ms
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vite.config.ts:11:20). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+[exit 0]

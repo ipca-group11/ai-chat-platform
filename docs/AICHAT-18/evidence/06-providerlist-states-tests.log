@@ -1,0 +1,12 @@
+$ pnpm --filter @app/mfe-settings exec vitest run src/features/api-keys/components/ProviderList.test.tsx
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-settings
+
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  16:18:30
+   Duration  2.67s (import 28%, environment 28%, tests 27%, setup 9%, transform 8%)
+
+
+[exit 0]

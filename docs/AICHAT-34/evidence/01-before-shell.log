@@ -1,0 +1,33 @@
+$ cd apps/shell && pnpm exec vitest run --coverage --coverage.reporter=text-summary
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/shell
+      Coverage enabled with v8
+
+
+ Test Files  7 passed (7)
+      Tests  24 passed (24)
+   Start at  11:20:43
+   Duration  3.41s (environment 50%, setup 14%, tests 14%, import 12%, transform 7%, worker 3%)
+
+ % Coverage report from v8
+
+=============================== Coverage summary ===============================
+Statements   : 68.71% ( 112/163 )
+Branches     : 60.97% ( 75/123 )
+Functions    : 62.12% ( 41/66 )
+Lines        : 70.51% ( 110/156 )
+================================================================================
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./module-federation.config" without a file extension (vite.config.ts:5:36). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+ERROR: Coverage for lines (70.51%) does not meet global threshold (80%)
+ERROR: Coverage for functions (62.12%) does not meet global threshold (80%)
+ERROR: Coverage for statements (68.71%) does not meet global threshold (80%)
+ERROR: Coverage for branches (60.97%) does not meet global threshold (80%)
+
+[exit 1]

@@ -1,0 +1,9 @@
+$ pnpm --dir apps/mfe-chat exec eslint src/snapshot-lint-fixture.test.tsx
+
+/Users/truezone/Projects/ai-chat-platform/apps/mfe-chat/src/snapshot-lint-fixture.test.tsx
+  6:21  error  'toMatchSnapshot' is not allowed in component tests. Assert on roles, text and behaviour; snapshots are only for DTOs and wire output (in .ts tests)  platform/no-component-snapshots
+
+✖ 1 problem (1 error, 0 warnings)
+
+
+[exit 1]

@@ -50,5 +50,48 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    // Visual regression (AICHAT-19). Own folder, so `chromium` never runs these specs and this
+    // project never runs the e2e specs. Serves the built apps itself and mocks every API call,
+    // so it needs no stack and no BASE_URL. Baselines are only valid from the Playwright Docker
+    // image (`pnpm --filter e2e visual`, see docs/AICHAT-19/RUNNING.md).
+    {
+      name: "visual",
+      testDir: "./src/visual",
+      // The Vitest specs of the helpers in lib/ are not Playwright specs.
+      testIgnore: "**/lib/**",
+      // One browser at a time: the specs share four fixed ports.
+      fullyParallel: false,
+      retries: 0,
+      timeout: 30_000,
+      snapshotPathTemplate: "{testDir}/__screenshots__/{projectName}/{arg}{ext}",
+      expect: {
+        toHaveScreenshot: {
+          // At most 50 pixels (of 1 024 000) may differ, and each of them only a little. The images are the same
+          // from run to run, so the limit is only for anti-aliasing noise; 1% let a changed heading through.
+          maxDiffPixels: 50,
+          threshold: 0.2,
+          animations: "disabled",
+          caret: "hide",
+          scale: "css",
+        },
+      },
+      use: {
+        ...devices["Desktop Chrome"],
+        // The shell, served by the spec itself.
+        baseURL: "http://localhost:5000",
+        viewport: { width: 1280, height: 800 },
+        deviceScaleFactor: 1,
+        locale: "en-GB",
+        timezoneId: "UTC",
+        colorScheme: "light",
+        launchOptions: {
+          // Same pixels on a busy machine: software rendering on one raster thread, no LCD text, no font hinting.
+          args: ["--disable-gpu", "--disable-lcd-text", "--font-render-hinting=none", "--force-color-profile=srgb", "--disable-skia-runtime-opts", "--num-raster-threads=1"],
+        },
+        screenshot: "off",
+        video: "off",
+        trace: "off",
+      },
+    },
   ],
 });

@@ -3,7 +3,10 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/workspace-config/src",
   "projectType": "library",
-  "tags": ["type:package", "scope:shared"],
+  "tags": [
+    "type:package",
+    "scope:shared"
+  ],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",
@@ -12,12 +15,29 @@
         "cwd": "packages/workspace-config"
       }
     },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.json --noEmit",
+        "cwd": "packages/workspace-config"
+      }
+    },
     "test": {
       "executor": "nx:run-commands",
       "options": {
         "command": "vitest run --coverage",
         "cwd": "packages/workspace-config"
-      }
+      },
+      "dependsOn": [],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/vitest.workspace.ts",
+        "{workspaceRoot}/apps/**/*",
+        "{workspaceRoot}/services/**/*",
+        "{workspaceRoot}/packages/**/*",
+        "{workspaceRoot}/e2e/**/*",
+        "{workspaceRoot}/scripts/unit-test/**/*"
+      ]
     }
   }
 }

@@ -1,0 +1,18 @@
+$ cd testing/mock-server && (PORT=4010 npx tsx src/main.ts & PID=$!; sleep 3; for d in empty default many-chats long-conversation shared-chats attachments; do echo "--- POST /__admin/seed/$d"; curl -s -X POST localhost:4010/__admin/seed/$d; echo; done; echo "--- unknown dataset"; curl -s -X POST localhost:4010/__admin/seed/nope; echo; kill $PID)
+mock-server listening on http://localhost:4010
+--- POST /__admin/seed/empty
+{"dataset":"empty","counts":{"users":0,"chats":0,"members":0,"messages":0,"attachments":0,"providerKeys":0}}
+--- POST /__admin/seed/default
+{"dataset":"default","counts":{"users":2,"chats":4,"members":4,"messages":10,"attachments":0,"providerKeys":2}}
+--- POST /__admin/seed/many-chats
+{"dataset":"many-chats","counts":{"users":1,"chats":220,"members":220,"messages":440,"attachments":0,"providerKeys":0}}
+--- POST /__admin/seed/long-conversation
+{"dataset":"long-conversation","counts":{"users":1,"chats":1,"members":1,"messages":500,"attachments":0,"providerKeys":0}}
+--- POST /__admin/seed/shared-chats
+{"dataset":"shared-chats","counts":{"users":4,"chats":4,"members":13,"messages":14,"attachments":0,"providerKeys":0}}
+--- POST /__admin/seed/attachments
+{"dataset":"attachments","counts":{"users":1,"chats":1,"members":1,"messages":8,"attachments":4,"providerKeys":0}}
+--- unknown dataset
+{"error":{"code":"unknown_dataset","message":"Unknown dataset \"nope\"","available":["empty","default","many-chats","long-conversation","shared-chats","attachments"]}}
+
+[exit 0]

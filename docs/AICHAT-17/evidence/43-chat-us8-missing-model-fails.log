@@ -1,0 +1,13 @@
+$ bash /private/tmp/claude-501/-Users-truezone-Projects-ai-chat-platform/eef7d68d-8a8c-448c-9b92-df26c0f970df/scratchpad/e43.sh
+--- PROVIDER_MODELS.openai gets a new model "gpt-6" with no row in the tables ---
+ × src/shared/model-capability-tables.test.ts > capability expectations > has an expectation for every openai model, and for no model that is gone 3ms
+ × src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-6: reasoning matches the expectation 0ms
+ × src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-6: web fetch matches the expectation 0ms
+ × src/shared/model-capability-tables.test.ts > PROVIDER_MODELS capability tables > openai / gpt-6: image (vision) matches the expectation 0ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  4 failed | 56 passed (60)
+--- types.ts restored ---
+Updated 1 path from the index
+
+[exit 0]

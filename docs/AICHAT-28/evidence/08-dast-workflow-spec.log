@@ -1,0 +1,27 @@
+$ pnpm --filter e2e exec vitest run src/ci/dast-workflow.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/e2e
+
+ ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > runs on pull requests to main, on pushes to the integration branch and main, and on demand 1ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > pins the ZAP image to 2.17.0 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > starts the compose stack with the LLM mock and waits for it with a bound 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > fails the job on a High alert (fail_action) and warns on Medium 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > scans signed in with the AJAX spider and the rules file 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > masks the session cookie in the log 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > keeps the HTML, JSON and Markdown reports as build artifacts even when the scan fails 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > tears the stack down even if the job fails 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST CI workflow (AICHAT-28) > documents the required-check team rule and never targets production 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST weekly API scan (AICHAT-121) > runs on a weekly schedule and on demand, never on a pull request 1ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST weekly API scan (AICHAT-121) > scans the OpenAPI file with zap-api-scan.py and keeps the reports 0ms
+ ✓ src/ci/dast-workflow.spec.ts > DAST weekly API scan (AICHAT-121) > sets the active High rules to FAIL 0ms
+ ✓ src/ci/dast-workflow.spec.ts > OpenAPI file for the API scan (AICHAT-121) > is OpenAPI 3 and uses the shell as the server 0ms
+ ✓ src/ci/dast-workflow.spec.ts > OpenAPI file for the API scan (AICHAT-121) > lists every conversation-service route under /api/chats, except the endless stream 1ms
+ ✓ src/ci/dast-workflow.spec.ts > OpenAPI file for the API scan (AICHAT-121) > lists every auth-service route under /auth 0ms
+
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  21:13:38
+   Duration  144ms (transform 48%, import 31%, tests 13%, worker 8%)
+
+
+[exit 0]

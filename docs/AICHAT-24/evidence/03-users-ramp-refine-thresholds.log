@@ -1,0 +1,30 @@
+$ tr '' '
+' < docs/AICHAT-24/results/users_ramp_refine-k6.txt | sed -n '/THRESHOLDS/,/TOTAL RESULTS/p' | grep -v '^$'
+  █ THRESHOLDS 
+    http_req_duration{kind:rest,level:400}
+    ✓ 'p(95)<1000' p(95)=711.13ms
+    http_req_duration{kind:rest,level:475}
+    ✗ 'p(95)<1000' p(95)=1.02s
+    http_req_duration{kind:rest,level:550}
+    ✗ 'p(95)<1000' p(95)=1.49s
+    http_req_duration{kind:rest,level:625}
+    ✗ 'p(95)<1000' p(95)=1.82s
+    http_req_duration{kind:rest,level:700}
+    ✗ 'p(95)<1000' p(95)=2.38s
+    http_req_duration{kind:rest}
+    ✗ 'p(95)<1000' p(95)=1.81s
+    http_req_failed{kind:rest,level:400}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest,level:475}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest,level:550}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest,level:625}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest,level:700}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest}
+    ✓ 'rate<0.01' rate=0.00%
+  █ TOTAL RESULTS 
+
+[exit 0]

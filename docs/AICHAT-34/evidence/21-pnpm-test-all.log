@@ -1,0 +1,68 @@
+$ pnpm test
+
+> llm-chat-workspace@1.0.0 test /Users/truezone/Projects/ai-chat-platform
+> nx run-many -t test
+
+
+ NX   Running target test for 15 projects and 6 tasks they depend on:
+
+- conversation-service
+- workspace-config
+- eslint-config
+- observability
+- auth-service
+- shared-types
+- pact-config
+- test-config
+- mfe-settings
+- mfe-auth
+- mfe-chat
+- ui
+- k6
+- shell
+- e2e
+
+
+✔  nx run eslint-config:build  [existing outputs match the cache, left as is]
+✔  nx run auth-service:prisma-generate  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:prisma-generate  [existing outputs match the cache, left as is]
+✔  nx run k6:test  [existing outputs match the cache, left as is]
+✔  nx run test-config:build  [existing outputs match the cache, left as is]
+✔  nx run auth-service:test  [existing outputs match the cache, left as is]
+✔  nx run conversation-service:test  [existing outputs match the cache, left as is]
+✔  nx run ui:build  [existing outputs match the cache, left as is]
+✔  nx run shared-types:build  [existing outputs match the cache, left as is]
+✔  nx run ui:test  [existing outputs match the cache, left as is]
+✔  nx run shared-types:test  [existing outputs match the cache, left as is]
+✔  nx run pact-config:test  [existing outputs match the cache, left as is]
+✔  nx run observability:test  [existing outputs match the cache, left as is]
+✔  nx run e2e:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-settings:test  [existing outputs match the cache, left as is]
+✔  nx run mfe-auth:test  [existing outputs match the cache, left as is]
+✔  nx run shell:test  [existing outputs match the cache, left as is]
+✔  nx run test-config:test
+✔  nx run eslint-config:test
+✔  nx run workspace-config:test
+
+
+
+ NX   Successfully ran target test for 15 projects and 6 tasks they depend on
+
+Nx read the output from the cache instead of running the command for 18 out of 21 tasks.
+
+Output of 21 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      2.7s
+  Cache:             18/21 hit (86%)
+  Critical path:     2.6s (3 tasks)
+  Recoverable time:  19ms (1% of the run)
+
+ NX   Nx detected a flaky task
+
+  conversation-service:test
+
+Flaky tasks can disrupt your CI pipeline. Automatically retry them with Nx Cloud. Learn more at https://nx.dev/ci/features/flaky-tasks
+
+
+[exit 0]

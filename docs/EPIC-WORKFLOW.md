@@ -13,11 +13,14 @@ epics listed in [AICHAT-EPICS.md](AICHAT-EPICS.md).
 | Jira project | [AICHAT](https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list) |
 | Owner of every epic and story | Jean-Pierre Carvalho |
 | Board columns | TODO → In Progress → Review → Done |
+| Execution order | [EPIC-PLAN.md](EPIC-PLAN.md) |
 | Per-epic analysis | `docs/AICHAT-<n>/README.md` (goal, current state, plan, stories, risks) |
 | Per-epic work log | `docs/AICHAT-<n>/WORKLOG.md` (what was done, how to run it, how to repeat it by hand, evidence) |
 | Evidence (screenshots, logs, reports) | `docs/AICHAT-<n>/evidence/` |
 | Work-log template | [templates/WORKLOG.md](templates/WORKLOG.md) |
-| Terminal screenshot helper | [`scripts/evidence/term-shot.mjs`](../scripts/evidence/term-shot.mjs) |
+| Terminal screenshot helper | [`scripts/evidence/term-shot.ts`](../scripts/evidence/term-shot.ts) |
+| Integration branch | `integration/testing-epics` (all epic branches merge here; one final PR to `main`) |
+| Epic branch | `test/AICHAT-<n>-<short-name>`, created from the integration branch |
 
 ## Overview
 
@@ -34,34 +37,12 @@ epics listed in [AICHAT-EPICS.md](AICHAT-EPICS.md).
 
 ## 1. Start the epic
 
-1. Pick the next epic from the order below (dependencies first). Only **one epic In Progress at a time**.
+1. Pick the next epic from [EPIC-PLAN.md](EPIC-PLAN.md) (dependencies first). Only **one epic In Progress at a time**.
 2. In Jira, move the epic **TODO → In Progress** (transition *Em andamento*).
 3. Check the epic and every child story are assigned to the owner.
 4. Add a comment to the epic: `Started <date>. Work log: docs/AICHAT-<n>/WORKLOG.md`.
 
-**Recommended order**
-
-| # | Epic | Why here |
-|---|---|---|
-| 1 | AICHAT-34 Coverage thresholds | Sets the quality gate the other test epics are measured against |
-| 2 | AICHAT-17 Unit testing | Base of the test pyramid |
-| 3 | AICHAT-18 Component testing | Builds on the unit-test helpers |
-| 4 | AICHAT-20 Snapshot testing | Small, no blockers |
-| 5 | AICHAT-23 Integration testing | Needs the backend fakes |
-| 6 | AICHAT-144 Mock server | Unblocks E2E chat flows, load, DAST, prompt-injection and frontend-only tests |
-| 7 | AICHAT-25 Provider adapter testing | Needs one recording run with API keys |
-| 8 | AICHAT-27 SAST | Security baseline, no blockers |
-| 9 | AICHAT-31 Secret scanning | Security baseline, no blockers |
-| 10 | AICHAT-30 SBOM generation | Plugs into the image build |
-| 11 | AICHAT-28 DAST | Reuses the e2e stack |
-| 12 | AICHAT-22 Bundle size budget | Needs agreed limits |
-| 13 | AICHAT-21 Performance testing (frontend) | Needs agreed budgets |
-| 14 | AICHAT-19 Visual regression | Needs the e2e harness and the font decision |
-| 15 | AICHAT-24 Load testing | Needs the mock server (AICHAT-144) |
-| 16 | AICHAT-32 PII masking | Needs the masking rule |
-| 17 | AICHAT-26 Prompt injection | Needs the system-prompt decision and an API budget |
-| 18 | AICHAT-33 GDPR retention and deletion | Blocked until the user deletion endpoint exists |
-| 19 | AICHAT-29 Penetration testing | Last: tests everything above; needs rules of engagement |
+**Order**: follow [EPIC-PLAN.md](EPIC-PLAN.md) (waves, dependencies and the start command for every epic).
 
 ## 2. Definition of Ready review
 
@@ -87,9 +68,20 @@ Before any code is written, every DoR item of the epic is checked **with the own
 
 ## 3. Set up
 
+Branching model:
+
+```
+main
+ └── integration/testing-epics            ← final PR to main, reviewed by the team
+      ├── test/AICHAT-34-coverage-thresholds
+      ├── test/AICHAT-17-unit-testing
+      └── … one branch per epic (already created and pushed)
+```
+
 ```sh
-git switch main && git pull
-git switch -c test/AICHAT-<n>-<short-name>          # e.g. test/AICHAT-27-sast
+git fetch origin
+git switch test/AICHAT-<n>-<short-name>             # e.g. test/AICHAT-27-sast (exists on origin)
+git merge origin/integration/testing-epics          # pick up epics merged since the branch was cut
 mkdir -p docs/AICHAT-<n>/evidence
 cp docs/templates/WORKLOG.md docs/AICHAT-<n>/WORKLOG.md
 ```
@@ -105,7 +97,7 @@ For every story of the epic, in order (US1, US2, …):
 2. Do the work in small commits (`test(<scope>): …`, `ci(<scope>): …`, `docs(<scope>): …`; reference the story key
    in the body, e.g. `Refs: AICHAT-35`).
 3. **Run it** and capture evidence:
-   - Terminal output → `node scripts/evidence/term-shot.mjs --out docs/AICHAT-<n>/evidence --name <nn>-<what> -- <command>`
+   - Terminal output → `node scripts/evidence/term-shot.ts --out docs/AICHAT-<n>/evidence --name <nn>-<what> -- <command>`
      (writes `<name>.log` and a `<name>.png` screenshot; the exit code is kept, so failing runs can be captured too).
    - Browser pages (Grafana, GitHub Actions, Jira, the app) → screenshot saved as `docs/AICHAT-<n>/evidence/<nn>-<what>.png`
      (Chrome DevTools *Capture screenshot*, or Playwright `page.screenshot()`).
@@ -119,8 +111,10 @@ For every story of the epic, in order (US1, US2, …):
    - *How to repeat it manually*, step by step, from a clean checkout, with the expected output.
    - *Result*: numbers (tests, findings, coverage, timings) and the evidence images.
    - *Problems* hit and how they were solved.
-5. Tick the acceptance criteria in the Jira story; open a PR (`AICHAT-<story>: <summary>`), link the PR in the story.
-6. After review and merge, move the story to **Done**.
+5. Tick the acceptance criteria in the Jira story; push and open a PR from the epic branch into
+   `integration/testing-epics` (`AICHAT-<n>: <summary>`), link the PR in the story.
+6. As soon as the PR checks pass, merge it into `integration/testing-epics` (merge commit, branch kept) and move
+   the stories to **Done**. Team review happens once, on the final PR to `main` (§6).
 
 A failing check that is **expected** (a deliberate drop in coverage, a planted fake secret, a bundle over its limit)
 is captured as evidence too: it proves the gate works.
@@ -131,8 +125,15 @@ is captured as evidence too: it proves the gate works.
 2. Write the **Notes for the report** section of the work log: what was found, what was fixed, numbers, lessons learned.
 3. Add the run instructions to `docs/AICHAT-<n>/README.md` (or link the work log) and update the status column in
    [AICHAT-EPICS.md](AICHAT-EPICS.md).
-4. Jira: epic **In Progress → Review** with a comment linking the work log and the PRs; **Review → Done** once the
+4. Make sure every PR of the epic is merged into `integration/testing-epics`.
+5. Jira: epic **In Progress → Review** with a comment linking the work log and the PRs; **Review → Done** once the
    DoD is accepted.
+
+## 6. Final merge to main
+
+When all epics are merged (or explicitly left out), one PR `integration/testing-epics → main` is opened and the
+team is asked for review. Before opening it: `git merge origin/main` into the integration branch, run the full test
+suite, and list every epic with its work log in the PR description.
 
 ## Conventions for the documentation
 

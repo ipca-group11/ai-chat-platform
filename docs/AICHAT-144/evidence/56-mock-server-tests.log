@@ -1,0 +1,7 @@
+$ cd testing/mock-server && pnpm exec vitest run --coverage 2>&1 | grep -E 'Test Files|Tests|All files|request-log|remotes.router|collect.router|admin.router'
+ Test Files  10 passed (10)
+      Tests  77 passed (77)
+All files          |   99.64 |    96.29 |     100 |     100 |                   
+  request-log.ts   |     100 |    94.73 |     100 |     100 | 69                
+
+[exit 0]

@@ -1,0 +1,176 @@
+# Weekly prompt injection run (AICHAT-26). promptfoo plays the attack set of testing/promptfoo/src/attacks.ts against
+# a throw-away compose stack (never production) with a REAL model, and keeps the report as an artifact.
+#
+# NON-BLOCKING: it never runs on a pull request or a push, the job has continue-on-error, and a failing attack does not
+# fail the workflow. A red-team result is a finding to triage (docs/AICHAT-26/WORKLOG.md), not a merge gate.
+#
+# KEY: the repository secret ANTHROPIC_API_KEY pays for the run. When it is not set (forks, new repositories) every
+# step after the check is skipped and the workflow ends green with a notice. The key goes to the app only as the
+# X-Llm-Api-Key header of a message, never to a file; the report is searched for the key before it is uploaded.
+#
+# COST CAP: 2 USD per run, set three times so one mistake cannot lift it:
+#   1. REDTEAM_BUDGET_USD below. The provider (testing/promptfoo/src/budget.ts) charges every live call to the cap
+#      before it is made and stops the run when the next call would pass it. The code refuses a cap above 2 USD.
+#   2. The "Estimate the cost" step runs the same estimate first and fails the job before any call when it is above the cap.
+#   3. promptfoo runs one call at a time (maxConcurrency 1), without cache, with the repeat count below.
+# Expected cost with the defaults (claude-haiku-4-5, 9 attacks x 2): about 0.30 USD. Haiku 4.5 list price is 1 USD per
+# million input tokens and 5 per million output tokens; the grader of the llm-rubric checks is the same model.
+#
+# WEB ATTACKS (A3 to A5): Anthropic fetches the pages from its own servers, so the pages must be on a public URL. Set the
+# repository variable REDTEAM_PAGES_BASE_URL to a place that serves testing/promptfoo/pages (for example GitHub Pages).
+# Without it the web attacks are left out and the run covers the other surfaces.
+name: redteam
+
+on:
+  schedule:
+    # Monday 03:00 UTC, an hour before the DAST API scan.
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      repeat:
+        description: "Times each attack runs (the cost estimate scales with it)"
+        default: "2"
+      model:
+        description: "Model of the chats and of the grader (a Haiku class model)"
+        default: "claude-haiku-4-5"
+
+concurrency:
+  group: redteam
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  # Hard cap of one run in USD. The code refuses more than 2.
+  REDTEAM_BUDGET_USD: "2"
+  REDTEAM_MODEL: ${{ inputs.model || 'claude-haiku-4-5' }}
+  REDTEAM_REPEAT: ${{ inputs.repeat || '2' }}
+  REDTEAM_APP_URL: http://localhost:8000
+  REDTEAM_RESULTS: redteam-results
+
+jobs:
+  redteam:
+    name: redteam
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    continue-on-error: true
+    steps:
+      # The secret is only read into the environment of this step, and only its presence is reported.
+      - name: Check for the API key
+        id: key
+        env:
+          KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "$KEY" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::ANTHROPIC_API_KEY is not set: the red-team run is skipped"
+            echo "Red-team run skipped: the repository secret ANTHROPIC_API_KEY is not set." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Free disk space
+        if: steps.key.outputs.present == 'true'
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost && df -h /
+
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.present == 'true'
+
+      - uses: pnpm/action-setup@v4
+        if: steps.key.outputs.present == 'true'
+
+      # promptfoo loads the TypeScript provider and assertions with Node's own TypeScript support.
+      - uses: actions/setup-node@v4
+        if: steps.key.outputs.present == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.key.outputs.present == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Choose the attack surfaces
+        if: steps.key.outputs.present == 'true'
+        env:
+          PAGES: ${{ vars.REDTEAM_PAGES_BASE_URL }}
+        run: |
+          if [ -n "$PAGES" ]; then
+            echo "PAGES_BASE_URL=$PAGES" >> "$GITHUB_ENV"
+            echo "REDTEAM_SURFACES=" >> "$GITHUB_ENV"
+          else
+            echo "::notice::REDTEAM_PAGES_BASE_URL is not set: the web attacks A3 to A5 are left out"
+            echo "REDTEAM_SURFACES=image,file,shared,direct,cross-user" >> "$GITHUB_ENV"
+          fi
+
+      # Fails here, before any call, when the estimate is above REDTEAM_BUDGET_USD.
+      - name: Estimate the cost
+        if: steps.key.outputs.present == 'true'
+        run: node testing/promptfoo/src/estimate-cli.ts --repeat "$REDTEAM_REPEAT" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # The real provider API (no mock): conversation-service uses its default base URL. The system prompt with the
+      # canary and the attack pages come from compose.redteam.yaml, which only this test stack uses.
+      - name: Start the test stack
+        if: steps.key.outputs.present == 'true'
+        env:
+          COMPOSE_FILE: compose.yaml:compose.redteam.yaml
+        run: docker compose --profile llm up -d --build --wait postgres auth-service conversation-service shell attack-pages
+
+      # Bounded poll of the entry points; fails after about five minutes instead of hanging.
+      - name: Wait for the stack to become healthy
+        if: steps.key.outputs.present == 'true'
+        run: |
+          for url in http://localhost:8000/ http://localhost:4001/health http://localhost:4002/health; do
+            ok=0
+            for _ in $(seq 1 60); do
+              if curl -fsS -o /dev/null "$url"; then ok=1; break; fi
+              sleep 5
+            done
+            [ "$ok" = "1" ] || { echo "not healthy: $url"; exit 1; }
+          done
+
+      # A failing attack makes promptfoo exit 1; the step is allowed to fail so the report is still kept and summarised.
+      - name: Run promptfoo
+        id: run
+        if: steps.key.outputs.present == 'true'
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          mkdir -p "$REDTEAM_RESULTS"
+          pnpm --filter @platform/promptfoo exec promptfoo eval -c promptfooconfig.yaml --repeat "$REDTEAM_REPEAT" --no-cache --no-progress-bar \
+            -o "$GITHUB_WORKSPACE/$REDTEAM_RESULTS/report.json" -o "$GITHUB_WORKSPACE/$REDTEAM_RESULTS/report.html"
+
+      - name: Summarise the report
+        if: steps.key.outputs.present == 'true' && always()
+        run: node testing/promptfoo/src/report-cli.ts "$REDTEAM_RESULTS/report.json" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # The report must not hold the key; if it does, it is deleted instead of uploaded.
+      - name: Check the report for the key
+        if: steps.key.outputs.present == 'true' && always()
+        env:
+          KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -d "$REDTEAM_RESULTS" ] && grep -rqF -- "$KEY" "$REDTEAM_RESULTS"; then
+            echo "::error::the report holds the API key, it is deleted"
+            rm -rf "$REDTEAM_RESULTS"
+            exit 1
+          fi
+
+      - name: Upload the report
+        if: steps.key.outputs.present == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: redteam-report
+          path: |
+            redteam-results/report.html
+            redteam-results/report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Tear down the test stack
+        if: steps.key.outputs.present == 'true' && always()
+        env:
+          COMPOSE_FILE: compose.yaml:compose.redteam.yaml
+        run: docker compose --profile llm down -v --remove-orphans

@@ -13,6 +13,7 @@ title: "AICHAT-17 · [Foundations] Unit testing"
 | Depends on | AICHAT-34 (coverage thresholds) |
 | Related | AICHAT-18 (deep state testing of Composer, ChatView, ProviderList), AICHAT-23 (route-level tests of controllers) |
 | Layer | **All source files of the monorepo**: `apps/*`, `packages/*`, `services/*`, `e2e/src` helpers |
+| Policy | [UNIT-TEST-POLICY.md](UNIT-TEST-POLICY.md) · exempt list [`unit-test-exempt.json`](../../packages/workspace-config/unit-test-exempt.json) |
 
 ## 1. Goal
 
@@ -27,8 +28,8 @@ The Jira text names "hooks, utils and model capability tables". These stay in sc
 
 **DoR**
 - [x] **Owner assigned:** JP (Jira assignee)
-- [ ] **Scope agreed:** every source file in `apps/*/src`, `packages/*`, `services/*/src` and `e2e/src` (246 files, §4.1) is in scope; the exempt categories in §4.2 are agreed
-- [ ] **Tooling agreed:** Vitest + Testing Library (`render`, `renderHook`) + supertest confirmed; MSW adopted or rejected (US10)
+- [x] **Scope agreed:** every source file in `apps/*/src`, `packages/*`, `services/*/src` and `e2e/src` (246 files, §4.1) is in scope; the exempt categories in §4.2 are agreed
+- [x] **Tooling agreed:** Vitest + Testing Library (`render`, `renderHook`) + supertest confirmed; MSW **adopted** (US10, see §7.1)
 - [ ] Target environment available (local, CI or VM)
 - [ ] Files to cover listed → **done in §4 of this doc** (Jira: "hooks, utils and capability tables to cover listed")
 
@@ -54,7 +55,8 @@ The Jira text names "hooks, utils and model capability tables". These stay in sc
 | ESLint `RuleTester` (from `eslint`) | `^10` | Unit tests for the custom rule and configs in `packages/eslint-config` |
 | Nx | `23.2.1` | `nx affected -t test` in `.github/workflows/ci.yml` |
 
-Optional (to be agreed): **MSW** (`msw`) to replace ~23 hand-written `vi.stubGlobal("fetch", ...)` stubs with one handler set per API.
+| `msw` | `^2.15.0` | **Adopted** (§7.1): one handler set per API in `packages/test-utils`, replaces the hand-written `vi.stubGlobal("fetch", ...)` stubs |
+| `@platform/test-utils` | workspace | `renderWithClient`, `renderHookWithClient`, `FakeEventSource`, MSW server and handlers ([README](../../packages/test-utils/README.md)) |
 
 ## 4. Discovery: current state
 
@@ -185,8 +187,22 @@ Stories are grouped **by MFE and microservice**, so each project is delivered an
 - **Whole-repo scope is larger** than the Jira wording (hooks/utils/tables). Confirm this with the team and update the Jira epic description if agreed.
 - "Every file has a test" can lead to shallow tests written just to pass the guard. Pair the guard with the coverage thresholds (AICHAT-34) and, later, mutation testing (AICHAT-16).
 - **Overlap with AICHAT-18 and AICHAT-23:** components get a render-level unit test here, with deep state matrices in AICHAT-18; controllers get focused unit tests here, with full HTTP error-path tests in AICHAT-23.
-- **MSW or not?** Adds a dependency but removes ~23 hand-rolled fetch stubs. **Decided 2026-10-03: settle it in the time-boxed spike AICHAT-135.**
+- **MSW or not?** Adds a dependency but removes the hand-rolled fetch stubs. **Decided 2026-10-03 (spike AICHAT-135): adopted**, see §7.1.
 - The capability parity test needs the frontend test to read the backend tables (shared module or JSON export). Moving the table to `packages/shared-types` would be an app change and must be agreed. **Decided 2026-10-03: move the tables to `packages/shared-types`** (see WORKLOG §1).
+
+### 7.1 Decision: MSW for HTTP mocking in the MFEs (AICHAT-135)
+
+**Decision: adopted (2026-10-03).** The four microfrontends mock HTTP with [MSW](https://mswjs.io) v2 (`msw`, `^2.15.0`, `devDependencies`).
+
+| | |
+|---|---|
+| Why | A `vi.stubGlobal("fetch", ...)` stub answers every request the same way and hides a wrong URL, method or body; the test passes while the app would fail. An MSW handler matches on method and path, so a wrong call is an unhandled request and fails the test. The handlers also read like the API (`GET */chats` returns `{ chats }`) and are shared by all tests. |
+| How | `packages/test-utils` (`@platform/test-utils`): default handlers for auth, chats (with members), messages (with queue actions and attachments) and settings (test connection), served by one `setupServer`. The setup file `@platform/test-utils/setup` starts it with `onUnhandledRequest: "error"`. A test changes one answer with `server.use(...)` and checks the calls with `recordRequests()`. |
+| Data | Response bodies are built with the `@platform/mock-server` factories (fixed seed), mapped to the DTOs conversation-service sends. |
+| Result | All 54 `vi.stubGlobal("fetch", ...)` calls in 19 test files (the discovery had estimated ~23) were replaced (see work log, US3), except two single-call spies listed under "Limits". |
+| Cost | One new dev dependency (`msw`, 31 packages in the lockfile), one workspace package, `"node"` in the app `tsconfig` types, and one `COPY` line in the four app Dockerfiles. |
+| Limits | (1) Node's `fetch` cannot send a jsdom `FormData` with a jsdom `File`, so the upload test keeps a one-call `fetch` spy. (2) Code that must see something that is not a response (`TestConnectionButton` fallback) keeps a one-call spy. (3) Backend tests are not affected: they keep the fakes in `services/conversation-service/src/test-utils/`. |
+| Not chosen | Keep the stubs: cheapest, but repeated in 20 files and blind to the request. A `fetch` wrapper in `test-utils` without MSW: would re-implement matching, and still not stop at an unhandled request. |
 
 ## 8. Notes for the report
 
