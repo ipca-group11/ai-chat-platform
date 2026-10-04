@@ -1,0 +1,13 @@
+$ gitleaks git --redact --config .gitleaks.toml --log-opts=origin/integration/testing-epics..HEAD
+
+    ○
+    │╲
+    │ ○
+    ○ ░
+    ░    gitleaks
+
+7:34AM INF 15 commits scanned.
+7:34AM INF scanned ~273133 bytes (273.13 KB) in 137ms
+7:34AM INF no leaks found
+
+[exit 0]
