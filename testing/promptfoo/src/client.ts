@@ -33,6 +33,7 @@ export interface ChatOptions {
 }
 
 /** Header the browser uses to send the provider key with a message (never stored by the service). */
+// nosemgrep: node_api_key
 const API_KEY_HEADER = "X-Llm-Api-Key";
 
 /** Name=value pairs of Set-Cookie headers, joined into one Cookie header value. */

@@ -11,8 +11,8 @@ title: "AICHAT-26 · Prompt injection testing: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-26-prompt-injection-testing` |
 | Started / finished | 2026-10-04 / 2026-10-04 |
-| Pull requests | #… |
-| Status | Done (real-model run pending a key) |
+| Pull requests | [#25](https://github.com/ipca-group11/ai-chat-platform/pull/25) |
+| Status | Done, merged into `integration/testing-epics` (real-model run pending a key) |
 
 ## 1. DoR review
 
@@ -257,7 +257,7 @@ cd ../.. && pnpm mock:down
 
 ## 7. Notes for the report
 
-- **Checks before the pull request.** `pnpm exec nx affected -t lint typecheck test build size --base=origin/integration/testing-epics --parallel=3`: green for 19 projects (with `NX_DAEMON=false`; the first run with the daemon aborted). `gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD`: no leaks after two entries in `.gitleaksignore` for the fake test canary and victim note (they look like API keys to the generic rule). `pnpm sast`: **not run** - it runs Semgrep in Docker and the Docker daemon (OrbStack) was down after the disk filled up; run it again on a machine with space. No key or cookie is in a committed file.
+- **Checks before the pull request.** `pnpm exec nx affected -t lint typecheck test build size --base=origin/integration/testing-epics --parallel=3`: green for 19 projects (with `NX_DAEMON=false`; the first run with the daemon aborted). `gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD`: no leaks after two entries in `.gitleaksignore` for the fake test canary and victim note (they look like API keys to the generic rule). `pnpm sast`: first not run, because Docker was down after the disk filled up. After we freed space it found two false positives: the header name `X-Llm-Api-Key` and the fake test canary/victim note. We marked these lines with `nosemgrep`, and the rerun has no ERROR finding (![](evidence/13-sast.png)). No key or cookie is in a committed file.
 - **Found.** See the US5 table. The most important: web fetch has no domain list (F2), there is no system prompt with untrusted-content rules (F1) and markdown images in replies were loaded by the browser (fixed, F3).
 - **Not done.** No real-model run (no key): the harness is proven against the mock, but how often a Haiku class model follows the payloads is unknown. The Docker stack with `REDTEAM=1` was not started to the end (disk space), the Docker-free stack was used for the runs. The workflow has not run on GitHub yet. Web attacks against a real model need a public URL for the pages.
 - **Lessons.** A scripted obeying reply is the cheapest way to show that an assertion can fail. Files can only be attached to an existing message, so an attack with a file needs two messages. Put heavy tools in the project that uses them, not in the root, when Docker images install the root.
