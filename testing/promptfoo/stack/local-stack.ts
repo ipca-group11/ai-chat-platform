@@ -6,7 +6,9 @@
 //   services/conversation-service/node_modules/.bin/tsx testing/promptfoo/stack/local-stack.ts
 //
 // Variables: LOCAL_STACK_PORT (default 8000), LOCAL_STACK_MOCK_PORT (default 4010), WEB_FETCH_ALLOWED_DOMAINS (default
-// attack-pages, like compose.redteam.yaml; empty: no domain list, as before AICHAT-242).
+// attack-pages, like compose.redteam.yaml; empty: no domain list, as before AICHAT-242), LOCAL_STACK_ANTHROPIC_BASE_URL
+// (default: the LLM mock; https://api.anthropic.com for a real run, AICHAT-241 — the key still comes from the
+// harness's ANTHROPIC_API_KEY, sent per message, never read here).
 import { createHmac } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { createApp } from "../../../services/conversation-service/src/app.ts";
@@ -41,7 +43,7 @@ await new Promise<void>((resolve) => mock.listen(mockPort, "127.0.0.1", resolve)
 const env = parseEnv({
   JWT_SECRET: secret,
   LOG_LEVEL: "silent",
-  ANTHROPIC_BASE_URL: `http://127.0.0.1:${mockPort}/anthropic`,
+  ANTHROPIC_BASE_URL: process.env["LOCAL_STACK_ANTHROPIC_BASE_URL"] || `http://127.0.0.1:${mockPort}/anthropic`,
   SYSTEM_PROMPT: TEST_SYSTEM_PROMPT,
   WEB_FETCH_ALLOWED_DOMAINS: process.env["WEB_FETCH_ALLOWED_DOMAINS"] ?? "attack-pages",
 });
