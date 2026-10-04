@@ -7,9 +7,10 @@
 #   attack-pages  a static server (nginx) with the pages that hide instructions for the web-fetch attacks
 #                 (testing/promptfoo/pages). Exfiltration targets in the pages use attacker.example, which
 #                 does not exist, so nothing can leave the machine.
-#   SYSTEM_PROMPT conversation-service gets a system prompt that holds a canary. The app has no system
-#                 prompt of its own, so a canary is the only way to tell whether a model leaked one. The text
-#                 must stay the same as TEST_SYSTEM_PROMPT in testing/promptfoo/src/canary.ts (a test checks it).
+#   SYSTEM_PROMPT conversation-service gets a system prompt that holds a canary, so a leak can be seen. The
+#                 service appends its rules for untrusted content to it (AICHAT-243), so the attacks run against
+#                 the real rules. The text must stay the same as TEST_SYSTEM_PROMPT in
+#                 testing/promptfoo/src/canary.ts (a test checks it).
 #
 #   WEB_FETCH_ALLOWED_DOMAINS  the model may only fetch the attack pages (AICHAT-242): an injected "fetch
 #                 https://attacker.example/..." is refused by the tool. For a real run with public pages, set

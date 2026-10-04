@@ -14,6 +14,7 @@ import { authMiddleware } from "./shared/auth-middleware.js";
 import { correlationMiddleware } from "./shared/correlation-middleware.js";
 import { errorHandler, notFoundHandler } from "./shared/error-handler.js";
 import { createLogger, type Logger } from "./shared/logger.js";
+import { buildSystemPrompt } from "./shared/system-prompt.js";
 import { createMetrics } from "./shared/metrics.js";
 import type { PrismaClient } from "./shared/prisma.js";
 
@@ -78,7 +79,7 @@ export function createApp(
   const queueManager =
     overrides.queueManager ??
     new QueueManager(
-      createMessageProcessor({ messagesRepo, chatsService, providerRegistry, bus, buildLlmMessages, systemPrompt: env.SYSTEM_PROMPT }),
+      createMessageProcessor({ messagesRepo, chatsService, providerRegistry, bus, buildLlmMessages, systemPrompt: buildSystemPrompt(env.SYSTEM_PROMPT) }),
       (chatId, entry, error) => {
         logger.error({ chatId, messageId: entry.messageId, err: error }, "queue processor threw unexpectedly");
       },

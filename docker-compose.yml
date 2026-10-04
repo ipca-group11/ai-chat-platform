@@ -115,6 +115,9 @@ services:
       UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:1b}
+      # Opening of the system prompt (AICHAT-243). Empty: the built-in one. The rules that files, web pages,
+      # text in images and other members' messages are data, never instructions, are always appended.
+      SYSTEM_PROMPT: ${SYSTEM_PROMPT:-}
       # Sites the model may fetch while answering (AICHAT-242): only these, or all but these. Comma-separated, never both.
       WEB_FETCH_ALLOWED_DOMAINS: ${WEB_FETCH_ALLOWED_DOMAINS:-}
       WEB_FETCH_BLOCKED_DOMAINS: ${WEB_FETCH_BLOCKED_DOMAINS:-}

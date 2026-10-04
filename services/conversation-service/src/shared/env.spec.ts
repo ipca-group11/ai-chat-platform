@@ -29,10 +29,10 @@ describe("parseEnv", () => {
     expect(env.MAX_UPLOAD_BYTES).toBe(1048576);
   });
 
-  it("has no system prompt unless SYSTEM_PROMPT is set (AICHAT-26)", () => {
+  it("reads SYSTEM_PROMPT and treats an empty one as unset, so the built-in prompt applies (AICHAT-243)", () => {
     expect(parseEnv(base).SYSTEM_PROMPT).toBeUndefined();
     expect(parseEnv({ ...base, SYSTEM_PROMPT: "Be brief." }).SYSTEM_PROMPT).toBe("Be brief.");
-    expect(() => parseEnv({ ...base, SYSTEM_PROMPT: "" })).toThrow();
+    expect(parseEnv({ ...base, SYSTEM_PROMPT: "  " }).SYSTEM_PROMPT).toBeUndefined();
   });
 
   it("has no internal service token unless INTERNAL_SERVICE_TOKEN is set, and rejects a short one (AICHAT-79)", () => {
@@ -48,14 +48,14 @@ describe("parseEnv", () => {
   });
 
   it("reads the web fetch domain lists, one of the two at most (AICHAT-242)", () => {
-    expect(parseEnv({}).WEB_FETCH_ALLOWED_DOMAINS).toBeUndefined();
-    expect(parseEnv({ WEB_FETCH_ALLOWED_DOMAINS: " example.com,*.Docs.Python.org " }).WEB_FETCH_ALLOWED_DOMAINS).toEqual([
+    expect(parseEnv(base).WEB_FETCH_ALLOWED_DOMAINS).toBeUndefined();
+    expect(parseEnv({ ...base, WEB_FETCH_ALLOWED_DOMAINS: " example.com,*.Docs.Python.org " }).WEB_FETCH_ALLOWED_DOMAINS).toEqual([
       "example.com",
       "docs.python.org",
     ]);
-    expect(parseEnv({ WEB_FETCH_BLOCKED_DOMAINS: "attacker.example" }).WEB_FETCH_BLOCKED_DOMAINS).toEqual(["attacker.example"]);
-    expect(() => parseEnv({ WEB_FETCH_ALLOWED_DOMAINS: "https://example.com/path" })).toThrow(/not a domain name/);
-    expect(() => parseEnv({ WEB_FETCH_ALLOWED_DOMAINS: "example.com", WEB_FETCH_BLOCKED_DOMAINS: "attacker.example" })).toThrow(/not both/);
+    expect(parseEnv({ ...base, WEB_FETCH_BLOCKED_DOMAINS: "attacker.example" }).WEB_FETCH_BLOCKED_DOMAINS).toEqual(["attacker.example"]);
+    expect(() => parseEnv({ ...base, WEB_FETCH_ALLOWED_DOMAINS: "https://example.com/path" })).toThrow(/not a domain name/);
+    expect(() => parseEnv({ ...base, WEB_FETCH_ALLOWED_DOMAINS: "example.com", WEB_FETCH_BLOCKED_DOMAINS: "attacker.example" })).toThrow(/not both/);
   });
 
   it("AC-45: rejects an invalid NODE_ENV value", () => {

@@ -24,7 +24,8 @@ describe("red-team test stack (compose.redteam.yaml)", () => {
   });
 
   it("is only used on top of the mock stack, never by the plain compose file", () => {
-    expect(read("compose.yaml")).not.toContain("SYSTEM_PROMPT");
+    expect(read("compose.yaml")).not.toContain(CANARY);
+    expect(read("compose.yaml")).toContain("SYSTEM_PROMPT: ${SYSTEM_PROMPT:-}");
     expect(read("scripts/mock-compose.sh")).toContain("compose.redteam.yaml");
   });
 

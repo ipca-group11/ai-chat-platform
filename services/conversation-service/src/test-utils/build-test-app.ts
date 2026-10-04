@@ -21,6 +21,8 @@ export interface TestAppOptions {
   overrides?: AppOverrides;
   /** Replaces the silent logger, for tests that read the log lines. */
   logger?: Logger;
+  /** Extra environment settings, e.g. `SYSTEM_PROMPT`. */
+  env?: Record<string, string>;
 }
 
 /** The real `createApp` (real middleware order, routers and error handler) wired to
@@ -42,6 +44,7 @@ export function buildTestApp(options: TestAppOptions = {}) {
     LOG_LEVEL: "silent",
     INTERNAL_SERVICE_TOKEN: TEST_SERVICE_TOKEN,
     ...(options.maxUploadBytes ? { MAX_UPLOAD_BYTES: String(options.maxUploadBytes) } : {}),
+    ...options.env,
   });
   const app: Express = createApp({} as PrismaClient, env, options.logger ?? createLogger("silent"), { ...fakes, ...options.overrides });
   return { app, ...fakes };

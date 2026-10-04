@@ -30,9 +30,10 @@ const envSchema = z.object({
   OPENAI_BASE_URL: z.string().url().default("https://api.openai.com"),
   // Local Ollama server (no API key).
   OLLAMA_BASE_URL: z.string().url().default("http://localhost:11434"),
-  // Optional system prompt added at the start of every conversation. Unset in production (no system prompt today);
-  // the red-team test stack sets it to a prompt that holds a canary (AICHAT-26, compose.redteam.yaml).
-  SYSTEM_PROMPT: z.string().min(1).optional(),
+  // Opening of the system prompt of every reply (AICHAT-243). Unset or empty: the built-in one
+  // (src/shared/system-prompt.ts). The rules about untrusted content are always appended to it. The red-team
+  // stack sets a prompt that holds a canary (AICHAT-26, compose.redteam.yaml).
+  SYSTEM_PROMPT: z.preprocess((value) => (typeof value === "string" && value.trim() === "" ? undefined : value), z.string().optional()),
   // Sites the model may fetch while answering (AICHAT-242), comma-separated, subdomains included:
   // only these (ALLOWED) or all but these (BLOCKED), never both. Unset: no restriction.
   WEB_FETCH_ALLOWED_DOMAINS: domainList,
