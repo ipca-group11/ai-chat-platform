@@ -111,6 +111,7 @@ pnpm exec nx run-many -t test-db -p auth-service,conversation-service --parallel
 **Problems and fixes.**
 - All test files of a service share one database, so the smoke tests count rows by id instead of counting the whole table, and `fileParallelism` is off.
 - The setup file lives in `test-utils/` because the repository's unit-test guard treats other `.ts` files in a package as source that needs its own test.
+- The first CI run of `test-db` failed with `Cannot find package '@app/shared-types/model-capabilities'`: on a clean runner the workspace packages were not built yet, because the target only depended on `prisma-generate`. Locally the old `dist/` hid it. The target now also depends on `^build`, like `test`; we checked it after deleting `packages/shared-types/dist`.
 
 ### US3 · Remove uploaded files when a chat or message is deleted ([AICHAT-97](https://ipca-grupo11.atlassian.net/browse/AICHAT-97))
 
