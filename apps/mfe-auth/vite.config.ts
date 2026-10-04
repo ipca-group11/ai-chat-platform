@@ -31,6 +31,10 @@ export default defineConfig({
         "@tanstack/react-query": { singleton: true, requiredVersion: false },
         "@app/ui": { singleton: true, requiredVersion: false },
       },
+      // AICHAT-237: take the shared libraries from the shell as loaded, and reuse the shell's
+      // federation runtime (globalThis._FEDERATION_RUNTIME_CORE) instead of bundling a copy.
+      shareStrategy: "loaded-first",
+      experiments: { externalRuntime: true },
     }),
   ],
   build: {

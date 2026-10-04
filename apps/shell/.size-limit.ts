@@ -26,7 +26,9 @@ const glue = [
 const sharedCopies = [`${assets}/*prebuild*.js`, `${assets}/*loadShare*.js`];
 
 export default [
-  { name: 'shell remoteEntry.js', path: 'dist/remoteEntry.js', limit: '7 KB', gzip: true },
+  // 8 KB (the analysis upper bound): since AICHAT-237 it also publishes the federation runtime for the remotes,
+  // which no longer download their own copy (about 19 kB gzip each).
+  { name: 'shell remoteEntry.js', path: 'dist/remoteEntry.js', limit: '8 KB', gzip: true },
   {
     name: 'shell own chunks',
     path: [`${assets}/*.js`, ...glue.map((g) => `!${g}`), ...sharedCopies.map((g) => `!${g}`)],

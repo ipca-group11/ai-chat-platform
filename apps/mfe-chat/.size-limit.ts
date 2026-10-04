@@ -1,6 +1,7 @@
 // Bundle size budget of mfe-chat (AICHAT-22), gzip. Run: pnpm exec nx run mfe-chat:size (builds first).
 // Limit = measured baseline + 10%, rounded up to the next KB; baseline and rule in docs/AICHAT-22/WORKLOG.md (US1).
 // Raising a limit needs a reason in the pull request.
+// AICHAT-237: glue and total tightened after the remote stopped bundling the federation runtime.
 const assets = 'dist/assets';
 
 // Module Federation runtime and loader glue: requested at runtime, but not application code.
@@ -33,7 +34,7 @@ export default [
     limit: '70 KB',
     gzip: true,
   },
-  { name: 'mfe-chat federation glue', path: glue, limit: '136 KB', gzip: true },
+  { name: 'mfe-chat federation glue', path: glue, limit: '114 KB', gzip: true },
   { name: 'mfe-chat shared-library copies', path: sharedCopies, limit: '137 KB', gzip: true },
-  { name: 'mfe-chat all emitted JS', path: [`${assets}/*.js`, 'dist/remoteEntry.js'], limit: '348 KB', gzip: true },
+  { name: 'mfe-chat all emitted JS', path: [`${assets}/*.js`, 'dist/remoteEntry.js'], limit: '326 KB', gzip: true },
 ];

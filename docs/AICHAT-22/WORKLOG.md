@@ -277,3 +277,20 @@ pnpm mock:down
 - **Found.** The application code is small (25 to 63 kB gzip per app); the federation glue (114 to 123 kB) and the copies of the shared libraries (88 to 124 kB) are bigger than the application. The copies in the remotes are never downloaded while the shell provides the libraries (US5), so the budget keeps them in their own group. The federation runtime helpers are downloaded once per container (4 times `utils-*`, about 57 kB gzip of repeat downloads), and the shell registers all remotes at start-up, so `mfe-auth` and `mfe-settings` are fetched on `/chats` as well. Both are tickets for the platform owner, not changes of this epic.
 - **Not done.** The `Bundle size change` step and the new `size` target have not run on GitHub yet (the branch is not pushed), so a Linux-only difference can still show up in the first run; the base build in the second worktree adds the time of a second `pnpm install` and a build to pull request runs. The check on `/chats` is manual and not in CI. Gzip sizes differ by a few bytes between machines and zlib versions; the limits have a 10% margin for that.
 - **Lessons.** Measure by group, not in total: a total hides growth of the application behind the glue. Content hashes in file names have to be cut before two builds are compared. size-limit counts 1 kB as 1000 bytes. Look at the code of the responses, not at file names, to prove a library is loaded once.
+
+## 8. Follow-ups
+
+Measured on 2026-10-04 against `integration/develop` (gzip, `node scripts/ci/bundle-size.ts snapshot` before and after, `nx run-many -t size`).
+
+### AICHAT-237 · Share the federation runtime, load remote entries on demand
+
+The shell now publishes its Module Federation runtime on `globalThis` (`experiments.provideExternalRuntime`) and the three remotes build with `experiments.externalRuntime`, so the `utils-*` chunk (19.2 kB gzip) is no longer emitted or downloaded by the remotes. `shareStrategy: 'loaded-first'` (shell and remotes) takes the shared libraries from the shell as they are loaded, so the shell no longer imports every `remoteEntry.js` at start-up: on `/chats` only the shell's and `mfe-chat`'s `remoteEntry.js` are requested (was 4).
+
+| | Before | After |
+|---|---|---|
+| `utils-*` downloads on `/chats` | 4 | 1 (the shell's runtime) |
+| `remoteEntry.js` requests on `/chats` | 4 | 2 |
+| Each remote, all emitted JS | 271.6 / 316.5 / 238.3 kB | -20 kB each |
+| Shell `remoteEntry.js` | 6.2 kB | 7.4 kB (carries the runtime publisher) |
+
+Budgets: remote glue and totals lowered; the shell `remoteEntry.js` limit goes from 7 to 8 KB (the analysis upper bound), justified by the ~57 kB of repeat downloads it removes.

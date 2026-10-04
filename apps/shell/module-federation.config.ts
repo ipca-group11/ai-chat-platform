@@ -50,4 +50,14 @@ export default createModuleFederationConfig({
     // remotes render the same shadcn/Base UI components.
     '@app/ui': { singleton: true, requiredVersion: false },
   },
+  // AICHAT-237: `loaded-first` takes a shared module from whoever already loaded it (the shell)
+  // instead of fetching every remote's remoteEntry.js at start-up to compare versions, so
+  // /chats only downloads mfe-chat. The remotes are loaded when their route is visited.
+  shareStrategy: 'loaded-first',
+  experiments: {
+    // AICHAT-237: the shell publishes its federation runtime (the `utils-*` chunk, ~19 kB gzip)
+    // on `globalThis`; the remotes build with `externalRuntime` and reuse it instead of
+    // downloading their own copy.
+    provideExternalRuntime: true,
+  },
 });

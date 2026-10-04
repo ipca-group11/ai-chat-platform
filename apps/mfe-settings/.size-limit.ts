@@ -1,6 +1,7 @@
 // Bundle size budget of mfe-settings (AICHAT-22), gzip. Run: pnpm exec nx run mfe-settings:size (builds first).
 // Limit = measured baseline + 10%, rounded up to the next KB; baseline and rule in docs/AICHAT-22/WORKLOG.md (US1).
 // Raising a limit needs a reason in the pull request.
+// AICHAT-237: glue and total tightened after the remote stopped bundling the federation runtime.
 const assets = 'dist/assets';
 
 // Module Federation runtime and loader glue: requested at runtime, but not application code.
@@ -33,7 +34,7 @@ export default [
     limit: '29 KB',
     gzip: true,
   },
-  { name: 'mfe-settings federation glue', path: glue, limit: '129 KB', gzip: true },
+  { name: 'mfe-settings federation glue', path: glue, limit: '107 KB', gzip: true },
   { name: 'mfe-settings shared-library copies', path: sharedCopies, limit: '99 KB', gzip: true },
-  { name: 'mfe-settings all emitted JS', path: [`${assets}/*.js`, 'dist/remoteEntry.js'], limit: '263 KB', gzip: true },
+  { name: 'mfe-settings all emitted JS', path: [`${assets}/*.js`, 'dist/remoteEntry.js'], limit: '241 KB', gzip: true },
 ];

@@ -1,6 +1,7 @@
 // Bundle size budget of mfe-auth (AICHAT-22), gzip. Run: pnpm exec nx run mfe-auth:size (builds first).
 // Limit = measured baseline + 10%, rounded up to the next KB; baseline and rule in docs/AICHAT-22/WORKLOG.md (US1).
 // Raising a limit needs a reason in the pull request.
+// AICHAT-237: glue and total tightened after the remote stopped bundling the federation runtime.
 const assets = 'dist/assets';
 
 // Module Federation runtime and loader glue: requested at runtime, but not application code.
@@ -33,7 +34,7 @@ export default [
     limit: '28 KB',
     gzip: true,
   },
-  { name: 'mfe-auth federation glue', path: glue, limit: '129 KB', gzip: true },
+  { name: 'mfe-auth federation glue', path: glue, limit: '107 KB', gzip: true },
   { name: 'mfe-auth shared-library copies', path: sharedCopies, limit: '137 KB', gzip: true },
-  { name: 'mfe-auth all emitted JS', path: [`${assets}/*.js`, 'dist/remoteEntry.js'], limit: '299 KB', gzip: true },
+  { name: 'mfe-auth all emitted JS', path: [`${assets}/*.js`, 'dist/remoteEntry.js'], limit: '277 KB', gzip: true },
 ];
