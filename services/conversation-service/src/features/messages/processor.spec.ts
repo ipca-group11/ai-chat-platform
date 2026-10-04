@@ -253,6 +253,33 @@ describe("createMessageProcessor", () => {
     expect(errorEvent?.retryable).toBe(true);
   });
 
+  it("AICHAT-211: an error after some text keeps the partial answer but marks it failed, so it can be retried", async () => {
+    const { chatsService, messagesRepo, bus, chat, userMessage } = await setupChatWithUserMessage();
+    const provider = new ScriptedProvider(async function* () {
+      yield "The answer starts ";
+      throw new ProviderError("openai", "The server had an error", { retryable: true });
+    });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
+
+    const events = await collectEvents(bus, chat.id, () =>
+      processor(chat.id, { messageId: userMessage.id, content: "hello", attachmentIds: [] }, new AbortController().signal),
+    );
+
+    const assistant = messagesRepo.all().find((m) => m.role === "assistant");
+    expect({ content: assistant?.content, status: assistant?.status, error: assistant?.error }).toEqual({
+      content: "The answer starts ",
+      status: "failed",
+      error: "The server had an error",
+    });
+    expect(events.some((e) => e.type === "done")).toBe(false);
+    expect(events.find((e) => e.type === "error")).toEqual({
+      type: "error",
+      messageId: assistant?.id,
+      message: "The server had an error",
+      retryable: true,
+    });
+  });
+
   it("AC-50: subsequent messages use the chat's persisted provider and model, even after it changes", async () => {
     const { chatsService, messagesRepo, bus, chat, userMessage } = await setupChatWithUserMessage();
     const seenRequests: Array<{ providerId: string; model: string }> = [];

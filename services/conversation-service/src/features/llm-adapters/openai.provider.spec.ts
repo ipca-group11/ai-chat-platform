@@ -61,6 +61,38 @@ describe("OpenAiProvider", () => {
     }
   });
 
+  it("AICHAT-211: a mid-stream `error` event fails the answer instead of ending it", async () => {
+    const drain = async (error: Record<string, unknown>) => {
+      const fetchImpl = vi.fn().mockResolvedValue(
+        mockStreamResponse([
+          `data: ${JSON.stringify({ choices: [{ delta: { content: "Hel" } }] })}\n\n`,
+          `data: ${JSON.stringify({ error })}\n\n`,
+        ]),
+      );
+      const tokens: string[] = [];
+      try {
+        for await (const token of new OpenAiProvider({ fetchImpl }).sendMessage({
+          messages: [{ role: "user", content: "hi" }],
+          model: "gpt-4o-mini",
+          apiKey: "sk-test",
+        })) {
+          tokens.push(token);
+        }
+      } catch (err) {
+        return { tokens, err: err as ProviderError };
+      }
+      return expect.unreachable();
+    };
+
+    const server = await drain({ message: "The server had an error", type: "server_error" });
+    expect(server.tokens).toEqual(["Hel"]);
+    expect(server.err).toBeInstanceOf(ProviderError);
+    expect({ message: server.err.message, retryable: server.err.retryable }).toEqual({ message: "The server had an error", retryable: true });
+
+    const invalid = await drain({ type: "invalid_request_error" });
+    expect({ message: invalid.err.message, retryable: invalid.err.retryable }).toEqual({ message: "OpenAI stream error", retryable: false });
+  });
+
   it("AC-70: reports vision support for gpt-4o family models", () => {
     const provider = new OpenAiProvider();
     expect(provider.supportsVision("gpt-4o")).toBe(true);

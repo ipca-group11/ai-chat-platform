@@ -164,16 +164,25 @@ describe.each(LAYOUTS)("recorded replay, %s", (_name, layout) => {
       expect(chunks.join("")).toBe("1 2 3 4 5 ");
     });
 
-    it("error-midstream.sse: CURRENT behaviour, the mid-stream error is swallowed and the answer looks complete", async () => {
+    it("error-midstream.sse: partial text, then a retryable ProviderError (AICHAT-211)", async () => {
       const { provider } = openai(replaySse("openai", "error-midstream", layout));
-      // AICHAT-211: the `data: {"error": ...}` event has no `choices`, so the stream ends normally.
-      expect(await collect(provider, context("gpt-4o"))).toEqual(["The answer starts "]);
+      const received: LlmStreamChunk[] = [];
+      const error = await failure(
+        (async () => {
+          for await (const chunk of provider.sendMessage(context("gpt-4o"))) received.push(chunk);
+        })(),
+      );
+      expect(received).toEqual(["The answer starts "]);
+      expect({ message: error.message, retryable: error.retryable, statusCode: error.statusCode }).toEqual({
+        message: "The server had an error while processing your request. Sorry about that!",
+        retryable: true,
+        statusCode: undefined,
+      });
     });
   });
 });
 
 describe("expected behaviour once the defects are fixed", () => {
-  it.todo("AICHAT-211: an OpenAI mid-stream `error` event rejects with a ProviderError instead of ending the answer");
   it.todo("AICHAT-212: stop_reason max_tokens (Anthropic) and finish_reason length (OpenAI) mark the answer as incomplete");
 });
 

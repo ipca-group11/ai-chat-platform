@@ -33,5 +33,8 @@ The tests assert today's behaviour and carry an `it.todo` for the expected one.
 
 | Ticket | Defect | Fixtures |
 |---|---|---|
-| [AICHAT-211](https://ipca-grupo11.atlassian.net/browse/AICHAT-211) | OpenAI mid-stream errors are swallowed, a failed answer looks complete | `openai/error-midstream.sse` |
 | [AICHAT-212](https://ipca-grupo11.atlassian.net/browse/AICHAT-212) | `max_tokens` / `length` truncation is not surfaced | `anthropic/max-tokens.sse`, `openai/max-tokens.sse` |
+
+Fixed: [AICHAT-211](https://ipca-grupo11.atlassian.net/browse/AICHAT-211) (`openai/error-midstream.sse`): the
+mid-stream `error` event now fails the answer with a retryable `ProviderError`; the partial text is kept and
+the message is saved as `failed`, so the user can retry it.

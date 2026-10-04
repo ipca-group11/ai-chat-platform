@@ -67,7 +67,17 @@ export class OpenAiProvider implements LlmProvider {
     }
 
     for await (const data of readSseData(response.body)) {
-      const parsed = JSON.parse(data) as { choices?: Array<{ delta?: { content?: string } }> };
+      const parsed = JSON.parse(data) as {
+        choices?: Array<{ delta?: { content?: string } }>;
+        error?: { message?: string; type?: string };
+      };
+      // A failure after the stream started arrives as a `data: {"error": ...}` event with no
+      // `choices` (AICHAT-211). It must fail the answer, not end it as if it were complete.
+      if (parsed.error) {
+        throw new ProviderError("openai", parsed.error.message ?? "OpenAI stream error", {
+          retryable: parsed.error.type !== "invalid_request_error",
+        });
+      }
       const token = parsed.choices?.[0]?.delta?.content;
       if (token) yield token;
     }
