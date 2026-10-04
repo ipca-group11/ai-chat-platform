@@ -5,13 +5,14 @@ import type { Provider } from "../shared/contracts/chat.js";
 import { parseEnv } from "../shared/env.js";
 import { createLogger, type Logger } from "../shared/logger.js";
 import type { PrismaClient } from "../shared/prisma.js";
-import { cookieFor, TEST_JWT_SECRET } from "./auth-token.js";
+import { cookieFor, TEST_JWT_SECRET, TEST_SERVICE_TOKEN } from "./auth-token.js";
 import { FakeAttachmentsRepository } from "./fake-attachments-repository.js";
 import { FakeChatsRepository } from "./fake-chats-repository.js";
 import { FakeMessagesRepository } from "./fake-messages-repository.js";
 import { fakeProviderRegistry } from "./fake-provider-registry.js";
 import { createFakeQueue } from "./fake-queue.js";
 import { FakeStorage } from "./fake-storage.js";
+import { StubErasureRepository } from "./fake-erasure-repository.js";
 import { ChatEventBus } from "../features/streaming/index.js";
 
 export interface TestAppOptions {
@@ -34,10 +35,12 @@ export function buildTestApp(options: TestAppOptions = {}) {
     providerRegistry: fakeProviderRegistry(),
     queueManager: createFakeQueue(),
     bus: new ChatEventBus(),
+    erasureRepo: new StubErasureRepository(),
   };
   const env = parseEnv({
     JWT_SECRET: TEST_JWT_SECRET,
     LOG_LEVEL: "silent",
+    INTERNAL_SERVICE_TOKEN: TEST_SERVICE_TOKEN,
     ...(options.maxUploadBytes ? { MAX_UPLOAD_BYTES: String(options.maxUploadBytes) } : {}),
   });
   const app: Express = createApp({} as PrismaClient, env, options.logger ?? createLogger("silent"), { ...fakes, ...options.overrides });

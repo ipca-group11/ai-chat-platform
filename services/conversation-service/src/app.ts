@@ -6,6 +6,7 @@ import { createAttachmentsRepository, createAttachmentsRouter, createFileCleanup
 import { createChatsRepository, createChatsRouter, ChatsService, type ChatsRepository } from "./features/chats/index.js";
 import { createProviderRegistry, type ProviderRegistry } from "./features/llm-adapters/index.js";
 import { createMessageProcessor, createMessagesRepository, createMessagesRouter, MessagesService, type MessagesRepository } from "./features/messages/index.js";
+import { createErasureRepository, createErasureRouter, ErasureService, type ErasureRepository } from "./features/erasure/index.js";
 import { QueueManager } from "./features/queue/index.js";
 import { ChatEventBus, createStreamingRouter } from "./features/streaming/index.js";
 import type { Env } from "./shared/env.js";
@@ -29,6 +30,7 @@ export interface AppOverrides {
   /** Replaces the queue (and the message processor that feeds it). */
   queueManager?: QueueManager;
   bus?: ChatEventBus;
+  erasureRepo?: ErasureRepository;
 }
 
 /** Builds the Express app + all its wiring (ARCHITECTURE.md §5). Takes the Prisma
@@ -89,6 +91,13 @@ export function createApp(
     providerRegistry,
     env.MAX_UPLOAD_BYTES,
   );
+
+  // Service-to-service routes sit before the user authentication: auth-service calls them with the
+  // service token. Not mounted at all when no token is configured.
+  if (env.INTERNAL_SERVICE_TOKEN) {
+    const erasureService = new ErasureService(overrides.erasureRepo ?? createErasureRepository(prisma), fileCleanup);
+    app.use("/internal", createErasureRouter(erasureService, env.INTERNAL_SERVICE_TOKEN));
+  }
 
   app.use(authMiddleware(env.JWT_SECRET));
   app.use("/chats", createChatsRouter(chatsService));

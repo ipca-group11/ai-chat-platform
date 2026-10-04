@@ -25,6 +25,12 @@ describe("parseEnv", () => {
     expect(() => parseEnv({ SYSTEM_PROMPT: "" })).toThrow();
   });
 
+  it("has no internal service token unless INTERNAL_SERVICE_TOKEN is set, and rejects a short one (AICHAT-79)", () => {
+    expect(parseEnv({}).INTERNAL_SERVICE_TOKEN).toBeUndefined();
+    expect(parseEnv({ INTERNAL_SERVICE_TOKEN: "x".repeat(32) }).INTERNAL_SERVICE_TOKEN).toBe("x".repeat(32));
+    expect(() => parseEnv({ INTERNAL_SERVICE_TOKEN: "too-short" })).toThrow();
+  });
+
   it("AC-45: rejects an invalid NODE_ENV value", () => {
     expect(() => parseEnv({ NODE_ENV: "not-a-real-env" })).toThrow();
   });

@@ -13,3 +13,7 @@ export function tokenFor(userId: string, secret: string = TEST_JWT_SECRET): stri
 export function cookieFor(userId: string): string[] {
   return [`access_token=${tokenFor(userId)}`];
 }
+
+/** Service token of the internal routes in tests, not a credential. */
+// nosemgrep: ajinabraham.njsscan.generic.hardcoded_secrets.node_secret
+export const TEST_SERVICE_TOKEN = "test-service-token-0123456789-abcdef";
