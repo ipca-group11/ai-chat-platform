@@ -26,3 +26,7 @@ semgrep-results/
 zap-results/
 zap-wrk/
 sbom-results/
+
+# Lighthouse CI local output (AICHAT-21)
+.lighthouseci/
+lighthouse-results/
