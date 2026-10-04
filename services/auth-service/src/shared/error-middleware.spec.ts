@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { describe, expect, it, vi } from "vitest";
 import type { ZodError } from "zod";
 import { z } from "zod";
-import { errorMiddleware, HttpError, notFoundMiddleware } from "./error-middleware.js";
+import { errorMiddleware, HttpError, isMalformedJsonBody, notFoundMiddleware } from "./error-middleware.js";
 
 function mockRes() {
   const res = {
@@ -54,6 +54,26 @@ describe("errorMiddleware", () => {
 
     expect(res.statusCode).toBe(400);
     expect((res.body as { error: { code: string } }).error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("formats the body parser's malformed-JSON error as a 400 VALIDATION_ERROR (AICHAT-217)", () => {
+    const res = mockRes();
+    const err = Object.assign(new SyntaxError("Unexpected token n in JSON"), { type: "entity.parse.failed", body: "{n" });
+
+    errorMiddleware(err, mockReq(), res as unknown as Response, vi.fn());
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({ error: { code: "VALIDATION_ERROR", message: "Request body is not valid JSON" }, correlationId: "corr-1" });
+  });
+
+  it("only the body parser's error counts as malformed JSON; any other SyntaxError is a 500", () => {
+    expect(isMalformedJsonBody(Object.assign(new SyntaxError("x"), { type: "entity.parse.failed" }))).toBe(true);
+    expect(isMalformedJsonBody(new SyntaxError("x"))).toBe(false);
+    expect(isMalformedJsonBody(Object.assign(new Error("x"), { type: "entity.parse.failed" }))).toBe(false);
+
+    const res = mockRes();
+    errorMiddleware(new SyntaxError("bug in our code"), mockReq(), res as unknown as Response, vi.fn());
+    expect(res.statusCode).toBe(500);
   });
 
   it("falls back to a 500 INTERNAL_ERROR for unexpected errors", () => {

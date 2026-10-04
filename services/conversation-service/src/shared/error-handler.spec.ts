@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { MulterError } from "multer";
 import { z } from "zod";
 import type { Request, Response } from "express";
-import { errorHandler, HttpError, notFoundHandler } from "./error-handler.js";
+import { errorHandler, HttpError, isMalformedJsonBody, notFoundHandler } from "./error-handler.js";
 
 function makeRes(): Response {
   const res = {
@@ -50,6 +50,32 @@ describe("errorHandler", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     const [body] = (res.json as ReturnType<typeof vi.fn>).mock.calls[0] as [{ error: { message: string } }];
     expect(body.error.message).not.toContain("leaked");
+  });
+
+  it("maps the body parser's malformed-JSON error to a 400 VALIDATION_ERROR without logging the body (AICHAT-217)", () => {
+    const log = { warn: vi.fn(), error: vi.fn() };
+    const req = { correlationId: "corr-6", log } as unknown as Request;
+    const res = makeRes();
+    const err = Object.assign(new SyntaxError("Unexpected token in JSON"), { type: "entity.parse.failed", body: '{"title":"private' });
+
+    errorHandler(err, req, res, vi.fn());
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      error: { code: "VALIDATION_ERROR", message: "Request body is not valid JSON" },
+      correlationId: "corr-6",
+    });
+    expect(JSON.stringify(log.warn.mock.calls)).not.toContain("private");
+  });
+
+  it("only the body parser's error counts as malformed JSON; any other SyntaxError is a 500", () => {
+    expect(isMalformedJsonBody(Object.assign(new SyntaxError("x"), { type: "entity.parse.failed" }))).toBe(true);
+    expect(isMalformedJsonBody(new SyntaxError("x"))).toBe(false);
+    expect(isMalformedJsonBody(Object.assign(new Error("x"), { type: "entity.parse.failed" }))).toBe(false);
+
+    const res = makeRes();
+    errorHandler(new SyntaxError("bug in our code"), { log: { warn: vi.fn(), error: vi.fn() } } as unknown as Request, res, vi.fn());
+    expect(res.status).toHaveBeenCalledWith(500);
   });
 
   it("AC-68/AICHAT-218: maps multer's size limit to a 413 ATTACHMENT_TOO_LARGE", () => {

@@ -78,8 +78,6 @@ export function createApp(deps: AppDeps = {}): Express {
       keyGenerator: (req) => ipKeyGenerator(req.ip ?? "unknown"),
     }),
   );
-  app.use(express.json());
-  app.use(cookieParser());
   app.use(correlationIdMiddleware);
   app.use(
     pinoHttp({
@@ -89,6 +87,10 @@ export function createApp(deps: AppDeps = {}): Express {
       customProps: (req: Request) => ({ correlationId: req.correlationId }),
     }),
   );
+  // Body parsing after the correlation id and request log, so a malformed body still gets both and the
+  // error middleware answers 400 with the request's id (AICHAT-217).
+  app.use(express.json());
+  app.use(cookieParser());
 
   app.get("/health", (_req, res) => {
     res.status(200).json({ status: "ok" });

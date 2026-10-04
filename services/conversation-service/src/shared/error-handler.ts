@@ -22,6 +22,11 @@ export function notFoundHandler(req: Request, res: Response) {
     .json(toErrorResponse("NOT_FOUND", "Resource not found", { correlationId: req.correlationId }));
 }
 
+/** The error `express.json()` raises for a body it cannot parse (a client error, not a 500: AICHAT-217). */
+export function isMalformedJsonBody(err: unknown): boolean {
+  return err instanceof SyntaxError && (err as SyntaxError & { type?: unknown }).type === "entity.parse.failed";
+}
+
 /** Uniform error-handling middleware (ARCHITECTURE.md §7): every error becomes the
  * shared `{ error: { code, message } }` shape, redacting internals for 5xx. */
 export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction) {
@@ -49,6 +54,15 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     res
       .status(400)
       .json(toErrorResponse("ATTACHMENT_UPLOAD_ERROR", err.message, { correlationId }));
+    return;
+  }
+
+  if (isMalformedJsonBody(err)) {
+    // Not the error itself: its message and `body` carry the raw request body, which may hold personal data.
+    req.log?.warn("malformed JSON body");
+    res
+      .status(400)
+      .json(toErrorResponse("VALIDATION_ERROR", "Request body is not valid JSON", { correlationId }));
     return;
   }
 

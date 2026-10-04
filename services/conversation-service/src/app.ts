@@ -47,12 +47,14 @@ export function createApp(
 
   app.use(helmet());
   app.use(cors({ origin: env.CORS_ORIGIN.split(",").map((o) => o.trim()), credentials: true }));
-  app.use(express.json());
-  app.use(cookieParser());
   app.use(correlationMiddleware(logger));
 
   const { metricsMiddleware, metricsHandler, activeStreams } = createMetrics();
   app.use(metricsMiddleware);
+  // Body parsing after the correlation id and metrics, so a malformed body still gets both and the error
+  // handler answers 400 with the request's id (AICHAT-217).
+  app.use(express.json());
+  app.use(cookieParser());
   app.get("/metrics", metricsHandler);
   app.get("/health", (_req, res) => res.json({ status: "ok" }));
 

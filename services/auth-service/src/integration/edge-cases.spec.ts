@@ -79,15 +79,30 @@ describe("POST /auth/login with a malformed body", () => {
     expect(res.body.error.code).toBe("INVALID_CREDENTIALS");
   });
 
-  // Pinned current behaviour (defect, WORKLOG §7): a body that is not valid JSON is
-  // rejected by express.json() with a 400-class SyntaxError, but the error middleware only
-  // knows HttpError and ZodError, so the client gets a 500 INTERNAL_ERROR instead of a 400.
-  // Fixing it needs a new branch in the error middleware, not a one-line change.
-  it("500 INTERNAL_ERROR for a body that is not valid JSON (pinned: should be 400)", async () => {
+  // Was a 500 INTERNAL_ERROR (AICHAT-217): express.json() raises a 400-class SyntaxError the error
+  // middleware did not know.
+  it("400 VALIDATION_ERROR for a body that is not valid JSON, with the correlation id and nothing of the parser error", async () => {
     const { app } = buildTestApp();
-    const res = await request(app).post("/auth/login").set("Content-Type", "application/json").send("{not json");
-    expect(res.status).toBe(500);
-    expect(res.body.error.code).toBe("INTERNAL_ERROR");
-    expect(JSON.stringify(res.body)).not.toMatch(/Unexpected token|SyntaxError|at /);
+    const res = await request(app)
+      .post("/auth/login")
+      .set("Content-Type", "application/json")
+      .set("X-Correlation-Id", "corr-bad-json")
+      .send('{"email":"ana@example.com",');
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("VALIDATION_ERROR");
+    expect(res.body.error.message).toBe("Request body is not valid JSON");
+    expect(res.body.correlationId).toBe("corr-bad-json");
+    expect(JSON.stringify(res.body)).not.toMatch(/Unexpected|SyntaxError|ana@example.com|at /);
+  });
+
+  it("400 VALIDATION_ERROR for malformed JSON on every route that takes a body", async () => {
+    const { app } = buildTestApp();
+    for (const path of ["/auth/register", "/auth/login", "/auth/refresh", "/auth/logout"]) {
+      const res = await request(app).post(path).set("Content-Type", "application/json").send("{not json");
+      expect(res.status, path).toBe(400);
+      expect(res.body.error.code, path).toBe("VALIDATION_ERROR");
+    }
+    const del = await request(app).delete("/auth/me").set("Content-Type", "application/json").send("[1,");
+    expect(del.status).toBe(400);
   });
 });

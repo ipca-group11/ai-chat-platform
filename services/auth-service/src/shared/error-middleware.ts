@@ -38,6 +38,11 @@ export function notFoundMiddleware(req: Request, res: Response): void {
     );
 }
 
+/** The error `express.json()` raises for a body it cannot parse (a client error, not a 500: AICHAT-217). */
+export function isMalformedJsonBody(err: unknown): boolean {
+  return err instanceof SyntaxError && (err as SyntaxError & { type?: unknown }).type === "entity.parse.failed";
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Express requires 4-arg error middleware signature
 export function errorMiddleware(err: unknown, req: Request, res: Response, next: NextFunction): void {
   if (err instanceof HttpError) {
@@ -46,6 +51,17 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
       .json(
         http.toErrorResponse(err.code, err.message, {
           fieldErrors: err.fieldErrors,
+          correlationId: req.correlationId,
+        }),
+      );
+    return;
+  }
+
+  if (isMalformedJsonBody(err)) {
+    res
+      .status(400)
+      .json(
+        http.toErrorResponse("VALIDATION_ERROR", "Request body is not valid JSON", {
           correlationId: req.correlationId,
         }),
       );

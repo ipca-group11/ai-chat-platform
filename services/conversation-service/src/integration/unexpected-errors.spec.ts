@@ -40,16 +40,33 @@ describe("unexpected errors", () => {
     expectSafe500(res);
   });
 
-  // Pinned current behaviour (defect, WORKLOG §7): a body that is not valid JSON makes
-  // express.json() raise a 400-class SyntaxError, which the error handler does not know,
-  // so the client gets a 500 instead of a 400. Fixing it needs a new branch in the handler.
-  it("a body that is not valid JSON returns 500 (pinned: should be 400) and still leaks nothing", async () => {
+  // Was a 500 (AICHAT-217): express.json() raises a 400-class SyntaxError the handler did not know.
+  it("a body that is not valid JSON returns 400 VALIDATION_ERROR with the correlation id and leaks nothing", async () => {
     const { app } = buildTestApp();
     const res = await request(app)
       .post("/chats")
       .set("Cookie", cookieFor("user-1"))
       .set("Content-Type", "application/json")
-      .send("{not json");
-    expectSafe500(res);
+      .set("X-Correlation-Id", "corr-bad-json")
+      .send('{"title":"secret plans",');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toEqual({ code: "VALIDATION_ERROR", message: "Request body is not valid JSON" });
+    expect(res.body.correlationId).toBe("corr-bad-json");
+    expect(res.headers["x-correlation-id"]).toBe("corr-bad-json");
+    expect(JSON.stringify(res.body)).not.toMatch(/Unexpected|SyntaxError|secret plans|at /);
+  });
+
+  it("malformed JSON is a 400 on the other JSON routes too", async () => {
+    const { app } = buildTestApp();
+    const chatId = await createChatVia(app, "user-1");
+    for (const [method, path] of [
+      ["post", `/chats/${chatId}/messages`],
+      ["patch", `/chats/${chatId}`],
+      ["post", "/internal/erasures"],
+    ] as const) {
+      const res = await request(app)[method](path).set("Cookie", cookieFor("user-1")).set("Content-Type", "application/json").send("{not json");
+      expect(res.status, path).toBe(400);
+      expect(res.body.error.code, path).toBe("VALIDATION_ERROR");
+    }
   });
 });
