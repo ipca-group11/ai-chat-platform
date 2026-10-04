@@ -13,5 +13,5 @@
     "declarationMap": false,
     "sourceMap": false
   },
-  "include": ["scripts/**/*.ts", "testing/mock-server/scripts/**/*.ts"]
+  "include": ["scripts/**/*.ts", "testing/mock-server/scripts/**/*.ts", "testing/pentest/**/*.ts"]
 }
