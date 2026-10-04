@@ -1,0 +1,52 @@
+$ cd services/auth-service && pnpm exec vitest run --config vitest.db.config.ts src/test-db/retention.db.spec.ts --reporter=verbose && cd ../conversation-service && pnpm exec vitest run --config vitest.db.config.ts src/test-db/retention.db.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "test", schema "public" at "localhost:32795"
+
+🚀  Your database is now in sync with your Prisma schema. Done in 93ms
+
+ ✓ src/test-db/retention.db.spec.ts > refresh tokens: deleted 7 days after they expire > 1 second before the limit (expired 6 d 23 h 59 min 59 s ago) -> kept: Sun Sep 27 2026 13:00:01 GMT+0100 (Western European Summer Time) 35ms
+ ✓ src/test-db/retention.db.spec.ts > refresh tokens: deleted 7 days after they expire > exactly at the limit (expired 7 d ago) -> kept: Sun Sep 27 2026 13:00:00 GMT+0100 (Western European Summer Time) 9ms
+ ✓ src/test-db/retention.db.spec.ts > refresh tokens: deleted 7 days after they expire > 1 second after the limit (expired 7 d 1 s ago) -> kept: Sun Sep 27 2026 12:59:59 GMT+0100 (Western European Summer Time) 11ms
+ ✓ src/test-db/retention.db.spec.ts > refresh tokens: deleted 7 days after they expire > not yet expired -> kept: Sun Oct 04 2026 14:00:00 GMT+0100 (Western European Summer Time) 9ms
+ ✓ src/test-db/retention.db.spec.ts > refresh tokens: deleted 7 days after they expire > follows the clock: the same token survives an earlier run and goes in a later one 12ms
+ ✓ src/test-db/retention.db.spec.ts > refresh tokens: deleted 7 days after they expire > deletes expired and revoked tokens alike, and only the old ones 17ms
+ ✓ src/test-db/retention.db.spec.ts > accounts: deleted after 24 months without activity > 1 second before the limit (idle 24 months less 1 s) -> kept: Fri Oct 04 2024 13:00:01 GMT+0100 (Western European Summer Time) 9ms
+ ✓ src/test-db/retention.db.spec.ts > accounts: deleted after 24 months without activity > exactly at the limit (idle 24 months) -> kept: Fri Oct 04 2024 13:00:00 GMT+0100 (Western European Summer Time) 9ms
+ ✓ src/test-db/retention.db.spec.ts > accounts: deleted after 24 months without activity > 1 second after the limit (idle 24 months and 1 s) -> kept: Fri Oct 04 2024 12:59:59 GMT+0100 (Western European Summer Time) 13ms
+ ✓ src/test-db/retention.db.spec.ts > accounts: deleted after 24 months without activity > active today -> kept: Sun Oct 04 2026 13:00:00 GMT+0100 (Western European Summer Time) 6ms
+ ✓ src/test-db/retention.db.spec.ts > accounts: deleted after 24 months without activity > erases the chats first, deletes the user and the refresh tokens cascade 13ms
+ ✓ src/test-db/retention.db.spec.ts > accounts: deleted after 24 months without activity > keeps the account when the erasure fails and deletes it on the next run 11ms
+ ✓ src/test-db/retention.db.spec.ts > accounts: deleted after 24 months without activity > leaves due accounts alone without an erasure client 6ms
+ ✓ src/test-db/retention.db.spec.ts > idempotency > a second run right after the first deletes nothing more and keeps what was kept 21ms
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  07:17:59
+   Duration  4.19s (tests 43%, import 36%, transform 19%, setup 1%, worker 1%)
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "test", schema "public" at "localhost:32796"
+
+🚀  Your database is now in sync with your Prisma schema. Done in 154ms
+
+ ✓ src/test-db/retention.db.spec.ts > orphaned upload files: removed after 24 hours > an unreferenced file 1 second before the limit (23 h 59 min 59 s old) -> kept: Sat Oct 03 2026 13:00:01 GMT+0100 (Western European Summer Time) 23ms
+ ✓ src/test-db/retention.db.spec.ts > orphaned upload files: removed after 24 hours > an unreferenced file exactly at the limit (24 h old) -> kept: Sat Oct 03 2026 13:00:00 GMT+0100 (Western European Summer Time) 1ms
+ ✓ src/test-db/retention.db.spec.ts > orphaned upload files: removed after 24 hours > an unreferenced file 1 second after the limit (24 h 1 s old) -> kept: Sat Oct 03 2026 12:59:59 GMT+0100 (Western European Summer Time) 4ms
+ ✓ src/test-db/retention.db.spec.ts > orphaned upload files: removed after 24 hours > an unreferenced file just uploaded -> kept: Sun Oct 04 2026 13:00:00 GMT+0100 (Western European Summer Time) 1ms
+ ✓ src/test-db/retention.db.spec.ts > orphaned upload files: removed after 24 hours > never removes a file an attachment row points to, however old 16ms
+ ✓ src/test-db/retention.db.spec.ts > orphaned upload files: removed after 24 hours > follows the clock: the same file survives an earlier run and goes in a later one 6ms
+ ✓ src/test-db/retention.db.spec.ts > orphaned upload files: removed after 24 hours > is idempotent, and only removes the orphans among a mix of files 14ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  07:18:04
+   Duration  3.64s (import 45%, tests 30%, transform 23%, setup 1%, worker 1%)
+
+
+[exit 0]
