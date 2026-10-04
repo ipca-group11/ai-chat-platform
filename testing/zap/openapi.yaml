@@ -210,6 +210,7 @@ paths:
       responses:
         "202": { description: Queued again }
         "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
   /api/chats/{chatId}/stop:
     post:
       tags: [messages]

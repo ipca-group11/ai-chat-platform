@@ -475,6 +475,15 @@ describe("queue: edit, cancel, stop and retry", () => {
     expect(res.body.error.code).toBe("MESSAGE_NOT_RETRYABLE");
   });
 
+  it("answers 404 when retrying an unknown message", async () => {
+    const { app } = setup();
+    const { as } = await signIn(app);
+    const id = await firstChatId(as);
+    const res = await as("post", `/chats/${id}/messages/msg_99999/retry`);
+    expect(res.status).toBe(404);
+    expect(res.body.error.code).toBe("MESSAGE_NOT_FOUND");
+  });
+
   it("makes the long scenario ten times as long", async () => {
     const { app } = setup();
     const { as } = await signIn(app);

@@ -240,7 +240,8 @@ function createConversationRouter(ctx: MockContext): Router {
   router.post("/chats/:chatId/messages/:messageId/retry", (req, res) => {
     const target = accessibleChat(ctx, userOf(res), param(req, "chatId"));
     const record = findMessage(ctx, param(req, "messageId"));
-    if (!record || record.chatId !== target.id || record.role !== "assistant" || record.status !== "failed") {
+    if (!record || record.chatId !== target.id) throw new HttpError(404, "MESSAGE_NOT_FOUND", "Message not found");
+    if (record.role !== "assistant" || record.status !== "failed") {
       throw new HttpError(409, "MESSAGE_NOT_RETRYABLE", "Only a failed assistant message can be retried");
     }
     Object.assign(record, { content: "", reasoning: null, webFetches: undefined, status: "queued", error: null });

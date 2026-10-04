@@ -191,7 +191,10 @@ export class MessagesService {
     // Not scoped to the caller: assistant replies belong to the chat owner, and any
     // member may retry one (with their own API key).
     const message = await this.repo.findById(messageId);
-    if (!message || message.chatId !== chatId || message.role !== "assistant" || message.status !== "failed") {
+    if (!message || message.chatId !== chatId) {
+      throw new HttpError(404, "MESSAGE_NOT_FOUND", "Message not found");
+    }
+    if (message.role !== "assistant" || message.status !== "failed") {
       throw new HttpError(409, "MESSAGE_NOT_RETRYABLE", "Only a failed assistant message can be retried");
     }
 

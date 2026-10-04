@@ -105,6 +105,11 @@ describe("MessagesService", () => {
     await expect(service.retry(asUser("user-1"), chat.id, sent.id)).rejects.toBeInstanceOf(HttpError);
   });
 
+  it("AICHAT-219: retrying an unknown message is a 404, like edit and cancel", async () => {
+    const { service, chat } = await setup();
+    await expect(service.retry(asUser("user-1"), chat.id, "missing")).rejects.toMatchObject({ statusCode: 404, code: "MESSAGE_NOT_FOUND" });
+  });
+
   it("AC-43/55: list returns the full persisted chat history", async () => {
     const { service, chat } = await setup();
     await service.send(asUser("user-1"), chat.id, { content: "hi", attachmentIds: [] });

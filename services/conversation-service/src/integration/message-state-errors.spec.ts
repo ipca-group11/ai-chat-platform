@@ -73,22 +73,21 @@ describe("POST /chats/:chatId/messages/:messageId/retry errors", () => {
     expect(res.body.error.code).toBe("MESSAGE_NOT_RETRYABLE");
   });
 
-  it("409 MESSAGE_NOT_RETRYABLE for a failed message that belongs to another chat", async () => {
+  it("404 MESSAGE_NOT_FOUND for a failed message that belongs to another chat", async () => {
     const t = await chatWithProcessingAndQueued();
     const otherChat = await createChatVia(t.app, "user-1");
     const failed = await t.messagesRepo.create({ chatId: otherChat, ownerId: "user-1", role: "assistant", content: "", status: "failed" });
     const res = await request(t.app).post(`/chats/${t.chatId}/messages/${failed.id}/retry`).set("Cookie", t.cookie);
-    expect(res.status).toBe(409);
-    expect(res.body.error.code).toBe("MESSAGE_NOT_RETRYABLE");
+    expect(res.status).toBe(404);
+    expect(res.body.error.code).toBe("MESSAGE_NOT_FOUND");
   });
 
-  // Pinned current behaviour: an unknown message id is reported as 409 (not retryable),
-  // not 404, because the service looks the message up and rejects on the same branch.
-  it("409 MESSAGE_NOT_RETRYABLE for an unknown message id (pinned: not a 404)", async () => {
+  // AICHAT-219: same as edit and cancel.
+  it("404 MESSAGE_NOT_FOUND for an unknown message id", async () => {
     const { app, chatId, cookie } = await chatWithProcessingAndQueued();
     const res = await request(app).post(`/chats/${chatId}/messages/does-not-exist/retry`).set("Cookie", cookie);
-    expect(res.status).toBe(409);
-    expect(res.body.error.code).toBe("MESSAGE_NOT_RETRYABLE");
+    expect(res.status).toBe(404);
+    expect(res.body.error.code).toBe("MESSAGE_NOT_FOUND");
   });
 
   it("404 CHAT_NOT_FOUND for an unknown chat", async () => {
