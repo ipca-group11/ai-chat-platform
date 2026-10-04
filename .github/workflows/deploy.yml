@@ -4,7 +4,8 @@
 #
 # Runs after CI passes on main, or by hand (Actions → deploy → Run workflow).
 # Needs: secret VM_SSH_KEY (private key for azureuser@VM), secret VM_KNOWN_HOSTS
-# (the VM's ssh host key line), variable DOMAIN (the VM's public hostname).
+# (the VM's ssh host key line), variable DOMAIN (the VM's public hostname), and secret
+# INTERNAL_SERVICE_TOKEN in the `production` environment (distinct per environment).
 name: deploy
 
 on:
@@ -170,6 +171,14 @@ jobs:
           ref: ${{ env.SHA }}
           sparse-checkout: deploy/azure
 
+      # INTERNAL_SERVICE_TOKEN is a secret of the `production` GitHub environment, so every
+      # environment gets its own value (AICHAT-251). Fail here, before touching the VM, when
+      # it is missing or a committed local value.
+      - name: Check deployment secrets
+        env:
+          INTERNAL_SERVICE_TOKEN: ${{ secrets.INTERNAL_SERVICE_TOKEN }}
+        run: bash deploy/azure/check-deploy-secrets.sh
+
       - name: Configure SSH
         run: |
           install -m 700 -d ~/.ssh
@@ -182,11 +191,15 @@ jobs:
           scp deploy/azure/docker-compose.yml deploy/azure/Caddyfile azureuser@${{ vars.DOMAIN }}:ai-chat/
 
       # Caddy's container doesn't change when only the Caddyfile does, so `up` leaves it
-      # running the old routes; reload it explicitly.
+      # running the old routes; reload it explicitly. The internal service token goes over
+      # ssh's stdin, not the command line, and docker-compose.yml refuses to start without it.
       - name: Pull and restart
+        env:
+          INTERNAL_SERVICE_TOKEN: ${{ secrets.INTERNAL_SERVICE_TOKEN }}
         run: |
-          ssh azureuser@${{ vars.DOMAIN }} \
-            "echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin \
+          printf '%s\n' "$INTERNAL_SERVICE_TOKEN" | ssh azureuser@${{ vars.DOMAIN }} \
+            "IFS= read -r INTERNAL_SERVICE_TOKEN && export INTERNAL_SERVICE_TOKEN \
+            && echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin \
             && cd ~/ai-chat \
             && export IMAGE_PREFIX='${{ env.IMAGE_PREFIX }}' IMAGE_TAG='${{ env.SHA }}' \
             && docker compose pull --quiet \

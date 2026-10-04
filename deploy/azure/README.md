@@ -32,15 +32,22 @@ GitHub configuration:
 | `VM_SSH_KEY` | secret | private key of a deploy-only key pair (its public half is in the VM's `authorized_keys`) |
 | `VM_KNOWN_HOSTS` | secret | `ssh-keyscan -t ed25519 <host>` output, so the job verifies the VM's host key |
 | `DOMAIN` | variable | `ai-chat-jpc.swedencentral.cloudapp.azure.com` |
+| `INTERNAL_SERVICE_TOKEN` | secret of the `production` **environment** | service-to-service token for account erasure (auth-service -> conversation-service), at least 32 characters, e.g. `openssl rand -hex 32`. One value per environment, never the local default from `compose.yaml` |
+
+The deploy job runs `check-deploy-secrets.sh` first and stops before touching the VM if
+`INTERNAL_SERVICE_TOKEN` is missing, shorter than 32 characters, or a value committed to the
+repository (AICHAT-251). It then passes the token to `docker compose` over ssh's stdin;
+`docker-compose.yml` has no default for it, so compose refuses to start without one.
 
 **Rollback:** redeploy an older commit with **Run workflow**, or on the VM:
-`cd ~/ai-chat && IMAGE_PREFIX=ghcr.io/<owner>/<repo> IMAGE_TAG=<old sha> docker compose up -d`
+`cd ~/ai-chat && IMAGE_PREFIX=ghcr.io/<owner>/<repo> IMAGE_TAG=<old sha> INTERNAL_SERVICE_TOKEN=<the production secret> docker compose up -d`
 (log in to GHCR first if the image isn't cached locally).
 
 ## On the VM
 
 `~/ai-chat/.env` holds the secrets. It was generated on the VM, isn't in git, and has mode 600:
-`DOMAIN`, `POSTGRES_PASSWORD`, `JWT_SECRET`, `GRAFANA_ADMIN_PASSWORD`.
+`DOMAIN`, `POSTGRES_PASSWORD`, `JWT_SECRET`, `GRAFANA_ADMIN_PASSWORD`. `INTERNAL_SERVICE_TOKEN`
+is not kept there: the deploy job supplies it from the GitHub environment on every run.
 Don't change `POSTGRES_PASSWORD` after first boot: Postgres only reads it when it initialises its volume.
 
 Open inbound ports (NSG `vm-ai-chatNSG`): 22, 80, 443, 3001-3003. Ports 3001-3003 are the
@@ -70,6 +77,7 @@ Settings, and the browser sends it with each request.
   `max-age`. Its access log (`docker compose logs caddy`) keeps only the client's network
   (IPv4 /16, IPv6 /32), drops query strings and the Referer/forwarding/Location headers
   (AICHAT-232). Checked by `packages/workspace-config/src/caddyfile.test.ts`.
+- `check-deploy-secrets.sh`: the deploy job's pre-flight check of the per-environment secrets.
 - `cloud-init.yaml`: first-boot setup (Docker, swap, unattended upgrades).
 
 ## Recreate from scratch

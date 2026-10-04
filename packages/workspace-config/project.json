@@ -38,7 +38,8 @@
         "{workspaceRoot}/e2e/**/*",
         "{workspaceRoot}/scripts/unit-test/**/*",
         "{workspaceRoot}/deploy/**/*",
-        "{workspaceRoot}/observability/**/*"
+        "{workspaceRoot}/observability/**/*",
+        "{workspaceRoot}/.github/**/*"
       ]
     }
   }

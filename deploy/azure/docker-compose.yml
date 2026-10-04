@@ -50,6 +50,10 @@ services:
       PORT: "4001"
       DATABASE_URL: postgresql://llmchat:${POSTGRES_PASSWORD}@postgres:5432/llmchat?schema=auth
       JWT_SECRET: ${JWT_SECRET:?}
+      # Distinct per environment, from the deploy job (AICHAT-251); no default, so compose
+      # refuses to start without it instead of falling back to the local dev token.
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN is not set}
+      CONVERSATION_SERVICE_URL: http://conversation-service:4002
       ACCESS_TOKEN_TTL_SECONDS: "900"
       REFRESH_TOKEN_TTL_SECONDS: "604800"
       CORS_ORIGIN: https://${DOMAIN:?}
@@ -71,6 +75,7 @@ services:
       PORT: "4002"
       DATABASE_URL: postgresql://llmchat:${POSTGRES_PASSWORD}@postgres:5432/llmchat?schema=conversation
       JWT_SECRET: ${JWT_SECRET:?}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?INTERNAL_SERVICE_TOKEN is not set}
       UPLOAD_DIR: /data/uploads
       CORS_ORIGIN: https://${DOMAIN}
       # Opening of the system prompt (AICHAT-243). Empty: the built-in one. The rules that files, web pages,
