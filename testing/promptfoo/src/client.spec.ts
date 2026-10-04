@@ -90,6 +90,14 @@ describe("AppClient", () => {
     expect(reply.error).toBeUndefined();
   });
 
+  it("keeps a fetch the domain list refused out of the fetched URLs (AICHAT-242)", async () => {
+    app.reply = () => ({ tokens: ["ok"], fetchUrls: ["https://a.test/x"], refusedUrls: ["https://attacker.example/log"] });
+    const client = new AppClient(baseUrl);
+    await client.signUp("a@redteam.example.com", "x");
+    const reply = await client.ask(await client.createChat(chatOptions), "hi", "k");
+    expect(reply).toMatchObject({ fetchedUrls: ["https://a.test/x"], refusedUrls: ["https://attacker.example/log"] });
+  });
+
   it("returns the provider error of an error event", async () => {
     app.reply = () => ({ tokens: ["x"], error: "invalid key" });
     const client = new AppClient(baseUrl);

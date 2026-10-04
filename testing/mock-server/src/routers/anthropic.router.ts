@@ -1,6 +1,6 @@
 import { Router, type ErrorRequestHandler } from "express";
 import { jsonBody } from "../core/request-log.js";
-import { anthropicMessage, anthropicReply, anthropicStream, messageId } from "../llm/anthropic.js";
+import { anthropicMessage, anthropicReply, anthropicStream, fetchDomainsOf, messageId } from "../llm/anthropic.js";
 import { providerError, requestId } from "../llm/errors.js";
 import { isReplay } from "../llm/replay.js";
 import { serveReplay } from "../llm/serve-replay.js";
@@ -51,7 +51,8 @@ export const anthropicMock: MockModule = {
       }
 
       const last = request.messages[request.messages.length - 1] as { role?: unknown } | undefined;
-      const reply = anthropicReply(plan, ctx.config.seed, last?.role === "assistant");
+      // The web fetch tool's domain list is applied like the API does: a URL outside it is refused (AICHAT-242).
+      const reply = anthropicReply(plan, ctx.config.seed, last?.role === "assistant", fetchDomainsOf(request.tools));
       const id = messageId(ctx.rng);
 
       if (request.stream !== true) {

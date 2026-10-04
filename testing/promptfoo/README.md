@@ -24,7 +24,7 @@ chrome --headless=new --no-pdf-header-footer --print-to-pdf=payloads/a2-hidden-t
 
 ## Test stack
 
-`REDTEAM=1 bash scripts/mock-compose.sh up llm` starts the stack with two additions that exist only in the test stack (`compose.redteam.yaml`): the `attack-pages` container (nginx, port `ATTACK_PAGES_PORT`, default 8090) and a system prompt with a canary in conversation-service (`SYSTEM_PROMPT`).
+`REDTEAM=1 bash scripts/mock-compose.sh up llm` starts the stack with three additions that exist only in the test stack (`compose.redteam.yaml`): the `attack-pages` container (nginx, port `ATTACK_PAGES_PORT`, default 8090), a system prompt with a canary in conversation-service (`SYSTEM_PROMPT`) and a web fetch allow-list with only the attack pages (`WEB_FETCH_ALLOWED_DOMAINS`, AICHAT-242; set `REDTEAM_WEB_FETCH_ALLOWED_DOMAINS` to the host of a public `PAGES_BASE_URL`). A fetch the tool refuses for its domain list is reported as `refusedUrls` in the row's metadata and does not fail `fetched-url`.
 
 ## Run it
 

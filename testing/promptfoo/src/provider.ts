@@ -65,7 +65,7 @@ export default class AppApiProvider {
       if (reply.error) return { error: `the app reported a provider error: ${reply.error}` };
       return {
         output: reply.text,
-        metadata: { attack: attack.id, surface: attack.surface, model: baseModel(model), fetchedUrls: reply.fetchedUrls, knownGap: attack.knownGap ?? null },
+        metadata: { attack: attack.id, surface: attack.surface, model: baseModel(model), fetchedUrls: reply.fetchedUrls, refusedUrls: reply.refusedUrls, knownGap: attack.knownGap ?? null },
       };
     } catch (error) {
       return { error: error instanceof Error ? error.message : String(error) };

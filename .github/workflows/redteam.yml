@@ -99,6 +99,8 @@ jobs:
           if [ -n "$PAGES" ]; then
             echo "PAGES_BASE_URL=$PAGES" >> "$GITHUB_ENV"
             echo "REDTEAM_SURFACES=" >> "$GITHUB_ENV"
+            # Web fetch may only reach the pages host (AICHAT-242, compose.redteam.yaml).
+            echo "REDTEAM_WEB_FETCH_ALLOWED_DOMAINS=$(node -e 'console.log(new URL(process.argv[1]).hostname)' "$PAGES")" >> "$GITHUB_ENV"
           else
             echo "::notice::REDTEAM_PAGES_BASE_URL is not set: the web attacks A3 to A5 are left out"
             echo "REDTEAM_SURFACES=image,file,shared,direct,cross-user" >> "$GITHUB_ENV"

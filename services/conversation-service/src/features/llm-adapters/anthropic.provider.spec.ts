@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { mockJsonErrorResponse, mockStreamResponse } from "../../test-utils/mock-stream.js";
 import { AnthropicProvider } from "./anthropic.provider.js";
 import { ProviderError } from "./types.js";
+import type { WebFetchDomainPolicy } from "./web-fetch-domains.js";
 
 describe("AnthropicProvider", () => {
   it("AC-63: implements the common LlmProvider interface", () => {
@@ -251,8 +252,8 @@ describe("AnthropicProvider", () => {
   describe("web fetch", () => {
     const sse = (event: unknown) => `data: ${JSON.stringify(event)}\n\n`;
 
-    async function run(fetchImpl: ReturnType<typeof vi.fn>, model: string, webFetch: boolean) {
-      const provider = new AnthropicProvider({ fetchImpl });
+    async function run(fetchImpl: ReturnType<typeof vi.fn>, model: string, webFetch: boolean, webFetchDomains?: WebFetchDomainPolicy) {
+      const provider = new AnthropicProvider({ fetchImpl, webFetchDomains });
       const chunks: unknown[] = [];
       for await (const chunk of provider.sendMessage({ messages: [{ role: "user", content: "read https://example.com" }], model, apiKey: "k", webFetch })) {
         chunks.push(chunk);
@@ -370,6 +371,61 @@ describe("AnthropicProvider", () => {
           },
         ],
       });
+    });
+
+    it("sends the allowed or blocked domains of the deployment with the tool (AICHAT-242)", async () => {
+      const done = () => mockStreamResponse([sse({ type: "message_stop" })]);
+      const allowed = await run(vi.fn().mockResolvedValue(done()), "claude-opus-5-5", true, { allowed: ["example.com", "docs.python.org"] });
+      expect((allowed.bodies[0]?.tools as Array<Record<string, unknown>>)[0]).toMatchObject({
+        name: "web_fetch",
+        allowed_domains: ["example.com", "docs.python.org"],
+      });
+      const blocked = await run(vi.fn().mockResolvedValue(done()), "claude-opus-5-5", true, { blocked: ["attacker.example"] });
+      const tool = (blocked.bodies[0]?.tools as Array<Record<string, unknown>>)[0];
+      expect(tool).toMatchObject({ blocked_domains: ["attacker.example"] });
+      expect(tool).not.toHaveProperty("allowed_domains");
+    });
+
+    it("passes on a fetch the API refused for its domain (AICHAT-242)", async () => {
+      const fetchImpl = vi.fn().mockResolvedValue(
+        mockStreamResponse([
+          ...fetchTurn.slice(0, 7),
+          sse({
+            type: "content_block_start",
+            index: 2,
+            content_block: {
+              type: "web_fetch_tool_result",
+              tool_use_id: "srvtoolu_1",
+              content: { type: "web_fetch_tool_error", error_code: "url_not_allowed" },
+            },
+          }),
+          sse({ type: "content_block_stop", index: 2 }),
+          sse({ type: "message_stop" }),
+        ]),
+      );
+      const { chunks } = await run(fetchImpl, "claude-opus-5-5", true, { allowed: ["python.org"] });
+      expect(chunks.at(-1)).toEqual({ type: "web_fetch", id: "srvtoolu_1", url: "https://example.com", status: "error", errorCode: "url_not_allowed" });
+    });
+
+    it("stops the answer when a page outside the allowed domains comes back anyway (AICHAT-242)", async () => {
+      const fetchImpl = vi.fn().mockResolvedValue(
+        mockStreamResponse([
+          ...fetchTurn,
+          sse({ type: "content_block_start", index: 3, content_block: { type: "text", text: "" } }),
+          sse({ type: "content_block_delta", index: 3, delta: { type: "text_delta", text: " It says hi." } }),
+          sse({ type: "message_stop" }),
+        ]),
+      );
+      const chunks: unknown[] = [];
+      const provider = new AnthropicProvider({ fetchImpl, webFetchDomains: { allowed: ["python.org"] } });
+      const drain = async () => {
+        for await (const chunk of provider.sendMessage({ messages: [{ role: "user", content: "hi" }], model: "claude-opus-5-5", apiKey: "k", webFetch: true })) {
+          chunks.push(chunk);
+        }
+      };
+      await expect(drain()).rejects.toMatchObject({ name: "ProviderError", retryable: false });
+      expect(chunks).not.toContain(" It says hi.");
+      expect(chunks.at(-1)).toEqual({ type: "web_fetch", id: "srvtoolu_1", url: "https://example.com", status: "fetching" });
     });
   });
 });

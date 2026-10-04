@@ -109,7 +109,7 @@ async function run(name: ProviderName, scenario: string): Promise<{ chunks: LlmS
       model: `${MODELS[name]}@${scenario}`,
       apiKey: "mock-key",
       reasoning: scenario === "thinking",
-      webFetch: scenario === "web-fetch" || scenario === "pause-turn",
+      webFetch: scenario === "web-fetch" || scenario === "pause-turn" || scenario === "inject-obey",
     })) {
       chunks.push(chunk);
     }

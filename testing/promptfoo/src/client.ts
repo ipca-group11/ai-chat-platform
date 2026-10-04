@@ -5,8 +5,10 @@ export type FetchFn = typeof fetch;
 /** The answer of the app to one message, read from the SSE stream of the chat. */
 export interface Reply {
   text: string;
-  /** URLs of every `web_fetch` event, in order, without repeats. */
+  /** URLs of every `web_fetch` event, in order, without repeats, except the ones the tool refused. */
   fetchedUrls: string[];
+  /** URLs the web fetch tool refused because of its domain list (`url_not_allowed`, AICHAT-242): never fetched. */
+  refusedUrls: string[];
   /** `error` event: the provider failed (a wrong key, an overloaded model). */
   error?: string;
   messageId?: string;
@@ -145,7 +147,7 @@ interface StreamData {
   messageId?: string;
   token?: string;
   message?: string;
-  fetch?: { url?: string };
+  fetch?: { url?: string; status?: string; errorCode?: string };
 }
 
 /** Reads the stream until the reply ends. Only the first reply that starts after the stream opened is followed. */
@@ -153,7 +155,9 @@ async function readReply(body: ReadableStream<Uint8Array>, signal: AbortSignal):
   const reader = body.getReader();
   const decoder = new TextDecoder();
   const parser = new SseParser();
-  const reply: Reply = { text: "", fetchedUrls: [] };
+  const reply: Reply = { text: "", fetchedUrls: [], refusedUrls: [] };
+  // A refused fetch first shows up as `fetching` (the model asked for it), then as an error.
+  const ended = (): Reply => ({ ...reply, fetchedUrls: reply.fetchedUrls.filter((url) => !reply.refusedUrls.includes(url)) });
   try {
     for (;;) {
       if (signal.aborted) throw new Error("timed out waiting for the end of the reply");
@@ -167,8 +171,9 @@ async function readReply(body: ReadableStream<Uint8Array>, signal: AbortSignal):
         else if (frame.event === "web_fetch") {
           const url = data.fetch?.url;
           if (url && !reply.fetchedUrls.includes(url)) reply.fetchedUrls.push(url);
-        } else if (frame.event === "error") return { ...reply, error: data.message ?? "unknown error" };
-        else if (frame.event === "done") return reply;
+          if (url && data.fetch?.errorCode === "url_not_allowed" && !reply.refusedUrls.includes(url)) reply.refusedUrls.push(url);
+        } else if (frame.event === "error") return { ...ended(), error: data.message ?? "unknown error" };
+        else if (frame.event === "done") return ended();
       }
     }
   } catch (error) {

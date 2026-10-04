@@ -19,6 +19,10 @@ describe("red-team test stack (compose.redteam.yaml)", () => {
     expect(compose).toMatch(/"127\.0\.0\.1:\$\{ATTACK_PAGES_PORT:-8090\}:80"/);
   });
 
+  it("lets the model fetch only the attack pages, so an injected fetch to the attacker is refused (AICHAT-242)", () => {
+    expect(compose).toContain("WEB_FETCH_ALLOWED_DOMAINS: ${REDTEAM_WEB_FETCH_ALLOWED_DOMAINS:-attack-pages}");
+  });
+
   it("is only used on top of the mock stack, never by the plain compose file", () => {
     expect(read("compose.yaml")).not.toContain("SYSTEM_PROMPT");
     expect(read("scripts/mock-compose.sh")).toContain("compose.redteam.yaml");

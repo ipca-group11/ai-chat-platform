@@ -60,3 +60,20 @@ describe("createProviderRegistry base URLs (AICHAT-43)", () => {
     expect(() => createProviderRegistry({ OPENAI_BASE_URL: "nope" })).toThrow();
   });
 });
+
+describe("createProviderRegistry web fetch domains (AICHAT-242)", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("gives the Anthropic adapter the domain list of the deployment", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(mockStreamResponse([`data: ${JSON.stringify({ type: "message_stop" })}\n\n`]));
+    vi.stubGlobal("fetch", fetchMock);
+    const adapter = createProviderRegistry({ WEB_FETCH_ALLOWED_DOMAINS: "Example.com, docs.python.org" }).get("anthropic");
+    for await (const _chunk of adapter.sendMessage({ messages: [{ role: "user", content: "hi" }], model: "claude-opus-5-5", apiKey: "k", webFetch: true })) {
+      // drain
+    }
+    const body = JSON.parse((fetchMock.mock.calls[0]?.[1] as RequestInit).body as string) as { tools: Array<Record<string, unknown>> };
+    expect(body.tools[0]?.allowed_domains).toEqual(["example.com", "docs.python.org"]);
+  });
+});

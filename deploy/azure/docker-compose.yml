@@ -73,6 +73,9 @@ services:
       JWT_SECRET: ${JWT_SECRET:?}
       UPLOAD_DIR: /data/uploads
       CORS_ORIGIN: https://${DOMAIN}
+      # Sites the model may fetch while answering (AICHAT-242): only these, or all but these. Comma-separated, never both.
+      WEB_FETCH_ALLOWED_DOMAINS: ${WEB_FETCH_ALLOWED_DOMAINS:-}
+      WEB_FETCH_BLOCKED_DOMAINS: ${WEB_FETCH_BLOCKED_DOMAINS:-}
     volumes:
       - uploads-data:/data/uploads
     healthcheck:

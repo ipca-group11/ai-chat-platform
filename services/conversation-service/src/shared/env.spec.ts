@@ -47,6 +47,17 @@ describe("parseEnv", () => {
     expect(() => parseEnv({ ...base, RETENTION_INTERVAL_MINUTES: "-5" })).toThrow();
   });
 
+  it("reads the web fetch domain lists, one of the two at most (AICHAT-242)", () => {
+    expect(parseEnv({}).WEB_FETCH_ALLOWED_DOMAINS).toBeUndefined();
+    expect(parseEnv({ WEB_FETCH_ALLOWED_DOMAINS: " example.com,*.Docs.Python.org " }).WEB_FETCH_ALLOWED_DOMAINS).toEqual([
+      "example.com",
+      "docs.python.org",
+    ]);
+    expect(parseEnv({ WEB_FETCH_BLOCKED_DOMAINS: "attacker.example" }).WEB_FETCH_BLOCKED_DOMAINS).toEqual(["attacker.example"]);
+    expect(() => parseEnv({ WEB_FETCH_ALLOWED_DOMAINS: "https://example.com/path" })).toThrow(/not a domain name/);
+    expect(() => parseEnv({ WEB_FETCH_ALLOWED_DOMAINS: "example.com", WEB_FETCH_BLOCKED_DOMAINS: "attacker.example" })).toThrow(/not both/);
+  });
+
   it("AC-45: rejects an invalid NODE_ENV value", () => {
     expect(() => parseEnv({ ...base, NODE_ENV: "not-a-real-env" })).toThrow();
   });

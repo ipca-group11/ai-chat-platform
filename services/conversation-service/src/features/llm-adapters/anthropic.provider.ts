@@ -7,6 +7,7 @@ import {
   type SendMessageOptions,
 } from "./types.js";
 import { readSseData } from "./http-stream.js";
+import { isUrlAllowed, webFetchDomainParams, type WebFetchDomainPolicy } from "./web-fetch-domains.js";
 import { supportsReasoning, supportsVision, supportsWebFetch, thinkingStyle, webFetchToolType } from "@app/shared-types/model-capabilities";
 
 
@@ -28,6 +29,8 @@ const TRUNCATING_STOP_REASONS = new Set(["max_tokens", "model_context_window_exc
 export interface AnthropicProviderConfig {
   baseUrl?: string;
   fetchImpl?: typeof fetch;
+  /** Sites the model may fetch (AICHAT-242); unrestricted when empty. */
+  webFetchDomains?: WebFetchDomainPolicy;
 }
 
 /** Anthropic adapter — POSTs to `/v1/messages` with `stream: true` and parses the SSE
@@ -38,10 +41,12 @@ export class AnthropicProvider implements LlmProvider {
   readonly id = "anthropic" as const;
   private readonly baseUrl: string;
   private readonly fetchImpl: typeof fetch;
+  private readonly webFetchDomains: WebFetchDomainPolicy;
 
   constructor(config: AnthropicProviderConfig = {}) {
     this.baseUrl = config.baseUrl ?? "https://api.anthropic.com";
     this.fetchImpl = config.fetchImpl ?? fetch;
+    this.webFetchDomains = config.webFetchDomains ?? {};
   }
 
   supportsVision(model: string): boolean {
@@ -77,6 +82,7 @@ export class AnthropicProvider implements LlmProvider {
                 name: "web_fetch",
                 max_uses: WEB_FETCH_MAX_USES,
                 max_content_tokens: WEB_FETCH_MAX_CONTENT_TOKENS,
+                ...webFetchDomainParams(this.webFetchDomains),
               },
             ],
           }
@@ -88,7 +94,7 @@ export class AnthropicProvider implements LlmProvider {
     for (let continuation = 0; ; continuation++) {
       const messages = replyBlocks.length > 0 ? [...turnMessages, { role: "assistant", content: replyBlocks }] : turnMessages;
       const response = await this.post({ ...request, messages }, context.apiKey, options.signal);
-      const turn = yield* streamTurn(response);
+      const turn = yield* streamTurn(response, this.webFetchDomains);
       replyBlocks.push(...turn.blocks);
       if (turn.stopReason && TRUNCATING_STOP_REASONS.has(turn.stopReason)) {
         yield { type: "truncated" };
@@ -149,6 +155,7 @@ interface StreamEvent {
  */
 async function* streamTurn(
   response: Response,
+  webFetchDomains: WebFetchDomainPolicy,
 ): AsyncGenerator<LlmStreamChunk, { blocks: ContentBlock[]; stopReason?: string }> {
   const blocks: ContentBlock[] = [];
   const partialJson = new Map<number, string>();
@@ -168,6 +175,13 @@ async function* streamTurn(
         blocks[index] = { ...block };
         if (block.type === "web_fetch_tool_result") {
           const result = webFetchResult(block, fetchUrls);
+          // The API applies the domain list itself; a page outside it that still comes back is never
+          // used for an answer (AICHAT-242).
+          if (result?.status === "done" && !isUrlAllowed(result.url, webFetchDomains)) {
+            throw new ProviderError("anthropic", "The model fetched a page outside the allowed web fetch domains; the answer was stopped", {
+              retryable: false,
+            });
+          }
           if (result) yield result;
         }
         break;

@@ -11,7 +11,41 @@ const FETCH_PAGE = "This domain is for use in illustrative examples.";
 type Block =
   | { type: "thinking"; tokens: string[]; signature: string }
   | { type: "text"; tokens: string[] }
-  | { type: "web_fetch"; id: string; url: string };
+  /** `refused`: the URL is outside the tool's domain list, so the result is a `url_not_allowed` error. */
+  | { type: "web_fetch"; id: string; url: string; refused: boolean };
+
+/** The `allowed_domains` / `blocked_domains` of the request's web fetch tool (AICHAT-242). */
+export interface FetchDomains {
+  allowed?: string[];
+  blocked?: string[];
+}
+
+const strings = (value: unknown): string[] | undefined =>
+  Array.isArray(value) ? value.filter((v): v is string => typeof v === "string").map((v) => v.toLowerCase()) : undefined;
+
+/** The domain lists of the web fetch tool in a Messages API request body; undefined when the request has no such tool. */
+export function fetchDomainsOf(tools: unknown): FetchDomains | undefined {
+  const tool = Array.isArray(tools)
+    ? (tools.find((t) => typeof t === "object" && t !== null && (t as { name?: unknown }).name === "web_fetch") as
+        | Record<string, unknown>
+        | undefined)
+    : undefined;
+  return tool ? { allowed: strings(tool.allowed_domains), blocked: strings(tool.blocked_domains) } : undefined;
+}
+
+/** Like the API: a domain covers its subdomains; an allow-list wins over a block-list. */
+export function isFetchAllowed(url: string, domains: FetchDomains): boolean {
+  let host: string;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  const covers = (domain: string) => host === domain || host.endsWith(`.${domain}`);
+  if (domains.allowed) return domains.allowed.some(covers);
+  if (domains.blocked) return !domains.blocked.some(covers);
+  return true;
+}
 
 export interface AnthropicReply {
   blocks: Block[];
@@ -26,7 +60,8 @@ export interface AnthropicReply {
  * The content blocks of a plan. When the request already ends with an assistant turn (the
  * caller resumes a paused turn) a pause-turn scenario answers with plain text.
  */
-export function anthropicReply(plan: ScenarioPlan, seed: string, resumed: boolean): AnthropicReply {
+export function anthropicReply(plan: ScenarioPlan, seed: string, resumed: boolean, domains?: FetchDomains): AnthropicReply {
+  const webFetch = (url: string): Block => ({ type: "web_fetch", id: "srvtoolu_mock0001", url, refused: !isFetchAllowed(url, domains ?? {}) });
   const full = generateTokens(seed, `${plan.name}/answer`, plan.tokens);
   const answer = plan.drop ? full.slice(0, Math.ceil(full.length / 2)) : full;
   const blocks: Block[] = [];
@@ -40,12 +75,13 @@ export function anthropicReply(plan: ScenarioPlan, seed: string, resumed: boolea
   }
   if (plan.scripted) {
     const words = plan.scripted.answer.split(/(?<=\s)/);
-    if (plan.scripted.fetchUrl) {
-      blocks.push({ type: "text", tokens: [FETCH_INTRO] }, { type: "web_fetch", id: "srvtoolu_mock0001", url: plan.scripted.fetchUrl });
+    // A scripted model only fetches when the request offers the web fetch tool, like a real one (AICHAT-242).
+    if (plan.scripted.fetchUrl && domains) {
+      blocks.push({ type: "text", tokens: [FETCH_INTRO] }, webFetch(plan.scripted.fetchUrl));
     }
     blocks.push({ type: "text", tokens: words });
   } else if (plan.webFetch && !resumed) {
-    blocks.push({ type: "text", tokens: [FETCH_INTRO] }, { type: "web_fetch", id: "srvtoolu_mock0001", url: FETCH_URL });
+    blocks.push({ type: "text", tokens: [FETCH_INTRO] }, webFetch(FETCH_URL));
     if (stopReason !== "pause_turn") blocks.push({ type: "text", tokens: answer });
   } else {
     if (stopReason === "pause_turn") stopReason = "end_turn";
@@ -56,10 +92,10 @@ export function anthropicReply(plan: ScenarioPlan, seed: string, resumed: boolea
 }
 
 const fetchInput = (url: string): string => JSON.stringify({ url });
-const fetchResult = (id: string, url: string) => ({
+const fetchResult = (id: string, url: string, refused = false) => ({
   type: "web_fetch_tool_result",
   tool_use_id: id,
-  content: {
+  content: refused ? { type: "web_fetch_tool_error", error_code: "url_not_allowed" } : {
     type: "web_fetch_result",
     url,
     retrieved_at: "1970-01-01T00:00:00Z",
@@ -88,7 +124,7 @@ export function anthropicMessage(reply: AnthropicReply, model: string, id: strin
     if (block.type === "text") return [{ type: "text", text: block.tokens.join("") }];
     return [
       { type: "server_tool_use", id: block.id, name: "web_fetch", input: { url: block.url } },
-      fetchResult(block.id, block.url),
+      fetchResult(block.id, block.url, block.refused),
     ];
   });
   return {
@@ -149,7 +185,7 @@ export async function* anthropicStream(
       yield anthropicFrame("content_block_start", {
         type: "content_block_start",
         index,
-        content_block: fetchResult(block.id, block.url),
+        content_block: fetchResult(block.id, block.url, block.refused),
       });
       yield anthropicFrame("content_block_stop", { type: "content_block_stop", index });
       index++;

@@ -5,7 +5,8 @@
 //
 //   services/conversation-service/node_modules/.bin/tsx testing/promptfoo/stack/local-stack.ts
 //
-// Variables: LOCAL_STACK_PORT (default 8000), LOCAL_STACK_MOCK_PORT (default 4010).
+// Variables: LOCAL_STACK_PORT (default 8000), LOCAL_STACK_MOCK_PORT (default 4010), WEB_FETCH_ALLOWED_DOMAINS (default
+// attack-pages, like compose.redteam.yaml; empty: no domain list, as before AICHAT-242).
 import { createHmac } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { createApp } from "../../../services/conversation-service/src/app.ts";
@@ -42,13 +43,17 @@ const env = parseEnv({
   LOG_LEVEL: "silent",
   ANTHROPIC_BASE_URL: `http://127.0.0.1:${mockPort}/anthropic`,
   SYSTEM_PROMPT: TEST_SYSTEM_PROMPT,
+  WEB_FETCH_ALLOWED_DOMAINS: process.env["WEB_FETCH_ALLOWED_DOMAINS"] ?? "attack-pages",
 });
 const conversation = createApp({} as PrismaClient, env, createLogger("silent"), {
   chatsRepo: new FakeChatsRepository(),
   messagesRepo: new FakeMessagesRepository(),
   attachmentsRepo: new FakeAttachmentsRepository(),
   storage: new FakeStorage(),
-  providerRegistry: createProviderRegistry({ ANTHROPIC_BASE_URL: env.ANTHROPIC_BASE_URL } as NodeJS.ProcessEnv),
+  providerRegistry: createProviderRegistry({
+    ANTHROPIC_BASE_URL: env.ANTHROPIC_BASE_URL,
+    WEB_FETCH_ALLOWED_DOMAINS: env.WEB_FETCH_ALLOWED_DOMAINS?.join(","),
+  } as NodeJS.ProcessEnv),
   bus: new ChatEventBus(),
 });
 

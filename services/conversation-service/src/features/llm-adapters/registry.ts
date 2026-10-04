@@ -21,7 +21,10 @@ export function createProviderRegistry(source: NodeJS.ProcessEnv = process.env):
   const providers: Record<Provider, LlmProvider> = {
     ollama: new OllamaProvider({ baseUrl: env.OLLAMA_BASE_URL }),
     openai: new OpenAiProvider({ baseUrl: env.OPENAI_BASE_URL }),
-    anthropic: new AnthropicProvider({ baseUrl: env.ANTHROPIC_BASE_URL }),
+    anthropic: new AnthropicProvider({
+      baseUrl: env.ANTHROPIC_BASE_URL,
+      webFetchDomains: { allowed: env.WEB_FETCH_ALLOWED_DOMAINS, blocked: env.WEB_FETCH_BLOCKED_DOMAINS },
+    }),
   };
 
   return {

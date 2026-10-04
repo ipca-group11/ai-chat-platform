@@ -5,6 +5,8 @@ import type { AddressInfo } from "node:net";
 export interface FakeReply {
   tokens?: string[];
   fetchUrls?: string[];
+  /** Fetches the tool refuses for its domain list: `fetching`, then an error `url_not_allowed`. */
+  refusedUrls?: string[];
   error?: string;
   /** Never ends the reply, to test the timeout. */
   hang?: boolean;
@@ -97,6 +99,10 @@ export class FakeApp {
     for (const url of reply.fetchUrls ?? []) {
       this.publish("web_fetch", { type: "web_fetch", messageId, fetch: { id: url, url, status: "fetching" } });
       this.publish("web_fetch", { type: "web_fetch", messageId, fetch: { id: url, url, status: "done" } });
+    }
+    for (const url of reply.refusedUrls ?? []) {
+      this.publish("web_fetch", { type: "web_fetch", messageId, fetch: { id: url, url, status: "fetching" } });
+      this.publish("web_fetch", { type: "web_fetch", messageId, fetch: { id: url, url, status: "error", errorCode: "url_not_allowed" } });
     }
     for (const token of reply.tokens ?? []) this.publish("token", { type: "token", messageId, token });
     if (reply.error) this.publish("error", { type: "error", messageId, message: reply.error, retryable: false });

@@ -3,7 +3,7 @@ import type { Reply } from "./client.ts";
 import AppApiProvider from "./provider.ts";
 import type { RunSettings } from "./scenario.ts";
 
-const reply = (over: Partial<Reply> = {}): Reply => ({ text: "answer", fetchedUrls: ["https://a.test/"], ...over });
+const reply = (over: Partial<Reply> = {}): Reply => ({ text: "answer", fetchedUrls: ["https://a.test/"], refusedUrls: [], ...over });
 
 function make(env: Record<string, string>, result: Reply = reply()) {
   const run = vi.fn(async (_attack: unknown, _settings: RunSettings) => result);

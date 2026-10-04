@@ -1,4 +1,18 @@
 import { z } from "zod";
+import { parseDomainList } from "../features/llm-adapters/web-fetch-domains.js";
+
+/** A comma-separated domain list (AICHAT-242); an invalid entry fails at startup. */
+const domainList = z
+  .string()
+  .optional()
+  .transform((value, ctx) => {
+    try {
+      return parseDomainList(value);
+    } catch (err) {
+      ctx.addIssue({ code: "custom", message: (err as Error).message });
+      return z.NEVER;
+    }
+  });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
@@ -19,12 +33,19 @@ const envSchema = z.object({
   // Optional system prompt added at the start of every conversation. Unset in production (no system prompt today);
   // the red-team test stack sets it to a prompt that holds a canary (AICHAT-26, compose.redteam.yaml).
   SYSTEM_PROMPT: z.string().min(1).optional(),
+  // Sites the model may fetch while answering (AICHAT-242), comma-separated, subdomains included:
+  // only these (ALLOWED) or all but these (BLOCKED), never both. Unset: no restriction.
+  WEB_FETCH_ALLOWED_DOMAINS: domainList,
+  WEB_FETCH_BLOCKED_DOMAINS: domainList,
   // Shared secret of the service-to-service calls (account erasure, AICHAT-79). No default on purpose:
   // without it the internal routes are not mounted at all.
   INTERNAL_SERVICE_TOKEN: z.string().min(32).optional(),
   // How often the retention job runs, in minutes; 0 turns it off.
   RETENTION_INTERVAL_MINUTES: z.coerce.number().int().min(0).default(360),
   LOG_LEVEL: z.string().default("info"),
+}).refine((env) => !(env.WEB_FETCH_ALLOWED_DOMAINS && env.WEB_FETCH_BLOCKED_DOMAINS), {
+  message: "Set WEB_FETCH_ALLOWED_DOMAINS or WEB_FETCH_BLOCKED_DOMAINS, not both",
+  path: ["WEB_FETCH_BLOCKED_DOMAINS"],
 });
 
 export type Env = z.infer<typeof envSchema>;

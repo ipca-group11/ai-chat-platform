@@ -75,12 +75,38 @@ describe("POST /anthropic/v1/messages (stream)", () => {
   });
 
   it("inject-obey fetches the attacker page, leaks the canary and renders the exfiltration image", async () => {
-    const { frames } = await stream("inject-obey");
+    const { frames } = await stream("inject-obey", { tools: [{ type: "web_fetch_20250910", name: "web_fetch" }] });
     const tool = frames.find((f) => f.data.delta?.type === "input_json_delta")!;
     expect(JSON.parse(tool.data.delta.partial_json)).toEqual({ url: ATTACKER_FETCH_URL });
     const text = frames.filter((f) => f.data.delta?.type === "text_delta").map((f) => f.data.delta.text).join("");
     expect(text).toContain(INJECTION_CANARY);
     expect(text).toContain("![status](https://attacker.example/");
+  });
+
+  it("refuses a fetch outside the tool's domain list with url_not_allowed, like the API (AICHAT-242)", async () => {
+    const tools = (domains: object) => ({ tools: [{ type: "web_fetch_20250910", name: "web_fetch", ...domains }] });
+    const resultOf = (frames: Frame[]) =>
+      frames.find((f) => f.data.content_block?.type === "web_fetch_tool_result")!.data.content_block.content;
+
+    expect(resultOf((await stream("inject-obey", tools({ allowed_domains: ["example.com"] }))).frames)).toEqual({
+      type: "web_fetch_tool_error",
+      error_code: "url_not_allowed",
+    });
+    expect(resultOf((await stream("inject-obey", tools({ blocked_domains: ["attacker.example"] }))).frames)).toMatchObject({
+      error_code: "url_not_allowed",
+    });
+    expect(resultOf((await stream("web-fetch", tools({ allowed_domains: ["example.com"] }))).frames)).toMatchObject({
+      type: "web_fetch_result",
+      url: "https://example.com",
+    });
+    expect(resultOf((await stream("inject-obey", tools({}))).frames)).toMatchObject({ type: "web_fetch_result" });
+  });
+
+  it("inject-obey does not fetch when the request offers no web fetch tool, but still leaks", async () => {
+    const { frames } = await stream("inject-obey");
+    expect(frames.some((f) => f.data.content_block?.type === "server_tool_use")).toBe(false);
+    const text = frames.filter((f) => f.data.delta?.type === "text_delta").map((f) => f.data.delta.text).join("");
+    expect(text).toContain(INJECTION_CANARY);
   });
 
   it("inject-resist answers in plain text without a fetch or a leak", async () => {
