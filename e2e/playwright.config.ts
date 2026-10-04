@@ -5,7 +5,7 @@ import { defineConfig, devices } from "@playwright/test";
  * `e2e` factory command) inject this as `BASE_URL`; it falls back to a local
  * `docker compose up` / dev-preview default for running the suite by hand.
  */
-const baseURL = process.env["BASE_URL"] ?? "http://localhost:4173";
+const baseURL = process.env["BASE_URL"] ?? "http://localhost:8000";
 
 const isCI = !!process.env["CI"];
 
