@@ -12,6 +12,7 @@ export interface FakeUserRow {
   email: string;
   passwordHash: string;
   createdAt: Date;
+  lastActiveAt: Date;
 }
 
 export interface FakeRefreshTokenRow {
@@ -30,6 +31,7 @@ export async function makeUser(email: string, password: string): Promise<FakeUse
     email,
     passwordHash: await bcrypt.hash(password, 4),
     createdAt: new Date(),
+    lastActiveAt: new Date(),
   };
 }
 
@@ -62,11 +64,35 @@ export function fakePrisma(seed: { users?: FakeUserRow[]; refreshTokens?: FakeRe
       usersById.delete(id);
       users.delete(user.email);
     },
+    /** Test-only: how many refresh tokens a user still has. */
+    __tokenCount(userId: string) {
+      return [...tokens.values()].filter((t) => t.userId === userId).length;
+    },
     user: {
       findUnique: vi.fn(async ({ where }: { where: { email?: string; id?: string } }) => {
         if (where.email) return users.get(where.email) ?? null;
         if (where.id) return usersById.get(where.id) ?? null;
         return null;
+      }),
+      update: vi.fn(async ({ where, data }: { where: { id: string }; data: Partial<FakeUserRow> }) => {
+        const user = usersById.get(where.id);
+        if (!user) throw new Error("not found");
+        Object.assign(user, data);
+        return user;
+      }),
+      /** Deletes the matching user and, like the `onDelete: Cascade` of the schema, their refresh tokens. */
+      deleteMany: vi.fn(async ({ where }: { where: { id: string } }) => {
+        const user = usersById.get(where.id);
+        if (!user) return { count: 0 };
+        usersById.delete(user.id);
+        users.delete(user.email);
+        for (const [hash, token] of tokens) {
+          if (token.userId === user.id) {
+            tokens.delete(hash);
+            tokensById.delete(token.id);
+          }
+        }
+        return { count: 1 };
       }),
       create: vi.fn(async ({ data }: { data: { email: string; passwordHash: string } }) => {
         const user: FakeUserRow = {
@@ -74,6 +100,7 @@ export function fakePrisma(seed: { users?: FakeUserRow[]; refreshTokens?: FakeRe
           email: data.email,
           passwordHash: data.passwordHash,
           createdAt: new Date(),
+          lastActiveAt: new Date(),
         };
         users.set(user.email, user);
         usersById.set(user.id, user);
@@ -131,6 +158,11 @@ export function fakePrisma(seed: { users?: FakeUserRow[]; refreshTokens?: FakeRe
 /** A Prisma stand-in whose every operation rejects with an unexpected error, to drive the
  * "unexpected failure -> safe 500" paths. */
 export function throwingPrisma(error: Error = new Error("database exploded: secret-internal-detail")): PrismaClient {
-  const failing = { findUnique: vi.fn(() => Promise.reject(error)), create: vi.fn(() => Promise.reject(error)), update: vi.fn(() => Promise.reject(error)) };
+  const failing = {
+    findUnique: vi.fn(() => Promise.reject(error)),
+    create: vi.fn(() => Promise.reject(error)),
+    update: vi.fn(() => Promise.reject(error)),
+    deleteMany: vi.fn(() => Promise.reject(error)),
+  };
   return { user: failing, refreshToken: failing } as unknown as PrismaClient;
 }

@@ -44,6 +44,12 @@ export const loginRequestSchema = z.object({
 });
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
 
+/** `DELETE /auth/me`: the password is asked again before the account is erased. */
+export const deleteAccountRequestSchema = z.object({
+  password: z.string().min(1).max(1024),
+});
+export type DeleteAccountRequest = z.infer<typeof deleteAccountRequestSchema>;
+
 export const userProfileSchema = z.object({
   id: z.string(),
   email: z.string().email(),

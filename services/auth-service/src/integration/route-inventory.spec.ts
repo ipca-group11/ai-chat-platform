@@ -19,6 +19,7 @@ const ROUTE_TESTS: Record<string, string> = {
   "POST /auth/refresh": "routes.spec.ts",
   "POST /auth/logout": "routes.spec.ts",
   "GET /auth/me": "routes.spec.ts",
+  "DELETE /auth/me": "account-deletion.spec.ts",
 };
 
 const here = dirname(fileURLToPath(import.meta.url));

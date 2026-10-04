@@ -2,10 +2,11 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Express } from "express";
 import helmet from "helmet";
-import { createAttachmentsRepository, createAttachmentsRouter, createFileSystemStorage, AttachmentsService, createAttachmentAwareContextBuilder, type AttachmentsRepository, type AttachmentStorage } from "./features/attachments/index.js";
+import { createAttachmentsRepository, createAttachmentsRouter, createFileCleanup, createFileSystemStorage, AttachmentsService, createAttachmentAwareContextBuilder, type AttachmentsRepository, type AttachmentStorage } from "./features/attachments/index.js";
 import { createChatsRepository, createChatsRouter, ChatsService, type ChatsRepository } from "./features/chats/index.js";
 import { createProviderRegistry, type ProviderRegistry } from "./features/llm-adapters/index.js";
 import { createMessageProcessor, createMessagesRepository, createMessagesRouter, MessagesService, type MessagesRepository } from "./features/messages/index.js";
+import { createErasureRepository, createErasureRouter, ErasureService, type ErasureRepository } from "./features/erasure/index.js";
 import { QueueManager } from "./features/queue/index.js";
 import { ChatEventBus, createStreamingRouter } from "./features/streaming/index.js";
 import type { Env } from "./shared/env.js";
@@ -29,6 +30,7 @@ export interface AppOverrides {
   /** Replaces the queue (and the message processor that feeds it). */
   queueManager?: QueueManager;
   bus?: ChatEventBus;
+  erasureRepo?: ErasureRepository;
 }
 
 /** Builds the Express app + all its wiring (ARCHITECTURE.md §5). Takes the Prisma
@@ -55,15 +57,20 @@ export function createApp(
   app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
   // --- wiring (ARCHITECTURE.md §5: chats -> messages/queue/streaming -> attachments) --
-  const chatsRepo = overrides.chatsRepo ?? createChatsRepository(prisma);
-  const chatsService = new ChatsService(chatsRepo);
-
   const messagesRepo = overrides.messagesRepo ?? createMessagesRepository(prisma);
+  const attachmentsRepo = overrides.attachmentsRepo ?? createAttachmentsRepository(prisma);
+  const storage = overrides.storage ?? createFileSystemStorage(env.UPLOAD_DIR);
+  // Removes the uploaded files of a chat or message once its rows are deleted (AICHAT-97).
+  const fileCleanup = createFileCleanup(messagesRepo, attachmentsRepo, storage, (_storagePath, err) => {
+    logger.warn({ err }, "could not remove an uploaded file");
+  });
+
+  const chatsRepo = overrides.chatsRepo ?? createChatsRepository(prisma);
+  const chatsService = new ChatsService(chatsRepo, fileCleanup);
+
   const bus = overrides.bus ?? new ChatEventBus();
   const providerRegistry = overrides.providerRegistry ?? createProviderRegistry();
 
-  const attachmentsRepo = overrides.attachmentsRepo ?? createAttachmentsRepository(prisma);
-  const storage = overrides.storage ?? createFileSystemStorage(env.UPLOAD_DIR);
   const buildLlmMessages = createAttachmentAwareContextBuilder(attachmentsRepo, storage);
 
   const queueManager =
@@ -75,7 +82,7 @@ export function createApp(
       },
     );
 
-  const messagesService = new MessagesService(messagesRepo, chatsService, queueManager, bus);
+  const messagesService = new MessagesService(messagesRepo, chatsService, queueManager, bus, fileCleanup);
   const attachmentsService = new AttachmentsService(
     attachmentsRepo,
     chatsService,
@@ -84,6 +91,13 @@ export function createApp(
     providerRegistry,
     env.MAX_UPLOAD_BYTES,
   );
+
+  // Service-to-service routes sit before the user authentication: auth-service calls them with the
+  // service token. Not mounted at all when no token is configured.
+  if (env.INTERNAL_SERVICE_TOKEN) {
+    const erasureService = new ErasureService(overrides.erasureRepo ?? createErasureRepository(prisma), fileCleanup);
+    app.use("/internal", createErasureRouter(erasureService, env.INTERNAL_SERVICE_TOKEN));
+  }
 
   app.use(authMiddleware(env.JWT_SECRET));
   app.use("/chats", createChatsRouter(chatsService));

@@ -13,8 +13,11 @@ import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 import { collectDefaultMetrics, register as metricsRegister } from "prom-client";
 import type { PrismaClient } from "./generated/prisma-client/index.js";
+import { createAccountRouter } from "./features/account/index.js";
+import { runRetention, scheduleRetention } from "./features/retention/index.js";
 import { createRegisterRouter } from "./features/register/index.js";
 import { createSessionRouter } from "./features/session/index.js";
+import { createErasureClient, type ErasureClient } from "./shared/erasure-client.js";
 import { correlationIdMiddleware } from "./shared/correlation-id.js";
 import { env } from "./shared/env.js";
 import { errorMiddleware, notFoundMiddleware } from "./shared/error-middleware.js";
@@ -31,6 +34,16 @@ export interface AppDeps {
   prisma?: PrismaClient;
   /** Where request and error logs go; tests pass one that writes to memory. */
   logger?: Logger;
+  /** Calls conversation-service to erase a user's data; tests pass a fake. Defaults to the
+   * real client when INTERNAL_SERVICE_TOKEN and CONVERSATION_SERVICE_URL are set. */
+  erasure?: ErasureClient;
+  /** Account deletions per client and hour (default 10). */
+  deletionsPerHour?: number;
+}
+
+function defaultErasureClient(): ErasureClient | undefined {
+  if (!env.INTERNAL_SERVICE_TOKEN || !env.CONVERSATION_SERVICE_URL) return undefined;
+  return createErasureClient({ baseUrl: env.CONVERSATION_SERVICE_URL, token: env.INTERNAL_SERVICE_TOKEN });
 }
 
 export function createApp(deps: AppDeps = {}): Express {
@@ -78,6 +91,7 @@ export function createApp(deps: AppDeps = {}): Express {
 
   app.use("/auth", createRegisterRouter(prisma));
   app.use("/auth", createSessionRouter(prisma));
+  app.use("/auth", createAccountRouter(prisma, { erasure: deps.erasure ?? defaultErasureClient(), deletionsPerHour: deps.deletionsPerHour }));
 
   app.use(notFoundMiddleware);
   app.use(errorMiddleware);
@@ -91,5 +105,19 @@ if (process.env.VITEST === undefined) {
   app.listen(env.PORT, () => {
     defaultLogger.info({ port: env.PORT }, "auth-service listening");
   });
+  if (env.RETENTION_INTERVAL_MINUTES > 0) {
+    scheduleRetention(
+      async () => {
+        const result = await runRetention(new Date(), {
+          prisma: defaultPrisma,
+          erasure: defaultErasureClient(),
+          onAccountError: (_userId, err) => defaultLogger.warn({ err }, "inactive account not deleted, will retry"),
+        });
+        defaultLogger.info(result, "retention run finished");
+      },
+      env.RETENTION_INTERVAL_MINUTES * 60 * 1000,
+      (err) => defaultLogger.error({ err }, "retention run failed"),
+    );
+  }
 }
 /* c8 ignore stop */

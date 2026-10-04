@@ -1,0 +1,26 @@
+$ cd services/auth-service && pnpm exec vitest run src/integration/account-deletion.spec.ts src/features/account --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+ ✓ src/features/account/model.spec.ts > deleteAccount > does not touch the user row when the erasure fails 2ms
+ ✓ src/features/account/model.spec.ts > deleteAccount > erases first and then deletes the user by id 1ms
+ ✓ src/features/account/api.spec.ts > account router > deletes the account after erasing the conversation data 28ms
+ ✓ src/features/account/api.spec.ts > account router > answers 503 and keeps the account when erasure is not configured 6ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · 204 erases the conversation data first, then the account, and clears the cookies 854ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · 502 and the user stays when conversation-service fails; a retry succeeds 1082ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · is idempotent: repeating it after the account is gone still answers 204 808ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · 401 without a session 540ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · 401 for a wrong password and nothing is deleted 808ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · 400 without a password 544ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · 403 for a request that comes from another origin (CSRF) 537ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · accepts the allowed origin 807ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · 503 and nothing deleted when erasure is not configured 547ms
+ ✓ src/integration/account-deletion.spec.ts > DELETE /auth/me > DELETE /auth/me · is rate limited 1079ms
+
+ Test Files  3 passed (3)
+      Tests  14 passed (14)
+   Start at  07:11:13
+   Duration  7.95s (tests 93%, import 4%, transform 2%, worker 1%)
+
+
+[exit 0]

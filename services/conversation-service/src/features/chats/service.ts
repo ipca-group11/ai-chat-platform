@@ -2,6 +2,7 @@ import type { PrismaClient } from "../../shared/prisma.js";
 import { HttpError } from "../../shared/error-handler.js";
 import type { Principal } from "../../shared/auth-middleware.js";
 import type { ChatDto, ChatMemberDto, Provider } from "../../shared/contracts/chat.js";
+import type { FileCleanup } from "../attachments/index.js";
 import type { CreateChatInput, UpdateChatInput } from "./schema.js";
 
 export interface ChatRecord {
@@ -96,7 +97,10 @@ export function createChatsRepository(prisma: PrismaClient): ChatsRepository {
 }
 
 export class ChatsService {
-  constructor(private readonly repo: ChatsRepository) {}
+  constructor(
+    private readonly repo: ChatsRepository,
+    private readonly files?: FileCleanup,
+  ) {}
 
   async list(user: Principal): Promise<ChatDto[]> {
     const chats = await this.repo.findManyAccessible(user.userId, user.email);
@@ -146,7 +150,11 @@ export class ChatsService {
 
   async remove(ownerId: string, chatId: string): Promise<void> {
     await this.getOwned(ownerId, chatId);
+    // The rows tell where the files are, so read them first, but remove the files only after
+    // the database delete went through (AICHAT-97).
+    const storagePaths = (await this.files?.collectForChat(chatId)) ?? [];
     await this.repo.delete(chatId);
+    await this.files?.remove(storagePaths);
   }
 
   /** The owner first, then invited members in the order they were added. */

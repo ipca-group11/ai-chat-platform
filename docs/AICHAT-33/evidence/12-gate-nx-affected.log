@@ -1,0 +1,1412 @@
+$ NX_DAEMON=false pnpm exec nx affected -t lint typecheck test build size --base=origin/integration/testing-epics --parallel=3 --skip-nx-cache --output-style=static
+
+ NX   Running targets lint, typecheck, test, build, size for 19 projects and 2 tasks they depend on:
+
+- test-config
+- conversation-service
+- workspace-config
+- auth-service
+- mock-server
+- test-utils
+- mfe-settings
+- mfe-auth
+- mfe-chat
+- shell
+- promptfoo
+- observability
+- pii-detector
+- shared-types
+- pact-config
+- ui
+- e2e
+- eslint-config
+- k6
+
+
+
+> nx run eslint-config:build
+
+> echo 'eslint-config ships TypeScript source; nothing to build'
+
+eslint-config ships TypeScript source; nothing to build
+
+> nx run test-config:build
+
+> echo 'test-config ships TypeScript source; nothing to build'
+
+test-config ships TypeScript source; nothing to build
+
+> nx run auth-service:prisma-generate
+
+> prisma generate
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.1.0) to ./src/generated/prisma-client in 44ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+
+
+> nx run conversation-service:prisma-generate
+
+> prisma generate
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.1.0) to ./src/generated/prisma-client in 48ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+
+> nx run pii-detector:build
+
+> echo 'pii-detector ships TypeScript source used by Vitest; nothing to build'
+
+pii-detector ships TypeScript source used by Vitest; nothing to build
+
+> nx run shared-types:build
+
+> tsc -p tsconfig.build.json
+
+
+> nx run conversation-service:build
+
+> tsc -p tsconfig.json
+
+
+> nx run mock-server:build
+
+> node scripts/build.ts
+
+
+  dist/main.cjs      1.9mb ⚠️
+  dist/main.cjs.map  3.2mb
+
+⚡ Done in 111ms
+
+> nx run test-utils:build
+
+> echo 'test-utils ships TypeScript source used by Vitest; nothing to build'
+
+test-utils ships TypeScript source used by Vitest; nothing to build
+
+> nx run eslint-config:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/eslint-config
+      Coverage enabled with v8
+
+
+ Test Files  6 passed (6)
+      Tests  60 passed (60)
+   Start at  07:32:02
+   Duration  2.14s (import 70%, tests 22%, transform 7%, worker 2%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |    97.29 |     100 |     100 |                   
+ ...-boundaries.ts |     100 |    95.65 |     100 |     100 | 88                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 39/39 )
+Branches     : 97.29% ( 36/37 )
+Functions    : 100% ( 8/8 )
+Lines        : 100% ( 38/38 )
+================================================================================
+
+> nx run ui:build
+
+> vite build && tsc -p tsconfig.build.json --noEmit false --emitDeclarationOnly
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vite.config.ts:11:20). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 21 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/styles.css  45.44 kB │ gzip: 8.28 kB
+dist/index.js    26.23 kB │ gzip: 5.53 kB │ map: 55.45 kB
+
+✓ built in 980ms
+
+> nx run eslint-config:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run eslint-config:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run mfe-settings:build
+
+> vite build
+
+vite v8.3.1 building client environment for production...
+`output.codeSplitting.groups[1].name` is a function. Set `output.codeSplitting.groups[1].debugName` so the bundler timing report can identify this group.
+transforming...
+✓ 2484 modules transformed.
+rendering chunks...
+[ Module Federation DTS ] Federated types created correctly
+computing gzip size...
+dist/index.html                                                                                                                                                0.34 kB │ gzip:  0.25 kB
+dist/assets/mf-entry-bootstrap-0-f7106abb.js                                                                                                                   2.16 kB
+dist/assets/routes-Bh0u2nu4.js                                                                                                                                 0.05 kB │ gzip:  0.07 kB
+dist/assets/helpers-ErDYAcao.js                                                                                                                                0.08 kB │ gzip:  0.10 kB
+dist/assets/dist-DZe0u63M.js                                                                                                                                   0.29 kB │ gzip:  0.22 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__-CtgG8yGZ.js                  0.52 kB │ gzip:  0.34 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__prebuild__react_mf_2_dom__prebuild__-dSNXAqDB.js                               0.76 kB │ gzip:  0.39 kB
+dist/assets/index-B5LJWWNe.js                                                                                                                                  0.83 kB │ gzip:  0.36 kB
+dist/assets/rolldown-runtime-B0Z9INg1.js                                                                                                                       0.90 kB │ gzip:  0.51 kB
+dist/assets/vite-preload-helper-bTxWVuPN.js                                                                                                                    1.48 kB │ gzip:  0.81 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__prebuild__react__prebuild__-BMla3Kqn.js                                        1.85 kB │ gzip:  0.81 kB
+dist/assets/pendingShares-CdP9Fo6x.js                                                                                                                          2.03 kB │ gzip:  0.91 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js-CNh1ODA-.js              2.64 kB │ gzip:  1.11 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-C54jIdyS.js             2.65 kB │ gzip:  1.11 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__loadShare__react_mf_2_dom__loadShare__.js-BOzXk2SP.js                          3.31 kB │ gzip:  1.45 kB
+dist/assets/react-dom-D-bLs1U1.js                                                                                                                              3.89 kB │ gzip:  1.41 kB
+dist/assets/hostInit-CrJAW-aR.js                                                                                                                               3.99 kB │ gzip:  1.75 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__loadShare__react__loadShare__.js-BhSoccoV.js                                   4.55 kB │ gzip:  1.99 kB
+dist/assets/_virtual_mf-localSharedImportMap___mfe_internal__mfeSettings__mf_owner__1-DOFRK3az.js                                                              5.27 kB │ gzip:  1.19 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__loadShare___mf_0_tanstack_mf_1_react_mf_2_query__loadShare__.js-DQaVCYD1.js    5.46 kB │ gzip:  2.10 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__loadShare___mf_0_app_mf_1_ui__loadShare__.js-BWAYdh86.js                       5.82 kB │ gzip:  2.33 kB
+dist/assets/react-DVplv7_D.js                                                                                                                                  7.87 kB │ gzip:  3.01 kB
+dist/remoteEntry.js                                                                                                                                           18.40 kB │ gzip:  6.26 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__prebuild___mf_0_tanstack_mf_1_react_mf_2_query__prebuild__-BCaRAzyK.js        48.22 kB │ gzip: 13.93 kB
+dist/assets/utils-mzYn9uaX.js                                                                                                                                 65.53 kB │ gzip: 19.43 kB
+dist/assets/app-BCMRI6X9.js                                                                                                                                   86.94 kB │ gzip: 25.65 kB
+dist/assets/_virtual_mf___mfe_internal__mfeSettings__mf_owner__208302178223067__prebuild__react_mf_2_dom_mf_1_client__prebuild__-BdB12OE-.js                 207.60 kB │ gzip: 65.03 kB
+dist/assets/dist-osKZLr9V.js                                                                                                                                 270.66 kB │ gzip: 87.58 kB
+
+✓ built in 3.80s
+[PLUGIN_TIMINGS] JavaScript callbacks ran for 3.7s of this 3.8s build (97%).
+The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+  - plugin module-federation-dts-build generateBundle (69%, 2.6s, 1 call)
+Additional callback time came from the callbacks below and from callbacks under 1s.
+3 callbacks are listed without a time. Their calls overlapped, so the time inside one call includes work from other calls. To find their cost, profile the build with `node --cpu-prof`:
+  - plugin proxyPreBuildShared:resolve-shared-loadShare resolveId (8064 calls)
+  - plugin proxyRemoteEntry load (2470 calls)
+  - plugin generateLocalSharedImportMap load (2468 calls)
+See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+
+
+> nx run mfe-auth:build
+
+> vite build
+
+vite v8.3.1 building client environment for production...
+`output.codeSplitting.groups[1].name` is a function. Set `output.codeSplitting.groups[1].debugName` so the bundler timing report can identify this group.
+transforming...
+✓ 2573 modules transformed.
+rendering chunks...
+[ Module Federation DTS ] Federated types created correctly
+computing gzip size...
+dist/index.html                                                                                                                                            0.35 kB │ gzip:  0.25 kB
+dist/assets/mf-entry-bootstrap-0-789035bf.js                                                                                                               2.16 kB
+dist/assets/routes-CAngcPG9.js                                                                                                                             0.08 kB │ gzip:  0.09 kB
+dist/assets/helpers-ErDYAcao.js                                                                                                                            0.08 kB │ gzip:  0.10 kB
+dist/assets/dist-DZe0u63M.js                                                                                                                               0.29 kB │ gzip:  0.22 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__-CtgG8yGZ.js                   0.52 kB │ gzip:  0.34 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__prebuild__react_mf_2_dom__prebuild__-dSNXAqDB.js                                0.76 kB │ gzip:  0.39 kB
+dist/assets/rolldown-runtime-B0Z9INg1.js                                                                                                                   0.90 kB │ gzip:  0.51 kB
+dist/assets/index-DZstm7t7.js                                                                                                                              1.05 kB │ gzip:  0.43 kB
+dist/assets/vite-preload-helper-bTxWVuPN.js                                                                                                                1.48 kB │ gzip:  0.81 kB
+dist/assets/with-selector-B1vq6tZc.js                                                                                                                      1.78 kB │ gzip:  0.82 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__prebuild__react__prebuild__-BMla3Kqn.js                                         1.85 kB │ gzip:  0.81 kB
+dist/assets/pendingShares-nkqxUH5T.js                                                                                                                      2.21 kB │ gzip:  0.93 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js-CK5QS6GT.js               2.63 kB │ gzip:  1.10 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js--4a9cwDo.js              2.65 kB │ gzip:  1.11 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__loadShare__react_mf_2_dom__loadShare__.js-DfnZI8_g.js                           3.30 kB │ gzip:  1.45 kB
+dist/assets/react-dom-D-bLs1U1.js                                                                                                                          3.89 kB │ gzip:  1.41 kB
+dist/assets/hostInit-uuco1hPZ.js                                                                                                                           4.00 kB │ gzip:  1.76 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__loadShare__react__loadShare__.js-DjXTfCoY.js                                    4.57 kB │ gzip:  2.01 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__loadShare___mf_0_tanstack_mf_1_react_mf_2_query__loadShare__.js-DUHK_ODs.js     5.43 kB │ gzip:  2.09 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__loadShare___mf_0_app_mf_1_ui__loadShare__.js-D2LuC5ZA.js                        5.78 kB │ gzip:  2.31 kB
+dist/assets/_virtual_mf-localSharedImportMap___mfe_internal__mfeAuth__mf_owner__1-ayaWk-Jh.js                                                              5.97 kB │ gzip:  1.24 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__loadShare___mf_0_tanstack_mf_1_react_mf_2_router__loadShare__.js-dMfQroK3.js    6.86 kB │ gzip:  2.67 kB
+dist/assets/react-DVplv7_D.js                                                                                                                              7.87 kB │ gzip:  3.01 kB
+dist/remoteEntry.js                                                                                                                                       18.47 kB │ gzip:  6.27 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__prebuild___mf_0_tanstack_mf_1_react_mf_2_query__prebuild__-KuFg8yqF.js         48.21 kB │ gzip: 13.94 kB
+dist/assets/utils-mzYn9uaX.js                                                                                                                             65.53 kB │ gzip: 19.43 kB
+dist/assets/routes-CMmKimqe.js                                                                                                                            83.59 kB │ gzip: 24.44 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__prebuild___mf_0_tanstack_mf_1_react_mf_2_router__prebuild__-zOlRAWtl.js        92.54 kB │ gzip: 31.72 kB
+dist/assets/_virtual_mf___mfe_internal__mfeAuth__mf_owner__50565723777781__prebuild__react_mf_2_dom_mf_1_client__prebuild__-BdB12OE-.js                  207.60 kB │ gzip: 65.03 kB
+dist/assets/dist-D9VOg7bV.js                                                                                                                             269.08 kB │ gzip: 87.09 kB
+
+✓ built in 4.13s
+[PLUGIN_TIMINGS] JavaScript callbacks ran for 4.0s of this 4.1s build (97%).
+The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+  - plugin module-federation-dts-build generateBundle (66%, 2.7s, 1 call)
+Additional callback time came from the callbacks below and from callbacks under 1s.
+3 callbacks are listed without a time. Their calls overlapped, so the time inside one call includes work from other calls. To find their cost, profile the build with `node --cpu-prof`:
+  - plugin proxyPreBuildShared:resolve-shared-loadShare resolveId (10156 calls)
+  - plugin proxyRemoteEntry load (2557 calls)
+  - plugin generateLocalSharedImportMap load (2555 calls)
+See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+
+
+> nx run test-config:lint
+
+> eslint . --max-warnings=0
+
+
+> nx run shell:build
+
+> vite build
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./module-federation.config" without a file extension (vite.config.ts:6:36). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.1 building client environment for production...
+`output.codeSplitting.groups[1].name` is a function. Set `output.codeSplitting.groups[1].debugName` so the bundler timing report can identify this group.
+transforming...
+✓ 2637 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                                                                                                           0.72 kB │ gzip:  0.40 kB
+dist/assets/mf-entry-bootstrap-0-a5cf77d9.js                                                                                                              2.46 kB
+dist/assets/index-BTgjxohI.css                                                                                                                           44.81 kB │ gzip:  8.25 kB
+dist/assets/helpers-CeEy7IUA.js                                                                                                                           0.08 kB │ gzip:  0.10 kB
+dist/assets/dist-CLIfLqvQ.js                                                                                                                              0.29 kB │ gzip:  0.22 kB
+dist/assets/auth-guard-B5MWeo9h.js                                                                                                                        0.65 kB │ gzip:  0.39 kB
+dist/assets/rolldown-runtime-B0Z9INg1.js                                                                                                                  0.90 kB │ gzip:  0.51 kB
+dist/assets/pendingShares-DMIUwYL5.js                                                                                                                     1.29 kB │ gzip:  0.72 kB
+dist/assets/vite-preload-helper-B3nfOi5I.js                                                                                                               1.36 kB │ gzip:  0.74 kB
+dist/assets/login-YeUuiOXi.js                                                                                                                             1.54 kB │ gzip:  0.65 kB
+dist/assets/register-YeUuiOXi.js                                                                                                                          1.54 kB │ gzip:  0.65 kB
+dist/assets/chats-pW_IrDw8.js                                                                                                                             1.60 kB │ gzip:  0.68 kB
+dist/assets/chats._chatId-pW_IrDw8.js                                                                                                                     1.60 kB │ gzip:  0.68 kB
+dist/assets/settings-DkYtNH8D.js                                                                                                                          1.61 kB │ gzip:  0.68 kB
+dist/assets/remote-loader-B6JIOQwM.js                                                                                                                     2.52 kB │ gzip:  1.25 kB
+dist/assets/virtual_mf___mfe_internal__shell__loadRemote__mfeAuth_mf_1_routes__mf_owner__1__loadRemote__-DiqC4U0w.js                                      2.67 kB │ gzip:  1.13 kB
+dist/assets/virtual_mf___mfe_internal__shell__loadRemote__mfeChat_mf_1_routes__mf_owner__1__loadRemote__-CBKJpmT-.js                                      2.67 kB │ gzip:  1.13 kB
+dist/assets/virtual_mf___mfe_internal__shell__loadRemote__mfeSettings_mf_1_routes__mf_owner__1__loadRemote__-Bxzq1g8e.js                                  2.68 kB │ gzip:  1.13 kB
+dist/assets/createLucideIcon-BN06KjWz.js                                                                                                                  3.12 kB │ gzip:  1.54 kB
+dist/assets/_virtual_mf___mfe_internal__shell__mf_owner__278310307301895__loadShare___mf_0_app_mf_1_ui__loadShare__.js-DmwWFUo9.js                        3.65 kB │ gzip:  1.51 kB
+dist/assets/hostInit-BYpuklUD.js                                                                                                                          3.98 kB │ gzip:  1.75 kB
+dist/assets/ssrVmStrategy-Ud06y3Xf-Cd5RXJX4.js                                                                                                            4.50 kB │ gzip:  2.06 kB
+dist/assets/_virtual_mf-localSharedImportMap___mfe_internal__shell__mf_owner__1-CpvDn20Z.js                                                               6.72 kB │ gzip:  1.39 kB
+dist/assets/_virtual_mf___mfe_internal__shell__mf_owner__278310307301895__loadShare__react_mf_2_dom__loadShare__.js-BOxHwvrD.js                           6.92 kB │ gzip:  2.45 kB
+dist/assets/ssrEntryLoader-Mu8vFsiy.js                                                                                                                   12.77 kB │ gzip:  5.08 kB
+dist/remoteEntry.js                                                                                                                                      19.33 kB │ gzip:  6.19 kB
+dist/assets/utils-YCEgqyCG.js                                                                                                                            65.52 kB │ gzip: 19.43 kB
+dist/assets/_virtual_mf___mfe_internal__shell__mf_owner__278310307301895__loadShare___mf_0_tanstack_mf_1_react_mf_2_query__loadShare__.js-D01sXRRD.js    67.81 kB │ gzip: 19.81 kB
+dist/assets/_virtual_mf___mfe_internal__shell__mf_owner__278310307301895__loadShare___mf_0_tanstack_mf_1_react_mf_2_router__loadShare__.js-D7n6HU0k.js   97.37 kB │ gzip: 33.17 kB
+dist/assets/index-BCMqHVD7.js                                                                                                                           121.32 kB │ gzip: 41.99 kB
+dist/assets/_virtual_mf___mfe_internal__shell__mf_owner__278310307301895__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js-CX0SxF37.js             209.86 kB │ gzip: 65.79 kB
+dist/assets/dist-CBfeu5GW.js                                                                                                                            266.17 kB │ gzip: 85.91 kB
+
+✓ built in 1.57s
+
+> nx run test-config:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run test-config:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/test-config
+      Coverage enabled with v8
+
+
+ Test Files  4 passed (4)
+      Tests  17 passed (17)
+   Start at  07:32:11
+   Duration  198ms (transform 54%, import 21%, worker 19%, tests 6%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 13/13 )
+Branches     : 100% ( 8/8 )
+Functions    : 100% ( 5/5 )
+Lines        : 100% ( 13/13 )
+================================================================================
+
+> nx run mfe-chat:build
+
+> tsc --noEmit && vite build
+
+vite v8.3.1 building client environment for production...
+`output.codeSplitting.groups[1].name` is a function. Set `output.codeSplitting.groups[1].debugName` so the bundler timing report can identify this group.
+transforming...
+✓ 2756 modules transformed.
+rendering chunks...
+[ Module Federation DTS ] Federated types created correctly
+computing gzip size...
+dist/index.html                                                                                                                                             1.30 kB │ gzip:  0.35 kB
+dist/assets/mf-entry-bootstrap-8-d1711267.js                                                                                                                2.15 kB
+dist/assets/mf-entry-bootstrap-9-d56c5dbf.js                                                                                                                2.16 kB
+dist/assets/mf-entry-bootstrap-10-1072253b.js                                                                                                               2.16 kB
+dist/assets/mf-entry-bootstrap-0-6b0e329e.js                                                                                                                2.17 kB
+dist/assets/mf-entry-bootstrap-1-ee138149.js                                                                                                                2.17 kB
+dist/assets/mf-entry-bootstrap-2-1dd99e4d.js                                                                                                                2.25 kB
+dist/assets/mf-entry-bootstrap-6-e529c3e3.js                                                                                                                2.26 kB
+dist/assets/mf-entry-bootstrap-3-f3d21c91.js                                                                                                                2.27 kB
+dist/assets/mf-entry-bootstrap-7-27a8e286.js                                                                                                                2.27 kB
+dist/assets/mf-entry-bootstrap-4-7be5ec3f.js                                                                                                                2.28 kB
+dist/assets/mf-entry-bootstrap-5-b15f173c.js                                                                                                                2.28 kB
+dist/assets/routes-DwwosEzV.js                                                                                                                              0.08 kB │ gzip:  0.09 kB
+dist/assets/helpers-ErDYAcao.js                                                                                                                             0.08 kB │ gzip:  0.10 kB
+dist/assets/dist-DZe0u63M.js                                                                                                                                0.29 kB │ gzip:  0.22 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__-CtgG8yGZ.js                   0.52 kB │ gzip:  0.34 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__prebuild__react_mf_2_dom__prebuild__-dSNXAqDB.js                                0.76 kB │ gzip:  0.39 kB
+dist/assets/rolldown-runtime-B0Z9INg1.js                                                                                                                    0.90 kB │ gzip:  0.51 kB
+dist/assets/remote-entry-CSOtCF9f.js                                                                                                                        1.13 kB │ gzip:  0.45 kB
+dist/assets/vite-preload-helper-bTxWVuPN.js                                                                                                                 1.48 kB │ gzip:  0.81 kB
+dist/assets/with-selector-tDTRVf6H.js                                                                                                                       1.78 kB │ gzip:  0.82 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__prebuild__react__prebuild__-BMla3Kqn.js                                         1.85 kB │ gzip:  0.81 kB
+dist/assets/pendingShares-CQN6lHse.js                                                                                                                       2.22 kB │ gzip:  0.93 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js-B9Fzequf.js               2.63 kB │ gzip:  1.10 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-Ds0eC-jG.js              2.65 kB │ gzip:  1.11 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__loadShare__react_mf_2_dom__loadShare__.js-Dn1wy5FA.js                           3.30 kB │ gzip:  1.45 kB
+dist/assets/x-Cia1hYd5.js                                                                                                                                   3.33 kB │ gzip:  1.64 kB
+dist/assets/react-dom-D-bLs1U1.js                                                                                                                           3.89 kB │ gzip:  1.41 kB
+dist/assets/hostInit-NsZQh6U4.js                                                                                                                            4.02 kB │ gzip:  1.77 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__loadShare__react__loadShare__.js-CsQnX5SE.js                                    4.58 kB │ gzip:  2.01 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__loadShare___mf_0_tanstack_mf_1_react_mf_2_query__loadShare__.js-D5muw7oW.js     5.45 kB │ gzip:  2.09 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__loadShare___mf_0_app_mf_1_ui__loadShare__.js-Dc03YDqY.js                        5.86 kB │ gzip:  2.34 kB
+dist/assets/_virtual_mf-localSharedImportMap___mfe_internal__mfe_chat__mf_owner__1-BeFGZYJ3.js                                                              6.03 kB │ gzip:  1.26 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__loadShare___mf_0_tanstack_mf_1_react_mf_2_router__loadShare__.js-DSE15nJ2.js    6.86 kB │ gzip:  2.67 kB
+dist/assets/react-DVplv7_D.js                                                                                                                               7.87 kB │ gzip:  3.01 kB
+dist/remoteEntry.js                                                                                                                                        18.81 kB │ gzip:  6.31 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__prebuild___mf_0_tanstack_mf_1_react_mf_2_query__prebuild__-DODnoeE1.js         48.21 kB │ gzip: 13.95 kB
+dist/assets/utils-mzYn9uaX.js                                                                                                                              65.53 kB │ gzip: 19.43 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__prebuild___mf_0_tanstack_mf_1_react_mf_2_router__prebuild__-v6wD-cWS.js        92.53 kB │ gzip: 31.71 kB
+dist/assets/routes-B8QJS-b8.js                                                                                                                            204.01 kB │ gzip: 61.62 kB
+dist/assets/_virtual_mf___mfe_internal__mfe_chat__mf_owner__17198731110775__prebuild__react_mf_2_dom_mf_1_client__prebuild__-BdB12OE-.js                  207.60 kB │ gzip: 65.03 kB
+dist/assets/dist-CKF4yvb2.js                                                                                                                              265.94 kB │ gzip: 85.76 kB
+
+✓ built in 5.19s
+[PLUGIN_TIMINGS] JavaScript callbacks ran for 4.9s of this 5.1s build (97%).
+The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+  - plugin module-federation-dts-build generateBundle (67%, 3.4s, 1 call)
+Additional callback time came from the callbacks below and from callbacks under 1s.
+3 callbacks are listed without a time. Their calls overlapped, so the time inside one call includes work from other calls. To find their cost, profile the build with `node --cpu-prof`:
+  - plugin proxyPreBuildShared:resolve-shared-loadShare resolveId (9851 calls)
+  - plugin proxyRemoteEntry load (2740 calls)
+  - plugin generateLocalSharedImportMap load (2738 calls)
+See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+
+
+> nx run shared-types:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run shared-types:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/shared-types
+      Coverage enabled with v8
+
+
+ Test Files  16 passed (16)
+      Tests  125 passed (125)
+   Start at  07:32:11
+   Duration  697ms (import 39%, transform 30%, worker 25%, tests 6%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   96.87 |    86.66 |     100 |    96.8 |                   
+ src/api-keys      |   92.85 |       75 |     100 |   92.85 |                   
+  storage.ts       |   91.11 |       75 |     100 |   91.11 | 138,147-150       
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 96.87% ( 124/128 )
+Branches     : 86.66% ( 39/45 )
+Functions    : 100% ( 28/28 )
+Lines        : 96.8% ( 121/125 )
+================================================================================
+
+> nx run pii-detector:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/pii-detector
+      Coverage enabled with v8
+
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  07:32:12
+   Duration  161ms (transform 53%, worker 20%, import 17%, tests 10%)
+
+ % Coverage report from v8
+----------|---------|----------|---------|---------|-------------------
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+----------|---------|----------|---------|---------|-------------------
+All files |     100 |       95 |     100 |     100 |                   
+ pii.ts   |     100 |       95 |     100 |     100 | 43                
+----------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 51/51 )
+Branches     : 95% ( 19/20 )
+Functions    : 100% ( 17/17 )
+Lines        : 100% ( 43/43 )
+================================================================================
+
+> nx run shared-types:typecheck
+
+> tsc --noEmit -p tsconfig.json
+
+
+> nx run pii-detector:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run pii-detector:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run conversation-service:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run conversation-service:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run conversation-service:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+      Coverage enabled with v8
+
+
+ Test Files  67 passed (67)
+      Tests  530 passed | 2 todo (532)
+   Start at  07:32:13
+   Duration  4.70s (import 45%, transform 23%, tests 20%, worker 10%, setup 2%)
+
+    Isolate  67 workers spawned · ~113ms startup each (spawn + environment, per file)
+             at least ~971ms faster with isolate: false — reuses workers across files instead of one per file
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   98.22 |    91.21 |    97.3 |   98.91 |                   
+ src               |   94.59 |       95 |      60 |   94.28 |                   
+  app.ts           |   94.59 |       95 |      60 |   94.28 | 65,81             
+ ...es/attachments |   96.09 |    84.31 |   96.77 |   97.41 |                   
+  file-cleanup.ts  |     100 |        0 |   88.88 |     100 | 19                
+  llm-context.ts   |     100 |    83.33 |     100 |     100 | 15,38             
+  storage.ts       |   86.66 |       60 |     100 |    92.3 | 41,50             
+  ...-extractor.ts |   88.88 |      100 |     100 |   88.88 | 15                
+  validators.ts    |     100 |     87.5 |     100 |     100 | 40                
+ ...features/chats |   98.09 |      100 |   94.87 |   98.07 |                   
+  service.ts       |   96.55 |      100 |   92.59 |   96.49 | 87-90             
+ ...s/llm-adapters |   98.02 |    88.82 |     100 |   99.42 |                   
+  ...c.provider.ts |   96.69 |    85.82 |     100 |   99.05 | 182               
+  ...i.provider.ts |     100 |    94.44 |     100 |     100 | 55,111            
+ ...tures/messages |   97.85 |    93.84 |   97.14 |   99.26 |                   
+  processor.ts     |   95.91 |    89.65 |     100 |     100 | 37,42,111         
+  service.ts       |   98.18 |    96.87 |   94.44 |   98.18 | 232               
+ src/shared        |     100 |    90.47 |     100 |     100 |                   
+  logger.ts        |     100 |    88.88 |     100 |     100 | 31                
+  metrics.ts       |     100 |    66.66 |     100 |     100 | 29                
+  pii-scrub.ts     |     100 |     87.5 |     100 |     100 | 25                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 98.22% ( 884/900 )
+Branches     : 91.21% ( 384/421 )
+Functions    : 97.3% ( 217/223 )
+Lines        : 98.91% ( 824/833 )
+================================================================================
+
+> nx run mock-server:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run mock-server:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run ui:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run test-utils:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/test-utils
+      Coverage enabled with v8
+
+
+ Test Files  5 passed (5)
+      Tests  53 passed (53)
+   Start at  07:32:23
+   Duration  1.31s (environment 63%, setup 20%, transform 10%, worker 4%, tests 2%, import 1%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |    95.65 |     100 |     100 |                   
+ src               |     100 |    89.47 |     100 |     100 |                   
+  ...ent-source.ts |     100 |    83.33 |     100 |     100 | 45,75             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 87/87 )
+Branches     : 95.65% ( 44/46 )
+Functions    : 100% ( 41/41 )
+Lines        : 100% ( 82/82 )
+================================================================================
+
+> nx run ui:test
+
+> vitest run --coverage
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vite.config.ts:11:20). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/ui
+      Coverage enabled with v8
+
+
+ Test Files  22 passed (22)
+      Tests  137 passed (137)
+   Start at  07:32:18
+   Duration  5.88s (environment 37%, tests 30%, import 11%, transform 10%, setup 9%, worker 3%)
+
+Environment  jsdom was created 22 times · 11.65s total, 37% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   98.88 |    82.92 |   96.82 |   98.88 |                   
+ components/dialog |     100 |       50 |     100 |     100 |                   
+  dialog.tsx       |     100 |       50 |     100 |     100 | 50                
+ .../dropdown-menu |     100 |    57.14 |     100 |     100 |                   
+  ...down-menu.tsx |     100 |    57.14 |     100 |     100 | 51-139            
+ ...nts/form-field |     100 |       90 |     100 |     100 |                   
+  form-field.tsx   |     100 |       90 |     100 |     100 | 26                
+ components/select |   86.66 |      100 |      60 |   86.66 |                   
+  select.tsx       |   86.66 |      100 |      60 |   86.66 | 68,99             
+ components/toast  |     100 |    71.42 |     100 |     100 |                   
+  toast.tsx        |     100 |    71.42 |     100 |     100 | 114-115           
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 98.88% ( 177/179 )
+Branches     : 82.92% ( 34/41 )
+Functions    : 96.82% ( 61/63 )
+Lines        : 98.88% ( 177/179 )
+================================================================================
+
+> nx run ui:lint
+
+> eslint .
+
+
+> nx run test-utils:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run test-utils:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run mock-server:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/testing/mock-server
+      Coverage enabled with v8
+
+
+ Test Files  21 passed (21)
+      Tests  257 passed (257)
+   Start at  07:32:15
+   Duration  11.77s (tests 59%, transform 23%, import 17%, worker 1%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   98.37 |    92.87 |   98.99 |   99.26 |                   
+ src/backend       |   97.67 |    89.28 |     100 |   97.61 |                   
+  http.ts          |   97.67 |    89.28 |     100 |   97.61 | 63                
+ src/conversation  |   97.81 |    88.29 |   98.03 |   99.36 |                   
+  answer-text.ts   |   85.71 |       80 |     100 |   85.71 | 21                
+  engine.ts        |   98.03 |    87.23 |     100 |     100 | 54-70,92,131,196  
+  records.ts       |   98.27 |    90.47 |   96.42 |     100 | 28-35,104,120     
+ src/core          |     100 |    95.45 |     100 |     100 |                   
+  request-log.ts   |     100 |    95.45 |     100 |     100 | 87                
+ src/data          |   99.02 |     93.1 |     100 |     100 |                   
+  datasets.ts      |   98.52 |       80 |     100 |     100 | 40,92             
+ src/faults        |   98.85 |    93.61 |     100 |   98.59 |                   
+  faults.ts        |   98.85 |    93.61 |     100 |   98.59 | 136               
+ src/llm           |   97.91 |    94.16 |     100 |     100 |                   
+  anthropic.ts     |   97.14 |    94.73 |     100 |     100 | 135,167           
+  openai.ts        |   96.55 |    91.66 |     100 |     100 | 93                
+  serve-replay.ts  |   91.66 |     87.5 |     100 |     100 | 30                
+  sse.ts           |   94.44 |    66.66 |     100 |     100 | 17-24             
+  stream.ts        |     100 |    88.88 |     100 |     100 | 29                
+ src/routers       |      98 |    93.02 |   97.43 |   98.65 |                   
+  ...pic.router.ts |    90.9 |     87.5 |      75 |   92.68 | 60-61,73          
+  auth.router.ts   |    98.5 |      100 |     100 |     100 |                   
+  ...ion.router.ts |   99.53 |     92.7 |     100 |   99.49 | 319               
+  openai.router.ts |   95.45 |     92.3 |      75 |   97.56 | 78                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 98.37% ( 1212/1232 )
+Branches     : 92.87% ( 508/547 )
+Functions    : 98.99% ( 296/299 )
+Lines        : 99.26% ( 1084/1092 )
+================================================================================
+
+> nx run mfe-chat:typecheck
+
+> tsc --noEmit
+
+
+> nx run mfe-chat:size
+
+> size-limit
+
+  
+  mfe-chat remoteEntry.js
+  Size limit: 7 kB
+  Size:       6.26 kB gzipped
+  
+  mfe-chat route chunks
+  Size limit: 70 kB
+  Size:       63.15 kB gzipped
+  
+  mfe-chat federation glue
+  Size limit: 136 kB
+  Size:       123.08 kB gzipped
+  
+  mfe-chat shared-library copies
+  Size limit: 137 kB
+  Size:       123.75 kB gzipped
+  
+  mfe-chat all emitted JS
+  Size limit: 348 kB
+  Size:       316.24 kB gzipped
+  
+
+> nx run mfe-chat:lint
+
+> eslint src
+
+
+> nx run mfe-settings:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-settings
+      Coverage enabled with v8
+
+
+ Test Files  11 passed (11)
+      Tests  59 passed (59)
+   Start at  07:32:31
+   Duration  9.06s (environment 39%, transform 16%, setup 16%, import 15%, tests 11%, worker 3%)
+
+Environment  jsdom was created 11 times · 18.81s total, 39% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |    91.01 |     100 |     100 |                   
+ ...s/api-keys/api |     100 |       85 |     100 |     100 |                   
+  auth.ts          |     100 |    83.33 |     100 |     100 | 41                
+  ...Connection.ts |     100 |    85.71 |     100 |     100 | 69-75             
+ ...eys/components |     100 |    90.74 |     100 |     100 |                   
+  ProviderList.tsx |     100 |    79.16 |     100 |     100 | 45,54-59          
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 94/94 )
+Branches     : 91.01% ( 81/89 )
+Functions    : 100% ( 27/27 )
+Lines        : 100% ( 91/91 )
+================================================================================
+
+> nx run shell:test
+
+> vitest run --coverage
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - import "./module-federation.config" without a file extension (vite.config.ts:6:36). Add the file extension
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/shell
+      Coverage enabled with v8
+
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+
+ Test Files  22 passed (22)
+      Tests  97 passed (97)
+   Start at  07:32:32
+   Duration  14.19s (environment 40%, import 16%, transform 15%, setup 14%, tests 12%, worker 2%)
+
+Environment  jsdom was created 22 times · 33.28s total, 40% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   93.43 |    88.65 |   87.67 |   94.05 |                   
+ shell/src/routes  |   63.63 |    74.46 |      60 |   63.63 |                   
+  __root.tsx       |   33.33 |    85.71 |      50 |   33.33 | 11-18             
+  ...s.$chatId.tsx |   66.66 |       60 |      50 |   66.66 | 17                
+  chats.tsx        |   66.66 |       60 |      50 |   66.66 | 17                
+  index.tsx        |   66.66 |    85.71 |     100 |   66.66 | 8                 
+  login.tsx        |      75 |    71.42 |   66.66 |      75 | 20                
+  register.tsx     |   66.66 |    81.81 |      50 |   66.66 | 12                
+  settings.tsx     |   66.66 |       60 |      50 |   66.66 | 17                
+ .../observability |    97.5 |       96 |   88.88 |   96.96 |                   
+  faro-scrub.ts    |     100 |    94.44 |     100 |     100 | 41                
+  faro.ts          |      80 |      100 |      50 |      75 | 36                
+ ...c/shared/theme |   86.66 |    81.25 |   84.61 |      92 |                   
+  theme.ts         |   86.66 |    81.25 |   84.61 |      92 | 19,52             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 93.43% ( 185/198 )
+Branches     : 88.65% ( 125/141 )
+Functions    : 87.67% ( 64/73 )
+Lines        : 94.05% ( 174/185 )
+================================================================================
+
+> nx run mfe-chat:test
+
+> cross-env NODE_ENV=test vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-chat
+      Coverage enabled with v8
+
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+
+ Test Files  44 passed (44)
+      Tests  349 passed (349)
+   Start at  07:32:25
+   Duration  22.47s (environment 37%, import 21%, tests 18%, setup 15%, transform 6%, worker 2%)
+
+Environment  jsdom was created 44 times · 50.31s total, 37% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |    94.9 |    91.22 |   94.23 |   96.65 |                   
+ app               |   90.33 |    87.13 |   92.42 |   92.68 |                   
+  ...Workspace.tsx |   97.95 |    95.55 |     100 |    97.5 | 42                
+  routes.tsx       |    62.5 |        0 |      60 |   71.42 | 37-38             
+  split-panes.ts   |    87.7 |    83.92 |   93.54 |    91.3 | ...83-188,198,205 
+  ...edia-query.ts |      90 |      100 |   83.33 |    87.5 | 17                
+ ...nts/components |   91.66 |      100 |   83.33 |    90.9 |                   
+  ...entPicker.tsx |   83.33 |      100 |   66.66 |   83.33 | 41                
+ ...achments/hooks |    90.9 |       70 |   83.33 |    91.3 |                   
+  ...ttachments.ts |    90.9 |       70 |   83.33 |    91.3 | 59-60             
+ ...achments/model |     100 |    93.75 |     100 |     100 |                   
+  validators.ts    |     100 |    91.66 |     100 |     100 | 20                
+ .../chat-list/api |     100 |    81.81 |     100 |     100 |                   
+  chats.ts         |     100 |    81.81 |     100 |     100 | 17,63             
+ ...ist/components |   93.44 |    90.19 |   90.32 |   94.73 |                   
+  ChatList.tsx     |   88.88 |      100 |      80 |    87.5 | 59,101            
+  ChatListItem.tsx |     100 |       96 |     100 |     100 | 44                
+  ...hatDialog.tsx |   88.88 |       75 |   85.71 |   94.11 | 35                
+  ...delSelect.tsx |     100 |       50 |     100 |     100 | 37                
+ ...ers/components |   94.73 |     86.2 |     100 |     100 |                   
+  ...ersDialog.tsx |   94.73 |     86.2 |     100 |     100 | 59,93-101         
+ .../chat-view/api |   96.87 |       75 |      96 |     100 |                   
+  messages.ts      |   96.87 |       75 |      96 |     100 | 16,43,93          
+ ...iew/components |     100 |    95.54 |     100 |     100 |                   
+  ChatView.tsx     |     100 |    93.33 |     100 |     100 | ...52-153,166,219 
+  MessageError.tsx |     100 |    66.66 |     100 |     100 | 23-25             
+ ...hat-view/model |   92.95 |    76.47 |    87.5 |   96.61 |                   
+  ...-reasoning.ts |      95 |      100 |    87.5 |     100 |                   
+  ...m-registry.ts |   92.15 |    73.33 |    87.5 |   95.23 | 47,56             
+ shared            |   98.68 |       96 |     100 |     100 |                   
+  api-client.ts    |   97.56 |    94.87 |     100 |     100 | 25-40             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 94.9% ( 671/707 )
+Branches     : 91.22% ( 572/627 )
+Functions    : 94.23% ( 294/312 )
+Lines        : 96.65% ( 578/598 )
+================================================================================
+
+> nx run mfe-auth:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/apps/mfe-auth
+      Coverage enabled with v8
+
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+
+ Test Files  17 passed (17)
+      Tests  66 passed (66)
+   Start at  07:32:42
+   Duration  8.18s (environment 45%, setup 17%, import 12%, tests 12%, transform 10%, worker 3%)
+
+Environment  jsdom was created 17 times · 20.83s total, 45% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   98.05 |    85.24 |   96.55 |   98.05 |                   
+ ...ures/login/api |    90.9 |      100 |   83.33 |    90.9 |                   
+  session.ts       |   88.88 |      100 |      75 |   88.88 | 43                
+ ...gin/components |     100 |    78.57 |     100 |     100 |                   
+  LoginForm.tsx    |     100 |    83.33 |     100 |     100 | 28,81             
+  LogoutButton.tsx |     100 |       50 |     100 |     100 | 13                
+ ...ter/components |     100 |       90 |     100 |     100 |                   
+  RegisterForm.tsx |     100 |       90 |     100 |     100 | 33                
+ shared            |   97.29 |    84.84 |     100 |   97.29 |                   
+  api-client.ts    |   96.42 |    82.75 |     100 |   96.42 | 67                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 98.05% ( 101/103 )
+Branches     : 85.24% ( 52/61 )
+Functions    : 96.55% ( 28/29 )
+Lines        : 98.05% ( 101/103 )
+================================================================================
+
+> nx run shell:typecheck
+
+> tsc -b --noEmit
+
+
+> nx run auth-service:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+      Coverage enabled with v8
+
+
+ Test Files  31 passed (31)
+      Tests  178 passed (178)
+   Start at  07:32:47
+   Duration  6.38s (tests 58%, import 22%, transform 16%, worker 4%, setup 1%)
+
+    Isolate  31 workers spawned · ~128ms startup each (spawn + environment, per file)
+             at least ~440ms faster with isolate: false — reuses workers across files instead of one per file
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   99.28 |       96 |   98.55 |   99.26 |                   
+ features/session  |   98.92 |      100 |     100 |   98.92 |                   
+  api.ts           |   97.43 |      100 |     100 |   97.43 | 73                
+ shared            |    98.8 |    89.18 |   96.29 |   98.76 |                   
+  http-metrics.ts  |      95 |    66.66 |   83.33 |   94.44 | 40                
+  logger.ts        |     100 |    91.66 |     100 |     100 | 86                
+  pii-scrub.ts     |     100 |     87.5 |     100 |     100 | 25                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 99.28% ( 277/279 )
+Branches     : 96% ( 96/100 )
+Functions    : 98.55% ( 68/69 )
+Lines        : 99.26% ( 269/271 )
+================================================================================
+
+> nx run workspace-config:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/workspace-config
+      Coverage enabled with v8
+
+
+ Test Files  12 passed (12)
+      Tests  212 passed (212)
+   Start at  07:32:51
+   Duration  3.06s (tests 57%, import 27%, transform 12%, worker 3%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   96.52 |    85.88 |    92.3 |   97.93 |                   
+ coverage-guard.ts |     100 |       88 |     100 |     100 | 36,74-82          
+ loki-retention.ts |     100 |       85 |     100 |     100 | 25,51             
+ repo.ts           |     100 |       50 |     100 |     100 | 15                
+ source-files.ts   |   91.66 |    86.84 |    87.5 |   94.28 | 100-101           
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 96.52% ( 111/115 )
+Branches     : 85.88% ( 73/85 )
+Functions    : 92.3% ( 24/26 )
+Lines        : 97.93% ( 95/97 )
+================================================================================
+
+> nx run mfe-auth:typecheck
+
+> tsc --noEmit
+
+
+> nx run mfe-auth:lint
+
+> eslint src
+
+
+> nx run mfe-settings:lint
+
+> eslint src
+
+
+> nx run shell:lint
+
+> eslint src
+
+
+> nx run auth-service:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run mfe-settings:typecheck
+
+> tsc --noEmit
+
+
+> nx run workspace-config:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run e2e:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run promptfoo:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/testing/promptfoo
+      Coverage enabled with v8
+
+
+ Test Files  12 passed (12)
+      Tests  88 passed (88)
+   Start at  07:32:57
+   Duration  733ms (transform 38%, tests 38%, import 14%, worker 11%)
+
+ % Coverage report from v8
+-----------------|---------|----------|---------|---------|-------------------
+File             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-----------------|---------|----------|---------|---------|-------------------
+All files        |   95.95 |    88.75 |     100 |   96.52 |                   
+ assertions.ts   |     100 |    93.75 |     100 |     100 | 36                
+ attacks.ts      |     100 |    83.33 |     100 |     100 | 131               
+ budget.ts       |     100 |    95.65 |     100 |     100 | 39                
+ client.ts       |   95.18 |    89.33 |     100 |   98.41 | 177               
+ estimate-cli.ts |   68.75 |    64.28 |     100 |   64.28 | 23-27             
+ mock-grader.ts  |     100 |    91.66 |     100 |     100 | 25                
+ provider.ts     |     100 |    96.29 |     100 |     100 | 71                
+ report-cli.ts   |      50 |       50 |     100 |   57.14 | 15-17             
+ report.ts       |     100 |    93.33 |     100 |     100 | 46-47             
+ scenario.ts     |     100 |    86.66 |     100 |     100 | 35,97             
+ sse.ts          |     100 |       90 |     100 |     100 | 35                
+-----------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 95.95% ( 308/321 )
+Branches     : 88.75% ( 213/240 )
+Functions    : 100% ( 82/82 )
+Lines        : 96.52% ( 250/259 )
+================================================================================
+
+> nx run auth-service:build
+
+> tsc -p tsconfig.json
+
+
+> nx run promptfoo:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run e2e:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/e2e
+      Coverage enabled with v8
+
+
+ Test Files  20 passed (20)
+      Tests  141 passed (141)
+   Start at  07:32:58
+   Duration  961ms (transform 40%, import 28%, tests 16%, worker 15%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   94.47 |    89.09 |   91.04 |   95.05 |                   
+ a11y              |   57.14 |       40 |   85.71 |      50 |                   
+  axe-helper.ts    |   57.14 |       40 |   85.71 |      50 | 53-60             
+ fixtures          |   97.64 |    87.09 |   93.75 |    98.8 |                   
+  ...ings-flows.ts |     100 |       50 |     100 |     100 | 25                
+  ...-for-stack.ts |   92.85 |    86.36 |   77.77 |   96.29 | 25                
+ visual/lib        |      97 |    93.24 |   89.28 |   97.67 |                   
+  fonts.ts         |     100 |       75 |     100 |     100 | 44                
+  servers.ts       |   57.14 |      100 |      25 |      60 | 22-26             
+  static-server.ts |     100 |    88.88 |     100 |     100 | 40-45,57,61       
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 94.47% ( 188/199 )
+Branches     : 89.09% ( 98/110 )
+Functions    : 91.04% ( 61/67 )
+Lines        : 95.05% ( 173/182 )
+================================================================================
+
+> nx run pact-config:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/pact-config
+      Coverage enabled with v8
+
+
+ Test Files  2 passed (2)
+      Tests  17 passed (17)
+   Start at  07:32:59
+   Duration  435ms (import 79%, transform 13%, worker 6%, tests 2%)
+
+ % Coverage report from v8
+------------------|---------|----------|---------|---------|-------------------
+File              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+------------------|---------|----------|---------|---------|-------------------
+------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 17/17 )
+Branches     : 100% ( 14/14 )
+Functions    : 100% ( 7/7 )
+Lines        : 100% ( 17/17 )
+================================================================================
+
+> nx run workspace-config:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run observability:test
+
+> vitest run --coverage
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/observability
+      Coverage enabled with v8
+
+
+ Test Files  9 passed (9)
+      Tests  45 passed (45)
+   Start at  07:32:59
+   Duration  445ms (transform 46%, import 32%, worker 16%, tests 6%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |    93.75 |     100 |     100 |                   
+ src/logging       |     100 |    96.55 |     100 |     100 |                   
+  logger.ts        |     100 |       90 |     100 |     100 | 37                
+ src/metrics       |     100 |    66.66 |     100 |     100 |                   
+  ...middleware.ts |     100 |    66.66 |     100 |     100 | 20                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 58/58 )
+Branches     : 93.75% ( 30/32 )
+Functions    : 100% ( 19/19 )
+Lines        : 100% ( 56/56 )
+================================================================================
+
+> nx run auth-service:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run e2e:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run observability:lint
+
+> eslint src --max-warnings=0
+
+
+> nx run promptfoo:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run pact-config:build
+
+> tsc -p tsconfig.json
+
+
+> nx run pact-config:lint
+
+> eslint . --max-warnings=0
+
+
+> nx run pact-config:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run k6:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run observability:build
+
+> tsc -p tsconfig.json
+
+
+> nx run mfe-auth:size
+
+> size-limit
+
+  
+  mfe-auth remoteEntry.js
+  Size limit: 7 kB
+  Size:       6.22 kB gzipped
+  
+  mfe-auth route chunks
+  Size limit: 28 kB
+  Size:       24.75 kB gzipped
+  
+  mfe-auth federation glue
+  Size limit: 129 kB
+  Size:       116.94 kB gzipped
+  
+  mfe-auth shared-library copies
+  Size limit: 137 kB
+  Size:       123.7 kB gzipped
+  
+  mfe-auth all emitted JS
+  Size limit: 299 kB
+  Size:       271.61 kB gzipped
+  
+
+> nx run observability:typecheck
+
+> tsc -p tsconfig.json --noEmit
+
+
+> nx run mfe-settings:size
+
+> size-limit
+
+  
+  mfe-settings remoteEntry.js
+  Size limit: 7 kB
+  Size:       6.22 kB gzipped
+  
+  mfe-settings route chunks
+  Size limit: 29 kB
+  Size:       25.84 kB gzipped
+  
+  mfe-settings federation glue
+  Size limit: 129 kB
+  Size:       116.55 kB gzipped
+  
+  mfe-settings shared-library copies
+  Size limit: 99 kB
+  Size:       89.64 kB gzipped
+  
+  mfe-settings all emitted JS
+  Size limit: 263 kB
+  Size:       238.25 kB gzipped
+  
+
+> nx run k6:test
+
+> vitest run
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/testing/k6
+
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  07:33:02
+   Duration  111ms (transform 60%, import 21%, tests 12%, worker 6%)
+
+
+> nx run shell:size
+
+> size-limit
+
+  
+  shell remoteEntry.js
+  Size limit: 7 kB
+  Size:       6.15 kB gzipped
+  
+  shell own chunks
+  Size limit: 57 kB
+  Size:       51.54 kB gzipped
+  
+  shell federation glue
+  Size limit: 130 kB
+  Size:       117.6 kB gzipped
+  
+  shell shared-library copies
+  Size limit: 134 kB
+  Size:       121.36 kB gzipped
+  
+  shell all emitted JS
+  Size limit: 327 kB
+  Size:       296.64 kB gzipped
+  
+
+
+
+ NX   Successfully ran targets lint, typecheck, test, build, size for 19 projects and 2 tasks they depend on
+
+
+  Run duration:      1m 1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     25.6s (4 tasks)
+  Recoverable time:  35.8s (58% of the run)
+
+  Recommendations:
+    - Increase parallelism to recover up to 35.8s → https://nx.dev/docs/concepts/ci-concepts/parallelization-distribution?utm_source=nx-cli&utm_medium=cli&utm_campaign=performance-report&utm_content=parallelization.
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+
+ NX   Nx detected 11 flaky tasks
+
+  observability:test
+  mfe-auth:test
+  e2e:test
+  test-utils:test
+  mfe-settings:test
+  6 more...
+
+Flaky tasks can disrupt your CI pipeline. Automatically retry them with Nx Cloud. Learn more at https://nx.dev/ci/features/flaky-tasks
+
+
+[exit 0]

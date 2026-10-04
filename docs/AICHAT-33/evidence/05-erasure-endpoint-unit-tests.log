@@ -1,0 +1,40 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/erasure.spec.ts src/features/erasure --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/features/erasure/repository.spec.ts > createErasureRepository > deletes the owned chats, the memberships by lowercased email and the user's messages in one transaction 2ms
+ ✓ src/features/erasure/repository.spec.ts > createErasureRepository > reads the file paths before anything is deleted 0ms
+ ✓ src/features/erasure/schema.spec.ts > eraseUserSchema > accepts a user id and an email 2ms
+ ✓ src/features/erasure/schema.spec.ts > eraseUserSchema > rejects {} 0ms
+ ✓ src/features/erasure/schema.spec.ts > eraseUserSchema > rejects {"userId":"","email":"u1@example.com"} 0ms
+ ✓ src/features/erasure/schema.spec.ts > eraseUserSchema > rejects {"userId":"u1","email":"nope"} 0ms
+ ✓ src/features/erasure/schema.spec.ts > eraseUserSchema > rejects {"userId":"u1"} 0ms
+ ✓ src/features/erasure/service-token.spec.ts > requireServiceToken > lets the right token through 1ms
+ ✓ src/features/erasure/service-token.spec.ts > requireServiceToken > answers 401 for undefined 1ms
+ ✓ src/features/erasure/service-token.spec.ts > requireServiceToken > answers 401 for "" 0ms
+ ✓ src/features/erasure/service-token.spec.ts > requireServiceToken > answers 401 for "Bearer " 0ms
+ ✓ src/features/erasure/service-token.spec.ts > requireServiceToken > answers 401 for "Bearer nope" 0ms
+ ✓ src/features/erasure/service-token.spec.ts > requireServiceToken > answers 401 for "Bearer a-service-token-that-is-long-enough-123x" 0ms
+ ✓ src/features/erasure/service-token.spec.ts > requireServiceToken > answers 401 for "Bearer -service-token-that-is-long-enough-123" 0ms
+ ✓ src/features/erasure/service-token.spec.ts > requireServiceToken > answers 401 for "Basic a-service-token-that-is-long-enough-123" 0ms
+ ✓ src/features/erasure/service-token.spec.ts > requireServiceToken > answers 401 for "a-service-token-that-is-long-enough-123" 0ms
+ ✓ src/features/erasure/service.spec.ts > ErasureService > removes the files of the deleted rows and reports the counts 2ms
+ ✓ src/features/erasure/service.spec.ts > ErasureService > keeps every file when the database part fails 1ms
+ ✓ src/features/erasure/service.spec.ts > ErasureService > is a success for a user with nothing left 0ms
+ ✓ src/features/erasure/routes.spec.ts > createErasureRouter > erases the user named in the body when the token is right 18ms
+ ✓ src/features/erasure/routes.spec.ts > createErasureRouter > does nothing without the token 2ms
+ ✓ src/integration/erasure.spec.ts > POST /internal/erasures > POST /internal/erasures erases the user's data and answers with the counts 21ms
+ ✓ src/integration/erasure.spec.ts > POST /internal/erasures > POST /internal/erasures is idempotent: a user with nothing left is a success 4ms
+ ✓ src/integration/erasure.spec.ts > POST /internal/erasures > POST /internal/erasures rejects a call without the service token 3ms
+ ✓ src/integration/erasure.spec.ts > POST /internal/erasures > POST /internal/erasures rejects a wrong token, a token of another length and a user session 6ms
+ ✓ src/integration/erasure.spec.ts > POST /internal/erasures > POST /internal/erasures validates the body 3ms
+ ✓ src/integration/erasure.spec.ts > POST /internal/erasures > POST /internal/erasures answers 500 without internals when the database fails, so the caller can retry 2ms
+ ✓ src/integration/erasure.spec.ts > POST /internal/erasures > is not mounted when no service token is configured 2ms
+
+ Test Files  6 passed (6)
+      Tests  28 passed (28)
+   Start at  07:11:22
+   Duration  476ms (import 47%, transform 36%, worker 9%, tests 7%, setup 1%)
+
+
+[exit 0]

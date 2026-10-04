@@ -16,6 +16,11 @@ const envSchema = z.object({
   // Optional system prompt added at the start of every conversation. Unset in production (no system prompt today);
   // the red-team test stack sets it to a prompt that holds a canary (AICHAT-26, compose.redteam.yaml).
   SYSTEM_PROMPT: z.string().min(1).optional(),
+  // Shared secret of the service-to-service calls (account erasure, AICHAT-79). No default on purpose:
+  // without it the internal routes are not mounted at all.
+  INTERNAL_SERVICE_TOKEN: z.string().min(32).optional(),
+  // How often the retention job runs, in minutes; 0 turns it off.
+  RETENTION_INTERVAL_MINUTES: z.coerce.number().int().min(0).default(360),
   LOG_LEVEL: z.string().default("info"),
 });
 

@@ -1,0 +1,24 @@
+$ cd services/auth-service && pnpm exec vitest run --config vitest.db.config.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "test", schema "public" at "localhost:32788"
+
+🚀  Your database is now in sync with your Prisma schema. Done in 87ms
+
+ ✓ src/test-db/account-deletion.db.spec.ts > DELETE /auth/me against a real database > erases the chats, messages, attachment rows and files, the memberships and the refresh tokens of the user 1549ms
+ ✓ src/test-db/account-deletion.db.spec.ts > DELETE /auth/me against a real database > keeps the account when conversation-service cannot be reached, and a retry succeeds 1744ms
+ ✓ src/test-db/account-deletion.db.spec.ts > DELETE /auth/me against a real database > keeps the account when conversation-service answers with an error, and a retry succeeds 1721ms
+ ✓ src/test-db/account-deletion.db.spec.ts > DELETE /auth/me against a real database > finishes after the conversation data was erased but the user row delete failed 1722ms
+ ✓ src/test-db/account-deletion.db.spec.ts > DELETE /auth/me against a real database > is idempotent: repeating the request after the account is gone still answers 204 1449ms
+ ✓ src/test-db/account-deletion.db.spec.ts > DELETE /auth/me against a real database > refuses a wrong password and deletes nothing 1431ms
+ ✓ src/test-db/smoke.db.spec.ts > Testcontainers Postgres (auth schema) > has the schema applied by prisma db push 29ms
+
+ Test Files  2 passed (2)
+      Tests  7 passed (7)
+   Start at  07:14:34
+   Duration  14.36s (tests 95%, import 3%, transform 2%)
+
+
+[exit 0]

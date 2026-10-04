@@ -24,7 +24,8 @@
     "noEmit": true
   },
   "include": [
-    "*.ts"
+    "*.ts",
+    "test-utils/*.ts"
   ],
   "exclude": [
     "node_modules",
