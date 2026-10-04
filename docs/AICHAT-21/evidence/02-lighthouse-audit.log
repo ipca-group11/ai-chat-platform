@@ -1,0 +1,50 @@
+$ bash testing/lighthouse/run.sh
+✅  .lighthouseci/ directory writable
+✅  Configuration file found
+✅  Chrome installation found
+⚠️   GitHub token not set
+Healthcheck passed!
+
+Running Lighthouse 3 time(s) on http://localhost:8000/login
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:8000/register
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:8000/chats
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:8000/chats/cmut0c1vq0000qf01ch3s738h
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:8000/settings
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Done running Lighthouse!
+
+
+Dumping 15 reports to disk at /Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci...
+Done writing reports to disk.
+
+Done running autorun.
+
+## Lighthouse CI: median of 3 runs per page
+
+| Page | Runs | LCP median (budget) | TBT median (budget) | CLS median (budget) | Within budget |
+|---|---|---|---|---|---|
+| `/chats` | 3 | 1327 ms (2500 ms) | 0 ms (300 ms) | 0.000 (0.1) | yes |
+| `/chats/:id` | 3 | 1371 ms (2500 ms) | 0 ms (300 ms) | 0.000 (0.1) | yes |
+| `/login` | 3 | 1247 ms (2000 ms) | 0 ms (200 ms) | 0.000 (0.05) | yes |
+| `/register` | 3 | 1289 ms (2000 ms) | 0 ms (200 ms) | 0.000 (0.05) | yes |
+| `/settings` | 3 | 1325 ms (2500 ms) | 0 ms (300 ms) | 0.000 (0.1) | yes |
+
+Checking assertions against 5 URL(s), 15 total run(s)
+
+All results processed!
+
+[exit 0]

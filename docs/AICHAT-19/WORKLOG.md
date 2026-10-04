@@ -11,8 +11,8 @@ title: "AICHAT-19 · Visual regression testing: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-19-visual-regression-testing` |
 | Started / finished | 2026-10-04 / 2026-10-04 |
-| Pull requests | #… |
-| Status | Done (pull request still to open) |
+| Pull requests | [#24](https://github.com/ipca-group11/ai-chat-platform/pull/24) |
+| Status | Done, merged into `integration/testing-epics` |
 
 ## 1. DoR review
 

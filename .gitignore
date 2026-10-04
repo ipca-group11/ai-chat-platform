@@ -27,6 +27,6 @@ zap-results/
 zap-wrk/
 sbom-results/
 
-# Lighthouse CI local output (AICHAT-21)
-.lighthouseci/
+# Lighthouse CI output (AICHAT-62)
 lighthouse-results/
+.lighthouseci/

@@ -1,0 +1,80 @@
+$ bash testing/lighthouse/run.sh
+✅  .lighthouseci/ directory writable
+✅  Configuration file found
+✅  Chrome installation found
+⚠️   GitHub token not set
+Healthcheck passed!
+
+Running Lighthouse 3 time(s) on http://localhost:8000/login
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:8000/register
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:8000/chats
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:8000/chats/cmut0c1vq0000qf01ch3s738h
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Running Lighthouse 3 time(s) on http://localhost:8000/settings
+Run #1...done.
+Run #2...done.
+Run #3...done.
+Done running Lighthouse!
+
+
+Dumping 15 reports to disk at /private/tmp/claude-501/lh-tight/lhci...
+Done writing reports to disk.
+
+
+## Lighthouse CI: median of 3 runs per page
+
+| Page | Runs | LCP median (budget) | TBT median (budget) | CLS median (budget) | Within budget |
+|---|---|---|---|---|---|
+| `/chats` | 3 | 1349 ms (1000 ms) | 0 ms (300 ms) | 0.000 (0.1) | no |
+| `/chats/:id` | 3 | 1365 ms (1000 ms) | 0 ms (300 ms) | 0.000 (0.1) | no |
+| `/login` | 3 | 1272 ms (2000 ms) | 0 ms (200 ms) | 0.000 (0.05) | yes |
+| `/register` | 3 | 1303 ms (2000 ms) | 0 ms (200 ms) | 0.000 (0.05) | yes |
+| `/settings` | 3 | 1267 ms (1000 ms) | 0 ms (300 ms) | 0.000 (0.1) | no |
+
+Checking assertions against 5 URL(s), 15 total run(s)
+
+1 result(s) for http://localhost:8000/chats :
+
+  ✘  largest-contentful-paint failure for maxNumericValue assertion
+       Largest Contentful Paint
+       https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/
+
+        expected: <=1000
+           found: 1349.179
+      all values: 1349.179, 1341.2961000000003, 1376.1887999999997
+
+1 result(s) for http://localhost:8000/chats/cmut0c1vq0000qf01ch3s738h :
+
+  ✘  largest-contentful-paint failure for maxNumericValue assertion
+       Largest Contentful Paint
+       https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/
+
+        expected: <=1000
+           found: 1364.6660000000002
+      all values: 1364.6660000000002, 1346.0657499999998, 1400.5391
+
+1 result(s) for http://localhost:8000/settings :
+
+  ✘  largest-contentful-paint failure for maxNumericValue assertion
+       Largest Contentful Paint
+       https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/
+
+        expected: <=1000
+           found: 1267.0770000000002
+      all values: 1275.0185, 1267.0770000000002, 1262.5659999999998
+
+Assertion failed. Exiting with status code 1.
+assert command failed. Exiting with status code 1.
+
+[exit 1]

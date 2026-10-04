@@ -1,0 +1,88 @@
+# Frontend performance budgets with Lighthouse CI (AICHAT-21). Starts the compose stack with the LLM mock (same steps as
+# dast.yml), signs in a seeded user and audits /login, /register, /chats, /chats/:id and /settings: 3 runs per page,
+# desktop preset. The median of each page is asserted against its budget in lighthouserc.json
+# (LCP, TBT as the INP proxy, CLS). A median over its budget fails the job; the reports are kept as an artifact.
+#
+# Required check: the job is named "lighthouse / budgets". Branch protection is not available on this private
+# free-plan repository (HTTP 403), so the team rule is: do not merge into main while "lighthouse / budgets" is red.
+name: lighthouse
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [integration/testing-epics, main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: lighthouse-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # The audit signs in with a session cookie; a longer lifetime than the default 15 minutes keeps it valid to the end.
+  ACCESS_TOKEN_TTL_SECONDS: "3600"
+  # The LLM mock accepts any key; this value is a placeholder, not a secret.
+  ANTHROPIC_API_KEY: mock-key-not-a-secret
+
+jobs:
+  budgets:
+    name: budgets
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      LH_RESULTS: lighthouse-results
+    steps:
+      # Building every app image fills the runner's ~14 GB free disk; drop preinstalled SDKs this job never uses.
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost && df -h /
+
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      # The run script (scripts/lighthouse/run.ts) runs on Node's built-in TypeScript support, so the runner needs the pinned Node.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start docker compose stack (profile llm)
+        run: pnpm mock:up
+
+      # Bounded poll of the three entry points; fails after about five minutes instead of hanging.
+      - name: Wait for the stack to become healthy
+        run: |
+          for url in http://localhost:8000/ http://localhost:4001/health http://localhost:4002/health; do
+            ok=0
+            for _ in $(seq 1 60); do
+              if curl -fsS -o /dev/null "$url"; then ok=1; break; fi
+              sleep 5
+            done
+            [ "$ok" = "1" ] || { echo "not healthy: $url"; exit 1; }
+          done
+
+      # Signs in the seeded user, audits 5 pages x 3 runs, prints the median per page and fails when one is over its budget.
+      - name: Lighthouse CI (budgets per page)
+        run: bash testing/lighthouse/run.sh
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: |
+            lighthouse-results/summary.md
+            lighthouse-results/lhci/*.html
+            lighthouse-results/lhci/manifest.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Tear down docker compose stack
+        if: always()
+        run: pnpm mock:down
