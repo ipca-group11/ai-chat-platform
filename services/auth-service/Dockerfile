@@ -2,19 +2,14 @@
 # services/auth-service. Build context is the repo root:
 #   docker build -f services/auth-service/Dockerfile .
 #
-# No Prisma migration history exists yet for this schema (see prisma/schema.prisma), so
-# the runtime CMD applies the schema with `prisma db push` on boot instead of
-# `prisma migrate deploy`. This is a pragmatic choice for local Docker deployment; a real
-# environment should replace it with committed migrations + `migrate deploy`.
+# On boot the CMD applies the committed migrations (prisma/migrations) with
+# `prisma migrate deploy` (scripts/db/prisma-migrate.sh, AICHAT-250), then starts the service.
 
 FROM node:24-alpine AS base
 WORKDIR /workspace
 # Prisma's query engine dynamically links libssl; Alpine (musl) ships neither by
-# default, so `prisma generate`/`prisma db push` fail at runtime without it.
-# `postgresql-client` (psql) is used by the runtime CMD to create this service's Postgres
-# schema (DATABASE_URL's `?schema=` param) before `prisma db push`, since Prisma does not
-# create that schema itself and `db push` fails on a fresh database otherwise.
-RUN apk add --no-cache openssl postgresql-client
+# default, so `prisma generate`/`prisma migrate deploy` fail at runtime without it.
+RUN apk add --no-cache openssl
 RUN corepack enable
 
 FROM base AS deps
@@ -41,16 +36,13 @@ COPY --from=build /workspace/services/auth-service/node_modules ./services/auth-
 COPY --from=build /workspace/services/auth-service/dist ./services/auth-service/dist
 COPY --from=build /workspace/services/auth-service/prisma ./services/auth-service/prisma
 COPY --from=build /workspace/services/auth-service/package.json ./services/auth-service/package.json
+COPY --chmod=755 scripts/db/prisma-migrate.sh /usr/local/bin/prisma-migrate
 
 RUN addgroup -S app && adduser -S app -G app && chown -R app:app /workspace
 USER app
 
 WORKDIR /workspace/services/auth-service
 EXPOSE 4001
-# Postgres never auto-creates the schema named in DATABASE_URL's `?schema=` param, so
-# create it (if missing) before `prisma db push`, which otherwise fails against a fresh
-# database. Connecting with a not-yet-existing schema in the search_path is harmless.
-# psql (unlike Prisma) rejects the `schema` query parameter as an unknown URI option, so
-# it must be stripped from the URL passed to psql; the un-stripped DATABASE_URL is still
-# used for `prisma db push`/the app itself.
-CMD ["sh", "-c", "schema=$(printf '%s' \"$DATABASE_URL\" | sed -n 's/.*[?&]schema=\\([^&]*\\).*/\\1/p'); psql_url=$(printf '%s' \"$DATABASE_URL\" | sed -e 's/[?&]schema=[^&]*$//' -e 's/\\([?&]\\)schema=[^&]*&/\\1/'); if [ -n \"$schema\" ]; then psql \"$psql_url\" -v ON_ERROR_STOP=1 -c \"CREATE SCHEMA IF NOT EXISTS \\\"$schema\\\"\"; fi && npx prisma db push --skip-generate --accept-data-loss --schema=./prisma/schema.prisma && node dist/main.js"]
+# Applies pending migrations (creating the `?schema=` schema if needed; a database set up
+# earlier with `db push` is baselined first), then replaces the shell with the service.
+CMD ["prisma-migrate", "node", "dist/main.js"]

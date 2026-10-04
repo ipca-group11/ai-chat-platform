@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 afterAll(() => prisma.$disconnect());
 
 describe("Testcontainers Postgres (conversation schema)", () => {
-  it("has the schema applied by prisma db push", async () => {
+  it("has the schema applied by prisma migrate deploy", async () => {
     const chat = await prisma.chat.create({
       data: { ownerId: "u1", title: "t", provider: "openai", model: "m", messages: { create: { ownerId: "u1", role: "user", content: "hi" } } },
     });

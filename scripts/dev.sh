@@ -26,11 +26,11 @@ PG="${PG_URL:-postgresql://llmchat:llmchat_local_dev@localhost:5432/llmchat}"
 AUTH_DB="$PG?schema=auth"
 CONV_DB="$PG?schema=conversation"
 
-# Apply both Prisma schemas (no migration history yet, same as the Dockerfiles).
+# Apply both services' committed migrations (same script as the Dockerfiles, AICHAT-250).
 for svc in auth-service:"$AUTH_DB" conversation-service:"$CONV_DB"; do
   name="${svc%%:*}"; url="${svc#*:}"
   (cd "services/$name" && DATABASE_URL="$url" npx prisma generate >/dev/null \
-    && DATABASE_URL="$url" npx prisma db push --skip-generate --accept-data-loss)
+    && DATABASE_URL="$url" ../../scripts/db/prisma-migrate.sh)
 done
 
 mkdir -p services/conversation-service/data/uploads

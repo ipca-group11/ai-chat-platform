@@ -47,7 +47,7 @@ Items marked **★** cover risks specific to this architecture: multi-user data,
 | ⬜ | File upload testing | — | Size limit, spoofed MIME type, path traversal in filenames, malicious PDFs | Vitest + supertest |
 | ⬜ | Concurrency testing | João Vieira | Two messages sent to the same chat at once; retry while a stream is running | Vitest, k6 |
 | ⬜ | Property-based / fuzz testing | — | Random input to validation schemas and parsers | fast-check |
-| ⬜ | Database migration testing | — | Migrations apply on a database with existing data, and roll back. **Blocked:** services use `prisma db push`; switch to `prisma migrate` first | Prisma Migrate + Testcontainers |
+| ⬜ | Database migration testing | — | Migrations apply on a database with existing data, and roll back. Unblocked: both services use committed migrations and `prisma migrate deploy` since AICHAT-250 | Prisma Migrate + Testcontainers |
 | 🟡 | Observability testing | — | Metrics and logs exist with the expected labels (the dashboard was empty because nothing checked this) | Vitest (`/metrics` assertions) |
 | ⬜ | Health / readiness testing | — | `/health` reports unhealthy when Postgres is down | Vitest, Docker |
 | ⬜ | Chaos testing | João Vieira | Kill Postgres, slow down the LLM provider, drop the network → graceful degradation | Docker stop / toxiproxy |

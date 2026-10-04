@@ -75,13 +75,14 @@ local use.
 
 ## Known gaps (local Docker deploy, not a devops issue)
 
-- **No committed Prisma migrations** exist yet for either service's schema
-  (`services/*/prisma/schema.prisma`), so both services' containers run
-  `prisma db push --accept-data-loss` once on boot (before starting the server) to create
-  the tables. Replace with committed migrations + `prisma migrate deploy` before this
-  goes anywhere beyond local Docker. Since Postgres/Prisma don't auto-create the
-  per-service schema named in `DATABASE_URL`'s `?schema=` param, each container's start
-  command runs `CREATE SCHEMA IF NOT EXISTS` (via `psql`) immediately before `db push`.
+- **Database schema (resolved in AICHAT-250).** Each service has committed migrations in
+  `services/*/prisma/migrations`. On boot the container runs `scripts/db/prisma-migrate.sh`,
+  which applies them with `prisma migrate deploy` (it also creates the `?schema=` schema of
+  `DATABASE_URL`) and then starts the server. A database set up before, with `prisma db push`,
+  has no migration history: the script marks the first (baseline) migration as applied and
+  continues, so existing data is kept. A schema change now needs a migration
+  (`pnpm exec prisma migrate dev --name <change>` in the service); the `test-db` target fails
+  when `schema.prisma` and the migrations differ.
 - `mfe-chat`'s SSE stream is proxied through `shell`'s `vite preview` dev-ish server
   (`/api` -> `conversation-service`), which is adequate for local use but not a
   production-grade reverse proxy.

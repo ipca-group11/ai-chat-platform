@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 afterAll(() => prisma.$disconnect());
 
 describe("Testcontainers Postgres (auth schema)", () => {
-  it("has the schema applied by prisma db push", async () => {
+  it("has the schema applied by prisma migrate deploy", async () => {
     const user = await prisma.user.create({ data: { email: "smoke@example.test", passwordHash: "x" } });
     await prisma.refreshToken.create({ data: { userId: user.id, tokenHash: "smoke", expiresAt: new Date() } });
     await prisma.user.delete({ where: { id: user.id } });
