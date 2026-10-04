@@ -14,7 +14,7 @@ const domainList = z
     }
   });
 
-const envSchema = z.object({
+const envFields = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4002),
   DATABASE_URL: z.string().min(1).default("postgresql://postgres:postgres@localhost:5432/conversation?schema=public"),
@@ -44,10 +44,15 @@ const envSchema = z.object({
   // How often the retention job runs, in minutes; 0 turns it off.
   RETENTION_INTERVAL_MINUTES: z.coerce.number().int().min(0).default(360),
   LOG_LEVEL: z.string().default("info"),
-}).refine((env) => !(env.WEB_FETCH_ALLOWED_DOMAINS && env.WEB_FETCH_BLOCKED_DOMAINS), {
-  message: "Set WEB_FETCH_ALLOWED_DOMAINS or WEB_FETCH_BLOCKED_DOMAINS, not both",
-  path: ["WEB_FETCH_BLOCKED_DOMAINS"],
 });
+
+const oneDomainList = {
+  check: (env: { WEB_FETCH_ALLOWED_DOMAINS?: string[]; WEB_FETCH_BLOCKED_DOMAINS?: string[] }) =>
+    !(env.WEB_FETCH_ALLOWED_DOMAINS && env.WEB_FETCH_BLOCKED_DOMAINS),
+  params: { message: "Set WEB_FETCH_ALLOWED_DOMAINS or WEB_FETCH_BLOCKED_DOMAINS, not both", path: ["WEB_FETCH_BLOCKED_DOMAINS"] },
+};
+
+const envSchema = envFields.refine(oneDomainList.check, oneDomainList.params);
 
 export type Env = z.infer<typeof envSchema>;
 
@@ -61,9 +66,18 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
   return cached;
 }
 
-const providerEnvSchema = envSchema.pick({ ANTHROPIC_BASE_URL: true, OPENAI_BASE_URL: true, OLLAMA_BASE_URL: true });
+// Picked from the fields, not envSchema: zod refuses .pick() on a refined object.
+const providerEnvSchema = envFields
+  .pick({
+    ANTHROPIC_BASE_URL: true,
+    OPENAI_BASE_URL: true,
+    OLLAMA_BASE_URL: true,
+    WEB_FETCH_ALLOWED_DOMAINS: true,
+    WEB_FETCH_BLOCKED_DOMAINS: true,
+  })
+  .refine(oneDomainList.check, oneDomainList.params);
 
-/** Only the LLM provider base URLs, for code that needs nothing else (the adapter registry). */
+/** Only the LLM provider settings (base URLs, web fetch domains), for code that needs nothing else (the adapter registry). */
 export function parseProviderEnv(source: NodeJS.ProcessEnv): z.infer<typeof providerEnvSchema> {
   return providerEnvSchema.parse(source);
 }
