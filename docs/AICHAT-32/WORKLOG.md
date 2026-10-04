@@ -260,3 +260,18 @@ pnpm exec nx affected -t lint typecheck test build --base=origin/integration/tes
 - **Fixed.** Scrubbed request, response and error logging in both services; `beforeSend` scrubber and console levels in the shell; tests that keep it so.
 - **Not done (tickets for the coordinator).** Caddy access logs record the client address and the full URL with query string (deploy owner). The Faro collector (Alloy `faro.receiver`) and Loki see the client address of the HTTP request that carries the payload; check the receiver configuration (deploy owner). `/metrics` is public through the shell (already ticketed in AICHAT-28). Free text inside third-party error messages is scrubbed for emails, addresses and tokens only. The Faro capture test replaces the Playwright one; if e2e comes back, a real-browser capture of `/collect` is worth adding.
 - **Lessons.** Planting a unique value and searching for it finds leaks that no field list would: the attachment name came out of a library error object. Default serializers are the usual leak, so a logged request or response should be a short allow-list, not a deny-list. A shared test helper must not depend on a package that depends on the code under test.
+
+## 8. Follow-up: client address in the Faro pipeline ([AICHAT-233](https://ipca-grupo11.atlassian.net/browse/AICHAT-233))
+
+**Question.** Does Alloy's `faro.receiver` or Loki keep the client address of the browser that posts to `/collect`?
+
+**Finding: no.** In Alloy v1.20.1 (`internal/component/faro/receiver`) the logs exporter builds each Loki line only from the decoded Faro payload (`kind`, message, app, session, page URL, browser); it never reads `RemoteAddr` or a request header, and the receiver's HTTP server only records metrics, not a request log. Request headers (where `X-Forwarded-For` would be) reach the pipeline only with `include_metadata = true`, and then only as context metadata for trace exporters. `observability/alloy.alloy` promotes only `kind` and `app_name` to labels and adds no extra labels or structured metadata. Loki only sees Alloy as its client.
+
+**Checked locally.** Alloy (`grafana/alloy:v1.20.1`) and Loki (`grafana/loki:3.7.8`) ran with the repository's `alloy.alloy` and `loki.yml`; a Faro payload was posted straight to the receiver with `X-Forwarded-For: 203.0.113.77` and `X-Real-Ip: 203.0.113.77`. The stored streams had the labels `app_name`, `kind`, `service_name` (and Loki's `detected_level`), the lines held only payload fields, and neither the Loki answer nor the Alloy and Loki container logs contained the address.
+
+**Hardening anyway.** So that a later config change cannot start storing it:
+- `deploy/azure/Caddyfile` removes `X-Forwarded-For`, `X-Real-Ip` and `Forwarded` before proxying `/collect`, so Alloy never receives the address in production.
+- `observability/alloy.alloy` sets `include_metadata = false` explicitly, with a comment.
+- `packages/workspace-config/src/alloy-faro.test.ts` fails if `include_metadata` is turned on, a label other than `kind`/`app_name`, `extra_log_labels` or structured metadata is added, or Caddy stops stripping the headers.
+
+A regex stage that masks addresses in the lines was not added: Faro's browser version (for example `137.0.0.0`) has the shape of an IPv4 address and would be masked too.

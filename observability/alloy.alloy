@@ -1,11 +1,17 @@
 // Grafana Alloy: receives Grafana Faro telemetry from the browser (apps/shell) and writes
 // it to Loki. Faro sends errors, logs, events and web-vitals measurements as logfmt
 // lines; `kind` and `app_name` are promoted to labels so dashboards can filter cheaply.
+//
+// No client address is stored (AICHAT-233): the receiver builds each line from the Faro
+// payload only, never from the HTTP request, and keeps no request log. The request headers
+// (where Caddy would put X-Forwarded-For, which it strips for /collect) only reach the
+// pipeline with include_metadata, which stays off.
 
 faro.receiver "frontend" {
   server {
     listen_address           = "0.0.0.0"
     listen_port              = 12347
+    include_metadata         = false
     // The browser posts same-origin through Caddy, so CORS is only for local dev.
     cors_allowed_origins     = ["*"]
     max_allowed_payload_size = "5MiB"

@@ -75,8 +75,13 @@
 		reverse_proxy grafana:3000
 	}
 	# Grafana Faro browser telemetry -> Alloy's faro.receiver (same origin, so no CORS).
+	# The client address is not passed on, so Alloy and Loki never see it (AICHAT-233).
 	handle /collect* {
-		reverse_proxy alloy:12347
+		reverse_proxy alloy:12347 {
+			header_up -X-Forwarded-For
+			header_up -X-Real-Ip
+			header_up -Forwarded
+		}
 	}
 	handle {
 		# The shell's own headers (Grafana above keeps its own). The CSP is Report-Only
