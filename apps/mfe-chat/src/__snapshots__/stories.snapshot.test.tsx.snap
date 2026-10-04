@@ -13006,7 +13006,6 @@ exports[`./features/chat-members/components/MembersDialog.stories.tsx > AsMember
     />
     <div
       aria-describedby="base-ui-_r_3_"
-      aria-label="Chat members"
       aria-labelledby="base-ui-_r_2_"
       class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-lg transition-all data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
       data-base-ui-focusable=""
@@ -13167,7 +13166,6 @@ exports[`./features/chat-members/components/MembersDialog.stories.tsx > AsOwner 
     />
     <div
       aria-describedby="base-ui-_r_3_"
-      aria-label="Chat members"
       aria-labelledby="base-ui-_r_2_"
       class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-lg transition-all data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
       data-base-ui-focusable=""
@@ -13440,7 +13438,6 @@ exports[`./features/chat-members/components/MembersDialog.stories.tsx > LoadErro
     />
     <div
       aria-describedby="base-ui-_r_3_"
-      aria-label="Chat members"
       aria-labelledby="base-ui-_r_2_"
       class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-lg transition-all data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
       data-base-ui-focusable=""
@@ -13634,7 +13631,6 @@ exports[`./features/chat-members/components/MembersDialog.stories.tsx > Loading 
     />
     <div
       aria-describedby="base-ui-_r_3_"
-      aria-label="Chat members"
       aria-labelledby="base-ui-_r_2_"
       class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-lg transition-all data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
       data-base-ui-focusable=""
@@ -13835,7 +13831,6 @@ exports[`./features/chat-members/components/MembersDialog.stories.tsx > OwnerOnl
     />
     <div
       aria-describedby="base-ui-_r_3_"
-      aria-label="Chat members"
       aria-labelledby="base-ui-_r_2_"
       class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-lg transition-all data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
       data-base-ui-focusable=""

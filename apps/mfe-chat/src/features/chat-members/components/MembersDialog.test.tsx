@@ -33,6 +33,16 @@ describe("MembersDialog", () => {
     expect(screen.getByText("Owner")).toBeInTheDocument();
   });
 
+  it("is named once, by its title", async () => {
+    listMembers([owner]);
+
+    renderDialog();
+
+    const dialog = await screen.findByRole("dialog", { name: "Members" });
+    expect(dialog).not.toHaveAttribute("aria-label");
+    expect(dialog).toHaveAttribute("aria-labelledby", screen.getByRole("heading", { name: "Members" }).id);
+  });
+
   it("the owner invites someone by email", async () => {
     listMembers([owner]);
     server.use(http.post("*/chats/:chatId/members", () => HttpResponse.json({ member: guest }, { status: 201 })));

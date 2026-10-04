@@ -40,7 +40,8 @@ export function MembersDialog({ chatId, chatTitle, isOwner, open, onClose, onLef
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent aria-label="Chat members">
+      {/* Named by its title (aria-labelledby): "Members". */}
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Members</DialogTitle>
           <DialogDescription>
