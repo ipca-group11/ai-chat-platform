@@ -3,6 +3,7 @@ export interface ApiKeyFormProps {
     provider: Provider;
     providerLabel: string;
     hasKey: boolean;
+    /** Throws when the key could not be stored; the form then shows an error and keeps the input. */
     onSave: (rawKey: string) => void;
     onRemove: () => void;
 }
