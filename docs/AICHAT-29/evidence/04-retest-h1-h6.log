@@ -1,0 +1,13 @@
+# Retest of H1 (AICHAT-253) and H6 (AICHAT-254), 2026-10-04, integration/develop @ 6a940aa
+# Staging copy without Docker: native PostgreSQL 16 on 127.0.0.1:55432, migrations applied with
+# scripts/db/prisma-migrate.sh, auth-service and conversation-service started from dist/ on 14001/14002.
+# JWT_SECRET was set to the old insecure default on purpose (as in TESTING.md), so H2 still shows as confirmed here.
+# AUTH_URL=http://127.0.0.1:14001 CONV_URL=http://127.0.0.1:14002 node testing/pentest/run.ts --json pentest.json
+
+H1	refuted	reading the chat after registering the invited address returned HTTP 404
+H2	confirmed	a token forged with the default secret was accepted on GET /chats (HTTP 200) via the Bearer header
+H3	refuted	reuse rejected=true, derived token still valid=false
+H4	inconclusive	RateLimit-Remaining values seen: 299, 299, 299, 299
+H5	refuted	a non-member was denied chat cmutz5zik00030s1n3tfowsah (HTTP 404) — ownership/membership is enforced
+H6	refuted	every disguised file was refused (page.png 400; report.pdf 400; notes.txt 400; bomb.png 400)
+H7	confirmed	GET /metrics returned Prometheus text with no auth on both services (HTTP 200)

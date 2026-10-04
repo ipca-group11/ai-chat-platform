@@ -116,8 +116,9 @@ chat), and bind membership to a verified user id rather than a raw email. Ticket
   are claimed again on next access.
 - *Tests.* `auth-service/src/integration/email-verification.spec.ts`,
   `conversation-service/src/integration/shared-chat-verification.spec.ts` (the H1 sequence
-  with an unverified token now gets 404). The live probe (`testing/pentest/run.ts`, H1) was not
-  re-run against the fixed build: Docker was not available.
+  with an unverified token now gets 404). The live probe (`testing/pentest/run.ts`, H1) was
+  re-run against the fixed build and is **refuted**: reading the chat after registering the
+  invited address returns 404 (`evidence/04-retest-h1-h6.log`).
 
 ### H4 — Shared rate-limit bucket (Medium)
 
@@ -128,7 +129,11 @@ A single client can exhaust the login budget for everyone. Tracked in AICHAT-222
 ### H6, H7, H8, H11
 
 - **H6:** the upload validator trusts the client MIME; add magic-byte sniffing, cap decode
-  memory and sandbox `pdf-parse`. Ticketed.
+  memory and sandbox `pdf-parse`. **Fixed in AICHAT-254**: uploads are checked by their bytes,
+  images over 40 megapixels are refused, and `pdf-parse` runs in a worker with a memory cap and
+  a timeout. The live probe now sends a PNG, a PDF and a text file with mismatched content plus
+  a pixel bomb; all four are refused with 400, so H6 is **refuted**
+  (`evidence/04-retest-h1-h6.log`).
 - **H7:** `/metrics` is public; restrict it to the monitoring network or require a token.
   Tracked in AICHAT-229.
 - **H8:** add CSP, HSTS and X-Frame-Options at Caddy, and move the provider key out of
@@ -144,14 +149,23 @@ refuted hypotheses (H3, H5) need no further action. When the tickets are fixed, 
 `node testing/pentest/run.ts` against the staging copy; a fixed finding flips from
 "confirmed" to "refuted" in the same table.
 
+**Retest, 2026-10-04 (H1, H6).** Run against a staging copy without Docker: native
+PostgreSQL 16, migrations applied with `scripts/db/prisma-migrate.sh`, both services started
+from `dist/` on 127.0.0.1:14001/14002, then
+`AUTH_URL=http://127.0.0.1:14001 CONV_URL=http://127.0.0.1:14002 node testing/pentest/run.ts`.
+H1 and H6 are now refuted. H2 still shows as confirmed only because the copy was started with
+the old default secret on purpose; since AICHAT-210 no service starts without `JWT_SECRET`.
+H7 is confirmed on the services' own ports and is closed at the edge by AICHAT-229. Output:
+`evidence/04-retest-h1-h6.log`.
+
 ## 6. Tickets
 
 | Finding | Ticket |
 |---|---|
 | H2 JWT default | AICHAT-210 (existing waiver) |
-| H1 unverified email → chat access | new |
+| H1 unverified email → chat access | AICHAT-253 (fixed, retested) |
 | H4 shared rate limit | AICHAT-222 (existing) |
-| H6 upload MIME trust | new |
+| H6 upload MIME trust | AICHAT-254 (fixed, retested) |
 | H7 public metrics | AICHAT-229 (existing) |
 | H8 missing security headers / key in sessionStorage | AICHAT-228 + AICHAT-230 (existing) / new |
 | H9 LLM web fetch + system prompt | AICHAT-242, AICHAT-243 (existing) |
