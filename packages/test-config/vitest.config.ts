@@ -5,6 +5,6 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["*.spec.ts"],
-    coverage: coveragePreset({ include: ["*.ts"] }),
+    coverage: coveragePreset({ include: ["*.ts"], exclude: ["postgres-global-setup.ts"] }),
   },
 });

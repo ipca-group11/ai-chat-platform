@@ -87,8 +87,8 @@ describe("AC-13: CI fails the build if any project reports a lint or typecheck e
     expect(nxStep["continue-on-error"]).toBeFalsy();
   });
 
-  it("AC-13: the only job that checks code is `affected`; the other one only produces the source SBOM (AICHAT-108)", () => {
-    expect(Object.keys(ci.jobs)).toEqual(["affected", "source-sbom"]);
+  it("AC-13: `affected` checks the code, `test-db` runs the database tests (AICHAT-116) and `source-sbom` only produces the source SBOM (AICHAT-108)", () => {
+    expect(Object.keys(ci.jobs)).toEqual(["affected", "test-db", "source-sbom"]);
   });
 });
 
@@ -102,5 +102,29 @@ describe("AC-14: Nx task results are cached in CI to avoid re-running unaffected
   it("AC-14: the cache key is derived from nx.json and the lockfile so it invalidates on config changes", () => {
     const cacheStep = ci.jobs.affected.steps.find((s: { uses?: string }) => s.uses && s.uses.startsWith("actions/cache"));
     expect(cacheStep.with.key).toMatch(/hashFiles\('nx\.json', 'pnpm-lock\.yaml'\)/);
+  });
+});
+
+describe("AICHAT-116: database tests run in CI on a real Postgres, apart from the unit tests", () => {
+  const services = ["auth-service", "conversation-service"];
+
+  it("has a test-db job that runs the test-db target for both services that own a Prisma schema", () => {
+    const run = ci.jobs["test-db"].steps.map((s: { run?: string }) => s.run ?? "").join("\n");
+    expect(run).toMatch(/nx run-many -t test-db -p auth-service,conversation-service/);
+  });
+
+  it("pulls the same Postgres image that compose.yaml uses", () => {
+    const image = readRepoFile("compose.yaml").match(/image:\s*(postgres:\S+)/)?.[1];
+    const run = ci.jobs["test-db"].steps.map((s: { run?: string }) => s.run ?? "").join("\n");
+    expect(image).toBeDefined();
+    expect(run).toContain(`docker pull ${image}`);
+  });
+
+  it.each(services)("%s: test-db is its own target and the unit test target stays free of Docker", (service) => {
+    const targets = readRepoJson(`services/${service}/project.json`).targets;
+    expect(targets["test-db"].options.command).toContain("vitest.db.config.ts");
+    expect(targets.test.options.command).not.toContain("vitest.db.config.ts");
+    expect(readRepoFile(`services/${service}/vitest.config.ts`)).toContain('"src/**/*.db.spec.ts"');
+    expect(readRepoFile(`services/${service}/vitest.db.config.ts`)).toContain("postgres-global-setup");
   });
 });

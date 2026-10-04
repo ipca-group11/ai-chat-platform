@@ -6,7 +6,8 @@
   "type": "module",
   "main": "./index.ts",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./postgres-global-setup": "./postgres-global-setup.ts"
   },
   "scripts": {
     "build": "echo 'test-config ships TypeScript source; nothing to build'",
@@ -20,8 +21,10 @@
   },
   "devDependencies": {
     "@platform/eslint-config": "workspace:*",
+    "@testcontainers/postgresql": "^12.2.0",
     "@types/node": "^24.13.6",
     "@vitest/coverage-v8": "5.0.1",
+    "testcontainers": "^12.2.0",
     "typescript": "6.0.3",
     "vitest": "5.0.1"
   }

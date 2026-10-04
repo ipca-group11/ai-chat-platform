@@ -98,6 +98,31 @@ jobs:
           node scripts/ci/bundle-size.ts snapshot --root "$RUNNER_TEMP/base" --out "$RUNNER_TEMP/base-sizes.json"
           node scripts/ci/bundle-size.ts report "$RUNNER_TEMP/base-sizes.json" "$RUNNER_TEMP/head-sizes.json"
 
+  # Database tests (AICHAT-116): a real Postgres from Testcontainers, the schema applied with
+  # `prisma db push`. Kept out of the `test` target so the unit loop needs no Docker; the GitHub
+  # runner has Docker. Runs for both services that own a Prisma schema on every pull request.
+  test-db:
+    name: test-db (Testcontainers Postgres)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Pull the Postgres image (same version as compose.yaml)
+        run: docker pull postgres:16-alpine
+
+      - name: nx test-db
+        run: pnpm exec nx run-many -t test-db -p auth-service,conversation-service --parallel=1
+
   # Source SBOM of the pnpm workspace (AICHAT-108): lists the npm packages the lockfile
   # resolves, for SCA on every pull request. Independent of the Nx job.
   source-sbom:

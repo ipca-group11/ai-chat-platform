@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.spec.ts"],
+    exclude: ["src/**/*.db.spec.ts", "node_modules/**"],
     snapshotSerializers: [snapshotSerializerPath],
     setupFiles: ["src/test-utils/setup-no-network.ts"],
     coverage: coveragePreset({
