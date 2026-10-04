@@ -15,6 +15,14 @@ interface Capabilities {
  * an unchecked (and probably wrong) capability.
  */
 const EXPECTED: Record<Provider, Record<string, Capabilities>> = {
+  ollama: {
+    "llama3.2:1b": { reasoning: false, webFetch: false, vision: false },
+    "llama3.2:3b": { reasoning: false, webFetch: false, vision: false },
+    "llama3.1:8b": { reasoning: false, webFetch: false, vision: false },
+    "qwen3:4b": { reasoning: true, webFetch: false, vision: false },
+    "qwen3:8b": { reasoning: true, webFetch: false, vision: false },
+    "deepseek-r1:8b": { reasoning: true, webFetch: false, vision: false },
+  },
   openai: {
     "gpt-4o": { reasoning: false, webFetch: false, vision: true },
     "gpt-4o-mini": { reasoning: false, webFetch: false, vision: true },

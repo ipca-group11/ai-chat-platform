@@ -41,7 +41,7 @@ describe("messages routes", () => {
 
   it("AC-51: an authenticated user can send a message and see it in the list", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const token = tokenFor("user-1");
 
     const sendRes = await request(app)
@@ -57,7 +57,7 @@ describe("messages routes", () => {
 
   it("AC-46: user B sending a message to user A's chat receives 403 or 404", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-a"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-a"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const tokenB = tokenFor("user-b");
 
     const res = await request(app)
@@ -70,7 +70,7 @@ describe("messages routes", () => {
 
   it("AC-58: a queued message can be edited and canceled via the API", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const token = tokenFor("user-1");
 
     await request(app)
@@ -98,7 +98,7 @@ describe("messages routes", () => {
 
   it("AC-54: stop reports whether an in-progress stream was stopped", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const token = tokenFor("user-1");
 
     await request(app)
@@ -113,7 +113,7 @@ describe("messages routes", () => {
 
   it("AC-73: a failed message can be retried via the API", async () => {
     const { app, chatsService, messagesRepo } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const failed = await messagesRepo.create({
       chatId: chat.id,
       ownerId: "user-1",

@@ -19,7 +19,8 @@ export interface SendMessageContext {
    * (AC-53: sent to the LLM as context on every request). */
   messages: LlmMessage[];
   model: string;
-  /** Per-request provider API key forwarded from the browser (ARCHITECTURE.md §6). */
+  /** Per-request provider API key forwarded from the browser (ARCHITECTURE.md §6). Not
+   * required for the Ollama provider. */
   apiKey?: string;
   /** The chat's reasoning toggle. Adapters apply it only when `supportsReasoning(model)`
    * — on: ask the model to think before answering; off: keep thinking to the minimum

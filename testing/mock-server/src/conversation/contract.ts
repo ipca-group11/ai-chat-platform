@@ -6,7 +6,7 @@ import { z } from "zod";
  * records in `@app/shared-types`: author fields, `sent` status, attachment objects), so the
  * mock repeats them to build and check its responses.
  */
-export const providerSchema = z.enum(["openai", "anthropic"]);
+export const providerSchema = z.enum(["ollama", "openai", "anthropic"]);
 
 export const messageRoleSchema = z.enum(["user", "assistant", "system"]);
 export const messageStatusSchema = z.enum(["sent", "queued", "streaming", "failed"]);

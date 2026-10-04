@@ -26,6 +26,11 @@ export const Default: Story = {
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
+          <SelectLabel>Ollama</SelectLabel>
+          <SelectItem value="llama3.2:1b">llama3.2:1b</SelectItem>
+        </SelectGroup>
+        <SelectSeparator />
+        <SelectGroup>
           <SelectLabel>OpenAI</SelectLabel>
           <SelectItem value="gpt-4o">gpt-4o</SelectItem>
           <SelectItem value="gpt-4o-mini">gpt-4o-mini</SelectItem>

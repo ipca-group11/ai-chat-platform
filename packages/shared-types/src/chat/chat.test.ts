@@ -5,8 +5,8 @@ describe("createChatRequestSchema", () => {
   it("AC-8: accepts a title with a valid provider/model selection", () => {
     const result = createChatRequestSchema.safeParse({
       title: "My first chat",
-      provider: "anthropic",
-      model: "claude-haiku-4-5",
+      provider: "ollama",
+      model: "llama3.2:1b",
     });
     expect(result.success).toBe(true);
   });

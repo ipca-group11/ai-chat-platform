@@ -16,7 +16,7 @@ async function setup(processor: QueueProcessor = hangingProcessor()) {
   const queueManager = createFakeQueue(processor);
   const bus = new ChatEventBus();
   const service = new MessagesService(messagesRepo, chatsService, queueManager, bus);
-  const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+  const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
   return { chatsService, messagesRepo, queueManager, bus, service, chat };
 }
 

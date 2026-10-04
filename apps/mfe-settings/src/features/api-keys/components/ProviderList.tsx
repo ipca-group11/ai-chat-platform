@@ -6,9 +6,10 @@ import { ApiKeyForm } from "./ApiKeyForm";
 import { MaskedKeyDisplay } from "./MaskedKeyDisplay";
 
 /**
- * Lists every supported provider (OpenAI, Anthropic) with its key management
- * UI (US-23, US-24, AC-76): a masked key display plus an add/update/remove form. A
- * provider that needs no key would show a static "no API key required" state instead. Keys are namespaced to the current user (AC-78, AC-80).
+ * Lists every supported provider (OpenAI, Anthropic, Ollama) with its key management
+ * UI (US-23, US-24, AC-76, AC-77): OpenAI/Anthropic show a masked key display plus an
+ * add/update/remove form, Ollama shows a static "no API key required" state with no
+ * input. Keys are namespaced to the current user (AC-78, AC-80).
  */
 export function ProviderList() {
   const { userId, isLoading, isError } = useCurrentUserId();
