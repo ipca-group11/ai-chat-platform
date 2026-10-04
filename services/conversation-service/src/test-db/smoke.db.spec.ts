@@ -10,6 +10,6 @@ describe("Testcontainers Postgres (conversation schema)", () => {
       data: { ownerId: "u1", title: "t", provider: "openai", model: "m", messages: { create: { ownerId: "u1", role: "user", content: "hi" } } },
     });
     await prisma.chat.delete({ where: { id: chat.id } });
-    expect(await prisma.message.count()).toBe(0); // the cascade ran in a real database
+    expect(await prisma.message.count({ where: { chatId: chat.id } })).toBe(0); // the cascade ran in a real database
   });
 });
