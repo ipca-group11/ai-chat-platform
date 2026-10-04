@@ -5,6 +5,6 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.spec.ts"],
-    coverage: coveragePreset({ include: ["src/**/*.ts"], exclude: ["src/**/*.spec.ts"] }),
+    coverage: coveragePreset({ include: ["src/**/*.ts"], exclude: ["src/**/*.spec.ts", "src/test-utils/**"] }),
   },
 });

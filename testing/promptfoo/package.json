@@ -7,7 +7,9 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src --max-warnings=0",
-    "test": "vitest run --coverage"
+    "test": "vitest run --coverage",
+    "estimate": "node src/estimate-cli.ts",
+    "eval": "promptfoo eval -c promptfooconfig.yaml --no-cache"
   },
   "devDependencies": {
     "@platform/eslint-config": "workspace:*",
@@ -15,6 +17,7 @@
     "@types/node": "^24.13.6",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.11.0",
+    "promptfoo": "^0.123.1",
     "typescript": "6.0.3",
     "vitest": "^5.0.1"
   }
