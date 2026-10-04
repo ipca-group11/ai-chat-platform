@@ -1,0 +1,13 @@
+$ node testing/pentest/run.ts --json /tmp/claude-501/pentest.json
+| # | Hypothesis | Result | Severity | CVSS v3.1 | Evidence |
+|---|---|---|---|---|---|
+| H2 | Forgeable JWT (shared secret, insecure default, Bearer accepted) | confirmed | Critical | AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8) | a token forged with the default secret was accepted on GET /chats (HTTP 200) via the Bearer header |
+| H1 | Chat sharing by unverified email | confirmed | High | AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N (7.1) | registered the invited address and read chat cmutnhxul0000o501lq79yr6x (HTTP 200) |
+| H4 | Shared rate-limit bucket, proxy not trusted (login DoS) | confirmed | Medium | AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L (5.3) | RateLimit-Remaining fell from 272 to 269 though each request spoofed a different X-Forwarded-For |
+| H7 | Metrics endpoints public (no authentication) | confirmed | Low | AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N (5.3) | GET /metrics returned Prometheus text with no auth on both services (HTTP 200) |
+| H3 | Refresh-token family not revoked on reuse detection | refuted | Info | — | reuse rejected=true, derived token still valid=false |
+| H5 | IDOR: non-member reads a chat by id | refuted | Info | — | a non-member was denied chat cmutnhzl30003o501qu6yip1n (HTTP 404) — ownership/membership is enforced |
+
+wrote /tmp/claude-501/pentest.json
+
+[exit 0]
