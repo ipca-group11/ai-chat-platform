@@ -14,6 +14,7 @@ import { pinoHttp } from "pino-http";
 import { collectDefaultMetrics, register as metricsRegister } from "prom-client";
 import type { PrismaClient } from "./generated/prisma-client/index.js";
 import { createAccountRouter } from "./features/account/index.js";
+import { runRetention, scheduleRetention } from "./features/retention/index.js";
 import { createRegisterRouter } from "./features/register/index.js";
 import { createSessionRouter } from "./features/session/index.js";
 import { createErasureClient, type ErasureClient } from "./shared/erasure-client.js";
@@ -104,5 +105,19 @@ if (process.env.VITEST === undefined) {
   app.listen(env.PORT, () => {
     defaultLogger.info({ port: env.PORT }, "auth-service listening");
   });
+  if (env.RETENTION_INTERVAL_MINUTES > 0) {
+    scheduleRetention(
+      async () => {
+        const result = await runRetention(new Date(), {
+          prisma: defaultPrisma,
+          erasure: defaultErasureClient(),
+          onAccountError: (_userId, err) => defaultLogger.warn({ err }, "inactive account not deleted, will retry"),
+        });
+        defaultLogger.info(result, "retention run finished");
+      },
+      env.RETENTION_INTERVAL_MINUTES * 60 * 1000,
+      (err) => defaultLogger.error({ err }, "retention run failed"),
+    );
+  }
 }
 /* c8 ignore stop */

@@ -32,6 +32,12 @@ describe("loadEnv", () => {
     expect(() => loadEnv({ ...base, INTERNAL_SERVICE_TOKEN: "short" })).toThrow();
   });
 
+  it("runs the retention job every 6 hours by default, and 0 turns it off (AICHAT-137)", () => {
+    expect(loadEnv(base).RETENTION_INTERVAL_MINUTES).toBe(360);
+    expect(loadEnv({ ...base, RETENTION_INTERVAL_MINUTES: "0" }).RETENTION_INTERVAL_MINUTES).toBe(0);
+    expect(() => loadEnv({ ...base, RETENTION_INTERVAL_MINUTES: "-1" })).toThrow();
+  });
+
   it("parses a comma-separated CORS_ORIGIN into a list", () => {
     const env = loadEnv({
       ...base,

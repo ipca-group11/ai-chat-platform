@@ -31,6 +31,12 @@ describe("parseEnv", () => {
     expect(() => parseEnv({ INTERNAL_SERVICE_TOKEN: "too-short" })).toThrow();
   });
 
+  it("runs the retention job every 6 hours by default, and 0 turns it off (AICHAT-137)", () => {
+    expect(parseEnv({}).RETENTION_INTERVAL_MINUTES).toBe(360);
+    expect(parseEnv({ RETENTION_INTERVAL_MINUTES: "0" }).RETENTION_INTERVAL_MINUTES).toBe(0);
+    expect(() => parseEnv({ RETENTION_INTERVAL_MINUTES: "-5" })).toThrow();
+  });
+
   it("AC-45: rejects an invalid NODE_ENV value", () => {
     expect(() => parseEnv({ NODE_ENV: "not-a-real-env" })).toThrow();
   });

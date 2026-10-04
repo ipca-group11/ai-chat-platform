@@ -193,6 +193,11 @@
       "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
     },
     {
+      "path": "services/auth-service/src/features/retention/index.ts",
+      "category": "barrel",
+      "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
+    },
+    {
       "path": "services/auth-service/src/features/session/index.ts",
       "category": "barrel",
       "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
@@ -234,6 +239,11 @@
     },
     {
       "path": "services/conversation-service/src/features/queue/index.ts",
+      "category": "barrel",
+      "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
+    },
+    {
+      "path": "services/conversation-service/src/features/retention/index.ts",
       "category": "barrel",
       "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
     },

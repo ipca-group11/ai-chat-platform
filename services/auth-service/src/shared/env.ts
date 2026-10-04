@@ -16,6 +16,8 @@ const envSchema = z.object({
   // purpose: when either value is missing, DELETE /auth/me answers 503 and deletes nothing.
   INTERNAL_SERVICE_TOKEN: z.string().min(32).optional(),
   CONVERSATION_SERVICE_URL: z.string().url().optional(),
+  // How often the retention job runs, in minutes; 0 turns it off.
+  RETENTION_INTERVAL_MINUTES: z.coerce.number().int().min(0).default(360),
   COOKIE_SECURE: z
     .string()
     .default("true")
@@ -34,6 +36,8 @@ export type Env = {
   INTERNAL_SERVICE_TOKEN?: string;
   /** Base URL of conversation-service, for the erasure call. */
   CONVERSATION_SERVICE_URL?: string;
+  /** Minutes between retention runs; 0 = off. */
+  RETENTION_INTERVAL_MINUTES: number;
   COOKIE_SECURE: boolean;
   LOG_LEVEL: string;
 };
@@ -50,6 +54,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
       .filter(Boolean),
     INTERNAL_SERVICE_TOKEN: parsed.INTERNAL_SERVICE_TOKEN,
     CONVERSATION_SERVICE_URL: parsed.CONVERSATION_SERVICE_URL,
+    RETENTION_INTERVAL_MINUTES: parsed.RETENTION_INTERVAL_MINUTES,
     COOKIE_SECURE: parsed.COOKIE_SECURE,
     LOG_LEVEL: parsed.LOG_LEVEL,
   };

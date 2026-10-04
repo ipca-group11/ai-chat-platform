@@ -83,6 +83,8 @@ export async function issueTokens(
       rotatedFrom: options?.rotatedFrom,
     },
   });
+  // Every sign-in and every refresh counts as activity; the retention job deletes accounts idle for 24 months.
+  await prisma.user.update({ where: { id: user.id }, data: { lastActiveAt: new Date() } });
 
   return { accessToken, refreshToken };
 }

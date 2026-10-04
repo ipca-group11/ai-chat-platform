@@ -12,6 +12,7 @@ export interface FakeUserRow {
   email: string;
   passwordHash: string;
   createdAt: Date;
+  lastActiveAt: Date;
 }
 
 export interface FakeRefreshTokenRow {
@@ -30,6 +31,7 @@ export async function makeUser(email: string, password: string): Promise<FakeUse
     email,
     passwordHash: await bcrypt.hash(password, 4),
     createdAt: new Date(),
+    lastActiveAt: new Date(),
   };
 }
 
@@ -72,6 +74,12 @@ export function fakePrisma(seed: { users?: FakeUserRow[]; refreshTokens?: FakeRe
         if (where.id) return usersById.get(where.id) ?? null;
         return null;
       }),
+      update: vi.fn(async ({ where, data }: { where: { id: string }; data: Partial<FakeUserRow> }) => {
+        const user = usersById.get(where.id);
+        if (!user) throw new Error("not found");
+        Object.assign(user, data);
+        return user;
+      }),
       /** Deletes the matching user and, like the `onDelete: Cascade` of the schema, their refresh tokens. */
       deleteMany: vi.fn(async ({ where }: { where: { id: string } }) => {
         const user = usersById.get(where.id);
@@ -92,6 +100,7 @@ export function fakePrisma(seed: { users?: FakeUserRow[]; refreshTokens?: FakeRe
           email: data.email,
           passwordHash: data.passwordHash,
           createdAt: new Date(),
+          lastActiveAt: new Date(),
         };
         users.set(user.email, user);
         usersById.set(user.id, user);

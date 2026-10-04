@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -57,5 +57,24 @@ describe("createFileSystemStorage", () => {
     const outside = path.join(dir, "..", "outside.txt");
 
     await expect(storage.delete(outside)).rejects.toThrow("outside the upload directory");
+  });
+
+  it("AICHAT-137: list returns the files with their modification time, and nothing for a directory that does not exist", async () => {
+    const storage = createFileSystemStorage(dir);
+    const first = await storage.save(Buffer.from("x"), ".txt");
+
+    const listed = await storage.list();
+
+    expect(listed.map((f) => f.storagePath)).toEqual([first]);
+    expect(Math.abs(listed[0]!.modifiedAt.getTime() - Date.now())).toBeLessThan(60_000);
+    expect(await createFileSystemStorage(path.join(dir, "missing")).list()).toEqual([]);
+  });
+
+  it("AICHAT-137: list skips sub-directories", async () => {
+    const storage = createFileSystemStorage(dir);
+    await mkdir(path.join(dir, "sub"));
+    await storage.save(Buffer.from("x"), ".txt");
+
+    expect(await storage.list()).toHaveLength(1);
   });
 });
