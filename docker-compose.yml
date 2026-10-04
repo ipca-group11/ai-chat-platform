@@ -50,6 +50,8 @@ services:
       PORT: ${AUTH_SERVICE_PORT:-4001}
       DATABASE_URL: ${AUTH_SERVICE_DATABASE_URL:-postgresql://llmchat:llmchat_local_dev@postgres:5432/llmchat?schema=auth}
       JWT_SECRET: ${JWT_SECRET:-local-dev-only-change-me}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-local-dev-only-internal-token-change-me}
+      CONVERSATION_SERVICE_URL: http://conversation-service:4002
       ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
       REFRESH_TOKEN_TTL_SECONDS: ${REFRESH_TOKEN_TTL_SECONDS:-604800}
       CORRELATION_HEADER: ${CORRELATION_HEADER:-X-Correlation-Id}
@@ -76,6 +78,7 @@ services:
       PORT: ${CONVERSATION_SERVICE_PORT:-4002}
       DATABASE_URL: ${CONVERSATION_SERVICE_DATABASE_URL:-postgresql://llmchat:llmchat_local_dev@postgres:5432/llmchat?schema=conversation}
       JWT_SECRET: ${JWT_SECRET:-local-dev-only-change-me}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-local-dev-only-internal-token-change-me}
       UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
       CORRELATION_HEADER: ${CORRELATION_HEADER:-X-Correlation-Id}
     ports:

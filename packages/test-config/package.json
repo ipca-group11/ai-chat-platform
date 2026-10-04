@@ -7,7 +7,7 @@
   "main": "./index.ts",
   "exports": {
     ".": "./index.ts",
-    "./postgres-global-setup": "./postgres-global-setup.ts"
+    "./postgres-global-setup": "./test-utils/postgres-global-setup.ts"
   },
   "scripts": {
     "build": "echo 'test-config ships TypeScript source; nothing to build'",

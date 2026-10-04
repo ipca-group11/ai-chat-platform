@@ -19,6 +19,19 @@ describe("loadEnv", () => {
     expect(env.CORS_ORIGINS).toEqual(["http://localhost:3000"]);
   });
 
+  it("has no service token or conversation-service URL by default, so account deletion stays off (AICHAT-79)", () => {
+    const env = loadEnv(base);
+    expect(env.INTERNAL_SERVICE_TOKEN).toBeUndefined();
+    expect(env.CONVERSATION_SERVICE_URL).toBeUndefined();
+  });
+
+  it("reads the service token and the conversation-service URL, and rejects a short token", () => {
+    const env = loadEnv({ ...base, INTERNAL_SERVICE_TOKEN: "x".repeat(32), CONVERSATION_SERVICE_URL: "http://conversation-service:4002" });
+    expect(env.INTERNAL_SERVICE_TOKEN).toBe("x".repeat(32));
+    expect(env.CONVERSATION_SERVICE_URL).toBe("http://conversation-service:4002");
+    expect(() => loadEnv({ ...base, INTERNAL_SERVICE_TOKEN: "short" })).toThrow();
+  });
+
   it("parses a comma-separated CORS_ORIGIN into a list", () => {
     const env = loadEnv({
       ...base,

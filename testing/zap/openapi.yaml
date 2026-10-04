@@ -8,7 +8,8 @@ info:
     (services/conversation-service/src/features). The shell proxies /auth to auth-service and /api to
     conversation-service (it strips the /api prefix), so the paths are the ones a browser and Caddy see.
     It is replaced by the spec of AICHAT-12 when that lands.
-    Left out on purpose: GET /api/chats/{chatId}/stream (server-sent events never end, the scan would wait for it).
+    Left out on purpose: GET /api/chats/{chatId}/stream (server-sent events never end, the scan would wait for it)
+    and DELETE /auth/me (account deletion, AICHAT-79: the scan would delete its own account).
 servers:
   - url: http://localhost:8000
 tags:
