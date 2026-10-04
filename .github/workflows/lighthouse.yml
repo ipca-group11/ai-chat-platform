@@ -1,7 +1,8 @@
 # Frontend performance budgets with Lighthouse CI (AICHAT-21). Starts the compose stack with the LLM mock (same steps as
 # dast.yml), signs in a seeded user and audits /login, /register, /chats, /chats/:id and /settings: 3 runs per page,
 # desktop preset. The median of each page is asserted against its budget in lighthouserc.json
-# (LCP, TBT as the INP proxy, CLS). A median over its budget fails the job; the reports are kept as an artifact.
+# (LCP, TBT, CLS); then scripted interactions assert INP per page (scripts/perf/inp-check.ts, AICHAT-240).
+# A median over its budget fails the job; the reports are kept as an artifact.
 #
 # Required check: the job is named "lighthouse / budgets". Branch protection is not available on this private
 # free-plan repository (HTTP 403), so the team rule is: do not merge into main while "lighthouse / budgets" is red.
@@ -71,6 +72,13 @@ jobs:
       - name: Lighthouse CI (budgets per page)
         run: bash testing/lighthouse/run.sh
 
+      # TBT is 0 ms on every page, so the lab budget cannot see a slow interaction (AICHAT-240): scripted clicks and
+      # typing in headless Chrome with a 4x slower CPU, INP per page (median of 3 runs) against the 200 ms budget.
+      # Runs even when the Lighthouse step failed, so both verdicts are in the summary.
+      - name: INP check (scripted interactions)
+        if: success() || failure()
+        run: bash testing/lighthouse/inp.sh
+
       - name: Upload Lighthouse reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,6 +86,7 @@ jobs:
           name: lighthouse-report
           path: |
             lighthouse-results/summary.md
+            lighthouse-results/inp-summary.md
             lighthouse-results/lhci/*.html
             lighthouse-results/lhci/manifest.json
           if-no-files-found: warn

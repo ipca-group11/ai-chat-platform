@@ -53,6 +53,15 @@ describe("Lighthouse CI workflow (AICHAT-80)", () => {
     expect(read("scripts/lighthouse/run.ts")).toContain("'autorun'");
   });
 
+  it("checks INP with scripted interactions after the audit, also when the audit failed (AICHAT-240)", () => {
+    expect(workflow).toMatch(/if: success\(\) \|\| failure\(\)\s*\n\s+run: bash testing\/lighthouse\/inp\.sh/);
+    expect(workflow.indexOf("testing/lighthouse/inp.sh")).toBeGreaterThan(workflow.indexOf("testing/lighthouse/run.sh"));
+    expect(read("testing/lighthouse/inp.sh")).toContain("exec node scripts/perf/inp-check.ts");
+    expect(read("scripts/perf/inp.ts")).toContain("INP_BUDGET_MS = 200");
+    expect(read("scripts/perf/inp-check.ts")).toContain("process.exit(rows.every((row) => row.pass) ? 0 : 1)");
+    expect(workflow).toContain("lighthouse-results/inp-summary.md");
+  });
+
   it("keeps the HTML reports and the summary as a build artifact even when the audit fails", () => {
     expect(workflow).toMatch(/if:\s*always\(\)\s*\n\s+uses: actions\/upload-artifact@v4/);
     expect(workflow).toContain("lighthouse-results/lhci/*.html");

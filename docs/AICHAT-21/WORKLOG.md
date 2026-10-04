@@ -316,3 +316,15 @@ Lighthouse (desktop preset, median of 3) on 2026-10-04 with Docker off: the four
 ### AICHAT-239 · Unused JavaScript on `/chats`
 
 Unused JS on `/chats` 166 → 78 KiB (table above): the shared design system was split by component and the chat view and dialogs are lazy (details in docs/AICHAT-22/WORKLOG.md §8).
+
+### AICHAT-240 · INP check in CI
+
+`scripts/perf/inp-check.ts` (run by `testing/lighthouse/inp.sh`, new step of `lighthouse.yml` after the Lighthouse step) plays a scripted session per page in headless Chrome with a 4x CPU throttle (`/login`: type in the form; `/chats`: open and close the new-chat dialog; `/chats/:id`: type in the composer, open the members and new-chat dialogs), takes the time from each input event to the end of its next frame, computes INP like web-vitals (worst interaction, p98) and fails when the median of 3 runs is over 200 ms. Event Timing was tried first and dropped: headless Chrome reports the "next paint" only when it next presents a frame, which on the chat page gave 2 s for a 1 ms click.
+
+| Page | INP median, before | after |
+|---|---|---|
+| `/login` | 48 ms | 47 ms |
+| `/chats` | 90 ms | 34 ms |
+| `/chats/:id` | 46 ms | 44 ms |
+
+Run: `bash testing/lighthouse/inp.sh` (`INP_BASE_URL`, `INP_RUNS`, `INP_CPU_THROTTLE` to change the defaults). Not run on GitHub (nothing pushed).
