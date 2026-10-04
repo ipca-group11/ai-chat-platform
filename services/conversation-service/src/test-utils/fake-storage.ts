@@ -15,4 +15,14 @@ export class FakeStorage implements AttachmentStorage {
     if (!buffer) throw new Error(`No file stored at ${storagePath}`);
     return buffer;
   }
+
+  /** Test helper: is a file still stored? */
+  has(storagePath: string): boolean {
+    return this.files.has(storagePath);
+  }
+
+  /** Test helper: how many files are stored. */
+  get count(): number {
+    return this.files.size;
+  }
 }
