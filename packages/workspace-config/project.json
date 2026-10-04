@@ -36,7 +36,8 @@
         "{workspaceRoot}/services/**/*",
         "{workspaceRoot}/packages/**/*",
         "{workspaceRoot}/e2e/**/*",
-        "{workspaceRoot}/scripts/unit-test/**/*"
+        "{workspaceRoot}/scripts/unit-test/**/*",
+        "{workspaceRoot}/deploy/**/*"
       ]
     }
   }

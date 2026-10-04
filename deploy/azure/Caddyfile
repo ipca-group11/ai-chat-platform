@@ -6,14 +6,30 @@
 # headers to localhost origins, so Host is rewritten upstream and CORS for the remotes is
 # set here instead.
 
+# Security headers for every answer, shell and remotes (AICHAT-228). HSTS starts at one
+# day; raise it to a year (31536000) once the deploy has run with it for a while.
+(security) {
+	header {
+		Strict-Transport-Security "max-age=86400; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		-Server
+	}
+}
+
 (remote) {
+	import security
 	header Access-Control-Allow-Origin "https://{$DOMAIN}"
 	header Vary Origin
-	header -Server
+	# The shell loads remoteEntry.js and the chunks from another origin (port 443).
+	header Cross-Origin-Resource-Policy "cross-origin"
+	header X-Frame-Options "DENY"
 }
 
 {$DOMAIN} {
 	encode gzip
+	import security
 	# Grafana serves itself under /grafana (GF_SERVER_SERVE_FROM_SUB_PATH), so the prefix
 	# is passed through unchanged.
 	handle /grafana* {
@@ -24,6 +40,15 @@
 		reverse_proxy alloy:12347
 	}
 	handle {
+		# The shell's own headers (Grafana above keeps its own). The CSP is Report-Only
+		# until a browser session shows no violations; then rename it to
+		# Content-Security-Policy. Triage: docs/AICHAT-28/WORKLOG.md (US4).
+		header {
+			Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://{$DOMAIN}:3001 https://{$DOMAIN}:3002 https://{$DOMAIN}:3003; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://{$DOMAIN}:3001 https://{$DOMAIN}:3002 https://{$DOMAIN}:3003; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+			X-Frame-Options "DENY"
+			Cross-Origin-Opener-Policy "same-origin"
+			Cross-Origin-Resource-Policy "same-origin"
+		}
 		reverse_proxy shell:3000 {
 			header_up Host localhost
 		}

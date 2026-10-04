@@ -63,7 +63,11 @@ Settings, and the browser sends it with each request.
 ## Files
 
 - `docker-compose.yml`: production stack (pull-only; `IMAGE_PREFIX`/`IMAGE_TAG` come from the deploy job).
-- `Caddyfile`: TLS + reverse proxy (rewrites `Host` for Vite preview, sets CORS for the remotes).
+- `Caddyfile`: TLS + reverse proxy (rewrites `Host` for Vite preview, sets CORS for the remotes)
+  and the security headers (HSTS, nosniff, Referrer-Policy, Permissions-Policy, X-Frame-Options,
+  COOP/CORP, and a `Content-Security-Policy-Report-Only` on the shell, AICHAT-228). Once a browser
+  session shows no CSP violations in the console, switch the CSP to enforcing and raise HSTS's
+  `max-age`. Checked by `packages/workspace-config/src/caddyfile.test.ts`.
 - `cloud-init.yaml`: first-boot setup (Docker, swap, unattended upgrades).
 
 ## Recreate from scratch
