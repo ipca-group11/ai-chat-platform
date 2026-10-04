@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { FIXED_TIME } from "./lib/data.js";
 import { installFonts } from "./lib/fonts.js";
 import { EMPTY_CHATS, installApiMocks, SIGNED_OUT, WITH_CHATS, type ApiScenario } from "./lib/mock-api.js";
+import { STABLE_CSS } from "./lib/stable-css.js";
 import { startApps, stopApps } from "./lib/servers.js";
 
 /**
@@ -124,6 +125,7 @@ for (const screen of SCREENS) {
 
       await page.goto(screen.path);
       await screen.ready(page);
+      await page.addStyleTag({ content: STABLE_CSS });
       await page.evaluate(() => document.fonts.ready);
       await page.waitForLoadState("networkidle");
 
