@@ -1,4 +1,5 @@
 import type { AttachmentKind } from "../../shared/contracts/chat.js";
+import { extractPdfTextSandboxed } from "./pdf-sandbox.js";
 
 /** Extracts text content for text/PDF attachments so it can be included in the LLM
  * request context (AC-69). Images return `undefined` here — they are sent as image
@@ -9,15 +10,10 @@ export async function extractText(kind: AttachmentKind, buffer: Buffer): Promise
   }
 
   if (kind === "pdf") {
-    try {
-      const { default: pdfParse } = await import("pdf-parse");
-      const data = await pdfParse(buffer);
-      return data.text;
-    } catch {
-      // Extraction failures (corrupt/unsupported PDF) shouldn't crash the upload; the
-      // attachment is still stored, just without extracted text context.
-      return undefined;
-    }
+    // Extraction failures (corrupt/unsupported/hostile PDF) shouldn't crash the upload;
+    // the attachment is still stored, just without extracted text context. The parser
+    // runs sandboxed in a worker with a memory limit and a timeout (AICHAT-254).
+    return extractPdfTextSandboxed(buffer);
   }
 
   return undefined;

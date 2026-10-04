@@ -6,6 +6,7 @@ import type { ChatsService } from "../chats/index.js";
 import type { MessagesRepository } from "../messages/index.js";
 import type { ProviderRegistry } from "../llm-adapters/index.js";
 import { validateAttachment, type UploadCandidate } from "./validators.js";
+import { assertContentMatches } from "./content-check.js";
 import { extractText } from "./text-extractor.js";
 import type { AttachmentStorage } from "./storage.js";
 
@@ -109,6 +110,8 @@ export class AttachmentsService {
     }
 
     const { extension, kind } = validateAttachment(file, this.maxBytes);
+    // The name and MIME type are the client's word; the bytes must agree (AICHAT-254).
+    assertContentMatches(file.mimetype, file.originalname, file.buffer);
 
     if (kind === "image") {
       const provider = this.providerRegistry.get(chat.provider);

@@ -103,7 +103,7 @@ export function createApp(
   app.use("/chats", createChatsRouter(chatsService));
   app.use("/chats", createMessagesRouter(messagesService));
   app.use("/chats", createStreamingRouter(chatsService, bus, activeStreams));
-  app.use("/chats", createAttachmentsRouter(attachmentsService, env.MAX_UPLOAD_BYTES * 2));
+  app.use("/chats", createAttachmentsRouter(attachmentsService, env.MAX_UPLOAD_BYTES));
 
   app.use(notFoundHandler);
   app.use(errorHandler);

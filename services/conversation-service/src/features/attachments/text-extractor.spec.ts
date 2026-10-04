@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { pdfFile } from "../../test-utils/file-fixtures.js";
 import { extractText } from "./text-extractor.js";
 
 describe("extractText", () => {
@@ -10,6 +11,10 @@ describe("extractText", () => {
   it("AC-70: returns undefined for image attachments (sent as image input instead)", async () => {
     const text = await extractText("image", Buffer.from([0, 1, 2]));
     expect(text).toBeUndefined();
+  });
+
+  it("AC-69: extracts the text of a PDF (parsed in the sandbox, AICHAT-254)", async () => {
+    expect(await extractText("pdf", pdfFile("Quarterly notes"))).toContain("Quarterly notes");
   });
 
   it("AC-69: does not throw for an unparsable PDF buffer", async () => {

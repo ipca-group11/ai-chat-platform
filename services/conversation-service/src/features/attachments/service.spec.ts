@@ -8,6 +8,7 @@ import { HttpError } from "../../shared/error-handler.js";
 import { ChatsService } from "../chats/index.js";
 import { AttachmentsService } from "./service.js";
 import { asUser } from "../../test-utils/principal.js";
+import { pngFile } from "../../test-utils/file-fixtures.js";
 
 const ONE_MB = 1024 * 1024;
 
@@ -108,10 +109,25 @@ describe("AttachmentsService", () => {
       originalname: "photo.png",
       mimetype: "image/png",
       size: 5,
-      buffer: Buffer.from([1, 2, 3]),
+      buffer: pngFile(),
     });
 
     expect(attachment.kind).toBe("image");
+  });
+
+  it("AICHAT-254: rejects a file whose bytes do not match its type, before storing it", async () => {
+    const { service, chat, message, storage, attachmentsRepo } = await setup();
+
+    await expect(
+      service.upload(asUser("user-1"), chat.id, message.id, {
+        originalname: "photo.png",
+        mimetype: "image/png",
+        size: 3,
+        buffer: Buffer.from([1, 2, 3]),
+      }),
+    ).rejects.toMatchObject({ statusCode: 400, code: "ATTACHMENT_TYPE_NOT_ALLOWED" });
+    expect(storage.count).toBe(0);
+    expect(attachmentsRepo.all()).toHaveLength(0);
   });
 
   it("AC-71: rejects an image attachment when the chat's model does not support vision", async () => {
@@ -122,7 +138,7 @@ describe("AttachmentsService", () => {
         originalname: "photo.png",
         mimetype: "image/png",
         size: 5,
-        buffer: Buffer.from([1, 2, 3]),
+        buffer: pngFile(),
       }),
     ).rejects.toMatchObject({ statusCode: 422 });
   });

@@ -51,6 +51,25 @@ const ALLOWED_FILES = [
   { extension: ".jpeg", mimeType: "image/jpeg" },
   { extension: ".jpg", mimeType: "image/jpeg" },
 ] as const;
+const SIGNATURES: Record<string, Buffer> = {
+  "image/png": Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+  "image/jpeg": Buffer.from([0xff, 0xd8, 0xff]),
+  "application/pdf": Buffer.from("%PDF-", "latin1"),
+};
+
+/** The magic-byte check of the service (AICHAT-254), without its image-size limit:
+ * signature for images and PDFs, NUL-free UTF-8 for text. */
+function contentMatches(mimeType: string, content: Buffer): boolean {
+  const signature = SIGNATURES[mimeType];
+  if (signature) return content.subarray(0, signature.length).equals(signature);
+  if (content.includes(0)) return false;
+  try {
+    new TextDecoder("utf-8", { fatal: true }).decode(content);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function parse<T>(schema: ZodType<T>, body: unknown): T {
   const parsed = schema.safeParse(body);
@@ -324,6 +343,10 @@ function createConversationRouter(ctx: MockContext): Router {
     const size = Math.max(1, raw.lastIndexOf("\r\n--") - start);
     if (size > MAX_UPLOAD_BYTES) {
       throw new HttpError(413, "ATTACHMENT_TOO_LARGE", `File "${name}" exceeds the 10 MB size limit`);
+    }
+    // Like the service (AICHAT-254), the bytes must match the claimed type.
+    if (!contentMatches(allowed.mimeType, Buffer.from(raw.slice(start, start + size), "latin1"))) {
+      throw new HttpError(400, "ATTACHMENT_TYPE_NOT_ALLOWED", `File "${name}" does not contain what its type claims`);
     }
     const attachment: chat.Attachment = {
       id: nextId(ctx, "att", ctx.store.data.attachments.map((a) => a.id)),

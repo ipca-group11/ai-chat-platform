@@ -529,7 +529,9 @@ describe("attachments", () => {
   const multipart = (name: string, mime: string, content = "hello file") =>
     Buffer.from(
       `--XX\r\nContent-Disposition: form-data; name="file"; filename="${name}"\r\nContent-Type: ${mime}\r\n\r\n${content}\r\n--XX--\r\n`,
+      "latin1",
     );
+  const PNG = "\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR";
   const send = (req: request.Test, body: Buffer) =>
     req.set("Content-Type", "multipart/form-data; boundary=XX").send(body);
 
@@ -559,7 +561,7 @@ describe("attachments", () => {
     const { app } = setup();
     const { as } = await signIn(app);
     const id = await firstChatId(as);
-    const up = await send(as("post", `/chats/${id}/attachments`), multipart("pic.png", "image/png"));
+    const up = await send(as("post", `/chats/${id}/attachments`), multipart("pic.png", "image/png", PNG));
     expect(up.status).toBe(201);
     const sent = await as("post", `/chats/${id}/messages`).send({
       content: "see picture",
@@ -572,6 +574,10 @@ describe("attachments", () => {
   it.each([
     ["a type that is not accepted", multipart("run.exe", "application/octet-stream"), "ATTACHMENT_TYPE_NOT_ALLOWED"],
     ["a MIME type that does not match", multipart("notes.txt", "application/pdf"), "ATTACHMENT_TYPE_NOT_ALLOWED"],
+    ["text posing as a PNG", multipart("pic.png", "image/png", "<html></html>"), "ATTACHMENT_TYPE_NOT_ALLOWED"],
+    ["a PNG posing as a PDF", multipart("doc.pdf", "application/pdf", PNG), "ATTACHMENT_TYPE_NOT_ALLOWED"],
+    ["binary data posing as text", multipart("notes.txt", "text/plain", "a\x00b"), "ATTACHMENT_TYPE_NOT_ALLOWED"],
+    ["invalid UTF-8 posing as text", multipart("notes.txt", "text/plain", "\xc3\x28"), "ATTACHMENT_TYPE_NOT_ALLOWED"],
     ["no file", Buffer.from("--XX--\r\n"), "ATTACHMENT_REQUIRED"],
   ])("rejects %s", async (_label, body, code) => {
     const { app } = setup();
