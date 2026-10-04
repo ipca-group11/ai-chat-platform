@@ -20,6 +20,8 @@ const ROUTE_TESTS: Record<string, string> = {
   "POST /auth/logout": "routes.spec.ts",
   "GET /auth/me": "routes.spec.ts",
   "DELETE /auth/me": "account-deletion.spec.ts",
+  "POST /auth/verify-email": "email-verification.spec.ts",
+  "POST /auth/verify-email/resend": "email-verification.spec.ts",
 };
 
 const here = dirname(fileURLToPath(import.meta.url));

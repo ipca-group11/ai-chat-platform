@@ -1,7 +1,8 @@
 // conversation-service Prisma schema (STACK.md: Postgres + Prisma).
 // Owns four tables: `Chat`, `ChatMember`, `Message`, `Attachment` (ARCHITECTURE.md §5).
 // Every row is scoped by `ownerId` from the validated JWT (FR5); a chat is also readable
-// by the users its owner invited (`ChatMember`, matched on the JWT `email` claim).
+// by the users its owner invited (`ChatMember`, claimed with a verified JWT `email` claim and
+// then bound to the user id).
 // Deleting a `Chat` cascades to its members, `Message`s and their `Attachment`s (AC-44).
 
 // `output` points inside this service's own source tree (not `node_modules/@prisma/client`)
@@ -67,19 +68,24 @@ model Chat {
   @@index([ownerId])
 }
 
-/// A user the chat's owner invited. Keyed by (lowercased) email rather than user id:
-/// this service has no user table, and matching on the JWT `email` claim means an
-/// invite also works for someone who has not registered yet.
+/// A user the chat's owner invited, by (lowercased) email: this service has no user table,
+/// and an invite also works for someone who has not registered yet. The invite is claimed
+/// by the first user who opens it with a *verified* `email` claim (`email_verified`), and
+/// from then on it is matched on that user's id only (`userId`), never on the email again
+/// (AICHAT-253: registering someone else's address no longer grants access).
 model ChatMember {
   id        String   @id @default(cuid())
   chatId    String
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   email     String
+  /// The user the invite is bound to; null until a verified user with `email` claims it.
+  userId    String?
   invitedBy String
   createdAt DateTime @default(now())
 
   @@unique([chatId, email])
   @@index([email])
+  @@index([userId])
 }
 
 model Message {

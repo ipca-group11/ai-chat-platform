@@ -187,7 +187,7 @@ describe("session routes", () => {
       const res = await request(buildApp()).get("/auth/me").set("Cookie", accessCookie);
 
       expect(res.status).toBe(200);
-      expect(res.body).toEqual({ id: user.id, email: user.email });
+      expect(res.body).toEqual({ id: user.id, email: user.email, emailVerified: false });
     });
 
     it("AC-38: GET /auth/me is 401 after logout (access cookie cleared client-side / no cookie sent)", async () => {

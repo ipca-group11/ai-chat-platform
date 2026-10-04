@@ -22,6 +22,8 @@ export interface ChatMemberRecord {
   id: string;
   chatId: string;
   email: string;
+  /** The user the invite is bound to; null until a verified user with `email` claims it. */
+  userId: string | null;
   invitedBy: string;
   createdAt: Date;
 }
@@ -38,10 +40,12 @@ export interface ChatsRepository {
     reasoning?: boolean;
     webFetch?: boolean;
   }): Promise<ChatRecord>;
-  /** Chats the user owns or was invited to (by email). */
-  findManyAccessible(ownerId: string, email: string): Promise<ChatRecord[]>;
+  /** Chats the user owns or is a bound member of (matched on the user id, never the email). */
+  findManyAccessible(userId: string): Promise<ChatRecord[]>;
   findByIdAndOwner(id: string, ownerId: string): Promise<ChatRecord | null>;
-  findAccessible(id: string, ownerId: string, email: string): Promise<ChatRecord | null>;
+  findAccessible(id: string, userId: string): Promise<ChatRecord | null>;
+  /** Binds the still unclaimed invites for `email` (of one chat, or all) to `userId`. Returns how many. */
+  claimInvites(email: string, userId: string, chatId?: string): Promise<number>;
   /** Unscoped lookup for trusted internal callers only (e.g. the queue processor, which
    * already validated ownership when the message was first submitted) — never exposed
    * directly to a per-request handler. */
@@ -52,6 +56,8 @@ export interface ChatsRepository {
   addMember(data: { chatId: string; email: string; invitedBy: string }): Promise<ChatMemberRecord>;
   /** Returns false when there was no such member. */
   removeMember(chatId: string, email: string): Promise<boolean>;
+  /** Removes the membership bound to `userId` (a member leaving). False when there was none. */
+  removeMemberByUser(chatId: string, userId: string): Promise<boolean>;
 }
 
 export function createChatsRepository(prisma: PrismaClient): ChatsRepository {
@@ -59,9 +65,9 @@ export function createChatsRepository(prisma: PrismaClient): ChatsRepository {
     async create(data) {
       return prisma.chat.create({ data });
     },
-    async findManyAccessible(ownerId, email) {
+    async findManyAccessible(userId) {
       return prisma.chat.findMany({
-        where: { OR: [{ ownerId }, { members: { some: { email } } }] },
+        where: { OR: [{ ownerId: userId }, { members: { some: { userId } } }] },
         orderBy: { updatedAt: "desc" },
       });
     },
@@ -70,8 +76,12 @@ export function createChatsRepository(prisma: PrismaClient): ChatsRepository {
       // just filtered after the fact.
       return prisma.chat.findFirst({ where: { id, ownerId } });
     },
-    async findAccessible(id, ownerId, email) {
-      return prisma.chat.findFirst({ where: { id, OR: [{ ownerId }, { members: { some: { email } } }] } });
+    async findAccessible(id, userId) {
+      return prisma.chat.findFirst({ where: { id, OR: [{ ownerId: userId }, { members: { some: { userId } } }] } });
+    },
+    async claimInvites(email, userId, chatId) {
+      const { count } = await prisma.chatMember.updateMany({ where: { email, userId: null, ...(chatId ? { chatId } : {}) }, data: { userId } });
+      return count;
     },
     async findById(id) {
       return prisma.chat.findUnique({ where: { id } });
@@ -93,6 +103,10 @@ export function createChatsRepository(prisma: PrismaClient): ChatsRepository {
       const { count } = await prisma.chatMember.deleteMany({ where: { chatId, email } });
       return count > 0;
     },
+    async removeMemberByUser(chatId, userId) {
+      const { count } = await prisma.chatMember.deleteMany({ where: { chatId, userId } });
+      return count > 0;
+    },
   };
 }
 
@@ -103,8 +117,20 @@ export class ChatsService {
   ) {}
 
   async list(user: Principal): Promise<ChatDto[]> {
-    const chats = await this.repo.findManyAccessible(user.userId, user.email);
+    await this.claimInvites(user);
+    const chats = await this.repo.findManyAccessible(user.userId);
     return chats.map(toChatDto);
+  }
+
+  /**
+   * Binds the pending invites for the user's email to their id (AICHAT-253, pentest H1). Only a
+   * verified email may claim: registering someone else's address gives an unverified account,
+   * which never matches an invite. Once bound, an invite is matched on the user id only, so a
+   * later account with the same address (after the first one was deleted) gets nothing.
+   */
+  private async claimInvites(user: Principal, chatId?: string): Promise<number> {
+    if (!user.emailVerified) return 0;
+    return this.repo.claimInvites(user.email, user.userId, chatId);
   }
 
   async create(user: Principal, input: CreateChatInput): Promise<ChatDto> {
@@ -125,7 +151,10 @@ export class ChatsService {
   /** Loads a chat the user owns or is a member of, or throws 404 (AC-45/46). Guards
    * everything members may do: read history, send/retry/stop messages, stream. */
   async getAccessible(user: Principal, chatId: string): Promise<ChatRecord> {
-    const chat = await this.repo.findAccessible(chatId, user.userId, user.email);
+    let chat = await this.repo.findAccessible(chatId, user.userId);
+    if (!chat && (await this.claimInvites(user, chatId)) > 0) {
+      chat = await this.repo.findAccessible(chatId, user.userId);
+    }
     if (!chat) {
       throw new HttpError(404, "CHAT_NOT_FOUND", "Chat not found");
     }
@@ -167,8 +196,8 @@ export class ChatsService {
     ];
   }
 
-  /** Owner-only. The invitee gets access immediately, even if they have not registered
-   * yet: membership is matched on the email claim of whoever signs in with it. */
+  /** Owner-only. The invitee may not have registered yet: the invite is claimed by the first
+   * user who opens it with that email *verified*, and bound to their id from then on. */
   async addMember(user: Principal, chatId: string, email: string): Promise<ChatMemberDto> {
     await this.getOwned(user.userId, chatId);
     if (email === user.email) {
@@ -189,7 +218,8 @@ export class ChatsService {
     if (!isOwner && email !== user.email) {
       throw new HttpError(403, "FORBIDDEN", "Only the chat owner can remove other members");
     }
-    const removed = await this.repo.removeMember(chatId, email);
+    // A member leaving removes the membership bound to them, not whatever row carries the address.
+    const removed = isOwner ? await this.repo.removeMember(chatId, email) : await this.repo.removeMemberByUser(chatId, user.userId);
     if (!removed) {
       throw new HttpError(404, "MEMBER_NOT_FOUND", "Member not found");
     }

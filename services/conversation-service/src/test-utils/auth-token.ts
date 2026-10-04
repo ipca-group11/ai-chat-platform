@@ -4,14 +4,19 @@ import jwt from "jsonwebtoken";
 // nosemgrep: ajinabraham.njsscan.generic.hardcoded_secrets.node_secret
 export const TEST_JWT_SECRET = "test-secret";
 
-/** A signed access token whose email claim matches `asUser(userId)`. */
-export function tokenFor(userId: string, secret: string = TEST_JWT_SECRET): string {
-  return jwt.sign({ sub: userId, email: `${userId}@example.com` }, secret, { expiresIn: "15m" });
+/** A signed access token whose email claim matches `asUser(userId)`. The address counts as
+ * verified unless `emailVerified: false` is passed (AICHAT-253). */
+export function tokenFor(userId: string, secret: string = TEST_JWT_SECRET, options: { emailVerified?: boolean; email?: string } = {}): string {
+  return jwt.sign(
+    { sub: userId, email: options.email ?? `${userId}@example.com`, email_verified: options.emailVerified ?? true },
+    secret,
+    { expiresIn: "15m" },
+  );
 }
 
 /** The `Cookie` header value for supertest's `.set("Cookie", ...)`. */
-export function cookieFor(userId: string): string[] {
-  return [`access_token=${tokenFor(userId)}`];
+export function cookieFor(userId: string, options: { emailVerified?: boolean; email?: string } = {}): string[] {
+  return [`access_token=${tokenFor(userId, TEST_JWT_SECRET, options)}`];
 }
 
 /** Service token of the internal routes in tests, not a credential. */

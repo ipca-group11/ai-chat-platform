@@ -22,7 +22,7 @@ describe("unexpected errors", () => {
 
   it("session router: GET /auth/me returns a safe 500 when the database fails", async () => {
     const { app } = buildTestApp(throwingPrisma());
-    const token = signAccessToken({ sub: "user-1", email: "ana@example.com" }, process.env.JWT_SECRET as string);
+    const token = signAccessToken({ sub: "user-1", email: "ana@example.com", emailVerified: false }, process.env.JWT_SECRET as string);
     expectSafe500(await request(app).get("/auth/me").set("Cookie", `access_token=${token}`));
   });
 });

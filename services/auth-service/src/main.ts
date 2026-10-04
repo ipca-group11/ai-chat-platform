@@ -14,6 +14,7 @@ import { pinoHttp } from "pino-http";
 import { collectDefaultMetrics, register as metricsRegister } from "prom-client";
 import type { PrismaClient } from "./generated/prisma-client/index.js";
 import { createAccountRouter } from "./features/account/index.js";
+import { createEmailVerificationRouter } from "./features/email-verification/index.js";
 import { runRetention, scheduleRetention } from "./features/retention/index.js";
 import { createRegisterRouter } from "./features/register/index.js";
 import { createSessionRouter } from "./features/session/index.js";
@@ -22,6 +23,7 @@ import { correlationIdMiddleware } from "./shared/correlation-id.js";
 import { env } from "./shared/env.js";
 import { errorMiddleware, notFoundMiddleware } from "./shared/error-middleware.js";
 import { httpMetricsMiddleware } from "./shared/http-metrics.js";
+import { createMailer, type Mailer } from "./shared/mailer.js";
 import { serializeError } from "./shared/pii-scrub.js";
 import { logger as defaultLogger, serializeRequest, serializeResponse, type Logger } from "./shared/logger.js";
 import { prisma as defaultPrisma } from "./shared/prisma.js";
@@ -43,6 +45,10 @@ export interface AppDeps {
   requestsPerWindow?: number;
   /** Express `trust proxy` (default TRUST_PROXY, 1 hop: Caddy). */
   trustProxy?: number | string;
+  /** Delivers email verification tokens (default from EMAIL_DELIVERY); tests keep them in memory. */
+  mailer?: Mailer;
+  /** Verification resends per client and hour (default 5). */
+  resendsPerHour?: number;
 }
 
 function defaultErasureClient(): ErasureClient | undefined {
@@ -53,6 +59,7 @@ function defaultErasureClient(): ErasureClient | undefined {
 export function createApp(deps: AppDeps = {}): Express {
   const prisma = deps.prisma ?? defaultPrisma;
   const logger = deps.logger ?? defaultLogger;
+  const mailer = deps.mailer ?? createMailer(env.EMAIL_DELIVERY, logger);
   const app = express();
 
   app.disable("x-powered-by");
@@ -101,7 +108,8 @@ export function createApp(deps: AppDeps = {}): Express {
     res.send(await metricsRegister.metrics());
   });
 
-  app.use("/auth", createRegisterRouter(prisma));
+  app.use("/auth", createRegisterRouter(prisma, mailer));
+  app.use("/auth", createEmailVerificationRouter(prisma, { mailer, resendsPerHour: deps.resendsPerHour }));
   app.use("/auth", createSessionRouter(prisma));
   app.use("/auth", createAccountRouter(prisma, { erasure: deps.erasure ?? defaultErasureClient(), deletionsPerHour: deps.deletionsPerHour }));
 

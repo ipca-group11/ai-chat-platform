@@ -80,7 +80,7 @@ export function createSessionRouter(prisma: PrismaClient): Router {
       if (!user) {
         throw new HttpError(401, "UNAUTHENTICATED", "Not authenticated");
       }
-      res.status(200).json({ id: user.id, email: user.email });
+      res.status(200).json({ id: user.id, email: user.email, emailVerified: user.emailVerified });
     } catch (err) {
       next(err);
     }

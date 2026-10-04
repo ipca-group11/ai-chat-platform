@@ -18,8 +18,10 @@ declare global {
   namespace Express {
     interface Request {
       userId: string;
-      /** Lowercased `email` claim; what chat memberships are matched against. */
+      /** Lowercased `email` claim; what a pending chat invite is claimed with. */
       userEmail: string;
+      /** The `email_verified` claim; false when absent (AICHAT-253). */
+      userEmailVerified: boolean;
     }
   }
 }
@@ -28,8 +30,8 @@ declare global {
  * Validates the `access_token` cookie locally against the shared `JWT_SECRET`
  * (ARCHITECTURE.md §4, STACK.md decision #1) — no network call to `auth-service`.
  * Also accepts an `Authorization: Bearer <token>` header as a fallback for
- * non-browser/contract-test clients. Sets `req.userId` from the token's `sub` claim and
- * `req.userEmail` from its `email` claim.
+ * non-browser/contract-test clients. Sets `req.userId` from the token's `sub` claim,
+ * `req.userEmail` from its `email` claim and `req.userEmailVerified` from `email_verified`.
  * Missing/invalid/expired token -> 401.
  */
 export function authMiddleware(jwtSecret: string) {
@@ -45,6 +47,7 @@ export function authMiddleware(jwtSecret: string) {
       const claims = accessTokenClaimsSchema.parse(decoded);
       req.userId = claims.sub;
       req.userEmail = claims.email.toLowerCase();
+      req.userEmailVerified = claims.email_verified === true;
       next();
     } catch {
       next(new HttpError(401, "UNAUTHENTICATED", "Missing or invalid access token"));
@@ -52,15 +55,17 @@ export function authMiddleware(jwtSecret: string) {
   };
 }
 
-/** The authenticated caller, as the chat features need it (id for ownership, email for
- * membership). */
+/** The authenticated caller, as the chat features need it (id for ownership and bound
+ * memberships; a verified email to claim a pending invite). */
 export interface Principal {
   userId: string;
   email: string;
+  /** Whether the email is proven (`email_verified` claim). Unverified users never claim an invite. */
+  emailVerified: boolean;
 }
 
 export function principalFrom(req: Request): Principal {
-  return { userId: req.userId, email: req.userEmail };
+  return { userId: req.userId, email: req.userEmail, emailVerified: req.userEmailVerified };
 }
 
 function extractToken(req: Request): string | undefined {

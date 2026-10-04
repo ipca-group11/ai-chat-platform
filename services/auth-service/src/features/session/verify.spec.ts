@@ -11,21 +11,21 @@ function mockReq(cookies: Record<string, string> = {}): Request {
 
 describe("verifyAccessToken (B4 contract)", () => {
   it("AC-40: verifies a token issued by this service using JWT_SECRET", () => {
-    const token = signAccessToken({ sub: "user-1", email: "a@b.com" }, env.JWT_SECRET);
+    const token = signAccessToken({ sub: "user-1", email: "a@b.com", emailVerified: false }, env.JWT_SECRET);
     const claims = verifyAccessToken(token);
     expect(claims.sub).toBe("user-1");
     expect(claims.email).toBe("a@b.com");
   });
 
   it("AC-40: throws for a token signed with a different secret", () => {
-    const token = signAccessToken({ sub: "user-1", email: "a@b.com" }, "wrong-secret");
+    const token = signAccessToken({ sub: "user-1", email: "a@b.com", emailVerified: false }, "wrong-secret");
     expect(() => verifyAccessToken(token)).toThrow();
   });
 });
 
 describe("requireAuth middleware", () => {
   it("AC-35: calls next() and attaches userId/userEmail for a valid access token cookie", () => {
-    const token = signAccessToken({ sub: "user-1", email: "a@b.com" }, env.JWT_SECRET);
+    const token = signAccessToken({ sub: "user-1", email: "a@b.com", emailVerified: false }, env.JWT_SECRET);
     const req = mockReq({ access_token: token });
     const next = vi.fn();
 
@@ -61,7 +61,7 @@ describe("requireAuth middleware", () => {
   });
 
   it("responds 401 when the access_token cookie is signed with the wrong secret", () => {
-    const token = signAccessToken({ sub: "user-1", email: "a@b.com" }, "some-other-secret");
+    const token = signAccessToken({ sub: "user-1", email: "a@b.com", emailVerified: false }, "some-other-secret");
     const req = mockReq({ access_token: token });
     const next = vi.fn();
 

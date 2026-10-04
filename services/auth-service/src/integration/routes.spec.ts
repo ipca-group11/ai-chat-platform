@@ -92,7 +92,7 @@ describe("auth routes", () => {
 
     const ok = await request(app).get("/auth/me").set("Cookie", access);
     expect(ok.status).toBe(200);
-    expect(ok.body).toEqual(user);
+    expect(ok.body).toEqual({ ...user, emailVerified: false });
     expect((await request(app).get("/auth/me")).status).toBe(401);
   });
 });

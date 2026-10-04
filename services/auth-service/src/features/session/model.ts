@@ -22,6 +22,8 @@ const REFRESH_TOKEN_BYTES = 64;
 export interface AuthenticatedUser {
   id: string;
   email: string;
+  /** Whether the user proved they control `email` (AICHAT-253). */
+  emailVerified: boolean;
 }
 
 export interface IssuedTokens {
@@ -58,7 +60,7 @@ export async function verifyCredentials(
     throw invalidCredentials();
   }
 
-  return { id: user.id, email: user.email };
+  return { id: user.id, email: user.email, emailVerified: user.emailVerified };
 }
 
 /** Signs a new access token and creates + persists (hashed) a new refresh token. */
@@ -67,7 +69,7 @@ export async function issueTokens(
   user: AuthenticatedUser,
   options?: { rotatedFrom?: string },
 ): Promise<IssuedTokens> {
-  const accessToken = signAccessToken({ sub: user.id, email: user.email }, env.JWT_SECRET);
+  const accessToken = signAccessToken({ sub: user.id, email: user.email, emailVerified: user.emailVerified }, env.JWT_SECRET);
 
   const refreshToken = randomBytes(REFRESH_TOKEN_BYTES).toString("hex");
   const tokenHash = hashRefreshToken(refreshToken);
@@ -114,7 +116,7 @@ export async function rotateRefreshToken(
     data: { revokedAt: new Date() },
   });
 
-  const user: AuthenticatedUser = { id: row.user.id, email: row.user.email };
+  const user: AuthenticatedUser = { id: row.user.id, email: row.user.email, emailVerified: row.user.emailVerified };
   const tokens = await issueTokens(prisma, user, { rotatedFrom: row.id });
 
   return { tokens, user };
@@ -138,5 +140,5 @@ export async function getUserById(
   id: string,
 ): Promise<AuthenticatedUser | null> {
   const user = await prisma.user.findUnique({ where: { id } });
-  return user ? { id: user.id, email: user.email } : null;
+  return user ? { id: user.id, email: user.email, emailVerified: user.emailVerified } : null;
 }

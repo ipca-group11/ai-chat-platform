@@ -19,7 +19,7 @@ async function setup(erasure?: { eraseUser: ReturnType<typeof vi.fn> }) {
   app.use(correlationIdMiddleware);
   app.use("/auth", createAccountRouter(prisma, { erasure }));
   app.use(errorMiddleware);
-  const cookie = `access_token=${signAccessToken({ sub: user.id, email: user.email }, env.JWT_SECRET)}`;
+  const cookie = `access_token=${signAccessToken({ sub: user.id, email: user.email, emailVerified: false }, env.JWT_SECRET)}`;
   return { app, prisma, user, cookie };
 }
 

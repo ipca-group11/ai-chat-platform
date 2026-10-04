@@ -135,6 +135,47 @@ describe("ChatsService", () => {
       await expect(service.get(asUser("guest"), chat.id)).resolves.toMatchObject({ id: chat.id });
     });
 
+    it("an unverified account with the invited address gets nothing (pentest H1, AICHAT-253)", async () => {
+      const { service } = createService();
+      const chat = await service.create(asUser("owner"), { title: "Shared", provider: "ollama", model: "llama3.2:1b" });
+      await service.addMember(asUser("owner"), chat.id, "guest@example.com");
+      const squatter = asUser("squatter", { email: "guest@example.com", emailVerified: false });
+
+      await expect(service.list(squatter)).resolves.toEqual([]);
+      await expect(service.get(squatter, chat.id)).rejects.toMatchObject({ statusCode: 404 });
+      await expect(service.listMembers(squatter, chat.id)).rejects.toMatchObject({ statusCode: 404 });
+      await expect(service.leave(squatter, chat.id)).rejects.toMatchObject({ statusCode: 404 });
+
+      // The invite is still unclaimed: the real owner of the address gets it once verified.
+      await expect(service.get(asUser("guest"), chat.id)).resolves.toMatchObject({ id: chat.id });
+    });
+
+    it("the first verified user binds the invite; after that it matches their id only, not the address", async () => {
+      const { service } = createService();
+      const chat = await service.create(asUser("owner"), { title: "Shared", provider: "ollama", model: "llama3.2:1b" });
+      await service.addMember(asUser("owner"), chat.id, "guest@example.com");
+
+      await expect(service.get(asUser("guest"), chat.id)).resolves.toMatchObject({ id: chat.id });
+      // A later account with the same verified address (say, after the first was deleted and the
+      // address re-registered) is a different user id, and the bound invite is not theirs.
+      const later = asUser("guest-2", { email: "guest@example.com" });
+      await expect(service.get(later, chat.id)).rejects.toMatchObject({ statusCode: 404 });
+      await expect(service.list(later)).resolves.toEqual([]);
+      // The bound user keeps access even with a token that lacks the claim.
+      await expect(service.list(asUser("guest", { emailVerified: false }))).resolves.toHaveLength(1);
+    });
+
+    it("listing chats claims every pending invite of a verified user", async () => {
+      const { service } = createService();
+      const first = await service.create(asUser("owner"), { title: "One", provider: "ollama", model: "llama3.2:1b" });
+      const second = await service.create(asUser("owner"), { title: "Two", provider: "ollama", model: "llama3.2:1b" });
+      await service.addMember(asUser("owner"), first.id, "guest@example.com");
+      await service.addMember(asUser("owner"), second.id, "guest@example.com");
+
+      const list = await service.list(asUser("guest"));
+      expect(list.map((c) => c.id).sort()).toEqual([first.id, second.id].sort());
+    });
+
     it("lists the owner first, then invited members", async () => {
       const { service } = createService();
       const chat = await service.create(asUser("owner"), { title: "Shared", provider: "ollama", model: "llama3.2:1b" });

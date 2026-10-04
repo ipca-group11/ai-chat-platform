@@ -32,6 +32,25 @@ describe("authMiddleware", () => {
     expect(req.userId).toBe("user-2");
   });
 
+  it("sets req.userEmailVerified only when the email_verified claim is true (AICHAT-253)", () => {
+    const verified = (claims: Record<string, unknown>) => {
+      const token = jwt.sign({ sub: "user-4", email: "v@example.com", ...claims }, SECRET, { expiresIn: "15m" });
+      const req = makeReq({ cookies: { access_token: token } });
+      authMiddleware(SECRET)(req, {} as Response, vi.fn());
+      return req.userEmailVerified;
+    };
+    expect(verified({ email_verified: true })).toBe(true);
+    expect(verified({ email_verified: false })).toBe(false);
+    expect(verified({})).toBe(false);
+  });
+
+  it("rejects a token whose email_verified claim is not a boolean", () => {
+    const token = jwt.sign({ sub: "user-5", email: "v@example.com", email_verified: "true" }, SECRET, { expiresIn: "15m" });
+    const next = vi.fn();
+    authMiddleware(SECRET)(makeReq({ cookies: { access_token: token } }), {} as Response, next);
+    expect(next.mock.calls[0]?.[0]).toBeInstanceOf(HttpError);
+  });
+
   it("sets req.userEmail from the email claim, lowercased", () => {
     const token = jwt.sign({ sub: "user-3", email: "Mixed.Case@Example.com" }, SECRET, { expiresIn: "15m" });
     const req = makeReq({ cookies: { access_token: token } });

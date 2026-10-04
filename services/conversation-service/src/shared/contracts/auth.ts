@@ -16,6 +16,8 @@ import { z } from "zod";
 export const accessTokenClaimsSchema = z.object({
   sub: z.string(),
   email: z.string().email(),
+  /** True once the user proved they control `email` (AICHAT-253); absent in older tokens. */
+  email_verified: z.boolean().optional(),
   iat: z.number().int(),
   exp: z.number().int(),
 });

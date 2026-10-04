@@ -92,6 +92,33 @@ chat. Anyone can claim an unregistered invited address.
 **Fix:** verify email ownership at registration (or before granting access through a shared
 chat), and bind membership to a verified user id rather than a raw email. Ticketed.
 
+**Status: fixed in AICHAT-253.**
+
+- *auth-service.* A new account starts with `emailVerified = false` and gets a single-use token
+  (32 random bytes, only its SHA-256 hash stored, valid 24 h). `POST /auth/verify-email
+  {"token"}` marks the account verified (204); `POST /auth/verify-email/resend` (signed in,
+  5 per hour) replaces the pending token. Access tokens carry `email_verified`; a verification
+  shows up in the next token (sign-in or `POST /auth/refresh`). `GET /auth/me` returns
+  `emailVerified`.
+- *Delivery.* There is no mail provider, so delivery goes through a `Mailer` interface
+  (`shared/mailer.ts`), chosen by `EMAIL_DELIVERY`: `log` writes the token (never the address)
+  to the auth-service log, `off` sends nothing. The default is `log` outside production and `off`
+  in production, because whoever reads the logs could otherwise verify any address. The local
+  `compose.yaml` sets `log`. A real deployment plugs in an SMTP or API mailer that implements
+  `Mailer`. Tests use an in-memory mailer.
+- *conversation-service.* An invite (`ChatMember`) is still created by email, but it is
+  claimed only by a user whose token says `email_verified: true`; the claim stores that user's
+  id on the row (`ChatMember.userId`), and from then on access matches the user id only. A token
+  without the claim counts as unverified. A later account with the same address does not
+  inherit a bound invite, and a member leaving removes the row bound to them.
+- *Migration.* Existing accounts start unverified and existing invites unbound, on purpose:
+  nothing proves who registered those addresses. Their owners verify (resend) and the invites
+  are claimed again on next access.
+- *Tests.* `auth-service/src/integration/email-verification.spec.ts`,
+  `conversation-service/src/integration/shared-chat-verification.spec.ts` (the H1 sequence
+  with an unverified token now gets 404). The live probe (`testing/pentest/run.ts`, H1) was not
+  re-run against the fixed build: Docker was not available.
+
 ### H4 — Shared rate-limit bucket (Medium)
 
 auth-service uses one global `express-rate-limit` bucket (`limit: 300 / 15 min`) and sets no

@@ -17,14 +17,14 @@ function mockPrisma() {
 }
 
 describe("createErasureRepository", () => {
-  it("deletes the owned chats, the memberships by lowercased email and the user's messages in one transaction", async () => {
+  it("deletes the owned chats, the memberships (by lowercased email or bound user id) and the user's messages in one transaction", async () => {
     const { prisma, tx } = mockPrisma();
 
     const result = await createErasureRepository(prisma).eraseUser("u1", "U1@Example.com");
 
     expect(prisma.$transaction).toHaveBeenCalledTimes(1);
     expect(tx.chat.deleteMany).toHaveBeenCalledWith({ where: { ownerId: "u1" } });
-    expect(tx.chatMember.deleteMany).toHaveBeenCalledWith({ where: { email: "u1@example.com" } });
+    expect(tx.chatMember.deleteMany).toHaveBeenCalledWith({ where: { OR: [{ email: "u1@example.com" }, { userId: "u1" }] } });
     expect(tx.message.deleteMany).toHaveBeenCalledWith({ where: { ownerId: "u1" } });
     expect(result).toEqual({ chats: 2, memberships: 1, messages: 3, storagePaths: ["/u/a.txt", "/u/b.txt"] });
   });

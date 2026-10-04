@@ -24,9 +24,9 @@ export class FakeChatsRepository implements ChatsRepository {
     return chat;
   }
 
-  async findManyAccessible(ownerId: string, email: string): Promise<ChatRecord[]> {
+  async findManyAccessible(userId: string): Promise<ChatRecord[]> {
     return [...this.chats.values()]
-      .filter((chat) => this.canAccess(chat, ownerId, email))
+      .filter((chat) => this.canAccess(chat, userId))
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
 
@@ -36,10 +36,21 @@ export class FakeChatsRepository implements ChatsRepository {
     return chat;
   }
 
-  async findAccessible(id: string, ownerId: string, email: string): Promise<ChatRecord | null> {
+  async findAccessible(id: string, userId: string): Promise<ChatRecord | null> {
     const chat = this.chats.get(id);
-    if (!chat || !this.canAccess(chat, ownerId, email)) return null;
+    if (!chat || !this.canAccess(chat, userId)) return null;
     return chat;
+  }
+
+  async claimInvites(email: string, userId: string, chatId?: string): Promise<number> {
+    let count = 0;
+    for (const member of this.members) {
+      if (member.email === email && member.userId === null && (chatId === undefined || member.chatId === chatId)) {
+        member.userId = userId;
+        count++;
+      }
+    }
+    return count;
   }
 
   async findById(id: string): Promise<ChatRecord | null> {
@@ -64,7 +75,7 @@ export class FakeChatsRepository implements ChatsRepository {
   }
 
   async addMember(data: { chatId: string; email: string; invitedBy: string }): Promise<ChatMemberRecord> {
-    const member: ChatMemberRecord = { id: randomUUID(), createdAt: new Date(), ...data };
+    const member: ChatMemberRecord = { id: randomUUID(), createdAt: new Date(), userId: null, ...data };
     this.members.push(member);
     return member;
   }
@@ -75,8 +86,14 @@ export class FakeChatsRepository implements ChatsRepository {
     return this.members.length < before;
   }
 
-  private canAccess(chat: ChatRecord, ownerId: string, email: string): boolean {
-    return chat.ownerId === ownerId || this.members.some((m) => m.chatId === chat.id && m.email === email);
+  async removeMemberByUser(chatId: string, userId: string): Promise<boolean> {
+    const before = this.members.length;
+    this.members = this.members.filter((m) => !(m.chatId === chatId && m.userId === userId));
+    return this.members.length < before;
+  }
+
+  private canAccess(chat: ChatRecord, userId: string): boolean {
+    return chat.ownerId === userId || this.members.some((m) => m.chatId === chat.id && m.userId === userId);
   }
 
   seed(chat: ChatRecord): void {

@@ -16,6 +16,7 @@ function mockPrisma() {
       findMany: vi.fn().mockResolvedValue([]),
       create: vi.fn().mockResolvedValue({ id: "m1" }),
       deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
   } as unknown as PrismaClient;
 }
@@ -30,12 +31,12 @@ describe("createChatsRepository", () => {
     });
   });
 
-  it("AC-47: findManyAccessible returns only chats the user owns or is a member of", async () => {
+  it("AC-47: findManyAccessible returns only chats the user owns or is a bound member of (by user id, AICHAT-253)", async () => {
     const prisma = mockPrisma();
     const repo = createChatsRepository(prisma);
-    await repo.findManyAccessible("u1", "u1@example.com");
+    await repo.findManyAccessible("u1");
     expect(prisma.chat.findMany).toHaveBeenCalledWith({
-      where: { OR: [{ ownerId: "u1" }, { members: { some: { email: "u1@example.com" } } }] },
+      where: { OR: [{ ownerId: "u1" }, { members: { some: { userId: "u1" } } }] },
       orderBy: { updatedAt: "desc" },
     });
   });
@@ -43,10 +44,28 @@ describe("createChatsRepository", () => {
   it("AC-45: findAccessible scopes the query by id and ownership-or-membership", async () => {
     const prisma = mockPrisma();
     const repo = createChatsRepository(prisma);
-    await repo.findAccessible("c1", "u1", "u1@example.com");
+    await repo.findAccessible("c1", "u1");
     expect(prisma.chat.findFirst).toHaveBeenCalledWith({
-      where: { id: "c1", OR: [{ ownerId: "u1" }, { members: { some: { email: "u1@example.com" } } }] },
+      where: { id: "c1", OR: [{ ownerId: "u1" }, { members: { some: { userId: "u1" } } }] },
     });
+  });
+
+  it("claimInvites binds only unclaimed invites for the email, in one chat or in all (AICHAT-253)", async () => {
+    const prisma = mockPrisma();
+    const repo = createChatsRepository(prisma);
+    await expect(repo.claimInvites("u1@example.com", "u1", "c1")).resolves.toBe(1);
+    expect(prisma.chatMember.updateMany).toHaveBeenCalledWith({ where: { email: "u1@example.com", userId: null, chatId: "c1" }, data: { userId: "u1" } });
+    await repo.claimInvites("u1@example.com", "u1");
+    expect(prisma.chatMember.updateMany).toHaveBeenLastCalledWith({ where: { email: "u1@example.com", userId: null }, data: { userId: "u1" } });
+  });
+
+  it("removeMemberByUser deletes the membership bound to the user and reports whether there was one", async () => {
+    const prisma = mockPrisma();
+    const repo = createChatsRepository(prisma);
+    await expect(repo.removeMemberByUser("c1", "u2")).resolves.toBe(true);
+    expect(prisma.chatMember.deleteMany).toHaveBeenCalledWith({ where: { chatId: "c1", userId: "u2" } });
+    vi.mocked(prisma.chatMember.deleteMany).mockResolvedValueOnce({ count: 0 });
+    await expect(repo.removeMemberByUser("c1", "u2")).resolves.toBe(false);
   });
 
   it("removeMember reports whether a member was actually removed", async () => {

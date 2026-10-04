@@ -30,7 +30,8 @@ export function createErasureRepository(prisma: PrismaClient): ErasureRepository
 
         // Owned chats go for everyone; members, messages and attachments cascade.
         const chats = await tx.chat.deleteMany({ where: { ownerId: userId } });
-        const memberships = await tx.chatMember.deleteMany({ where: { email } });
+        // Pending invites to the address and memberships bound to the user (AICHAT-253).
+        const memberships = await tx.chatMember.deleteMany({ where: { OR: [{ email }, { userId }] } });
         // The user's own messages in other people's chats; their attachments cascade.
         const messages = await tx.message.deleteMany({ where: { ownerId: userId } });
         await tx.attachment.deleteMany({ where: { ownerId: userId } });

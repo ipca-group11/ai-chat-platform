@@ -50,6 +50,12 @@ export const deleteAccountRequestSchema = z.object({
 });
 export type DeleteAccountRequest = z.infer<typeof deleteAccountRequestSchema>;
 
+/** `POST /auth/verify-email`: the token the mailer delivered (64 hex characters). */
+export const verifyEmailRequestSchema = z.object({
+  token: z.string().regex(/^[0-9a-f]{64}$/),
+});
+export type VerifyEmailRequest = z.infer<typeof verifyEmailRequestSchema>;
+
 export const userProfileSchema = z.object({
   id: z.string(),
   email: z.string().email(),
@@ -66,6 +72,8 @@ export type AuthResponse = z.infer<typeof authResponseSchema>;
 export const accessTokenClaimsSchema = z.object({
   sub: z.string(),
   email: z.string().email(),
+  /** True once the user proved they control `email` (AICHAT-253). Absent in tokens issued before. */
+  email_verified: z.boolean().optional(),
   iat: z.number().int(),
   exp: z.number().int(),
 });
@@ -76,3 +84,4 @@ export const REFRESH_TOKEN_COOKIE = "refresh_token";
 
 export const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
 export const REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60;
+export const EMAIL_VERIFICATION_TTL_SECONDS = 24 * 60 * 60;

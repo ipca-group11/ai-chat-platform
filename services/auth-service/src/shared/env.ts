@@ -27,6 +27,9 @@ const envSchema = z.object({
     .default("1")
     .refine((value) => value.trim().toLowerCase() !== "true", "TRUST_PROXY=true is not allowed, give a hop count or addresses")
     .transform((value): number | string => (/^\d+$/.test(value.trim()) ? Number(value) : value)),
+  // How the email verification token is delivered (AICHAT-253, shared/mailer.ts). Unset: "log" outside
+  // production, "off" in production (a token in the logs would let log readers verify any address).
+  EMAIL_DELIVERY: z.enum(["log", "off"]).optional(),
   COOKIE_SECURE: z
     .string()
     .default("true")
@@ -49,6 +52,8 @@ export type Env = {
   RETENTION_INTERVAL_MINUTES: number;
   /** Express `trust proxy`: proxy hop count, or trusted proxy addresses. */
   TRUST_PROXY: number | string;
+  /** Delivery of the email verification token. */
+  EMAIL_DELIVERY: "log" | "off";
   COOKIE_SECURE: boolean;
   LOG_LEVEL: string;
 };
@@ -67,6 +72,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     CONVERSATION_SERVICE_URL: parsed.CONVERSATION_SERVICE_URL,
     RETENTION_INTERVAL_MINUTES: parsed.RETENTION_INTERVAL_MINUTES,
     TRUST_PROXY: parsed.TRUST_PROXY,
+    EMAIL_DELIVERY: parsed.EMAIL_DELIVERY ?? (parsed.NODE_ENV === "production" ? "off" : "log"),
     COOKIE_SECURE: parsed.COOKIE_SECURE,
     LOG_LEVEL: parsed.LOG_LEVEL,
   };

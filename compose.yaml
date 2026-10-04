@@ -96,6 +96,8 @@ services:
       REFRESH_TOKEN_TTL_SECONDS: ${REFRESH_TOKEN_TTL_SECONDS:-604800}
       CORS_ORIGIN: http://localhost:${APP_PORT:-8000},http://127.0.0.1:${APP_PORT:-8000}
       COOKIE_SECURE: "false"
+      # Local stack only: the email verification token is written to the auth-service log (AICHAT-253).
+      EMAIL_DELIVERY: log
     ports:
       - "127.0.0.1:${AUTH_SERVICE_PORT:-4001}:4001"
     healthcheck:

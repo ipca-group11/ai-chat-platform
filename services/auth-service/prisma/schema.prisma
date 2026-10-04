@@ -1,6 +1,7 @@
 // auth-service Prisma schema (STACK.md: Postgres + Prisma).
-// Owns two tables: `User` (credentials) and `RefreshToken` (hashed, rotating refresh
-// tokens per ARCHITECTURE.md §4 / STACK.md decisions #1, #2).
+// Owns three tables: `User` (credentials), `RefreshToken` (hashed, rotating refresh
+// tokens per ARCHITECTURE.md §4 / STACK.md decisions #1, #2) and `EmailVerificationToken`
+// (hashed, single-use proof that the user controls their email address, AICHAT-253).
 
 // `output` points inside this service's own source tree (not `node_modules/@prisma/client`)
 // so the generated client can't collide with `conversation-service`'s own Prisma schema:
@@ -18,13 +19,18 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  passwordHash  String
-  createdAt     DateTime       @default(now())
+  id                      String                   @id @default(cuid())
+  email                   String                   @unique
+  passwordHash            String
+  createdAt               DateTime                 @default(now())
   /// Last sign-in or token refresh. Accounts idle for 24 months are deleted by the retention job.
-  lastActiveAt  DateTime       @default(now())
-  refreshTokens RefreshToken[]
+  lastActiveAt            DateTime                 @default(now())
+  /// True once the user proved they control `email` (AICHAT-253). Sent as the `email_verified`
+  /// claim; conversation-service grants access to chats shared by email only when it is true.
+  emailVerified           Boolean                  @default(false)
+  emailVerifiedAt         DateTime?
+  refreshTokens           RefreshToken[]
+  emailVerificationTokens EmailVerificationToken[]
 }
 
 model RefreshToken {
@@ -36,6 +42,19 @@ model RefreshToken {
   rotatedFrom String?
   revokedAt   DateTime?
   createdAt   DateTime  @default(now())
+
+  @@index([userId])
+}
+
+/// Single-use email verification token. Only a SHA-256 hash is stored; the token itself is
+/// delivered by the mailer (`shared/mailer.ts`) and presented to `POST /auth/verify-email`.
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 
   @@index([userId])
 }

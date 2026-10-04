@@ -7,7 +7,7 @@ const OTHER_SECRET = "a-different-secret";
 
 describe("jwt sign/verify (B4 contract)", () => {
   it("AC-40: a validly signed token verifies and yields the expected claims shape", () => {
-    const token = signAccessToken({ sub: "user-1", email: "a@b.com" }, SECRET);
+    const token = signAccessToken({ sub: "user-1", email: "a@b.com", emailVerified: false }, SECRET);
     const claims = verifyAccessToken(token, SECRET);
 
     expect(claims.sub).toBe("user-1");
@@ -15,6 +15,11 @@ describe("jwt sign/verify (B4 contract)", () => {
     expect(typeof claims.iat).toBe("number");
     expect(typeof claims.exp).toBe("number");
     expect(claims.exp - claims.iat).toBe(15 * 60);
+  });
+
+  it("carries whether the email address is verified as the email_verified claim (AICHAT-253)", () => {
+    expect(verifyAccessToken(signAccessToken({ sub: "u", email: "a@b.com", emailVerified: true }, SECRET), SECRET).email_verified).toBe(true);
+    expect(verifyAccessToken(signAccessToken({ sub: "u", email: "a@b.com", emailVerified: false }, SECRET), SECRET).email_verified).toBe(false);
   });
 
   it("AC-40: an expired token throws", () => {
@@ -27,13 +32,13 @@ describe("jwt sign/verify (B4 contract)", () => {
   });
 
   it("AC-40: a token signed with a different secret (tampered/mismatched) is rejected", () => {
-    const token = signAccessToken({ sub: "user-1", email: "a@b.com" }, OTHER_SECRET);
+    const token = signAccessToken({ sub: "user-1", email: "a@b.com", emailVerified: false }, OTHER_SECRET);
 
     expect(() => verifyAccessToken(token, SECRET)).toThrow();
   });
 
   it("AC-40: a structurally tampered token (payload altered post-signing) is rejected", () => {
-    const token = signAccessToken({ sub: "user-1", email: "a@b.com" }, SECRET);
+    const token = signAccessToken({ sub: "user-1", email: "a@b.com", emailVerified: false }, SECRET);
     const [header, _payload, signature] = token.split(".");
     const tamperedPayload = Buffer.from(
       JSON.stringify({ sub: "attacker", email: "attacker@evil.com", iat: 0, exp: 9999999999 }),

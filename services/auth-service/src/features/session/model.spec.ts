@@ -33,7 +33,7 @@ describe("verifyCredentials", () => {
       password: "password1",
     });
 
-    expect(result).toEqual({ id: user.id, email: user.email });
+    expect(result).toEqual({ id: user.id, email: user.email, emailVerified: false });
   });
 
   it("AC-36: an unknown email is rejected with the generic invalid-credentials error", async () => {
@@ -89,7 +89,7 @@ describe("issueTokens", () => {
     const stored = { ...(await makeUser("a@b.com", "password1")), lastActiveAt: new Date("2020-01-01T00:00:00Z") };
     const prisma = fakePrisma({ users: [stored] });
 
-    await issueTokens(prisma, { id: stored.id, email: stored.email });
+    await issueTokens(prisma, { id: stored.id, email: stored.email, emailVerified: stored.emailVerified });
 
     expect((await prisma.user.findUnique({ where: { id: stored.id } }))?.lastActiveAt.getFullYear()).toBeGreaterThan(2025);
   });
@@ -115,7 +115,7 @@ describe("rotateRefreshToken", () => {
 
     const { tokens: rotated, user: returnedUser } = await rotateRefreshToken(prisma, initial.refreshToken);
 
-    expect(returnedUser).toEqual({ id: user.id, email: user.email });
+    expect(returnedUser).toEqual({ id: user.id, email: user.email, emailVerified: false });
     expect(rotated.refreshToken).not.toBe(initial.refreshToken);
   });
 
@@ -188,7 +188,7 @@ describe("getUserById", () => {
 
     const result = await getUserById(prisma, user.id);
 
-    expect(result).toEqual({ id: user.id, email: user.email });
+    expect(result).toEqual({ id: user.id, email: user.email, emailVerified: false });
   });
 
   it("returns null for an unknown id", async () => {
