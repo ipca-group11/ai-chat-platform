@@ -18,8 +18,39 @@
 	}
 }
 
+# Access log without personal data (AICHAT-232): client addresses are cut to their network
+# (IPv4 /16, IPv6 /32), the query string is dropped from the URI and the headers that can
+# carry an address or a full URL (Referer, forwarding headers, a redirect's Location) are
+# removed. Cookie and Authorization are already redacted
+# by Caddy. Written to stderr, so `docker compose logs caddy` shows it.
+(access_log) {
+	log {
+		format filter {
+			wrap json
+			fields {
+				request>remote_ip ip_mask {
+					ipv4 16
+					ipv6 32
+				}
+				request>client_ip ip_mask {
+					ipv4 16
+					ipv6 32
+				}
+				request>remote_port delete
+				request>uri regexp "\?.*$" ""
+				request>headers>Referer delete
+				request>headers>X-Forwarded-For delete
+				request>headers>X-Real-Ip delete
+				request>headers>Forwarded delete
+				resp_headers>Location delete
+			}
+		}
+	}
+}
+
 (remote) {
 	import security
+	import access_log
 	header Access-Control-Allow-Origin "https://{$DOMAIN}"
 	header Vary Origin
 	# The shell loads remoteEntry.js and the chunks from another origin (port 443).
@@ -30,6 +61,7 @@
 {$DOMAIN} {
 	encode gzip
 	import security
+	import access_log
 	# Routes of the services that browsers must never reach through the shell's /api proxy:
 	# Prometheus scrapes /metrics inside the compose network (AICHAT-229). Caddy's path
 	# matcher ignores case, like Express's router.

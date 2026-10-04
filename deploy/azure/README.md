@@ -67,7 +67,9 @@ Settings, and the browser sends it with each request.
   and the security headers (HSTS, nosniff, Referrer-Policy, Permissions-Policy, X-Frame-Options,
   COOP/CORP, and a `Content-Security-Policy-Report-Only` on the shell, AICHAT-228). Once a browser
   session shows no CSP violations in the console, switch the CSP to enforcing and raise HSTS's
-  `max-age`. Checked by `packages/workspace-config/src/caddyfile.test.ts`.
+  `max-age`. Its access log (`docker compose logs caddy`) keeps only the client's network
+  (IPv4 /16, IPv6 /32), drops query strings and the Referer/forwarding/Location headers
+  (AICHAT-232). Checked by `packages/workspace-config/src/caddyfile.test.ts`.
 - `cloud-init.yaml`: first-boot setup (Docker, swap, unattended upgrades).
 
 ## Recreate from scratch

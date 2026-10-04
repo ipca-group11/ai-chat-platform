@@ -36,6 +36,31 @@ describe("deploy/azure/Caddyfile keeps service-only routes private", () => {
   });
 });
 
+describe("deploy/azure/Caddyfile access log keeps no personal data (AICHAT-232)", () => {
+  const accessLog = block(caddyfile, "(access_log) {");
+
+  it("is imported by the site block and every remote", () => {
+    expect(site).toMatch(/^\s*import access_log$/m);
+    expect(remote).toMatch(/^\s*import access_log$/m);
+  });
+
+  it.each(["remote_ip", "client_ip"])("truncates request>%s to its network", (field) => {
+    expect(accessLog).toMatch(new RegExp(`request>${field} ip_mask \\{\\s*ipv4 16\\s*ipv6 32\\s*\\}`));
+  });
+
+  it("drops the query string from the logged URI", () => {
+    expect(accessLog).toContain('request>uri regexp "\\?.*$" ""');
+  });
+
+  it.each(["Referer", "X-Forwarded-For", "X-Real-Ip", "Forwarded"])("deletes the %s header", (header) => {
+    expect(accessLog).toMatch(new RegExp(`request>headers>${header} delete`));
+  });
+
+  it("deletes a redirect's Location, which can carry a full URL", () => {
+    expect(accessLog).toMatch(/resp_headers>Location delete/);
+  });
+});
+
 describe("deploy/azure/Caddyfile security headers (AICHAT-228)", () => {
   it.each([
     ["Strict-Transport-Security", /"max-age=\d+/],
