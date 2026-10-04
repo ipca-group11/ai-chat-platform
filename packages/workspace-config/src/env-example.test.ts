@@ -24,9 +24,14 @@ describe("AC-7: .env.example lists every environment variable needed by every se
   const env = parseDotenv(readRepoFile(".env.example"));
   const compose = parse(readRepoFile("compose.yaml"));
 
+  // Empty on purpose: empty means "built-in system prompt" (AICHAT-243) and "no web fetch restriction"
+  // (AICHAT-242); the services treat an empty value as unset.
+  const emptyByDesign = new Set(["SYSTEM_PROMPT", "WEB_FETCH_ALLOWED_DOMAINS", "WEB_FETCH_BLOCKED_DOMAINS"]);
+
   it("AC-7: every variable is non-empty (a safe local default is present)", () => {
     expect(Object.keys(env).length).toBeGreaterThan(0);
     for (const [key, value] of Object.entries(env)) {
+      if (emptyByDesign.has(key)) continue;
       expect(value.trim().length, `${key} should have a non-empty default`).toBeGreaterThan(0);
     }
   });
