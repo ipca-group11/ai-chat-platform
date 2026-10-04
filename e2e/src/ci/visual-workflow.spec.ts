@@ -70,6 +70,7 @@ describe("Playwright Docker image for the screenshots (AICHAT-74)", () => {
 describe("visual Playwright project (AICHAT-56)", () => {
   it("has its own folder, viewport, thresholds and snapshot path template", () => {
     expect(config).toMatch(/name: "visual",\s*\n\s+testDir: "\.\/src\/visual"/);
+    expect(config).toContain('testIgnore: "**/lib/**"');
     expect(config).toContain('snapshotPathTemplate: "{testDir}/__screenshots__/{projectName}/{arg}{ext}"');
     expect(config).toContain("viewport: { width: 1280, height: 800 }");
     expect(config).toMatch(/maxDiffPixelRatio: 0\.01/);

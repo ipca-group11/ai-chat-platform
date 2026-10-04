@@ -57,6 +57,8 @@ export default defineConfig({
     {
       name: "visual",
       testDir: "./src/visual",
+      // The Vitest specs of the helpers in lib/ are not Playwright specs.
+      testIgnore: "**/lib/**",
       // One browser at a time: the specs share four fixed ports.
       fullyParallel: false,
       retries: 0,
