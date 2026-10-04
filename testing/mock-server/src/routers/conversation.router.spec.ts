@@ -228,6 +228,15 @@ describe("members (shared-chats dataset)", () => {
     expect((await bob.as("delete", `/chats/${id}/membership`)).status).toBe(204);
     expect((await bob.as("get", `/chats/${id}`)).status).toBe(404);
   });
+
+  it("refuses to let the owner leave their own chat", async () => {
+    const { app } = sharedSetup();
+    const owner = await signIn(app);
+    const id = await firstChatId(owner.as, "Team plan");
+    const res = await owner.as("delete", `/chats/${id}/membership`);
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe("OWNER_CANNOT_LEAVE");
+  });
 });
 
 describe("messages", () => {

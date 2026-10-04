@@ -167,6 +167,20 @@ describe("apiClient errors", () => {
     expect(error).toMatchObject({ name: "ApiError", status: 404, message: "Chat not found", code: "chat_not_found" });
   });
 
+  it("reads the code and message from the services' { error: { code, message } } body", async () => {
+    server.use(
+      http.delete("*/chats/c1/membership", () =>
+        HttpResponse.json({ error: { code: "OWNER_CANNOT_LEAVE", message: "The chat owner cannot leave" } }, { status: 409 })
+      )
+    );
+
+    await expect(apiClient.delete("/chats/c1/membership")).rejects.toMatchObject({
+      status: 409,
+      message: "The chat owner cannot leave",
+      code: "OWNER_CANNOT_LEAVE",
+    });
+  });
+
   it("falls back to the status text when the error body has no message", async () => {
     server.use(http.get("*/boom", () => HttpResponse.json({ detail: "x" }, { status: 409, statusText: "Conflict" })));
 

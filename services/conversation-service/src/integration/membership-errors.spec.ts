@@ -73,11 +73,13 @@ describe("DELETE /chats/:id/membership errors", () => {
     expect(res.body.error.code).toBe("CHAT_NOT_FOUND");
   });
 
-  it("404 MEMBER_NOT_FOUND when the owner tries to leave their own chat (owners delete instead)", async () => {
+  it("409 OWNER_CANNOT_LEAVE when the owner tries to leave their own chat (owners delete instead)", async () => {
     const { app, chatId } = await sharedChat();
     const res = await request(app).delete(`/chats/${chatId}/membership`).set("Cookie", cookieFor("owner"));
-    expect(res.status).toBe(404);
-    expect(res.body.error.code).toBe("MEMBER_NOT_FOUND");
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe("OWNER_CANNOT_LEAVE");
+    const members = await request(app).get(`/chats/${chatId}/members`).set("Cookie", cookieFor("owner"));
+    expect(members.body.members).toHaveLength(2);
   });
 });
 

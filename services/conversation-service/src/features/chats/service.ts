@@ -197,7 +197,14 @@ export class ChatsService {
 
   /** A member leaves a chat shared with them. The owner can't leave (they delete). */
   async leave(user: Principal, chatId: string): Promise<void> {
-    await this.removeMember(user, chatId, user.email);
+    const chat = await this.getAccessible(user, chatId);
+    if (chat.ownerId === user.userId) {
+      throw new HttpError(409, "OWNER_CANNOT_LEAVE", "The chat owner cannot leave their own chat. Delete the chat instead.");
+    }
+    const removed = await this.repo.removeMember(chatId, user.email);
+    if (!removed) {
+      throw new HttpError(404, "MEMBER_NOT_FOUND", "Member not found");
+    }
   }
 }
 

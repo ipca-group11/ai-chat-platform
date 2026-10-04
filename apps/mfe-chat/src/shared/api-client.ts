@@ -70,9 +70,11 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     let message = res.statusText;
     let code: string | undefined;
     try {
-      const payload = (await res.json()) as { message?: string; code?: string };
-      message = payload.message ?? message;
-      code = payload.code;
+      // The services answer `{ error: { code, message } }`; a flat body is accepted too.
+      const payload = (await res.json()) as { message?: string; code?: string; error?: { message?: string; code?: string } };
+      const body = payload.error ?? payload;
+      message = body.message ?? message;
+      code = body.code;
     } catch {
       // no JSON body, fall back to statusText
     }

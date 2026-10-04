@@ -174,7 +174,11 @@ function createConversationRouter(ctx: MockContext): Router {
     removeMember(req, res, param(req, "email").trim().toLowerCase());
   });
   router.delete("/chats/:id/membership", (req, res) => {
-    removeMember(req, res, userOf(res).email);
+    const user = userOf(res);
+    if (accessibleChat(ctx, user, param(req, "id")).ownerId === user.id) {
+      throw new HttpError(409, "OWNER_CANNOT_LEAVE", "The chat owner cannot leave their own chat. Delete the chat instead.");
+    }
+    removeMember(req, res, user.email);
   });
 
   // --- messages ------------------------------------------------------------------------

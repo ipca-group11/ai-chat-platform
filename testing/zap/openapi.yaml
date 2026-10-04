@@ -154,6 +154,7 @@ paths:
       responses:
         "204": { description: Left }
         "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
   /api/chats/{chatId}/messages:
     parameters:
       - { name: chatId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }

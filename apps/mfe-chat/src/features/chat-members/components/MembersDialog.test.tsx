@@ -109,4 +109,24 @@ describe("MembersDialog", () => {
     await waitFor(() => expect(onLeft).toHaveBeenCalled());
     expect(new URL(seen(requests, "DELETE")!.url).pathname).toBe("/api/chats/chat-1/membership");
   });
+
+  it("shows the server's reason and stays open when leaving is refused (owner)", async () => {
+    const onLeft = vi.fn();
+    listMembers([owner, guest]);
+    server.use(
+      http.delete("*/chats/:chatId/membership", () =>
+        HttpResponse.json(
+          { error: { code: "OWNER_CANNOT_LEAVE", message: "The chat owner cannot leave their own chat. Delete the chat instead." } },
+          { status: 409 }
+        )
+      )
+    );
+
+    renderDialog({ isOwner: false, onLeft });
+    await screen.findByText("guest@example.com");
+    await userEvent.click(screen.getByRole("button", { name: "Leave chat" }));
+
+    expect(await screen.findByText("The chat owner cannot leave their own chat. Delete the chat instead.")).toBeInTheDocument();
+    expect(onLeft).not.toHaveBeenCalled();
+  });
 });

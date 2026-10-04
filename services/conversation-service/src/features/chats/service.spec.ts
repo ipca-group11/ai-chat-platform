@@ -200,7 +200,7 @@ describe("ChatsService", () => {
     it("the owner cannot leave their own chat", async () => {
       const { service } = createService();
       const chat = await service.create(asUser("owner"), { title: "Shared", provider: "ollama", model: "llama3.2:1b" });
-      await expect(service.leave(asUser("owner"), chat.id)).rejects.toMatchObject({ statusCode: 404 });
+      await expect(service.leave(asUser("owner"), chat.id)).rejects.toMatchObject({ statusCode: 409, code: "OWNER_CANNOT_LEAVE" });
     });
 
     it("outsiders cannot see the member list", async () => {

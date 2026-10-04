@@ -150,7 +150,7 @@ describe("useLeaveChat", () => {
   });
 
   it("keeps the chat in the list when leaving fails", async () => {
-    server.use(http.delete("*/chats/:chatId/membership", () => HttpResponse.json({ message: "Owners cannot leave" }, { status: 409 })));
+    server.use(http.delete("*/chats/:chatId/membership", () => HttpResponse.json({ error: { code: "OWNER_CANNOT_LEAVE", message: "Owners cannot leave" } }, { status: 409 })));
     const queryClient = createTestQueryClient();
     queryClient.setQueryData(queryKeys.chats(), [chat("chat-1")]);
     const { result } = renderHookWithClient(() => useLeaveChat("chat-1"), { queryClient });
