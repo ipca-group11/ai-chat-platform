@@ -49,6 +49,20 @@ All stories were created in Jira on 2026-10-03 as children of their epic, assign
 | AICHAT-27 | Review (merged into the integration branch) | [WORKLOG](AICHAT-27/WORKLOG.md) | #9 |
 | AICHAT-25 | Review (merged into the integration branch) | [WORKLOG](AICHAT-25/WORKLOG.md) | #11 |
 | AICHAT-144 | Review (merged into the integration branch) | [WORKLOG](AICHAT-144/WORKLOG.md) | #12 |
+| AICHAT-17 | Done (merged into the integration branch) | [WORKLOG](AICHAT-17/WORKLOG.md) | #13 |
+| AICHAT-18 | Done (merged into the integration branch) | [WORKLOG](AICHAT-18/WORKLOG.md) | #14 |
+| AICHAT-23 | Done (merged into the integration branch) | [WORKLOG](AICHAT-23/WORKLOG.md) | #15 |
+| AICHAT-20 | Done (merged into the integration branch) | [WORKLOG](AICHAT-20/WORKLOG.md) | #16 |
+| AICHAT-24 | Done (merged into the integration branch) | [WORKLOG](AICHAT-24/WORKLOG.md) | #17 |
+| AICHAT-28 | Done (merged into the integration branch) | [WORKLOG](AICHAT-28/WORKLOG.md) | #18, #20 |
+| AICHAT-32 | Done (merged into the integration branch) | [WORKLOG](AICHAT-32/WORKLOG.md) | #19 |
+| AICHAT-30 | Done (merged into the integration branch) | [WORKLOG](AICHAT-30/WORKLOG.md) | #21 |
+| AICHAT-22 | Done (merged into the integration branch) | [WORKLOG](AICHAT-22/WORKLOG.md) | #22 |
+| AICHAT-21 | Done (merged into the integration branch) | [WORKLOG](AICHAT-21/WORKLOG.md) | #23 |
+| AICHAT-19 | Done (merged into the integration branch) | [WORKLOG](AICHAT-19/WORKLOG.md) | #24 |
+| AICHAT-26 | Done (merged into the integration branch) | [WORKLOG](AICHAT-26/WORKLOG.md) | #25 |
+| AICHAT-33 | Done (merged into the integration branch) | [WORKLOG](AICHAT-33/WORKLOG.md) | #26 |
+| AICHAT-29 | In Progress (DoR recorded on its branch; testing not started) | — | — |
 
 ## Suggested order
 
