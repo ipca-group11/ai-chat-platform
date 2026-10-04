@@ -1,14 +1,14 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { renderWithQueryClient } from "../../../shared/test/render";
+import { renderWithClient } from "@platform/test-utils";
 import { ApiKeyForm } from "./ApiKeyForm";
 
 describe("ApiKeyForm", () => {
   it("AC-76: saving a new key calls onSave with the trimmed key and clears the input", async () => {
     const onSave = vi.fn();
     const user = userEvent.setup();
-    renderWithQueryClient(
+    renderWithClient(
       <ApiKeyForm
         hasKey={false}
         onRemove={vi.fn()}
@@ -29,7 +29,7 @@ describe("ApiKeyForm", () => {
   it("AC-76: does not call onSave when the input is empty", async () => {
     const onSave = vi.fn();
     const user = userEvent.setup();
-    renderWithQueryClient(
+    renderWithClient(
       <ApiKeyForm
         hasKey={false}
         onRemove={vi.fn()}
@@ -46,7 +46,7 @@ describe("ApiKeyForm", () => {
   });
 
   it("AC-76: shows Update/Remove instead of Save when a key already exists", () => {
-    renderWithQueryClient(
+    renderWithClient(
       <ApiKeyForm
         hasKey={true}
         onRemove={vi.fn()}
@@ -64,7 +64,7 @@ describe("ApiKeyForm", () => {
   it("AC-87: clicking Remove calls onRemove", async () => {
     const onRemove = vi.fn();
     const user = userEvent.setup();
-    renderWithQueryClient(
+    renderWithClient(
       <ApiKeyForm
         hasKey={true}
         onRemove={onRemove}

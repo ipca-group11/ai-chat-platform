@@ -1,0 +1,48 @@
+$ pnpm --dir packages/shared-types exec vitest run src/__fixtures__/dto-snapshots.test.ts
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/shared-types
+
+ ❯ src/__fixtures__/dto-snapshots.test.ts (11 tests | 1 failed) 14ms
+   ❯ DTO snapshots (9)
+     × chat 2ms
+
+  Snapshots  1 failed
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  17:25:48
+   Duration  208ms (import 43%, transform 30%, worker 15%, tests 12%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__fixtures__/dto-snapshots.test.ts > DTO snapshots > chat
+Error: Snapshot `DTO snapshots > chat 1` mismatched
+
+- Expected
++ Received
+
+@@ -1,10 +1,11 @@
+  {
+    "createdAt": "<date>",
+    "id": "<uuid>",
+    "model": "claude-haiku-4-5",
+    "ownerId": "<uuid>",
++   "pinned": false,
+    "provider": "anthropic",
+    "reasoning": false,
+    "title": "Weekly planning",
+    "updatedAt": "<date>",
+    "webFetch": true,
+
+ ❯ src/__fixtures__/dto-snapshots.test.ts:48:61
+     46|
+     47|   it("chat", () => {
+     48|     expect(fixtures.chat.schema.parse(fixtures.chat.input)).toMatchInl…
+       |                                                             ^
+     49|       {
+     50|         "createdAt": "<date>",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

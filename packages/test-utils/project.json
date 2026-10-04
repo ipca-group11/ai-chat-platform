@@ -1,0 +1,28 @@
+{
+  "name": "test-utils",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/test-utils/src",
+  "projectType": "library",
+  "tags": ["scope:shared", "type:package"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint src --max-warnings=0", "cwd": "packages/test-utils" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc -p tsconfig.json --noEmit", "cwd": "packages/test-utils" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --coverage", "cwd": "packages/test-utils" }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'test-utils ships TypeScript source used by Vitest; nothing to build'",
+        "cwd": "packages/test-utils"
+      }
+    }
+  }
+}

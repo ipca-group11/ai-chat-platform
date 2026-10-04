@@ -1,0 +1,9 @@
+$ cd testing/mock-server && (PORT=4110 TOKENS=12 TOKEN_INTERVAL_MS=40 TTFT_MS=200 npx tsx src/main.ts > /dev/null & PID=$!; sleep 3; echo '--- model suffix'; curl -s localhost:4110/openai/v1/chat/completions -H content-type:application/json -d '{"model":"gpt-4o@max-tokens","messages":[]}' | jq -c '{model, finish: .choices[0].finish_reason}'; echo '--- same SEED, same answer'; for i in 1 2 3; do curl -s localhost:4110/openai/v1/chat/completions -H content-type:application/json -d '{"messages":[]}' | jq -r '.choices[0].message.content'; done; kill $PID)
+--- model suffix
+{"model":"gpt-4o","finish":"length"}
+--- same SEED, same answer
+As arrives tests is repeatable can that change picked seed to stay.
+As arrives tests is repeatable can that change picked seed to stay.
+As arrives tests is repeatable can that change picked seed to stay.
+
+[exit 0]

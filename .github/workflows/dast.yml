@@ -1,0 +1,167 @@
+# DAST with OWASP ZAP (AICHAT-28). Starts the compose stack with the LLM mock (same steps as e2e.yml, without
+# Playwright) and scans it with the pinned zaproxy/zap-stable image through testing/zap/run.sh.
+#
+# baseline  zap-baseline.py with the AJAX spider, signed in as a seeded user. Rules: testing/zap/rules.tsv.
+#           A rule set to FAIL (High risk) fails the job (FAIL_ACTION=true); Medium only warns.
+#
+# api-scan  zap-api-scan.py, an active scan of the REST API from testing/zap/openapi.yaml (a small spec written from the
+#           Express routes; the AICHAT-12 spec replaces it). Runs weekly (Monday 04:00 UTC) and on demand, never on a pull
+#           request: an active scan sends attack payloads and creates data, so it only ever targets this throw-away stack.
+#
+# Required check: the job is named "dast / baseline". Branch protection is not available on this private
+# free-plan repository (HTTP 403), so the team rule is: do not merge into main while "dast / baseline" is red.
+# Production is never scanned.
+name: dast
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [integration/testing-epics, main]
+  workflow_dispatch: {}
+  # Only the api-scan job runs on the schedule.
+  schedule:
+    - cron: "0 4 * * 1"
+
+concurrency:
+  group: dast-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Pinned: a newer image brings new rules and changes the findings, so bump it on purpose.
+  ZAP_IMAGE: zaproxy/zap-stable:2.17.0
+  # The signed-in scan injects the access token cookie; a longer lifetime than the default 15 minutes
+  # keeps the scan signed in to the end.
+  ACCESS_TOKEN_TTL_SECONDS: "3600"
+  # The LLM mock accepts any key; this value is a placeholder, not a secret.
+  ANTHROPIC_API_KEY: mock-key-not-a-secret
+
+jobs:
+  baseline:
+    name: baseline
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      # true: exit code 1 of ZAP (a FAIL rule matched) fails the job. false only reports.
+      FAIL_ACTION: "true"
+      ZAP_RESULTS: zap-results
+    steps:
+      # Building every app image fills the runner's ~14 GB free disk; drop preinstalled SDKs this job never uses.
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost && df -h /
+
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      # The helper scripts (scripts/dast/*.ts) run on Node's built-in TypeScript support, so the runner needs the pinned Node.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Start docker compose stack (profile llm)
+        run: pnpm mock:up
+
+      # Bounded poll of the three entry points; fails after about five minutes instead of hanging.
+      - name: Wait for the stack to become healthy
+        run: |
+          for url in http://localhost:8000/ http://localhost:4001/health http://localhost:4002/health; do
+            ok=0
+            for _ in $(seq 1 60); do
+              if curl -fsS -o /dev/null "$url"; then ok=1; break; fi
+              sleep 5
+            done
+            [ "$ok" = "1" ] || { echo "not healthy: $url"; exit 1; }
+          done
+
+      - name: Pull the ZAP image
+        run: docker pull "$ZAP_IMAGE"
+
+      # Signs in the seeded user, injects its cookie, scans, writes the report and fails on a High alert.
+      - name: ZAP baseline scan (signed in)
+        run: bash testing/zap/run.sh baseline
+
+      - name: Upload ZAP reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: |
+            zap-results/baseline.html
+            zap-results/baseline.json
+            zap-results/baseline.md
+            zap-results/baseline.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Tear down docker compose stack
+        if: always()
+        run: pnpm mock:down
+
+  api-scan:
+    name: api-scan
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      # true: exit code 1 of ZAP (a FAIL rule matched) fails the job. false only reports.
+      FAIL_ACTION: "true"
+      ZAP_RESULTS: zap-results
+      ZAP_MINUTES: "15"
+      DAST_EMAIL: dast-api@dast.example.com
+    steps:
+      # Building every app image fills the runner's ~14 GB free disk; drop preinstalled SDKs this job never uses.
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost && df -h /
+
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      # The helper scripts (scripts/dast/*.ts) run on Node's built-in TypeScript support, so the runner needs the pinned Node.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Start docker compose stack (profile llm)
+        run: pnpm mock:up
+
+      # Bounded poll of the three entry points; fails after about five minutes instead of hanging.
+      - name: Wait for the stack to become healthy
+        run: |
+          for url in http://localhost:8000/ http://localhost:4001/health http://localhost:4002/health; do
+            ok=0
+            for _ in $(seq 1 60); do
+              if curl -fsS -o /dev/null "$url"; then ok=1; break; fi
+              sleep 5
+            done
+            [ "$ok" = "1" ] || { echo "not healthy: $url"; exit 1; }
+          done
+
+      - name: Pull the ZAP image
+        run: docker pull "$ZAP_IMAGE"
+
+      # Signs in the seeded user, injects its cookie, attacks every route of the OpenAPI file and fails on a High alert.
+      - name: ZAP API scan from the OpenAPI file (signed in)
+        run: bash testing/zap/run.sh api
+
+      - name: Upload ZAP reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-api-report
+          path: |
+            zap-results/api.html
+            zap-results/api.json
+            zap-results/api.md
+            zap-results/api.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Tear down docker compose stack
+        if: always()
+        run: pnpm mock:down

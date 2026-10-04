@@ -14,4 +14,5 @@ data
 services/*/src/generated
 apps/*/.mf
 e2e
-testing
+testing/*
+!testing/mock-server

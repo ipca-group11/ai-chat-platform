@@ -24,3 +24,11 @@ scrape_configs:
   - job_name: prometheus
     static_configs:
       - targets: ["localhost:9090"]
+
+  # Container CPU and memory during a load run (AICHAT-24): scripts/load/docker-stats-sampler.ts
+  # --serve 9105 runs on the host and serves the `docker stats` numbers. Without a run this
+  # target is simply down.
+  - job_name: load-sampler
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["host.docker.internal:9105"]

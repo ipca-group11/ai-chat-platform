@@ -1,0 +1,28 @@
+$ cd testing/mock-server && npx vitest run --coverage
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/testing/mock-server
+      Coverage enabled with v8
+
+
+ Test Files  7 passed (7)
+      Tests  59 passed (59)
+   Start at  13:02:08
+   Duration  575ms (import 37%, transform 32%, tests 21%, worker 9%)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   99.52 |       96 |     100 |     100 |                   
+ src/data          |   99.02 |     93.1 |     100 |     100 |                   
+  datasets.ts      |   98.52 |       80 |     100 |     100 | 40,92             
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 99.52% ( 211/212 )
+Branches     : 96% ( 48/50 )
+Functions    : 100% ( 64/64 )
+Lines        : 100% ( 190/190 )
+================================================================================
+
+[exit 0]

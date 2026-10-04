@@ -1,0 +1,16 @@
+$ cd testing/promptfoo && ./node_modules/.bin/vitest run --coverage 2>&1 | grep -E "✓|Test Files|Tests|All files|\.ts " 
+ Test Files  12 passed (12)
+      Tests  88 passed (88)
+All files        |   95.95 |    88.75 |     100 |   96.52 |                   
+ assertions.ts   |     100 |    93.75 |     100 |     100 | 36                
+ attacks.ts      |     100 |    83.33 |     100 |     100 | 131               
+ budget.ts       |     100 |    95.65 |     100 |     100 | 39                
+ client.ts       |   95.18 |    89.33 |     100 |   98.41 | 176               
+ mock-grader.ts  |     100 |    91.66 |     100 |     100 | 25                
+ provider.ts     |     100 |    96.29 |     100 |     100 | 71                
+ report-cli.ts   |      50 |       50 |     100 |   57.14 | 15-17             
+ report.ts       |     100 |    93.33 |     100 |     100 | 46-47             
+ scenario.ts     |     100 |    86.66 |     100 |     100 | 35,97             
+ sse.ts          |     100 |       90 |     100 |     100 | 35                
+
+[exit 0]

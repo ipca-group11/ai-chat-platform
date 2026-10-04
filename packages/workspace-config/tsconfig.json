@@ -1,0 +1,32 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@app/shared-types/model-capabilities": [
+        "../shared-types/src/model-capabilities.ts"
+      ],
+      "@parity/mfe-chat/*": [
+        "../../apps/mfe-chat/src/*"
+      ],
+      "@parity/conversation-service/*": [
+        "../../services/conversation-service/src/*"
+      ]
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": [
+    "*.ts",
+    "src/**/*.ts"
+  ]
+}

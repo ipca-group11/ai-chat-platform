@@ -1,0 +1,13 @@
+$ cd apps/shell && pnpm exec nx test shell --skip-nx-cache 2>&1 | grep -E 'Test Files|Tests |Statements|Branches|Lines'; pnpm exec vitest run src/features/remote-loader/mockRemotes.test.tsx --reporter=verbose 2>&1 | grep -E '✓|×|Tests'
+ Test Files  8 passed (8)
+      Tests  27 passed (27)
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+Statements   : 68.71% ( 112/163 )
+Branches     : 60.97% ( 75/123 )
+Lines        : 70.51% ( 110/156 )
+ ✓ src/features/remote-loader/mockRemotes.test.tsx > RemoteFallback with the mock server remotes > shows the RemoteFallback when the remote is "404" 380ms
+ ✓ src/features/remote-loader/mockRemotes.test.tsx > RemoteFallback with the mock server remotes > shows the RemoteFallback when the remote is "broken-js" 311ms
+ ✓ src/features/remote-loader/mockRemotes.test.tsx > RemoteFallback with the mock server remotes > renders the remote, without a fallback, when it is "ok" 305ms
+      Tests  3 passed (3)
+
+[exit 0]

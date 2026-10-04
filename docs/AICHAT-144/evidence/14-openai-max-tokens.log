@@ -1,0 +1,9 @@
+$ cd testing/mock-server && (PORT=4110 TOKENS=12 TOKEN_INTERVAL_MS=40 TTFT_MS=200 npx tsx src/main.ts > /dev/null & PID=$!; sleep 3; curl -sN localhost:4110/openai/v1/chat/completions -H content-type:application/json -H 'X-Mock-Scenario: max-tokens' -d '{"model":"gpt-4o","stream":true,"messages":[{"role":"user","content":"hi"}]}' | tail -n 6 | sed -E 's/.*("model".*)/\1/'; kill $PID)
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{"content":"the."},"finish_reason":null}]}
+
+"model":"gpt-4o","system_fingerprint":"fp_mock","choices":[{"index":0,"delta":{},"finish_reason":"length"}]}
+
+data: [DONE]
+
+
+[exit 0]

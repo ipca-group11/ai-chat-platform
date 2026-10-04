@@ -1,41 +1,32 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
+import { TEST_JWT_SECRET, tokenFor } from "../../test-utils/auth-token.js";
 import { authMiddleware } from "../../shared/auth-middleware.js";
 import { errorHandler, notFoundHandler } from "../../shared/error-handler.js";
 import { FakeAttachmentsRepository } from "../../test-utils/fake-attachments-repository.js";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
 import { FakeMessagesRepository } from "../../test-utils/fake-messages-repository.js";
+import { fakeProviderRegistry } from "../../test-utils/fake-provider-registry.js";
 import { FakeStorage } from "../../test-utils/fake-storage.js";
 import { ChatsService } from "../chats/index.js";
-import type { ProviderRegistry, LlmProvider } from "../llm-adapters/index.js";
 import { AttachmentsService } from "./service.js";
 import { createAttachmentsRouter } from "./routes.js";
 import { asUser } from "../../test-utils/principal.js";
 
-const JWT_SECRET = "test-secret";
-
-function tokenFor(userId: string): string {
-  return jwt.sign({ sub: userId, email: `${userId}@example.com` }, JWT_SECRET, { expiresIn: "15m" });
-}
-
-function fakeProvider(): LlmProvider {
-  return { id: "anthropic", supportsVision: () => true, supportsReasoning: () => false, supportsWebFetch: () => false, async *sendMessage() {} };
-}
 
 function buildApp() {
   const chatsService = new ChatsService(new FakeChatsRepository());
   const messagesRepo = new FakeMessagesRepository();
   const attachmentsRepo = new FakeAttachmentsRepository();
   const storage = new FakeStorage();
-  const registry: ProviderRegistry = { get: () => fakeProvider() };
+  const registry = fakeProviderRegistry();
   const service = new AttachmentsService(attachmentsRepo, chatsService, messagesRepo, storage, registry, 10 * 1024 * 1024);
 
   const app = express();
   app.use(cookieParser());
-  app.use(authMiddleware(JWT_SECRET));
+  app.use(authMiddleware(TEST_JWT_SECRET));
   app.use("/chats", createAttachmentsRouter(service, 12 * 1024 * 1024));
   app.use(notFoundHandler);
   app.use(errorHandler);

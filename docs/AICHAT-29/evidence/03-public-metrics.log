@@ -1,0 +1,13 @@
+$ echo '== auth /metrics (no auth) =='; curl -s http://127.0.0.1:4001/metrics | head -4; echo '== conversation /metrics (no auth) =='; curl -s http://127.0.0.1:4002/metrics | head -4
+== auth /metrics (no auth) ==
+# HELP http_requests_total Total HTTP requests
+# TYPE http_requests_total counter
+http_requests_total{method="GET",route="/health",status="200"} 8
+http_requests_total{method="POST",route="/auth/register",status="201"} 8
+== conversation /metrics (no auth) ==
+# HELP process_cpu_user_seconds_total Total user CPU time spent in seconds.
+# TYPE process_cpu_user_seconds_total counter
+process_cpu_user_seconds_total 0.306895
+
+
+[exit 0]

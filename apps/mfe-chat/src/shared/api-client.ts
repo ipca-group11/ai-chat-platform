@@ -37,7 +37,7 @@ export function readLlmApiKey(userId: string, provider: Provider): string | null
   // `llm-api-key:*` in localStorage is only a masked record (last 4 chars) for display;
   // the usable key is kept per tab session (`@app/shared-types/api-keys`
   // `buildSessionApiKeyStorageKey`).
-  if (typeof sessionStorage === "undefined") return null;
+  if (provider === "ollama" || typeof sessionStorage === "undefined") return null;
   return sessionStorage.getItem(`llm-api-key-session:${userId}:${provider}`);
 }
 

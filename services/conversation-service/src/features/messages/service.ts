@@ -10,6 +10,7 @@ import {
   type MessageStatus,
   type WebFetchDto,
 } from "../../shared/contracts/chat.js";
+import type { FileCleanup } from "../attachments/index.js";
 import type { ChatsService } from "../chats/index.js";
 import type { QueueManager } from "../queue/index.js";
 import type { ChatEventBus } from "../streaming/index.js";
@@ -109,6 +110,7 @@ export class MessagesService {
     private readonly chatsService: ChatsService,
     private readonly queueManager: QueueManager,
     private readonly bus: ChatEventBus,
+    private readonly files?: FileCleanup,
   ) {}
 
   /** AC-43/55: full chat history, restored on reload/relogin. */
@@ -171,7 +173,9 @@ export class MessagesService {
     if (!ok) {
       throw new HttpError(409, "MESSAGE_NOT_CANCELABLE", "Message is not queued and can no longer be canceled");
     }
+    const storagePaths = (await this.files?.collectForMessage(messageId)) ?? [];
     await this.repo.delete(messageId);
+    await this.files?.remove(storagePaths);
   }
 
   /** AC-54: stop the in-progress stream for a chat; the partial response is saved by the

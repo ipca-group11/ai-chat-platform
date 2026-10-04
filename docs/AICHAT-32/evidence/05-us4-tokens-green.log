@@ -1,0 +1,21 @@
+$ pnpm -r --no-bail --filter @app/auth-service --filter @app/conversation-service exec vitest run src/integration/session-tokens-in-logs.spec.ts
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:28:52
+   Duration  439ms (import 43%, transform 41%, tests 11%, worker 5%)
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:28:52
+   Duration  946ms (tests 67%, import 19%, transform 12%, worker 2%)
+
+
+[exit 0]

@@ -17,8 +17,7 @@
       "!{projectRoot}/**/*.spec.tsx",
       "!{projectRoot}/**/*.test.tsx",
       "!{projectRoot}/vitest.config.ts",
-      "!{projectRoot}/eslint.config.js",
-      "!{projectRoot}/eslint.config.mjs"
+      "!{projectRoot}/eslint.config.ts"
     ]
   },
   "targetDefaults": {
@@ -64,6 +63,11 @@
       "outputs": [
         "{projectRoot}/coverage"
       ],
+      "cache": true
+    },
+    "size": {
+      "dependsOn": ["build"],
+      "inputs": ["default", "^production"],
       "cache": true
     },
     "serve": {

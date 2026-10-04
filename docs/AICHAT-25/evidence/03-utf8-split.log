@@ -1,0 +1,20 @@
+$ cd services/conversation-service && npx vitest run src/test-utils/replay.spec.ts -t UTF-8 --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ↓ src/test-utils/replay.spec.ts > splitBytes > cuts into uneven chunks that cycle through the sizes and rejoin to the same bytes
+ ↓ src/test-utils/replay.spec.ts > splitBytes > rejects empty or non-positive sizes
+ ↓ src/test-utils/replay.spec.ts > splitAtOffsets > cuts at the given offsets and skips empty pieces
+ ↓ src/test-utils/replay.spec.ts > splitAtOffsets > rejects offsets outside the body
+ ✓ src/test-utils/replay.spec.ts > UTF-8 split across chunks > decodes the text intact when the cut falls on every possible byte offset 17ms
+ ✓ src/test-utils/replay.spec.ts > UTF-8 split across chunks > decodes the text intact when the body arrives one byte at a time 0ms
+ ✓ src/test-utils/replay.spec.ts > UTF-8 split across chunks > streams multi-byte text through the Anthropic adapter when a character is split 1ms
+ ↓ src/test-utils/replay.spec.ts > replayFetch > answers in order, records the parsed request bodies and fails when it runs out
+
+ Test Files  1 passed (1)
+      Tests  3 passed | 5 skipped (8)
+   Start at  12:49:20
+   Duration  145ms (transform 51%, tests 29%, import 11%, setup 5%, worker 3%)
+
+
+[exit 0]

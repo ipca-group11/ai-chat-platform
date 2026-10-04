@@ -1,0 +1,30 @@
+$ scripts/ci/semgrep.sh 2>/dev/null; node scripts/ci/sast-summary.mjs semgrep-results/semgrep.sarif | cut -c1-200
+semgrep exit code: 0 (results in semgrep-results/)
+### SAST (Semgrep CE)
+**24 ERROR finding(s): the merge is blocked.**
+ERROR: 24, WARNING: 34, INFO: 13. Only ERROR blocks; the rest is reported.
+
+| Rule | Severity | Count | Locations |
+|---|---|---|---|
+| `ajinabraham.njsscan.generic.hardcoded_secrets.node_secret` | ERROR | 11 | `services/auth-service/src/shared/jwt.spec.ts:5`, `services/auth-service/src/shared/jwt.spec.ts:6`, `services/auth-service/
+| `ajinabraham.njsscan.generic.hardcoded_secrets.node_api_key` | ERROR | 6 | `apps/mfe-chat/src/shared/types.ts:127`, `e2e/src/fixtures/settings-flows.ts:33`, `packages/shared-types/src/api-keys/schem
+| `ajinabraham.njsscan.generic.hardcoded_secrets.node_password` | ERROR | 2 | `e2e/src/fixtures/test-users.ts:11`, `e2e/src/fixtures/test-users.ts:14` |
+| `dockerfile.security.missing-user.missing-user` | ERROR | 2 | `observability/alloy.Dockerfile:6`, `observability/loki.Dockerfile:6` |
+| `aichat.secret-env-fallback-literal` | ERROR | 1 | `e2e/src/fixtures/settings-flows.ts:25` |
+| `aichat.secret-with-literal-default-zod` | ERROR | 1 | `services/conversation-service/src/shared/env.ts:7` |
+| `generic.secrets.security.detected-bcrypt-hash.detected-bcrypt-hash` | ERROR | 1 | `services/auth-service/src/features/session/model.ts:52` |
+| `yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag` | WARNING | 14 | `.github/workflows/ci.yml:23`, `.github/workflows/ci.yml:27`, `.github/workflows/c
+| `javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret` | WARNING | 10 | `services/auth-service/src/shared/jwt.spec.ts:21`, `services/auth-service/src/shared/jwt.spec.ts:48`, `services/
+| `ajinabraham.njsscan.crypto.crypto_node.node_insecure_random_generator` | WARNING | 6 | `apps/mfe-auth/src/shared/correlation.ts:16`, `apps/mfe-chat/src/features/attachments/hooks/usePendingAttachme
+| `package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age` | WARNING | 1 | `.npmrc:1` |
+| `package_managers.pnpm.pnpm-block-exotic-sub-dependencies.pnpm-block-exotic-sub-dependencies` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `package_managers.pnpm.pnpm-missing-minimum-release-age.pnpm-minimum-release-age` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `package_managers.pnpm.pnpm-trust-policy.pnpm-trust-policy` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_x_powered_by` | INFO | 3 | `services/auth-service/src/main.ts:28`, `services/auth-service/src/main.ts:29`, `services/conversation-service/s
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_dns_prefetch` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_hsts` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_ienoopen` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_nosniff` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+| `ajinabraham.njsscan.good.good_helmet_checks.helmet_header_xss_filter` | INFO | 2 | `services/auth-service/src/main.ts:29`, `services/conversation-service/src/app.ts:26` |
+
+[exit 0]

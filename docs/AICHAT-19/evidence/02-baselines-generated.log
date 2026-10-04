@@ -1,0 +1,55 @@
+$ rm e2e/src/visual/__screenshots__/visual/*.png && pnpm --filter e2e run visual:update && ls e2e/src/visual/__screenshots__/visual | wc -l && git status --short e2e/src/visual/__screenshots__ && echo "no baseline differs from the committed ones"
+
+> e2e@0.0.0 visual:update /Users/truezone/Projects/ai-chat-platform/e2e
+> docker run --rm --ipc=host -v "$(cd .. && pwd)":/work -w /work/e2e mcr.microsoft.com/playwright:v1.63.0-noble npx playwright test --project=visual --reporter=list --update-snapshots
+
+
+Running 18 tests using 1 worker
+
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/login-light.png, writing actual.
+  ✓   1 [visual] › src/visual/screens.spec.ts:117:5 › login (light) (1.3s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/login-dark.png, writing actual.
+  ✓   2 [visual] › src/visual/screens.spec.ts:117:5 › login (dark) (1.3s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/login-validation-error-light.png, writing actual.
+  ✓   3 [visual] › src/visual/screens.spec.ts:117:5 › login-validation-error (light) (1.2s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/login-validation-error-dark.png, writing actual.
+  ✓   4 [visual] › src/visual/screens.spec.ts:117:5 › login-validation-error (dark) (1.2s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/register-light.png, writing actual.
+  ✓   5 [visual] › src/visual/screens.spec.ts:117:5 › register (light) (1.4s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/register-dark.png, writing actual.
+  ✓   6 [visual] › src/visual/screens.spec.ts:117:5 › register (dark) (1.6s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/chat-list-empty-light.png, writing actual.
+  ✓   7 [visual] › src/visual/screens.spec.ts:117:5 › chat-list-empty (light) (1.5s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/chat-list-empty-dark.png, writing actual.
+  ✓   8 [visual] › src/visual/screens.spec.ts:117:5 › chat-list-empty (dark) (1.6s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/chat-list-light.png, writing actual.
+  ✓   9 [visual] › src/visual/screens.spec.ts:117:5 › chat-list (light) (1.7s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/chat-list-dark.png, writing actual.
+  ✓  10 [visual] › src/visual/screens.spec.ts:117:5 › chat-list (dark) (1.5s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/chat-detail-light.png, writing actual.
+  ✓  11 [visual] › src/visual/screens.spec.ts:117:5 › chat-detail (light) (1.5s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/chat-detail-dark.png, writing actual.
+  ✓  12 [visual] › src/visual/screens.spec.ts:117:5 › chat-detail (dark) (1.5s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/new-chat-dialog-light.png, writing actual.
+  ✓  13 [visual] › src/visual/screens.spec.ts:117:5 › new-chat-dialog (light) (1.5s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/new-chat-dialog-dark.png, writing actual.
+  ✓  14 [visual] › src/visual/screens.spec.ts:117:5 › new-chat-dialog (dark) (1.5s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/settings-api-keys-light.png, writing actual.
+  ✓  15 [visual] › src/visual/screens.spec.ts:117:5 › settings-api-keys (light) (1.5s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/settings-api-keys-dark.png, writing actual.
+  ✓  16 [visual] › src/visual/screens.spec.ts:117:5 › settings-api-keys (dark) (1.5s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/remote-failure-fallback-light.png, writing actual.
+  ✓  17 [visual] › src/visual/screens.spec.ts:117:5 › remote-failure-fallback (light) (1.2s)
+A snapshot doesn't exist at /work/e2e/src/visual/__screenshots__/visual/remote-failure-fallback-dark.png, writing actual.
+  ✓  18 [visual] › src/visual/screens.spec.ts:117:5 › remote-failure-fallback (dark) (1.2s)
+
+  18 passed (27.0s)
+      18
+no baseline differs from the committed ones
+npm notice
+npm notice New major version of npm available! 11.19.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+
+[exit 0]

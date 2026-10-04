@@ -2,9 +2,9 @@ import http from "node:http";
 import type { AddressInfo } from "node:net";
 import express from "express";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
 import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
+import { TEST_JWT_SECRET, tokenFor } from "../../test-utils/auth-token.js";
 import { authMiddleware } from "../../shared/auth-middleware.js";
 import { errorHandler, notFoundHandler } from "../../shared/error-handler.js";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
@@ -13,11 +13,6 @@ import { ChatEventBus } from "./sse.js";
 import { createStreamingRouter } from "./routes.js";
 import { asUser } from "../../test-utils/principal.js";
 
-const JWT_SECRET = "test-secret";
-
-function tokenFor(userId: string): string {
-  return jwt.sign({ sub: userId, email: `${userId}@example.com` }, JWT_SECRET, { expiresIn: "15m" });
-}
 
 function buildApp() {
   const repo = new FakeChatsRepository();
@@ -25,7 +20,7 @@ function buildApp() {
   const bus = new ChatEventBus();
   const app = express();
   app.use(cookieParser());
-  app.use(authMiddleware(JWT_SECRET));
+  app.use(authMiddleware(TEST_JWT_SECRET));
   app.use("/chats", createStreamingRouter(chatsService, bus));
   app.use(notFoundHandler);
   app.use(errorHandler);
@@ -41,7 +36,7 @@ describe("streaming routes", () => {
 
   it("AC-46: user B opening user A's chat stream receives 403 or 404", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-a"), { title: "A's chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-a"), { title: "A's chat", provider: "ollama", model: "llama3.2:1b" });
     const tokenB = tokenFor("user-b");
 
     const res = await request(app).get(`/chats/${chat.id}/stream`).set("Cookie", [`access_token=${tokenB}`]);
@@ -52,12 +47,12 @@ describe("streaming routes", () => {
   it("AC-52: an authenticated owner receives events published for their chat over SSE", async () => {
     const { chatsService } = buildApp();
     const bus = new ChatEventBus();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const token = tokenFor("user-1");
 
     const streamApp = express();
     streamApp.use(cookieParser());
-    streamApp.use(authMiddleware(JWT_SECRET));
+    streamApp.use(authMiddleware(TEST_JWT_SECRET));
     streamApp.use("/chats", createStreamingRouter(chatsService, bus));
 
     const server = streamApp.listen(0);
@@ -104,7 +99,7 @@ describe("streaming routes", () => {
 
     const streamApp = express();
     streamApp.use(cookieParser());
-    streamApp.use(authMiddleware(JWT_SECRET));
+    streamApp.use(authMiddleware(TEST_JWT_SECRET));
     streamApp.use("/chats", createStreamingRouter(chatsService, bus, counter));
 
     const server = streamApp.listen(0);

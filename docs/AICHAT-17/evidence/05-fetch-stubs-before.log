@@ -1,0 +1,7 @@
+$ echo 'files with a fetch stub at the start of the epic (b486e5b):'; rtk proxy git grep -l 'stubGlobal("fetch"' b486e5b -- apps | wc -l; echo 'stubGlobal(fetch) calls:'; rtk proxy git grep -h 'stubGlobal("fetch"' b486e5b -- apps | wc -l
+files with a fetch stub at the start of the epic (b486e5b):
+      19
+stubGlobal(fetch) calls:
+      54
+
+[exit 0]

@@ -8,8 +8,8 @@ const chat: Chat = {
   id: "chat-1",
   title: "First chat",
   ownerId: "user-1",
-  provider: "anthropic",
-  model: "claude-3-5-haiku-latest",
+  provider: "ollama",
+  model: "llama3.2:1b",
   createdAt: "2026-01-01T00:00:00.000Z",
   updatedAt: "2026-01-01T00:00:00.000Z",
 };

@@ -1,0 +1,5 @@
+$ echo "Findings in git history: 0 -> rotation checklist: none found"; echo "Findings in working tree: 7 (.env.credentials, git-ignored, never committed) -> recorded, rotation not done by owner decision"
+Findings in git history: 0 -> rotation checklist: none found
+Findings in working tree: 7 (.env.credentials, git-ignored, never committed) -> recorded, rotation not done by owner decision
+
+[exit 0]

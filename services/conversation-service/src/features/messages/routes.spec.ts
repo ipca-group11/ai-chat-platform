@@ -1,36 +1,31 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
 import request from "supertest";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
+import { TEST_JWT_SECRET, tokenFor } from "../../test-utils/auth-token.js";
 import { authMiddleware } from "../../shared/auth-middleware.js";
 import { errorHandler, notFoundHandler } from "../../shared/error-handler.js";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
+import { createFakeQueue } from "../../test-utils/fake-queue.js";
 import { FakeMessagesRepository } from "../../test-utils/fake-messages-repository.js";
 import { ChatsService } from "../chats/index.js";
-import { QueueManager } from "../queue/index.js";
 import { ChatEventBus } from "../streaming/index.js";
 import { MessagesService } from "./service.js";
 import { createMessagesRouter } from "./routes.js";
 import { asUser } from "../../test-utils/principal.js";
 
-const JWT_SECRET = "test-secret";
-
-function tokenFor(userId: string): string {
-  return jwt.sign({ sub: userId, email: `${userId}@example.com` }, JWT_SECRET, { expiresIn: "15m" });
-}
 
 function buildApp() {
   const chatsService = new ChatsService(new FakeChatsRepository());
   const messagesRepo = new FakeMessagesRepository();
-  const queueManager = new QueueManager(vi.fn().mockReturnValue(new Promise(() => {})));
+  const queueManager = createFakeQueue();
   const bus = new ChatEventBus();
   const service = new MessagesService(messagesRepo, chatsService, queueManager, bus);
 
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
-  app.use(authMiddleware(JWT_SECRET));
+  app.use(authMiddleware(TEST_JWT_SECRET));
   app.use("/chats", createMessagesRouter(service));
   app.use(notFoundHandler);
   app.use(errorHandler);
@@ -46,7 +41,7 @@ describe("messages routes", () => {
 
   it("AC-51: an authenticated user can send a message and see it in the list", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const token = tokenFor("user-1");
 
     const sendRes = await request(app)
@@ -62,7 +57,7 @@ describe("messages routes", () => {
 
   it("AC-46: user B sending a message to user A's chat receives 403 or 404", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-a"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-a"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const tokenB = tokenFor("user-b");
 
     const res = await request(app)
@@ -75,7 +70,7 @@ describe("messages routes", () => {
 
   it("AC-58: a queued message can be edited and canceled via the API", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const token = tokenFor("user-1");
 
     await request(app)
@@ -103,7 +98,7 @@ describe("messages routes", () => {
 
   it("AC-54: stop reports whether an in-progress stream was stopped", async () => {
     const { app, chatsService } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const token = tokenFor("user-1");
 
     await request(app)
@@ -118,7 +113,7 @@ describe("messages routes", () => {
 
   it("AC-73: a failed message can be retried via the API", async () => {
     const { app, chatsService, messagesRepo } = buildApp();
-    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+    const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
     const failed = await messagesRepo.create({
       chatId: chat.id,
       ownerId: "user-1",

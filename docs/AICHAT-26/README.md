@@ -75,7 +75,7 @@ assistant **leak its system prompt** or **misuse its tools** (web fetch). Run a 
 1. **Decide the system prompt question** with the team: real system prompt, or a test-only canary (`SYSTEM_PROMPT_CANARY` env, only in the test stack).
 2. Define the attack set (§5) and host the attack pages (GitHub Pages repo or a static site reachable from the internet, since Anthropic fetches them).
 3. Write `testing/promptfoo/promptfooconfig.yaml`:
-   - target: **HTTP provider** that calls a small wrapper script (`testing/promptfoo/target.mjs`) doing login → create chat (web fetch on) → optional upload → send → collect SSE until `done`, returning the answer text plus the list of fetched URLs.
+   - target: **HTTP provider** that calls a small wrapper script (`testing/promptfoo/target.ts`) doing login → create chat (web fetch on) → optional upload → send → collect SSE until `done`, returning the answer text plus the list of fetched URLs.
    - `redteam.plugins`: `indirect-prompt-injection`, `prompt-extraction`, `excessive-agency`; custom tests for A1–A8.
    - assertions: `not-contains: <canary>`, `javascript` assertion over fetched URLs (no attacker domain), `llm-rubric` for "did it follow the injected instruction?".
 4. Budget guard: a cheap model (e.g. `claude-haiku-4-5`), capped number of tests, run weekly.

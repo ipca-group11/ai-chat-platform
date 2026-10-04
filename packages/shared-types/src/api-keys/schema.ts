@@ -3,9 +3,9 @@ import { z } from "zod";
 /**
  * Providers supported by the LLM configuration feature (FR17-FR20, US-23..US-26).
  *
- * Both `openai` and `anthropic` require an API key.
+ * `ollama` never requires an API key; `openai` and `anthropic` do.
  */
-export const providerSchema = z.enum(["openai", "anthropic"]);
+export const providerSchema = z.enum(["openai", "anthropic", "ollama"]);
 
 export type Provider = z.infer<typeof providerSchema>;
 
@@ -15,7 +15,7 @@ export const PROVIDERS: readonly Provider[] = providerSchema.options;
 export const PROVIDERS_REQUIRING_KEY: readonly Provider[] = ["openai", "anthropic"];
 
 /** Providers that never require an API key (AC-77). */
-export const PROVIDERS_WITHOUT_KEY: readonly Provider[] = [];
+export const PROVIDERS_WITHOUT_KEY: readonly Provider[] = ["ollama"];
 
 /** True when `provider` needs an API key configured before use (AC-77). */
 export function providerRequiresApiKey(provider: Provider): boolean {
@@ -47,4 +47,6 @@ export type StoredApiKeyRecord = z.infer<typeof storedApiKeyRecordSchema>;
  * test-connection). The service must use it once and never persist or log it
  * (AC-81, AC-82, AC-83).
  */
+// HTTP header name, not a secret (WAIVERS.md W2)
+// nosemgrep: node_api_key
 export const LLM_API_KEY_HEADER = "X-Llm-Api-Key";

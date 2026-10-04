@@ -1,0 +1,11 @@
+$ curl -si localhost:4110/remotes/404/remoteEntry.js
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+Content-Length: 22
+ETag: W/"16-ZOGv+UdkS/h5M2hiWS3Vc9n4J08"
+Date: Sat, 03 Oct 2026 12:10:58 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+Remote "404" not found
+[exit 0]

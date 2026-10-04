@@ -1,0 +1,65 @@
+$ pnpm -r --no-bail --filter @app/auth-service --filter @app/conversation-service exec vitest run src/integration/session-tokens-in-logs.spec.ts
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:28:30
+   Duration  518ms (import 50%, transform 36%, tests 9%, worker 4%)
+
+ ❯ src/integration/session-tokens-in-logs.spec.ts (2 tests | 1 failed) 581ms
+   ❯ auth-service logs carry no session token (2)
+     × keeps Set-Cookie, Cookie and the token values out of the log lines 575ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  21:28:30
+   Duration  1.03s (tests 61%, import 25%, transform 12%, worker 2%)
+
+undefined
+ ERR_PNPM_RECURSIVE_FAIL  
+
+
+Summary: 1 fails, 1 passes
+
+/Users/truezone/Projects/ai-chat-platform/services/auth-service:
+ ERROR  Command failed with exit code 1: vitest run src/integration/session-tokens-in-logs.spec.ts
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/session-tokens-in-logs.spec.ts > auth-service logs carry no session token > keeps Set-Cookie, Cookie and the token values out of the log lines
+AssertionError: expected 'token "access_token=eyJhbGciOiJ... (2…' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ token "access_token=eyJhbGciOiJ... (220 characters)" on line 2
++ canary "access_token=eyJhbGciOiJ... (220 characters)" on line 2
++ token "eyJhbGciOiJIUzI1NiIsInR5... (207 characters)" on line 2
++ canary "eyJhbGciOiJIUzI1NiIsInR5... (207 characters)" on line 2
++ token "refresh_token=25225fa684... (142 characters)" on line 2
++ canary "refresh_token=25225fa684... (142 characters)" on line 2
++ canary "25225fa684d6a48c1492bf7e... (128 characters)" on line 2
++ token "access_token=eyJhbGciOiJ... (220 characters)" on line 3
++ canary "access_token=eyJhbGciOiJ... (220 characters)" on line 3
++ token "eyJhbGciOiJIUzI1NiIsInR5... (207 characters)" on line 3
++ canary "eyJhbGciOiJIUzI1NiIsInR5... (207 characters)" on line 3
++ token "refresh_token=9cf916f1a1... (142 characters)" on line 3
++ canary "refresh_token=9cf916f1a1... (142 characters)" on line 3
+
+ ❯ src/integration/session-tokens-in-logs.spec.ts:39:87
+     37|     const lines = logs.lines();
+     38|     expect(lines.length).toBeGreaterThan(0);
+     39|     expect(describePii(findPiiInLines(lines, { canaries, ignore: ["ema…
+       |                                                                                       ^
+     40|     expect(lines.join("\n").toLowerCase()).not.toContain("set-cookie");
+     41|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

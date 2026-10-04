@@ -1,0 +1,21 @@
+$ curl -si localhost:4110/remotes/ok/remoteEntry.js
+HTTP/1.1 200 OK
+Content-Type: application/javascript; charset=utf-8
+Content-Length: 350
+ETag: W/"15e-uPeJkyXaoD0usKZkXqIsIyiEMNY"
+Date: Sat, 03 Oct 2026 12:10:53 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+// mock remote container (mock-server)
+const exposes = {
+  "./routes": async () => ({ default: () => null, __mock: true }),
+};
+export async function init() {}
+export async function get(module) {
+  const factory = exposes[module];
+  if (!factory) throw new Error("Module " + module + " is not exposed by the mock remote");
+  return () => factory();
+}
+
+[exit 0]

@@ -1,0 +1,6 @@
+data: {"id":"chatcmpl-REDACTED","object":"chat.completion.chunk","created":0,"model":"gpt-4o-2024-08-06","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-REDACTED","object":"chat.completion.chunk","created":0,"model":"gpt-4o-2024-08-06","choices":[{"index":0,"delta":{"content":"The answer starts "},"finish_reason":null}]}
+
+data: {"error":{"message":"The server had an error while processing your request. Sorry about that!","type":"server_error","param":null,"code":null}}
+

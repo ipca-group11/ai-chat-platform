@@ -3,29 +3,44 @@
   "private": true,
   "version": "1.0.0",
   "license": "UNLICENSED",
+  "type": "module",
   "engines": {
     "node": ">=24.0.0"
   },
   "packageManager": "pnpm@10.4.0",
   "scripts": {
     "dev": "bash scripts/dev.sh",
+    "dev:mock": "bash scripts/dev-mock.sh",
+    "mock:up": "bash scripts/mock-compose.sh up",
+    "mock:down": "bash scripts/mock-compose.sh down",
+    "load:up": "LOAD=1 bash scripts/mock-compose.sh up llm",
     "nx": "nx",
     "lint": "nx run-many -t lint",
     "typecheck": "nx run-many -t typecheck",
+    "typecheck:scripts": "tsc -p tsconfig.scripts.json",
+    "test:scripts": "node --test \"scripts/**/*.test.ts\"",
     "test": "nx run-many -t test",
     "build": "nx run-many -t build",
     "affected:lint": "nx affected -t lint",
     "affected:typecheck": "nx affected -t typecheck",
     "affected:test": "nx affected -t test",
     "affected:build": "nx affected -t build",
-    "graph": "nx graph"
+    "graph": "nx graph",
+    "hooks:install": "sh scripts/git-hooks/install.sh",
+    "sast": "bash scripts/ci/semgrep.sh semgrep-results && node scripts/ci/sast-summary.ts semgrep-results/semgrep.sarif"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
     "@nx/eslint": "23.2.1",
     "@nx/js": "23.2.1",
     "@nx/workspace": "23.2.1",
+    "@size-limit/file": "^14.1.0",
+    "@types/node": "^24.13.6",
     "eslint": "^10.11.0",
+    "jiti": "^2.7.0",
     "nx": "23.2.1",
+    "puppeteer-core": "^25.12.0",
+    "size-limit": "^14.1.0",
     "typescript": "6.0.3"
   },
   "pnpm": {

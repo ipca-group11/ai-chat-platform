@@ -1,0 +1,30 @@
+$ pnpm --dir packages/shared-types exec vitest run src/__fixtures__/tmp-missing.test.ts
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/shared-types
+
+ ❯ src/__fixtures__/tmp-missing.test.ts (1 test | 1 failed) 4ms
+   × has no stored snapshot 3ms
+
+  Snapshots  1 failed
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  17:25:51
+   Duration  109ms (worker 66%, tests 14%, transform 11%, import 9%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__fixtures__/tmp-missing.test.ts > has no stored snapshot
+Error: Snapshot `has no stored snapshot 1` mismatched
+ ❯ src/__fixtures__/tmp-missing.test.ts:3:20
+      1| import { expect, it } from "vitest";
+      2| it("has no stored snapshot", () => {
+      3|   expect({ a: 1 }).toMatchSnapshot();
+       |                    ^
+      4| });
+      5|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

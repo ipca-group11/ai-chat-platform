@@ -1,0 +1,51 @@
+$ ./.evidence-tmp/32-chat.sh
+$ curl -s -c cookies.txt -X POST localhost:4010/auth/login -H content-type: application/json -d {"email":"alice@mock.test","password":"Mock-pass-1234"}
+{"id":"user_00001","email":"alice@mock.test"}
+$ curl -s -b cookies.txt -X POST localhost:4010/api/chats -H content-type: application/json -d {"title":"Mock demo","provider":"anthropic","model":"claude-sonnet-5-5"}
+{"chat":{"id":"chat_00005","ownerId":"user_00001","title":"Mock demo","provider":"anthropic","model":"claude-sonnet-5-5","reasoning":false,"webFetch":false,"createdAt":"2026-10-03T12:18:08.007Z","updatedAt":"2026-10-03T12:18:08.007Z","ownerEmail":"alice@mock.test"}}
+$ curl -sN -b jar localhost:4010/api/chats/chat_00005/stream   (in the background)
+$ curl -s -b cookies.txt -X POST localhost:4010/api/chats/chat_00005/messages -H content-type: application/json -d {"content":"Hello mock"}
+{"message":{"id":"msg_00011","chatId":"chat_00005","authorId":"user_00001","authorEmail":"alice@mock.test","role":"user","content":"Hello mock","reasoning":null,"webFetches":[],"attachments":[],"status":"sent","error":null,"createdAt":"2026-10-03T12:18:08.533Z"}}event: message
+data: {"type":"message","message":{"id":"msg_00011","chatId":"chat_00005","authorId":"user_00001","authorEmail":"alice@mock.test","role":"user","content":"Hello mock","reasoning":null,"webFetches":[],"attachments":[],"status":"sent","error":null,"createdAt":"2026-10-03T12:18:08.533Z"}}
+
+event: started
+data: {"type":"started","messageId":"msg_00012"}
+
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"Here "}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"is "}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"a "}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"short "}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"summary "}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"of "}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"what "}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"you "}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"asked. "}
+
+event: token
+data: {"type":"token","messageId":"msg_00012","token":"The"}
+
+event: done
+data: {"type":"done","messageId":"msg_00012"}
+
+$ curl -s -b cookies.txt localhost:4010/api/chats/chat_00005/messages
+{"messages":[{"id":"msg_00011","chatId":"chat_00005","authorId":"user_00001","authorEmail":"alice@mock.test","role":"user","content":"Hello mock","reasoning":null,"webFetches":[],"attachments":[],"status":"sent","error":null,"createdAt":"2026-10-03T12:18:08.533Z"},{"id":"msg_00012","chatId":"chat_00005","authorId":"user_00001","authorEmail":null,"role":"assistant","content":"Here is a short summary of what you asked. The","reasoning":null,"webFetches":[],"attachments":[],"status":"sent","error":null,"createdAt":"2026-10-03T12:18:08.534Z"}]}
+
+[exit 0]

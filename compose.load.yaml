@@ -1,0 +1,65 @@
+# Load-test limits (AICHAT-24). Used on top of compose.yaml and compose.mock.yaml:
+#
+#   COMPOSE_FILE=compose.yaml:compose.mock.yaml:compose.load.yaml docker compose --profile llm up -d --build
+#   (or: bash scripts/mock-compose.sh up llm   with LOAD=1)
+#
+# It emulates the production VM, an Azure Standard_B2als_v2 (2 vCPU, 4 GB): the limits of the
+# containers that run on the VM add up to 2.00 vCPU and 3.6 GB, which leaves about 0.4 GB for
+# the operating system. The mock server stands in for the LLM provider, so it is NOT part of
+# the budget, and neither is cAdvisor (it only feeds the Grafana panels).
+# Limits are per container, so a service cannot borrow the CPU of another one. A real VM
+# shares its two vCPUs, so this is a stricter model: the result is a floor, not a ceiling.
+
+services:
+  postgres:
+    cpus: 0.35
+    mem_limit: 512m
+  auth-service:
+    cpus: 0.25
+    mem_limit: 384m
+  conversation-service:
+    cpus: 0.6
+    mem_limit: 1024m
+  shell:
+    cpus: 0.4
+    mem_limit: 512m
+    environment:
+      # k6 reaches the shell by its compose name; `vite preview` answers only to localhost otherwise.
+      __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS: shell
+  mfe-auth:
+    cpus: 0.05
+    mem_limit: 64m
+  mfe-chat:
+    cpus: 0.05
+    mem_limit: 64m
+  mfe-settings:
+    cpus: 0.05
+    mem_limit: 64m
+  prometheus:
+    # Accepts the k6 remote write (testing/k6/run.sh with K6_PROM_RW=1).
+    # The sampler (scripts/load/docker-stats-sampler.ts --serve) runs on the host.
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--web.enable-remote-write-receiver"]
+    cpus: 0.05
+    mem_limit: 256m
+  grafana:
+    cpus: 0.1
+    mem_limit: 384m
+  loki:
+    cpus: 0.05
+    mem_limit: 256m
+  alloy:
+    cpus: 0.05
+    mem_limit: 192m
+
+  # Outside the VM budget: the LLM provider stand-in.
+  # TTFT, token pace and answer length resemble a hosted model (about 50 tokens per second, a
+  # first token after 0.6 s, an answer of 200 tokens: 4.6 s per stream). Change them with
+  # MOCK_TTFT_MS, MOCK_TOKEN_INTERVAL_MS and MOCK_TOKENS.
+  mock-server:
+    cpus: 1
+    mem_limit: 256m
+    environment:
+      TTFT_MS: ${MOCK_TTFT_MS:-600}
+      TOKEN_INTERVAL_MS: ${MOCK_TOKEN_INTERVAL_MS:-20}
+      TOKENS: ${MOCK_TOKENS:-200}

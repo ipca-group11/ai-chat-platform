@@ -1,0 +1,70 @@
+$ bash /private/tmp/claude-501/sd.sh
+localhost:3001/assets/_virtual_mf-localSharedImportMap___mfe_internal__mfeAuth__mf_owner__1-ayaWk-Jh.js
+localhost:3001/assets/dist-DZe0u63M.js
+localhost:3001/assets/helpers-ErDYAcao.js
+localhost:3001/assets/rolldown-runtime-B0Z9INg1.js
+localhost:3001/assets/utils-mzYn9uaX.js
+localhost:3001/assets/vite-preload-helper-bTxWVuPN.js
+localhost:3001/remoteEntry.js
+localhost:3002/assets/_virtual_mf-localSharedImportMap___mfe_internal__mfe_chat__mf_owner__1-BeFGZYJ3.js
+localhost:3002/assets/dist-DZe0u63M.js
+localhost:3002/assets/helpers-ErDYAcao.js
+localhost:3002/assets/mfe_chat__loadShare___mf_0_app_mf_1_ui__loadShare__.js-Dc03YDqY.js
+localhost:3002/assets/mfe_chat__loadShare___mf_0_tanstack_mf_1_react_mf_2_query__loadShare__.js-D5muw7oW.js
+localhost:3002/assets/mfe_chat__loadShare___mf_0_tanstack_mf_1_react_mf_2_router__loadShare__.js-DSE15nJ2.js
+localhost:3002/assets/mfe_chat__loadShare__react__loadShare__.js-CsQnX5SE.js
+localhost:3002/assets/mfe_chat__loadShare__react_mf_1_jsx_mf_2_runtime__loadShare__.js-Ds0eC-jG.js
+localhost:3002/assets/rolldown-runtime-B0Z9INg1.js
+localhost:3002/assets/routes-1zh3jiYD.js
+localhost:3002/assets/routes-ET2Bv4iL.js
+localhost:3002/assets/utils-mzYn9uaX.js
+localhost:3002/assets/vite-preload-helper-bTxWVuPN.js
+localhost:3002/assets/x-Cia1hYd5.js
+localhost:3002/remoteEntry.js
+localhost:3003/assets/_virtual_mf-localSharedImportMap___mfe_internal__mfeSettings__mf_owner__1-DOFRK3az.js
+localhost:3003/assets/dist-DZe0u63M.js
+localhost:3003/assets/helpers-ErDYAcao.js
+localhost:3003/assets/rolldown-runtime-B0Z9INg1.js
+localhost:3003/assets/utils-mzYn9uaX.js
+localhost:3003/assets/vite-preload-helper-bTxWVuPN.js
+localhost:3003/remoteEntry.js
+localhost:8000/assets/_virtual_mf-localSharedImportMap___mfe_internal__shell__mf_owner__1-CVY2nkq2.js
+localhost:8000/assets/auth-guard-BYXmBoA0.js
+localhost:8000/assets/chats-D4i2gTVS.js
+localhost:8000/assets/createLucideIcon-Cc4AVgmL.js
+localhost:8000/assets/dist-CLIfLqvQ.js
+localhost:8000/assets/dist-VJ_v_pyo.js
+localhost:8000/assets/helpers-CeEy7IUA.js
+localhost:8000/assets/hostInit-D-RSq0fB.js
+localhost:8000/assets/index-Ds0DpMRp.js
+localhost:8000/assets/mf-entry-bootstrap-0-6c9e84a9.js
+localhost:8000/assets/pendingShares-BTwO0WiD.js
+localhost:8000/assets/remote-loader-B_ETr_lT.js
+localhost:8000/assets/rolldown-runtime-B0Z9INg1.js
+localhost:8000/assets/shell__loadShare___mf_0_app_mf_1_ui__loadShare__.js-CgrDWrej.js
+localhost:8000/assets/shell__loadShare___mf_0_tanstack_mf_1_react_mf_2_query__loadShare__.js-D01sXRRD.js
+localhost:8000/assets/shell__loadShare___mf_0_tanstack_mf_1_react_mf_2_router__loadShare__.js-_hrXoEyd.js
+localhost:8000/assets/shell__loadShare__react_mf_2_dom__loadShare__.js-DZkEGG3o.js
+localhost:8000/assets/shell__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js-y63sHyEv.js
+localhost:8000/assets/utils-YCEgqyCG.js
+localhost:8000/assets/virtual_mf___mfe_internal__shell__loadRemote__mfeChat_mf_1_routes__loadRemote__-C6LBfc13.js
+localhost:8000/assets/vite-preload-helper-B3nfOi5I.js
+localhost:8000/remoteEntry.js
+
+JS responses on /chats: 51
+
+Shared library | copies | verdict | files
+react + react-dom | 1 | loaded once | localhost:8000/assets/shell__loadShare__react_mf_2_dom_mf_1_client__loadShare__.js-y63sHyEv.js
+@tanstack/react-query | 1 | loaded once | localhost:8000/assets/shell__loadShare___mf_0_tanstack_mf_1_react_mf_2_query__loadShare__.js-D01sXRRD.js
+@tanstack/react-router | 1 | loaded once | localhost:8000/assets/shell__loadShare___mf_0_tanstack_mf_1_react_mf_2_router__loadShare__.js-_hrXoEyd.js
+
+Chunks with the same name loaded from more than one URL (not shared libraries):
+/assets/dist.js x5 (267 kB raw in total): localhost:3001, localhost:3003, localhost:3002, localhost:8000, localhost:8000
+/assets/utils.js x4 (262 kB raw in total): localhost:8000, localhost:3003, localhost:3001, localhost:3002
+/assets/routes.js x2 (204 kB raw in total): localhost:3002, localhost:3002
+/assets/vite-preload-helper.js x4 (6 kB raw in total): localhost:8000, localhost:3003, localhost:3001, localhost:3002
+/assets/rolldown-runtime.js x4 (4 kB raw in total): localhost:3003, localhost:3002, localhost:3001, localhost:8000
+/assets/helpers.js x4 (0 kB raw in total): localhost:8000, localhost:3001, localhost:3003, localhost:3002
+exit code: 0
+
+[exit 0]

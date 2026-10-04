@@ -1,0 +1,5 @@
+$ node scripts/unit-test/source-files.mjs --list | grep -E 'apps/(shell|mfe-auth)/' | awk '{print $1}' | sort | uniq -c
+  16 exempt
+  33 tested
+
+[exit 0]

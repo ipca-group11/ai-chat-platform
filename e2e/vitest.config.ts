@@ -1,3 +1,4 @@
+import { coveragePreset, e2eCoverageThresholds } from "@platform/test-config";
 import { defineConfig } from "vitest/config";
 
 // Unit-tests only the plain TS logic that backs the Playwright suite
@@ -7,17 +8,13 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     environment: "node",
-    include: ["src/fixtures/**/*.spec.ts", "src/a11y/**/*.spec.ts", "src/ci/**/*.spec.ts"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "lcov"],
-      // Only the pure, browser-independent logic (health polling, a11y
-      // result filtering) is meaningfully unit-testable here; the
-      // Playwright-only wrappers (auth-flows/chat-flows/test-users/
-      // wait-for-stack-cli) are exercised by the `e2e` Playwright target
-      // instead.
-      include: ["src/fixtures/wait-for-stack.ts", "src/a11y/axe-helper.ts"],
-      exclude: ["src/**/*.spec.ts"],
-    },
+    include: ["src/fixtures/**/*.spec.ts", "src/a11y/**/*.spec.ts", "src/ci/**/*.spec.ts", "src/visual/lib/**/*.spec.ts"],
+    coverage: coveragePreset({
+      thresholds: e2eCoverageThresholds,
+      // The Playwright flow helpers are unit-tested against a recording fake page (src/test-utils);
+      // the specs under src/tests are Playwright specs and run through the `e2e` target.
+      include: ["src/fixtures/**/*.ts", "src/a11y/axe-helper.ts", "src/visual/lib/**/*.ts"],
+      exclude: ["**/*.spec.ts"],
+    }),
   },
 });

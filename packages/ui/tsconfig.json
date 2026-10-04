@@ -13,12 +13,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "declaration": false,
     "paths": {
       "@/*": ["./src/*"]
     },
     "types": ["node", "vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", ".storybook", "vite.config.ts", "vitest.config.ts", "tailwind.config.ts", "postcss.config.js"],
+  "include": ["src", ".storybook", "vite.config.ts", "vitest.config.ts", "tailwind.config.ts", "postcss.config.ts"],
   "exclude": ["dist", "storybook-static", "node_modules"]
 }

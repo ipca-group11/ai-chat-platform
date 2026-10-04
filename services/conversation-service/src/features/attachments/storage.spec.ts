@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -33,5 +33,48 @@ describe("createFileSystemStorage", () => {
     const storagePath = await storage.save(Buffer.from("x"), ".txt");
 
     expect(storagePath.startsWith(nested)).toBe(true);
+  });
+
+  it("AICHAT-97: delete removes a saved file", async () => {
+    const storage = createFileSystemStorage(dir);
+    const storagePath = await storage.save(Buffer.from("x"), ".txt");
+
+    await storage.delete(storagePath);
+
+    await expect(storage.read(storagePath)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it("AICHAT-97: delete is idempotent, a missing file is not an error", async () => {
+    const storage = createFileSystemStorage(dir);
+    const storagePath = await storage.save(Buffer.from("x"), ".txt");
+
+    await storage.delete(storagePath);
+    await expect(storage.delete(storagePath)).resolves.toBeUndefined();
+  });
+
+  it("AICHAT-97: delete refuses a path outside the upload directory", async () => {
+    const storage = createFileSystemStorage(dir);
+    const outside = path.join(dir, "..", "outside.txt");
+
+    await expect(storage.delete(outside)).rejects.toThrow("outside the upload directory");
+  });
+
+  it("AICHAT-137: list returns the files with their modification time, and nothing for a directory that does not exist", async () => {
+    const storage = createFileSystemStorage(dir);
+    const first = await storage.save(Buffer.from("x"), ".txt");
+
+    const listed = await storage.list();
+
+    expect(listed.map((f) => f.storagePath)).toEqual([first]);
+    expect(Math.abs(listed[0]!.modifiedAt.getTime() - Date.now())).toBeLessThan(60_000);
+    expect(await createFileSystemStorage(path.join(dir, "missing")).list()).toEqual([]);
+  });
+
+  it("AICHAT-137: list skips sub-directories", async () => {
+    const storage = createFileSystemStorage(dir);
+    await mkdir(path.join(dir, "sub"));
+    await storage.save(Buffer.from("x"), ".txt");
+
+    expect(await storage.list()).toHaveLength(1);
   });
 });

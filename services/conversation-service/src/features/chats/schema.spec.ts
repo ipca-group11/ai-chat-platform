@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { createChatSchema, updateChatSchema } from "./schema.js";
 
 describe("chats schema", () => {
-  it("AC-48: accepts openai and anthropic as the provider on create", () => {
-    for (const provider of ["openai", "anthropic"] as const) {
+  it("AC-48: accepts ollama, openai, and anthropic as the provider on create", () => {
+    for (const provider of ["ollama", "openai", "anthropic"] as const) {
       const result = createChatSchema.safeParse({ title: "Chat", provider, model: "some-model" });
       expect(result.success).toBe(true);
     }
@@ -15,7 +15,7 @@ describe("chats schema", () => {
   });
 
   it("AC-42: rejects an empty title", () => {
-    const result = createChatSchema.safeParse({ title: "", provider: "anthropic", model: "claude-haiku-4-5" });
+    const result = createChatSchema.safeParse({ title: "", provider: "ollama", model: "llama3.2:1b" });
     expect(result.success).toBe(false);
   });
 

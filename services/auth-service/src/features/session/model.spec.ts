@@ -10,7 +10,7 @@ import {
   rotateRefreshToken,
   verifyCredentials,
 } from "./model.js";
-import { fakePrisma, makeUser } from "./test-fakes.js";
+import { fakePrisma, makeUser } from "../../test-utils/fake-prisma.js";
 
 function hashForTest(token: string): string {
   return createHash("sha256").update(token).digest("hex");
@@ -72,8 +72,9 @@ describe("verifyCredentials", () => {
 
 describe("issueTokens", () => {
   it("AC-37: issues an access token verifiable with JWT_SECRET and a random opaque refresh token", async () => {
-    const prisma = fakePrisma();
-    const user = { id: "user-1", email: "a@b.com" };
+    const stored = await makeUser("a@b.com", "password1");
+    const prisma = fakePrisma({ users: [stored] });
+    const user = { id: stored.id, email: stored.email };
 
     const tokens = await issueTokens(prisma, user);
 
@@ -84,9 +85,19 @@ describe("issueTokens", () => {
     expect(prisma.refreshToken.create).toHaveBeenCalledOnce();
   });
 
+  it("AICHAT-137: records the sign-in as activity, so the account is not deleted as inactive", async () => {
+    const stored = { ...(await makeUser("a@b.com", "password1")), lastActiveAt: new Date("2020-01-01T00:00:00Z") };
+    const prisma = fakePrisma({ users: [stored] });
+
+    await issueTokens(prisma, { id: stored.id, email: stored.email });
+
+    expect((await prisma.user.findUnique({ where: { id: stored.id } }))?.lastActiveAt.getFullYear()).toBeGreaterThan(2025);
+  });
+
   it("never persists the refresh token in plaintext (only its hash)", async () => {
-    const prisma = fakePrisma();
-    const user = { id: "user-1", email: "a@b.com" };
+    const stored = await makeUser("a@b.com", "password1");
+    const prisma = fakePrisma({ users: [stored] });
+    const user = { id: stored.id, email: stored.email };
 
     const tokens = await issueTokens(prisma, user);
 

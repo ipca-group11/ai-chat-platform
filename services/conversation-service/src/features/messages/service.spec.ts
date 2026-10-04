@@ -1,25 +1,22 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
+import { createFakeQueue, hangingProcessor } from "../../test-utils/fake-queue.js";
 import { FakeMessagesRepository } from "../../test-utils/fake-messages-repository.js";
 import { ChatsService } from "../chats/index.js";
-import { QueueManager } from "../queue/index.js";
+import type { QueueProcessor } from "../queue/index.js";
 import { ChatEventBus } from "../streaming/index.js";
 import { MessagesService } from "./service.js";
 import { HttpError } from "../../shared/error-handler.js";
 import { asUser } from "../../test-utils/principal.js";
 
-function neverResolves() {
-  return new Promise<void>(() => {});
-}
-
-async function setup(processor: ReturnType<typeof vi.fn> = vi.fn().mockReturnValue(neverResolves())) {
+async function setup(processor: QueueProcessor = hangingProcessor()) {
   const chatsRepo = new FakeChatsRepository();
   const chatsService = new ChatsService(chatsRepo);
   const messagesRepo = new FakeMessagesRepository();
-  const queueManager = new QueueManager(processor);
+  const queueManager = createFakeQueue(processor);
   const bus = new ChatEventBus();
   const service = new MessagesService(messagesRepo, chatsService, queueManager, bus);
-  const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+  const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
   return { chatsService, messagesRepo, queueManager, bus, service, chat };
 }
 

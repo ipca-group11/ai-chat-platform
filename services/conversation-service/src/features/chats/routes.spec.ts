@@ -1,26 +1,21 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
+import { TEST_JWT_SECRET, tokenFor } from "../../test-utils/auth-token.js";
 import { authMiddleware } from "../../shared/auth-middleware.js";
 import { errorHandler, notFoundHandler } from "../../shared/error-handler.js";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
 import { ChatsService } from "./service.js";
 import { createChatsRouter } from "./routes.js";
 
-const JWT_SECRET = "test-secret";
-
-function tokenFor(userId: string): string {
-  return jwt.sign({ sub: userId, email: `${userId}@example.com` }, JWT_SECRET, { expiresIn: "15m" });
-}
 
 function buildApp() {
   const service = new ChatsService(new FakeChatsRepository());
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
-  app.use(authMiddleware(JWT_SECRET));
+  app.use(authMiddleware(TEST_JWT_SECRET));
   app.use("/chats", createChatsRouter(service));
   app.use(notFoundHandler);
   app.use(errorHandler);
@@ -41,7 +36,7 @@ describe("chats routes", () => {
     const createRes = await request(app)
       .post("/chats")
       .set("Cookie", [`access_token=${token}`])
-      .send({ title: "First chat", provider: "anthropic", model: "claude-haiku-4-5" });
+      .send({ title: "First chat", provider: "ollama", model: "llama3.2:1b" });
     expect(createRes.status).toBe(201);
     expect(createRes.body.chat.title).toBe("First chat");
 
@@ -58,7 +53,7 @@ describe("chats routes", () => {
     const createRes = await request(app)
       .post("/chats")
       .set("Cookie", [`access_token=${tokenA}`])
-      .send({ title: "A's chat", provider: "anthropic", model: "claude-haiku-4-5" });
+      .send({ title: "A's chat", provider: "ollama", model: "llama3.2:1b" });
     const chatId = createRes.body.chat.id as string;
 
     const getRes = await request(app).get(`/chats/${chatId}`).set("Cookie", [`access_token=${tokenB}`]);
@@ -74,7 +69,7 @@ describe("chats routes", () => {
     const createRes = await request(app)
       .post("/chats")
       .set("Cookie", [`access_token=${token}`])
-      .send({ title: "Temp", provider: "anthropic", model: "claude-haiku-4-5" });
+      .send({ title: "Temp", provider: "ollama", model: "llama3.2:1b" });
     const chatId = createRes.body.chat.id as string;
 
     await request(app).delete(`/chats/${chatId}`).set("Cookie", [`access_token=${token}`]).expect(204);
@@ -92,7 +87,7 @@ describe("chats routes", () => {
     const createRes = await request(app)
       .post("/chats")
       .set("Cookie", [`access_token=${token}`])
-      .send({ title: "Old title", provider: "anthropic", model: "claude-haiku-4-5" });
+      .send({ title: "Old title", provider: "ollama", model: "llama3.2:1b" });
     const chatId = createRes.body.chat.id as string;
 
     const updateRes = await request(app)
@@ -113,7 +108,7 @@ describe("chats routes", () => {
     const res = await request(app)
       .post("/chats")
       .set("Cookie", [`access_token=${token}`])
-      .send({ title: "", provider: "anthropic", model: "claude-haiku-4-5" });
+      .send({ title: "", provider: "ollama", model: "llama3.2:1b" });
 
     expect(res.status).toBe(400);
   });
@@ -125,7 +120,7 @@ describe("chats routes", () => {
     const createRes = await request(app)
       .post("/chats")
       .set("Cookie", ownerCookie)
-      .send({ title: "Shared", provider: "anthropic", model: "claude-haiku-4-5" });
+      .send({ title: "Shared", provider: "ollama", model: "llama3.2:1b" });
     const chatId = createRes.body.chat.id as string;
 
     const inviteRes = await request(app)
@@ -148,7 +143,7 @@ describe("chats routes", () => {
     const createRes = await request(app)
       .post("/chats")
       .set("Cookie", cookie)
-      .send({ title: "Shared", provider: "anthropic", model: "claude-haiku-4-5" });
+      .send({ title: "Shared", provider: "ollama", model: "llama3.2:1b" });
 
     const res = await request(app)
       .post(`/chats/${createRes.body.chat.id as string}/members`)
@@ -164,7 +159,7 @@ describe("chats routes", () => {
     const createRes = await request(app)
       .post("/chats")
       .set("Cookie", ownerCookie)
-      .send({ title: "Shared", provider: "anthropic", model: "claude-haiku-4-5" });
+      .send({ title: "Shared", provider: "ollama", model: "llama3.2:1b" });
     const chatId = createRes.body.chat.id as string;
     await request(app).post(`/chats/${chatId}/members`).set("Cookie", ownerCookie).send({ email: "guest@example.com" });
 
@@ -183,7 +178,7 @@ describe("chats routes", () => {
     const createRes = await request(app)
       .post("/chats")
       .set("Cookie", ownerCookie)
-      .send({ title: "Shared", provider: "anthropic", model: "claude-haiku-4-5" });
+      .send({ title: "Shared", provider: "ollama", model: "llama3.2:1b" });
     const chatId = createRes.body.chat.id as string;
     await request(app).post(`/chats/${chatId}/members`).set("Cookie", ownerCookie).send({ email: "guest@example.com" });
 

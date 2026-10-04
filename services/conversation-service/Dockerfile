@@ -25,6 +25,8 @@ RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 COPY . .
+# The service imports the model capability rules from packages/shared-types, as compiled JS.
+RUN pnpm --filter @app/shared-types run build
 RUN pnpm --filter @app/conversation-service run prisma:generate
 RUN pnpm --filter @app/conversation-service run build
 # `prisma generate` emits a plain-JS client into src/generated/prisma-client (see
@@ -38,6 +40,8 @@ ENV NODE_ENV=production
 WORKDIR /workspace
 COPY --from=build /workspace/node_modules ./node_modules
 COPY --from=build /workspace/services/conversation-service/node_modules ./services/conversation-service/node_modules
+COPY --from=build /workspace/packages/shared-types/package.json ./packages/shared-types/package.json
+COPY --from=build /workspace/packages/shared-types/dist ./packages/shared-types/dist
 COPY --from=build /workspace/services/conversation-service/dist ./services/conversation-service/dist
 COPY --from=build /workspace/services/conversation-service/prisma ./services/conversation-service/prisma
 COPY --from=build /workspace/services/conversation-service/package.json ./services/conversation-service/package.json

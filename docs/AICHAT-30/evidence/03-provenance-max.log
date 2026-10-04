@@ -1,0 +1,19 @@
+$ docker buildx imagetools inspect localhost:5055/ai-chat/auth-service:local --format '{{ json .Provenance }}' | jq '.SLSA | {buildType: .buildDefinition.buildType, buildConfigSteps: (.buildDefinition.internalParameters.buildConfig.llbDefinition|length), request: .buildDefinition.externalParameters.request.locals, completeness: .runDetails.metadata.buildkit_completeness}'
+{
+  "buildType": "https://github.com/moby/buildkit/blob/master/docs/attestations/slsa-definitions.md",
+  "buildConfigSteps": 22,
+  "request": [
+    {
+      "name": "context"
+    },
+    {
+      "name": "dockerfile"
+    }
+  ],
+  "completeness": {
+    "request": true,
+    "resolvedDependencies": false
+  }
+}
+
+[exit 0]

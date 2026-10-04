@@ -1,0 +1,466 @@
+{
+  "uid": "web-vitals-by-page",
+  "title": "Web Vitals by page (Grafana Faro)",
+  "tags": [
+    "faro",
+    "frontend",
+    "performance"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "description": "Real-user LCP, INP and CLS p75 per page, from the Faro measurements stored in Loki (AICHAT-98). Budgets: docs/AICHAT-21/WORKLOG.md section 1.",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "refresh": "30s",
+  "editable": true,
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "table",
+      "title": "Real-user p75 by page (selected range)",
+      "description": "75th percentile of the Web Vitals Faro measured in real browsers, per page (chat ids folded into /chats/:id). Cell colour: green within the good threshold, orange needs improvement, red poor. Budgets in docs/AICHAT-21/WORKLOG.md section 1.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "quantile_over_time(0.75, {app_name=\"llm-chat\", kind=\"measurement\"} | logfmt | type=\"web-vitals\" | lcp!=\"\" | label_format page=`{{ regexReplaceAll \"^https?://[^/]+(/[^/?]*).*$\" (regexReplaceAll \"^https?://[^/]+/chats/[^/?]+.*$\" .page_url \"/chats/:id\") \"${1}\" }}` | unwrap lcp [$__range]) by (page)",
+          "legendFormat": "",
+          "refId": "A",
+          "queryType": "instant",
+          "format": "table"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "quantile_over_time(0.75, {app_name=\"llm-chat\", kind=\"measurement\"} | logfmt | type=\"web-vitals\" | inp!=\"\" | label_format page=`{{ regexReplaceAll \"^https?://[^/]+(/[^/?]*).*$\" (regexReplaceAll \"^https?://[^/]+/chats/[^/?]+.*$\" .page_url \"/chats/:id\") \"${1}\" }}` | unwrap inp [$__range]) by (page)",
+          "legendFormat": "",
+          "refId": "B",
+          "queryType": "instant",
+          "format": "table"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "quantile_over_time(0.75, {app_name=\"llm-chat\", kind=\"measurement\"} | logfmt | type=\"web-vitals\" | cls!=\"\" | label_format page=`{{ regexReplaceAll \"^https?://[^/]+(/[^/?]*).*$\" (regexReplaceAll \"^https?://[^/]+/chats/[^/?]+.*$\" .page_url \"/chats/:id\") \"${1}\" }}` | unwrap cls [$__range]) by (page)",
+          "legendFormat": "",
+          "refId": "C",
+          "queryType": "instant",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "md"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "LCP p75"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "basic"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 2500
+                    },
+                    {
+                      "color": "red",
+                      "value": 4000
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "description",
+                "value": "Budget: 2.5 s on /chats, /chats/:id and /settings, 2.0 s on /login and /register (AICHAT-45)."
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "INP p75"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "basic"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 200
+                    },
+                    {
+                      "color": "red",
+                      "value": 500
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "description",
+                "value": "Budget: 200 ms on every page (AICHAT-45). Only pages where someone interacted report INP."
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CLS p75"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 4
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "basic"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.1
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.25
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "description",
+                "value": "Budget: 0.1 (0.05 on /login and /register) (AICHAT-45)."
+              }
+            ]
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "page",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true
+            },
+            "renameByName": {
+              "page": "Page",
+              "Value #A": "LCP p75",
+              "Value #B": "INP p75",
+              "Value #C": "CLS p75"
+            },
+            "indexByName": {
+              "page": 0,
+              "Value #A": 1,
+              "Value #B": 2,
+              "Value #C": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "LCP p75 by page over time",
+      "description": "Budget: 2.5 s on /chats, /chats/:id and /settings, 2.0 s on /login and /register (AICHAT-45).",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "quantile_over_time(0.75, {app_name=\"llm-chat\", kind=\"measurement\"} | logfmt | type=\"web-vitals\" | lcp!=\"\" | label_format page=`{{ regexReplaceAll \"^https?://[^/]+(/[^/?]*).*$\" (regexReplaceAll \"^https?://[^/]+/chats/[^/?]+.*$\" .page_url \"/chats/:id\") \"${1}\" }}` | unwrap lcp [5m]) by (page)",
+          "legendFormat": "{{page}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "showPoints": "auto",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "INP p75 by page over time",
+      "description": "Budget: 200 ms on every page (AICHAT-45). Only pages where someone interacted report INP.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 8,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "quantile_over_time(0.75, {app_name=\"llm-chat\", kind=\"measurement\"} | logfmt | type=\"web-vitals\" | inp!=\"\" | label_format page=`{{ regexReplaceAll \"^https?://[^/]+(/[^/?]*).*$\" (regexReplaceAll \"^https?://[^/]+/chats/[^/?]+.*$\" .page_url \"/chats/:id\") \"${1}\" }}` | unwrap inp [5m]) by (page)",
+          "legendFormat": "{{page}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "showPoints": "auto",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "CLS p75 by page over time",
+      "description": "Budget: 0.1 (0.05 on /login and /register) (AICHAT-45).",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 8,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "quantile_over_time(0.75, {app_name=\"llm-chat\", kind=\"measurement\"} | logfmt | type=\"web-vitals\" | cls!=\"\" | label_format page=`{{ regexReplaceAll \"^https?://[^/]+(/[^/?]*).*$\" (regexReplaceAll \"^https?://[^/]+/chats/[^/?]+.*$\" .page_url \"/chats/:id\") \"${1}\" }}` | unwrap cls [5m]) by (page)",
+          "legendFormat": "{{page}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "lineWidth": 2,
+            "showPoints": "auto",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Page loads measured by page",
+      "description": "How many LCP measurements the p75 values above are based on.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "sum by (page) (count_over_time({app_name=\"llm-chat\", kind=\"measurement\"} | logfmt | type=\"web-vitals\" | lcp!=\"\" | label_format page=`{{ regexReplaceAll \"^https?://[^/]+(/[^/?]*).*$\" (regexReplaceAll \"^https?://[^/]+/chats/[^/?]+.*$\" .page_url \"/chats/:id\") \"${1}\" }}` [$__range]))",
+          "legendFormat": "",
+          "refId": "A",
+          "queryType": "instant",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "showHeader": true
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "LCP samples"
+              }
+            ]
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "page": "Page"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

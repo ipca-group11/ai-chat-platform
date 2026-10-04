@@ -7,60 +7,15 @@ import {
   type SendMessageOptions,
 } from "./types.js";
 import { readSseData } from "./http-stream.js";
+import { supportsReasoning, supportsVision, supportsWebFetch, thinkingStyle, webFetchToolType } from "@app/shared-types/model-capabilities";
 
-const VISION_MODEL_HINTS = ["claude-3", "claude-4", "claude-opus", "claude-sonnet", "claude-haiku"];
+
 const ANTHROPIC_VERSION = "2023-06-01";
 const DEFAULT_MAX_TOKENS = 4096;
 /** Room for thinking plus the answer; `budget_tokens` must stay below `max_tokens`. */
 const REASONING_MAX_TOKENS = 16000;
 const REASONING_BUDGET_TOKENS = 8000;
 
-/**
- * How each Claude generation turns thinking on and off (first match wins, so the more
- * specific ids come first — e.g. `claude-opus-5-5` before `claude-opus-5`):
- * - `always-on`: thinking can't be disabled (a `disabled` config is a 400); only its
- *   depth is tunable, via `output_config.effort`.
- * - `between-tools`: `adaptive` on; `disabled` is a 400, `between_tools` turns it off.
- * - `adaptive`: `adaptive` on, `disabled` off.
- * - `budget`: older models take a fixed `budget_tokens` and don't think by default.
- */
-type ThinkingStyle = "always-on" | "between-tools" | "adaptive" | "budget";
-const THINKING_STYLES: ReadonlyArray<readonly [hint: string, style: ThinkingStyle]> = [
-  ["claude-fable", "always-on"],
-  ["claude-mythos", "always-on"],
-  ["claude-opus-5-5", "always-on"],
-  ["claude-sonnet-5-5", "between-tools"],
-  ["claude-opus-5", "adaptive"],
-  ["claude-sonnet-5", "adaptive"],
-  ["claude-opus-4-8", "adaptive"],
-  ["claude-opus-4-7", "adaptive"],
-  ["claude-opus-4-6", "adaptive"],
-  ["claude-sonnet-4-6", "adaptive"],
-  ["claude-opus-4", "budget"],
-  ["claude-sonnet-4", "budget"],
-  ["claude-haiku-4", "budget"],
-  ["claude-3-7-sonnet", "budget"],
-];
-
-/**
- * Web fetch tool version per model (first match wins). `web_fetch_20260318` adds dynamic
- * filtering (the model trims fetched pages with code before reading them) and needs
- * Claude 4.6 or later; older models get the basic `web_fetch_20250910`.
- */
-const WEB_FETCH_TOOLS: ReadonlyArray<readonly [hint: string, type: string]> = [
-  ["claude-fable", "web_fetch_20260318"],
-  ["claude-mythos", "web_fetch_20260318"],
-  ["claude-opus-5", "web_fetch_20260318"],
-  ["claude-sonnet-5", "web_fetch_20260318"],
-  ["claude-opus-4-8", "web_fetch_20260318"],
-  ["claude-opus-4-7", "web_fetch_20260318"],
-  ["claude-opus-4-6", "web_fetch_20260318"],
-  ["claude-sonnet-4-6", "web_fetch_20260318"],
-  ["claude-opus-4", "web_fetch_20250910"],
-  ["claude-sonnet-4", "web_fetch_20250910"],
-  ["claude-haiku-4", "web_fetch_20250910"],
-  ["claude-3-7-sonnet", "web_fetch_20250910"],
-];
 /** Caps per reply, so one message can't pull in dozens of pages. */
 const WEB_FETCH_MAX_USES = 5;
 const WEB_FETCH_MAX_CONTENT_TOKENS = 25000;
@@ -88,16 +43,15 @@ export class AnthropicProvider implements LlmProvider {
   }
 
   supportsVision(model: string): boolean {
-    const lower = model.toLowerCase();
-    return VISION_MODEL_HINTS.some((hint) => lower.includes(hint));
+    return supportsVision("anthropic", model);
   }
 
   supportsReasoning(model: string): boolean {
-    return thinkingStyle(model) !== undefined;
+    return supportsReasoning("anthropic", model);
   }
 
   supportsWebFetch(model: string): boolean {
-    return webFetchToolType(model) !== undefined;
+    return supportsWebFetch("anthropic", model);
   }
 
   async *sendMessage(context: SendMessageContext, options: SendMessageOptions = {}): AsyncIterable<LlmStreamChunk> {
@@ -273,16 +227,6 @@ function webFetchResult(block: ContentBlock, fetchUrls: Map<string, string>): Ll
     return { type: "web_fetch", id, url, status: "done", ...(title ? { title } : {}) };
   }
   return { type: "web_fetch", id, url, status: "error", errorCode: content?.error_code ?? "unavailable" };
-}
-
-function webFetchToolType(model: string): string | undefined {
-  const lower = model.toLowerCase();
-  return WEB_FETCH_TOOLS.find(([hint]) => lower.includes(hint))?.[1];
-}
-
-function thinkingStyle(model: string): ThinkingStyle | undefined {
-  const lower = model.toLowerCase();
-  return THINKING_STYLES.find(([hint]) => lower.includes(hint))?.[1];
 }
 
 /** Adaptive thinking whose text is streamed back. Newer models return empty thinking

@@ -1,0 +1,38 @@
+$ curl -s -X POST localhost:4110/collect -H 'content-type: application/json' -d '{"meta":{"app":{"name":"shell"}},"logs":[{"message":"page loaded","level":"info"}]}' -w ' HTTP %{http_code}\n'; curl -s 'localhost:4110/__admin/requests?mock=collect' | node -e 'console.log(JSON.stringify(JSON.parse(require("fs").readFileSync(0,"utf8")),null,2))'
+{"status":"accepted"} HTTP 202
+{
+  "count": 1,
+  "requests": [
+    {
+      "id": 7,
+      "at": "2026-10-03T12:11:01.669Z",
+      "mock": "collect",
+      "method": "POST",
+      "path": "/collect",
+      "query": {},
+      "headers": {
+        "host": "localhost:4110",
+        "user-agent": "curl/8.7.1",
+        "accept": "*/*",
+        "content-type": "application/json",
+        "content-length": "83"
+      },
+      "body": {
+        "meta": {
+          "app": {
+            "name": "shell"
+          }
+        },
+        "logs": [
+          {
+            "message": "page loaded",
+            "level": "info"
+          }
+        ]
+      },
+      "status": 202
+    }
+  ]
+}
+
+[exit 0]

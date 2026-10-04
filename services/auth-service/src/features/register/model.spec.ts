@@ -1,35 +1,9 @@
 import bcrypt from "bcrypt";
 import { describe, expect, it, vi } from "vitest";
-import type { PrismaClient } from "../../generated/prisma-client/index.js";
 import { HttpError } from "../../shared/error-middleware.js";
 import { logger } from "../../shared/logger.js";
+import { fakePrisma } from "../../test-utils/fake-prisma.js";
 import { registerUser } from "./model.js";
-
-function fakePrisma(overrides?: {
-  existingUser?: unknown;
-}): PrismaClient {
-  const users = new Map<string, { id: string; email: string; passwordHash: string; createdAt: Date }>();
-  let nextId = 1;
-
-  return {
-    user: {
-      findUnique: vi.fn(async ({ where: { email } }: { where: { email: string } }) => {
-        if (overrides?.existingUser) return overrides.existingUser;
-        return users.get(email) ?? null;
-      }),
-      create: vi.fn(async ({ data }: { data: { email: string; passwordHash: string } }) => {
-        const user = {
-          id: `user-${nextId++}`,
-          email: data.email,
-          passwordHash: data.passwordHash,
-          createdAt: new Date(),
-        };
-        users.set(user.email, user);
-        return user;
-      }),
-    },
-  } as unknown as PrismaClient;
-}
 
 describe("registerUser", () => {
   it("AC-30: creates a user for a valid email/password", async () => {
@@ -43,12 +17,14 @@ describe("registerUser", () => {
 
   it("AC-31: rejects a duplicate email (case-insensitive) with a 409 and a single validation error, creating no account", async () => {
     const prisma = fakePrisma({
-      existingUser: {
-        id: "user-existing",
-        email: "dup@example.com",
-        passwordHash: "hash",
-        createdAt: new Date(),
-      },
+      users: [
+        {
+          id: "user-existing",
+          email: "dup@example.com",
+          passwordHash: "hash",
+          createdAt: new Date(),
+        },
+      ],
     });
 
     await expect(
@@ -59,7 +35,7 @@ describe("registerUser", () => {
 
   it("AC-31: rejects a duplicate email with exactly one field error", async () => {
     const prisma = fakePrisma({
-      existingUser: { id: "user-existing", email: "dup@example.com", passwordHash: "hash", createdAt: new Date() },
+      users: [{ id: "user-existing", email: "dup@example.com", passwordHash: "hash", createdAt: new Date() }],
     });
 
     try {

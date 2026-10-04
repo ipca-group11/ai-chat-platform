@@ -1,0 +1,27 @@
+# Generated or third-party code is not ours to fix (AICHAT-27 scope decision).
+node_modules/
+dist/
+build/
+coverage/
+.nx/
+.pnpm-store/
+.vite/
+storybook-static/
+.vitest/
+# Prisma client generated at build time
+services/*/src/generated/
+# Module Federation generated types
+@mf-types/
+.mf/
+# Lock files
+pnpm-lock.yaml
+# Evidence is documentation (screenshots, logs), not source
+docs/
+
+# Test code never ships. Fake secrets and fixtures there only produce noise (see docs/AICHAT-27/WAIVERS.md, W1).
+*.spec.ts
+*.spec.tsx
+*.test.ts
+*.test.tsx
+e2e/src/fixtures/
+services/*/src/shared/test/

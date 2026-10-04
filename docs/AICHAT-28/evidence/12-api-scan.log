@@ -1,0 +1,41 @@
+$ tail -n 38 zap-results-api/us5-api-scan.log
+PASS: Script Passive Scan Rules [50001]
+PASS: Path Traversal [6]
+PASS: Remote File Inclusion [7]
+PASS: Insecure JSF ViewState [90001]
+PASS: Java Serialization Object [90002]
+PASS: Sub Resource Integrity Attribute Missing [90003]
+PASS: Insufficient Site Isolation Against Spectre Vulnerability [90004]
+PASS: Charset Mismatch [90011]
+PASS: XSLT Injection [90017]
+PASS: Server Side Code Injection [90019]
+PASS: Remote OS Command Injection [90020]
+PASS: XPath Injection [90021]
+PASS: Application Error Disclosure [90022]
+PASS: XML External Entity Attack [90023]
+PASS: Generic Padding Oracle [90024]
+PASS: SOAP Action Spoofing [90026]
+PASS: SOAP XML Injection [90029]
+PASS: WSDL File Detection [90030]
+PASS: Loosely Scoped Cookie [90033]
+PASS: Cloud Metadata Potentially Exposed [90034]
+PASS: Server Side Template Injection [90035]
+PASS: Server Side Template Injection (Blind) [90036]
+PASS: Remote OS Command Injection (Time Based) [90037]
+SKIP: HTTP Only Site [10106]
+IGNORE-NEW: Unexpected Content-Type was returned [100001] x 64 The shell answers every unknown path with index.html (single page app fallback), so probes such as /WEB-INF/web.xml get HTML with 200
+	http://localhost:8000/WEB-INF/web.xml (200 OK)
+	http://localhost:8000/WEB-INF/applicationContext.xml (200 OK)
+	http://localhost:8000/WEB-INF/classes/1/0.class (200 OK)
+	http://localhost:8000/WEB-INF/classes/fonts/googleapis/com.class (200 OK)
+	http://localhost:8000/WEB-INF/classes/fonts/gstatic/com.class (200 OK)
+WARN-NEW: A Server Error response code was returned by the server [100000] x 4 Low: client errors (4xx) are expected while a scan probes; a 500 is worth a look
+	http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (500 Internal Server Error)
+	http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (500 Internal Server Error)
+	http://localhost:8000/api/chats (500 Internal Server Error)
+	http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (500 Internal Server Error)
+WARN-NEW: Format String Error [30002] x 1 
+	http://localhost:8000/api/chats/cm0example0000000000000000/messages/cm0example0000000000000001/attachments (500 Internal Server Error)
+FAIL-NEW: 0	FAIL-INPROG: 0	WARN-NEW: 2	WARN-INPROG: 0	INFO: 0	IGNORE: 1	PASS: 116
+
+[exit 0]

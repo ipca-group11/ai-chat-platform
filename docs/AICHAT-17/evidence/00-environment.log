@@ -1,0 +1,9 @@
+$ echo macOS $(sw_vers -productVersion); echo node $(node -v); echo pnpm $(pnpm -v); docker --version; echo nx $(pnpm exec nx --version | grep Local | awk '{print $3}'); echo vitest $(pnpm --filter shell exec vitest --version)
+macOS 26.3
+node v24.9.0
+pnpm 10.4.0
+Docker version 29.4.0, build 9d7ad9f
+nx v23.2.1
+vitest vitest/5.0.1 darwin-arm64 node-v24.9.0
+
+[exit 0]

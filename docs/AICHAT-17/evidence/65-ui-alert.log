@@ -1,0 +1,15 @@
+$ cd packages/ui && pnpm exec vitest run src/components/alert
+
+ RUN  v5.0.1 /private/tmp/claude-501/u17-backend/packages/ui
+
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  15:16:20
+   Duration  626ms (environment 61%, tests 15%, setup 14%, transform 6%, import 4%, worker 1%)
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vite.config.ts:11:20). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+[exit 0]

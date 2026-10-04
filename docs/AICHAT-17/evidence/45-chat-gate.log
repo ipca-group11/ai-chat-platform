@@ -1,0 +1,28 @@
+$ bash /private/tmp/claude-501/-Users-truezone-Projects-ai-chat-platform/eef7d68d-8a8c-448c-9b92-df26c0f970df/scratchpad/e45.sh
+✔  nx run test-utils:build  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:build  [existing outputs match the cache, left as is]
+✔  nx run mfe-chat:typecheck
+✔  nx run mfe-chat:lint
+✔  nx run mfe-chat:test
+
+
+
+ NX   Successfully ran targets lint, typecheck, test, build for project mfe-chat and 8 tasks it depends on
+
+Nx read the output from the cache instead of running the command for 9 out of 12 tasks.
+
+Output of 12 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+
+ NX   Nx detected a flaky task
+
+  mfe-chat:test
+
+Flaky tasks can disrupt your CI pipeline. Automatically retry them with Nx Cloud. Learn more at https://nx.dev/ci/features/flaky-tasks
+
+  Run duration:      17.1s
+  Cache:             9/12 hit (75%)
+  Critical path:     16.9s (6 tasks)
+  Recoverable time:  <1ms
+
+[exit 0]

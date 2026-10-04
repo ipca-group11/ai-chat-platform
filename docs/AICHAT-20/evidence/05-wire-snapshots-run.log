@@ -1,0 +1,44 @@
+$ pnpm --dir services/conversation-service exec vitest run snapshot --reporter=verbose; pnpm --dir services/auth-service exec vitest run snapshot --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/features/streaming/sse.snapshot.spec.ts > SSE frames > writes one frame per event type 2ms
+ ✓ src/features/streaming/sse.snapshot.spec.ts > SSE frames > writes the message event with the full message DTO 0ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > HttpError 400 2ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > HttpError 401 0ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > HttpError 403 0ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > HttpError 404 0ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > HttpError 409 0ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > HttpError 422 0ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > HttpError 500 0ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > validation error carries the field errors 1ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > upload rejected by multer 0ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > unexpected error is redacted to a 500 0ms
+ ✓ src/shared/error-handler.snapshot.spec.ts > conversation-service error bodies > unknown route 0ms
+
+ Test Files  2 passed (2)
+      Tests  13 passed (13)
+   Start at  17:32:10
+   Duration  195ms (import 45%, worker 25%, transform 22%, tests 6%, setup 1%)
+
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/auth-service
+
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > HttpError 400 2ms
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > HttpError 401 0ms
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > HttpError 403 0ms
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > HttpError 404 0ms
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > HttpError 409 0ms
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > HttpError 422 0ms
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > HttpError 500 0ms
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > validation error carries the field errors 1ms
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > unexpected error is redacted to a 500 0ms
+ ✓ src/shared/error-middleware.snapshot.spec.ts > auth-service error bodies > unknown route 0ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  17:32:10
+   Duration  176ms (import 52%, transform 26%, worker 17%, tests 5%, setup 1%)
+
+
+[exit 0]

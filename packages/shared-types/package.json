@@ -4,17 +4,25 @@
   "private": true,
   "license": "UNLICENSED",
   "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./api-keys": "./src/api-keys/index.ts"
+    "./api-keys": "./src/api-keys/index.ts",
+    "./model-capabilities": {
+      "types": "./dist/model-capabilities.d.ts",
+      "default": "./dist/model-capabilities.js"
+    }
   },
   "dependencies": {
     "zod": "^4.6.5"
   },
   "devDependencies": {
     "@platform/eslint-config": "workspace:*",
+    "@platform/test-config": "workspace:*",
     "@types/node": "^24.13.6",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.11.0",

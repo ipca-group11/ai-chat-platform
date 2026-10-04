@@ -1,0 +1,64 @@
+$ tr '' '
+' < docs/AICHAT-24/results/streams_ramp-k6.txt | sed -n '/THRESHOLDS/,/TOTAL RESULTS/p' | grep -v '^$'
+  █ THRESHOLDS 
+    http_req_duration{kind:rest,level:20}
+    ✓ 'p(95)<1000' p(95)=104.06ms
+    http_req_duration{kind:rest,level:30}
+    ✓ 'p(95)<1000' p(95)=484.17ms
+    http_req_duration{kind:rest,level:40}
+    ✗ 'p(95)<1000' p(95)=3.8s
+    http_req_duration{kind:rest,level:50}
+    ✗ 'p(95)<1000' p(95)=6.17s
+    http_req_duration{kind:rest,level:60}
+    ✗ 'p(95)<1000' p(95)=6.22s
+    http_req_duration{kind:rest}
+    ✗ 'p(95)<1000' p(95)=5.26s
+    http_req_failed{kind:rest,level:20}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest,level:30}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest,level:40}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest,level:50}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest,level:60}
+    ✓ 'rate<0.01' rate=0.00%
+    http_req_failed{kind:rest}
+    ✓ 'rate<0.01' rate=0.00%
+    stream_duration{level:20}
+    ✓ 'max>=0' max=5.63s
+    stream_duration{level:30}
+    ✓ 'max>=0' max=5.97s
+    stream_duration{level:40}
+    ✓ 'max>=0' max=10.31s
+    stream_duration{level:50}
+    ✓ 'max>=0' max=19.57s
+    stream_duration{level:60}
+    ✓ 'max>=0' max=17.32s
+    stream_success_rate
+    ✓ 'rate>0.99' rate=99.65%
+      {level:20}
+      ✓ 'rate>0.99' rate=100.00%
+      {level:30}
+      ✓ 'rate>0.99' rate=100.00%
+      {level:40}
+      ✓ 'rate>0.99' rate=100.00%
+      {level:50}
+      ✗ 'rate>0.99' rate=98.53%
+      {level:60}
+      ✓ 'rate>0.99' rate=100.00%
+    time_to_first_token
+    ✗ 'p(95)<1500' p(95)=11.97s
+      {level:20}
+      ✓ 'p(95)<1500' p(95)=807.9ms
+      {level:30}
+      ✓ 'p(95)<1500' p(95)=1.31s
+      {level:40}
+      ✗ 'p(95)<1500' p(95)=7.12s
+      {level:50}
+      ✗ 'p(95)<1500' p(95)=13.2s
+      {level:60}
+      ✗ 'p(95)<1500' p(95)=10.15s
+  █ TOTAL RESULTS 
+
+[exit 0]

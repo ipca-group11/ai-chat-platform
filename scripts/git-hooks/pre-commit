@@ -1,0 +1,10 @@
+#!/bin/sh
+# Blocks a commit that stages a secret. Install with: pnpm hooks:install
+# Bypass in an emergency (not for real secrets): git commit --no-verify
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks is not installed, secret scan SKIPPED." >&2
+  echo "  macOS: brew install gitleaks   Linux: see https://github.com/gitleaks/gitleaks#installing" >&2
+  exit 0
+fi
+root=$(git rev-parse --show-toplevel)
+exec gitleaks git --pre-commit --staged --redact --no-banner --config "$root/.gitleaks.toml"

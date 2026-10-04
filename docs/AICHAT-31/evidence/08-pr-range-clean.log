@@ -1,0 +1,7 @@
+$ gitleaks git --redact --no-banner --config .gitleaks.toml --log-opts="main..HEAD"; echo "gitleaks exit code: $?"
+gitleaks exit code: 0
+12:26PM INF 31 commits scanned.
+12:26PM INF scanned ~114374 bytes (114.37 KB) in 142ms
+12:26PM INF no leaks found
+
+[exit 0]

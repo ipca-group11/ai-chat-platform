@@ -26,7 +26,7 @@
     "paths": {
       "@app/shared-types/api-keys": ["../../packages/shared-types/src/api-keys/index.ts"]
     },
-    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
+    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom", "node"]
   },
   "include": ["src"]
 }

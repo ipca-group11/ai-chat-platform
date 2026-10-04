@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coveragePreset, vitestPreset } from "./vitest.preset.js";
+import { coveragePreset, vitestPreset } from "./vitest.preset.ts";
 
 describe("coveragePreset", () => {
   it("AC-97: uses the v8 provider and the shared 80% thresholds", () => {
@@ -33,6 +33,21 @@ describe("coveragePreset", () => {
   it("AC-97: omits include when not supplied, letting Vitest default to instrumented files", () => {
     const preset = coveragePreset();
     expect(preset.include).toBeUndefined();
+  });
+});
+
+describe("coveragePreset reporters and overrides", () => {
+  it("AICHAT-81: emits text, lcov and json-summary reports", () => {
+    expect(coveragePreset().reporter).toEqual(["text", "lcov", "json-summary"]);
+  });
+
+  it("AICHAT-81: merges threshold overrides over the 80% default", () => {
+    expect(coveragePreset({ thresholds: { branches: 75 } }).thresholds).toEqual({
+      lines: 80,
+      statements: 80,
+      functions: 80,
+      branches: 75,
+    });
   });
 });
 

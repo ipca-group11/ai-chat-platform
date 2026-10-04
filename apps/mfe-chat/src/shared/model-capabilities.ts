@@ -1,29 +1,15 @@
+import { supportsReasoning as sharedSupportsReasoning, supportsWebFetch as sharedSupportsWebFetch } from "@app/shared-types/model-capabilities";
 import type { Provider } from "./types";
 
 /**
- * Which models can reason ("think") before answering, so the reasoning toggle is only
- * offered where it does something. Mirrors `supportsReasoning` in conversation-service's
- * provider adapters, which is authoritative: the server ignores the toggle for any
- * model it doesn't recognise as a reasoning model.
+ * Which models can reason ("think") or fetch web pages, so the toggles are only offered
+ * where they do something. The rules live in `packages/shared-types` (AICHAT-133), the same
+ * ones conversation-service's adapters use, so the UI and the server cannot disagree.
  */
-const REASONING_MODEL_PATTERNS: Record<Provider, RegExp> = {
-  openai: /^(o\d|gpt-[5-9])/,
-  anthropic: /claude-(fable|mythos|opus-[45]|sonnet-[45]|haiku-4|3-7-sonnet)/,
-};
-
-/**
- * Which models can fetch web pages while answering (Anthropic's web fetch tool). Mirrors
- * `supportsWebFetch` in conversation-service's provider adapters, which is authoritative.
- */
-const WEB_FETCH_MODEL_PATTERNS: Record<Provider, RegExp | null> = {
-  openai: null,
-  anthropic: /claude-(fable|mythos|opus-[45]|sonnet-[45]|haiku-4|3-7-sonnet)/,
-};
-
 export function supportsWebFetch(provider: Provider, model: string): boolean {
-  return WEB_FETCH_MODEL_PATTERNS[provider]?.test(model.toLowerCase()) ?? false;
+  return sharedSupportsWebFetch(provider, model);
 }
 
 export function supportsReasoning(provider: Provider, model: string): boolean {
-  return REASONING_MODEL_PATTERNS[provider].test(model.toLowerCase());
+  return sharedSupportsReasoning(provider, model);
 }

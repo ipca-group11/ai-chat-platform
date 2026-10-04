@@ -1,0 +1,79 @@
+# Mock server profiles (AICHAT-144). Used on top of compose.yaml:
+#
+#   docker compose -f compose.yaml -f compose.mock.yaml --profile llm up -d --build
+#   docker compose -f compose.yaml -f compose.mock.yaml --profile frontend-only up -d --build
+#
+# `pnpm mock:up` / `pnpm mock:down` do this (scripts/mock-compose.sh). The plain
+# `docker compose up` of compose.yaml is not affected by this file.
+#
+#   llm            the real stack, with conversation-service calling the mock instead of
+#                  api.anthropic.com / api.openai.com. No provider key is needed: the mock
+#                  accepts any key. The scenario is picked with the model name ("model@scenario").
+#   frontend-only  shell + the three MFEs + the mock; the shell proxies /auth and /api to the
+#                  mock, so no database and no backend service run. Sign in with
+#                  alice@mock.test / the dataset password (docs/AICHAT-144/MOCK-SERVER.md).
+
+services:
+  mock-server:
+    build:
+      context: .
+      dockerfile: testing/mock-server/Dockerfile
+    profiles: [llm, frontend-only]
+    restart: unless-stopped
+    environment:
+      PORT: "4010"
+      MOCK_DATASET: ${MOCK_DATASET:-default}
+      SEED: ${MOCK_SEED:-1}
+      TTFT_MS: ${MOCK_TTFT_MS:-200}
+      TOKEN_INTERVAL_MS: ${MOCK_TOKEN_INTERVAL_MS:-20}
+      TOKENS: ${MOCK_TOKENS:-40}
+      LATENCY_MS: ${MOCK_LATENCY_MS:-0}
+      ERROR_RATE: ${MOCK_ERROR_RATE:-0}
+    ports:
+      - "127.0.0.1:${MOCK_SERVER_PORT:-4010}:4010"
+    networks:
+      - llm-chat
+
+  # --- profile llm: the real stack plus the mock -----------------------------------------
+  postgres:
+    profiles: !override [llm]
+  auth-service:
+    profiles: !override [llm]
+  conversation-service:
+    profiles: !override [llm]
+    depends_on:
+      mock-server:
+        condition: service_healthy
+    environment:
+      ANTHROPIC_BASE_URL: http://mock-server:4010/anthropic
+      OPENAI_BASE_URL: http://mock-server:4010/openai
+  shell:
+    profiles: !override [llm]
+  prometheus:
+    profiles: !override [llm]
+  grafana:
+    profiles: !override [llm]
+  loki:
+    profiles: !override [llm]
+  alloy:
+    profiles: !override [llm]
+
+  # --- profile frontend-only: no backend, the shell talks to the mock ----------------------
+  shell-frontend-only:
+    extends:
+      file: compose.yaml
+      service: shell
+    profiles: !override [frontend-only]
+    depends_on: !override
+      mock-server:
+        condition: service_healthy
+      mfe-auth:
+        condition: service_healthy
+      mfe-chat:
+        condition: service_healthy
+      mfe-settings:
+        condition: service_healthy
+    environment:
+      AUTH_SERVICE_URL: http://mock-server:4010
+      # The shell strips /api before it forwards, the mock serves the chat API under /api.
+      CONVERSATION_SERVICE_URL: http://mock-server:4010/api

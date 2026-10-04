@@ -1,0 +1,15 @@
+$ cd services/conversation-service && npx vitest run src/test-utils/no-network.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+ ✓ src/test-utils/no-network.spec.ts > no-network guard (setup-no-network.ts) > throws when a test calls the global fetch 1ms
+ ✓ src/test-utils/no-network.spec.ts > no-network guard (setup-no-network.ts) > fails an anthropic adapter built without fetchImpl instead of reaching the network 1ms
+ ✓ src/test-utils/no-network.spec.ts > no-network guard (setup-no-network.ts) > fails an openai adapter built without fetchImpl instead of reaching the network 0ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  12:49:18
+   Duration  124ms (transform 70%, import 13%, setup 7%, tests 6%, worker 4%)
+
+
+[exit 0]

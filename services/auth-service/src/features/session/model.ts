@@ -49,6 +49,8 @@ export async function verifyCredentials(
   if (!user) {
     // Still hash a dummy value so unknown-email and wrong-password requests take a
     // comparable amount of time (defense against email-enumeration by timing).
+    // Dummy hash for constant-time compare, not a credential (WAIVERS.md W3)
+    // nosemgrep: detected-bcrypt-hash
     await bcrypt.compare(input.password, "$2b$12$CwTycUXWue0Thq9StjUM0uJ8i6C6/EF9j5sMz6E7L2X4Y0h4h4h4u");
     throw invalidCredentials();
   }
@@ -81,6 +83,8 @@ export async function issueTokens(
       rotatedFrom: options?.rotatedFrom,
     },
   });
+  // Every sign-in and every refresh counts as activity; the retention job deletes accounts idle for 24 months.
+  await prisma.user.update({ where: { id: user.id }, data: { lastActiveAt: new Date() } });
 
   return { accessToken, refreshToken };
 }

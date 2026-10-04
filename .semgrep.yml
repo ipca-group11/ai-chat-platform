@@ -1,0 +1,37 @@
+# Custom Semgrep rules for ai-chat-platform (AICHAT-27).
+# The registry rule packs are listed in scripts/ci/semgrep.sh; this file holds our own rules.
+# Severity policy: ERROR blocks the merge, WARNING is only reported.
+rules:
+  - id: aichat.secret-with-literal-default-zod
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      "$K" looks like a secret but the env schema gives it a literal default. If the variable is missing the
+      service starts with a publicly known value. Make it required (no .default) and fail on startup.
+    patterns:
+      - pattern: |
+          $K: $SCHEMA.default("...")
+      - metavariable-regex:
+          metavariable: $K
+          regex: (?i).*(secret|password|passwd|token|api_?key|private_?key).*
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+
+  - id: aichat.secret-env-fallback-literal
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      process.env.$NAME falls back to a string literal. For secrets, require the variable and throw when it is missing.
+    patterns:
+      - pattern-either:
+          - pattern: process.env.$NAME ?? "..."
+          - pattern: process.env.$NAME || "..."
+          - pattern: process.env["$NAME"] ?? "..."
+          - pattern: process.env["$NAME"] || "..."
+      - metavariable-regex:
+          metavariable: $NAME
+          regex: (?i).*(secret|password|passwd|token|api_?key|private_?key).*
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"

@@ -1,0 +1,88 @@
+$ bash /private/tmp/claude-501/sz.sh
+nx run-many -t size: exit 0
+  
+  shell remoteEntry.js
+  Size limit: 7 kB
+  Size:       6.15 kB gzipped
+  
+  shell own chunks
+  Size limit: 57 kB
+  Size:       51.54 kB gzipped
+  
+  shell federation glue
+  Size limit: 130 kB
+  Size:       117.6 kB gzipped
+  
+  shell shared-library copies
+  Size limit: 134 kB
+  Size:       121.36 kB gzipped
+  
+  shell all emitted JS
+  Size limit: 327 kB
+  Size:       296.64 kB gzipped
+  
+  
+  mfe-auth remoteEntry.js
+  Size limit: 7 kB
+  Size:       6.22 kB gzipped
+  
+  mfe-auth route chunks
+  Size limit: 28 kB
+  Size:       24.75 kB gzipped
+  
+  mfe-auth federation glue
+  Size limit: 129 kB
+  Size:       116.94 kB gzipped
+  
+  mfe-auth shared-library copies
+  Size limit: 137 kB
+  Size:       123.7 kB gzipped
+  
+  mfe-auth all emitted JS
+  Size limit: 299 kB
+  Size:       271.61 kB gzipped
+  
+  
+  mfe-chat remoteEntry.js
+  Size limit: 7 kB
+  Size:       6.26 kB gzipped
+  
+  mfe-chat route chunks
+  Size limit: 70 kB
+  Size:       63.07 kB gzipped
+  
+  mfe-chat federation glue
+  Size limit: 136 kB
+  Size:       123.08 kB gzipped
+  
+  mfe-chat shared-library copies
+  Size limit: 137 kB
+  Size:       123.75 kB gzipped
+  
+  mfe-chat all emitted JS
+  Size limit: 348 kB
+  Size:       316.15 kB gzipped
+  
+  
+  mfe-settings remoteEntry.js
+  Size limit: 7 kB
+  Size:       6.22 kB gzipped
+  
+  mfe-settings route chunks
+  Size limit: 29 kB
+  Size:       25.84 kB gzipped
+  
+  mfe-settings federation glue
+  Size limit: 129 kB
+  Size:       116.55 kB gzipped
+  
+  mfe-settings shared-library copies
+  Size limit: 99 kB
+  Size:       89.64 kB gzipped
+  
+  mfe-settings all emitted JS
+  Size limit: 263 kB
+  Size:       238.25 kB gzipped
+  
+
+[exit 0]
