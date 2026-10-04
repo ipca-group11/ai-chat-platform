@@ -32,6 +32,18 @@ describe("ProviderList", () => {
     expect(screen.queryByLabelText("Ollama API key")).not.toBeInTheDocument();
   });
 
+  it("AC-77: marks Ollama, the keyless provider, as Local with no key status, form or test button", () => {
+    renderWithClient(<ProviderList />);
+
+    const ollamaCard = screen.getByRole("heading", { level: 2, name: "Ollama" }).closest("div[class*='rounded']") as HTMLElement;
+    expect(within(ollamaCard).getByText("Local")).toBeInTheDocument();
+    expect(within(ollamaCard).getByText("Ollama runs locally — no API key is required to use it.")).toBeInTheDocument();
+    expect(within(ollamaCard).queryByText(/configured|re-enter key/i)).not.toBeInTheDocument();
+    expect(within(ollamaCard).queryByRole("form")).not.toBeInTheDocument();
+    expect(within(ollamaCard).queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Local")).toHaveLength(1);
+  });
+
   it("AC-76: saving a key for a provider updates its masked display", async () => {
     const user = userEvent.setup();
     renderWithClient(<ProviderList />);
