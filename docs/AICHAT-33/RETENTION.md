@@ -50,3 +50,22 @@ success.
 
 **Telemetry.** Log lines carry no user id; minimisation (AICHAT-32) plus the 7-day Loki retention is the erasure
 mechanism for them. The config test keeps the 7 days from being removed or raised.
+
+## How to run the checks
+
+Docker must be running for the database tests (Testcontainers starts `postgres:16-alpine`, the version compose uses).
+
+```sh
+# unit tests, no Docker needed
+pnpm exec nx run-many -t test -p auth-service,conversation-service,workspace-config
+
+# database tests: account deletion across both services, retention boundaries (real Postgres, real files)
+pnpm exec nx run-many -t test-db -p auth-service,conversation-service --parallel=1
+
+# Loki retention guard
+pnpm exec nx test workspace-config
+```
+
+The retention jobs run every `RETENTION_INTERVAL_MINUTES` (default 360, `0` turns them off) in each service.
+`INTERNAL_SERVICE_TOKEN` (at least 32 characters, the same value in both services) and `CONVERSATION_SERVICE_URL`
+(auth-service) must be set for account deletion; the compose files set them for local use.
