@@ -197,18 +197,25 @@ docker compose -f compose.yaml down
 
 ## 5. Results
 
-| Metric | Before | After |
-|---|---|---|
-| … | … | … |
+| Metric | Value |
+|---|---|
+| Hypotheses tested | 11 (H1–H11) |
+| Confirmed | 6 (H1 High, H2 Critical, H4/H6/H8/H11 Medium, H7 Low) |
+| Refuted | 2 (H3, H5) |
+| Inconclusive / out of scope here | H9 (covered by AICHAT-26), H10 |
+| Most serious | H2 — forgeable JWT, CVSS 9.8 |
 
 ## 6. DoD check
 
 | DoD item | Met | Evidence |
 |---|---|---|
-| … | ✅ | [link](evidence/…) |
+| Run instructions / methodology documented | ✅ | §4 "How to run everything"; [RULES-OF-ENGAGEMENT.md](RULES-OF-ENGAGEMENT.md) |
+| Report with findings and severity in `docs/` | ✅ | [REPORT.md](REPORT.md); [evidence/01-probes.png](evidence/01-probes.png) |
+| High findings fixed or ticketed | ✅ | REPORT.md §6 ticket map; H2→AICHAT-210, H1 and H6 new, others linked |
 
 ## 7. Notes for the report
 
-- What was found
-- What was fixed / waived
-- Lessons learned
+- **What was found.** Six confirmed weaknesses. The Critical one (H2) is a forgeable JWT: conversation-service accepts any HS256 token signed with the shared secret, which has a committed insecure default. High: a chat shared to an email is reachable by anyone who later registers that address (no email verification). Medium: a shared login rate-limit bucket, upload type trusting the client MIME, missing CSP/HSTS on the frontends and committed default secrets. Low: public `/metrics`.
+- **What was refuted.** Refresh-token rotation invalidates a reused token (H3), and a non-member cannot read a chat by id (H5). Both access-control defences hold.
+- **What was fixed / waived.** No behaviour was changed during the assessment. H2 is the existing waiver AICHAT-210. The confirmed findings are ticketed; the retest is to rerun the harness after each fix.
+- **Lessons learned.** A small, dependency-free probe harness against a local staging copy turns a code-review hypothesis into reproducible evidence with a CVSS score, and the same harness is the retest once a fix lands.
