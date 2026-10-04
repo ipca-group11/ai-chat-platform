@@ -294,3 +294,18 @@ The shell now publishes its Module Federation runtime on `globalThis` (`experime
 | Shell `remoteEntry.js` | 6.2 kB | 7.4 kB (carries the runtime publisher) |
 
 Budgets: remote glue and totals lowered; the shell `remoteEntry.js` limit goes from 7 to 8 KB (the analysis upper bound), justified by the ~57 kB of repeat downloads it removes.
+
+### AICHAT-239 · Split the design system, lazy-load the chat view
+
+`@app/ui` is a federated singleton and a shared module is loaded whole, so every page downloaded all of Base UI through it (`dist-*`, 85 kB gzip) while only Button, Input, Card and a few more are rendered. The barrel now holds the light components; `avatar`, `dialog`, `dropdown-menu`, `select`, `tabs`, `toast` and `tooltip` are per-component entries (`@app/ui/dialog`, ...), shared the same way and only loaded with the component. `mfe-chat` lazy-loads the chat view (Markdown, composer) and both dialogs.
+
+| App, all emitted JS (gzip) | Before (develop) | After (237 + 239) |
+|---|---|---|
+| shell | 305.2 kB | 282.5 kB |
+| mfe-auth | 271.6 kB | 184.4 kB |
+| mfe-chat | 316.7 kB | 277.5 kB |
+| mfe-settings | 239.4 kB | 169.8 kB |
+| shared `@app/ui` downloaded on every page | 85 kB | 20 kB |
+| `mfe-chat` `routes-*` (the `/chats` chunk) | 61.2 kB | 5.7 kB (+ `chat-view-*` 54.6 kB, only on `/chats/:id`) |
+
+Budgets: the design-system entries (and their shared Base UI chunk) join the shared-copies group, so glue went down (shell 130 → 35 KB) and shared copies up (shell 134 → 202 KB) while every total went down; limits re-measured with the +10 % rule.

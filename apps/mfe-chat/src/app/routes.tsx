@@ -2,6 +2,10 @@ import { createRoute, useRouterState, type AnyRoute } from "@tanstack/react-rout
 import { ChatListPage } from "./ChatListPage";
 import { ChatDetailPage } from "./ChatDetailPage";
 import { CurrentUserGate } from "./auth-context";
+import { loadChatView } from "./lazy-chat-view";
+
+// Opening a chat directly: fetch the chat view code now rather than after the user check (AICHAT-239).
+if (typeof window !== "undefined" && /^\/chats\/[^/]+/.test(window.location.pathname)) void loadChatView();
 
 /**
  * Registers this remote's routes onto the shell's root route (FE-1).

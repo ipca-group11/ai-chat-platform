@@ -4,6 +4,9 @@ import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
+/** Components with their own entry (`@app/ui/<name>`), kept out of the barrel. */
+const componentEntries = ['avatar', 'dialog', 'dropdown-menu', 'select', 'tabs', 'toast', 'tooltip'];
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -13,9 +16,12 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      // The barrel plus one entry per heavy component (AICHAT-239, see src/index.ts).
+      entry: Object.fromEntries(
+        ['index', ...componentEntries].map((name) => [name, resolve(__dirname, `src/${name}.ts`)]),
+      ),
       formats: ['es'],
-      fileName: 'index',
+      fileName: (_format, entryName) => `${entryName}.js`,
     },
     outDir: 'dist',
     emptyOutDir: true,

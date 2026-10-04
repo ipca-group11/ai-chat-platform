@@ -6,15 +6,10 @@ import {
   Card,
   CardDescription,
   CardHeader,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
   Input,
   Label,
 } from "@app/ui";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@app/ui/dialog";
 import { useCurrentUserId } from "../../api-keys";
 import { DeleteAccountError, deleteAccount } from "../api/deleteAccount";
 

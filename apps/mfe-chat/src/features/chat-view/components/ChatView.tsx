@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle, Badge, Button, Skeleton, cn } from "@app/ui";
 import { ArrowLeft, Brain, CircleAlert, Eye, EyeOff, Globe, Users, X } from "lucide-react";
-import { MembersDialog } from "../../chat-members";
 import { useChat, useUpdateChat } from "../../chat-list";
 import { Composer } from "../../composer";
 import { MessageQueue } from "../../message-queue";
@@ -10,6 +9,9 @@ import { useMessages, useRetryMessage, useStopMessage } from "../api/messages";
 import { useMessageStream } from "../hooks/useMessageStream";
 import { useShowReasoning } from "../model/show-reasoning";
 import { MessageList } from "./MessageList";
+
+// Loaded on the first click on "Share" / "Members" (AICHAT-239).
+const MembersDialog = lazy(() => import("../../chat-members").then((m) => ({ default: m.MembersDialog })));
 
 export interface ChatViewProps {
   chatId: string;
@@ -36,6 +38,8 @@ export function ChatView({ chatId, userId, onBack, onClose, compact = false }: C
   const updateChat = useUpdateChat();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [membersOpen, setMembersOpen] = useState(false);
+  // Mounted from the first open on, so closing keeps its exit animation.
+  const [membersLoaded, setMembersLoaded] = useState(false);
   const [showReasoning, setShowReasoning] = useShowReasoning();
 
   useMessageStream(chatId);
@@ -195,7 +199,10 @@ export function ChatView({ chatId, userId, onBack, onClose, compact = false }: C
           variant="outline"
           size={compact ? "icon" : "sm"}
           className={cn("shrink-0", compact ? "size-8" : "h-8")}
-          onClick={() => setMembersOpen(true)}
+          onClick={() => {
+            setMembersLoaded(true);
+            setMembersOpen(true);
+          }}
           aria-label={isOwner ? "Share chat" : "Chat members"}
         >
           <Users aria-hidden="true" />
@@ -211,14 +218,18 @@ export function ChatView({ chatId, userId, onBack, onClose, compact = false }: C
           </Alert>
         </div>
       ) : null}
-      <MembersDialog
-        chatId={chatId}
-        chatTitle={chat.title}
-        isOwner={isOwner}
-        open={membersOpen}
-        onClose={() => setMembersOpen(false)}
-        onLeft={onClose ?? onBack}
-      />
+      {membersLoaded ? (
+        <Suspense fallback={null}>
+          <MembersDialog
+            chatId={chatId}
+            chatTitle={chat.title}
+            isOwner={isOwner}
+            open={membersOpen}
+            onClose={() => setMembersOpen(false)}
+            onLeft={onClose ?? onBack}
+          />
+        </Suspense>
+      ) : null}
 
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
         <div className={cn("mx-auto w-full max-w-3xl px-4", compact ? "py-3" : "py-6")}>

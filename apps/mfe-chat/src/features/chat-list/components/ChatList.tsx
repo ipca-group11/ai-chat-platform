@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { Alert, AlertDescription, Button, Skeleton } from "@app/ui";
 import { Plus } from "lucide-react";
 import { useChats, useCreateChat, useDeleteChat, useUpdateChat } from "../api/chats";
 import { ChatListItem } from "./ChatListItem";
-import { NewChatDialog } from "./NewChatDialog";
+
+// Loaded on the first click on "New chat" (AICHAT-239): the dialog and its select are not needed to show the list.
+const NewChatDialog = lazy(() => import("./NewChatDialog").then((m) => ({ default: m.NewChatDialog })));
 
 export interface ChatListProps {
   activeChatId?: string;
@@ -52,20 +54,24 @@ export function ChatList({
           New chat
         </Button>
       </div>
-      <NewChatDialog
-        key={dialogKey}
-        open={dialogOpen}
-        submitting={createChat.isPending}
-        onClose={() => setDialogOpen(false)}
-        onCreate={(input) => {
-          createChat.mutate(input, {
-            onSuccess: (chat) => {
-              setDialogOpen(false);
-              onOpenChat(chat.id);
-            },
-          });
-        }}
-      />
+      {dialogKey > 0 ? (
+        <Suspense fallback={null}>
+          <NewChatDialog
+            key={dialogKey}
+            open={dialogOpen}
+            submitting={createChat.isPending}
+            onClose={() => setDialogOpen(false)}
+            onCreate={(input) => {
+              createChat.mutate(input, {
+                onSuccess: (chat) => {
+                  setDialogOpen(false);
+                  onOpenChat(chat.id);
+                },
+              });
+            }}
+          />
+        </Suspense>
+      ) : null}
 
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
         {chatsQuery.isLoading && (

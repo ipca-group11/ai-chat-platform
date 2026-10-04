@@ -49,6 +49,10 @@ export default createModuleFederationConfig({
     // Design system (`packages/ui`), shared as a singleton per AC-24 so host and
     // remotes render the same shadcn/Base UI components.
     '@app/ui': { singleton: true, requiredVersion: false },
+    // AICHAT-239: the heavier components are separate entries of the design system, shared the
+    // same way but only downloaded when a remote renders them (mfe-chat's dialogs).
+    '@app/ui/dialog': { singleton: true, requiredVersion: false },
+    '@app/ui/select': { singleton: true, requiredVersion: false },
   },
   // AICHAT-237: `loaded-first` takes a shared module from whoever already loaded it (the shell)
   // instead of fetching every remote's remoteEntry.js at start-up to compare versions, so

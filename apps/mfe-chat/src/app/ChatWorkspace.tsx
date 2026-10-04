@@ -1,9 +1,9 @@
-import type { CSSProperties } from "react";
+import { Suspense, type CSSProperties } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Button, cn } from "@app/ui";
+import { Button, Skeleton, cn } from "@app/ui";
 import { Columns2, MessageSquare, Rows2 } from "lucide-react";
 import { ChatList } from "../features/chat-list";
-import { ChatView } from "../features/chat-view";
+import { ChatView } from "./lazy-chat-view";
 import { useCurrentUserId } from "./auth-context";
 import {
   closePane,
@@ -158,13 +158,15 @@ export function ChatWorkspace({ chatId }: { chatId?: string }) {
                       className="pointer-events-none absolute inset-0 z-10 hidden ring-2 ring-inset ring-ring/40 md:block"
                     />
                   ) : null}
-                  <ChatView
-                    chatId={id}
-                    userId={userId}
-                    onBack={backToList}
-                    onClose={split ? () => closeChat(id) : undefined}
-                    compact={split}
-                  />
+                  <Suspense fallback={<ChatViewFallback />}>
+                    <ChatView
+                      chatId={id}
+                      userId={userId}
+                      onBack={backToList}
+                      onClose={split ? () => closeChat(id) : undefined}
+                      compact={split}
+                    />
+                  </Suspense>
                 </div>
               );
             })}
@@ -181,6 +183,18 @@ export function ChatWorkspace({ chatId }: { chatId?: string }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Shown in a pane while the chat view code loads (the first chat opened in a visit). */
+function ChatViewFallback() {
+  return (
+    <div className="mx-auto w-full max-w-3xl space-y-3 px-4 py-6">
+      <span className="sr-only">Loading chat…</span>
+      <Skeleton className="h-8 w-1/3" />
+      <Skeleton className="h-16 w-2/3" />
+      <Skeleton className="h-16 w-1/2" />
     </div>
   );
 }

@@ -57,8 +57,12 @@ export const LoadError: Story = {
 
 /** After clicking "New chat". */
 export const NewChatDialogOpen: Story = {
-  play: ({ canvasElement }) => {
+  play: async ({ canvasElement }) => {
     const button = Array.from(canvasElement.querySelectorAll("button")).find((b) => b.textContent?.includes("New chat"));
     button?.click();
+    // The dialog is loaded on the first open (AICHAT-239): wait until it is on the page.
+    for (let i = 0; i < 100 && !document.querySelector('[role="dialog"]'); i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
   },
 };

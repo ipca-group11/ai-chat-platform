@@ -24,8 +24,18 @@ const glue = [
 
 // Copies of the shared libraries (react, react-dom, router, query, ui). In a remote these are
 // fallbacks that the browser does not download when the shell provides the library.
-const sharedCopies = [`${assets}/*prebuild*.js`, `${assets}/*loadShare*.js`];
+// The per-component entries of @app/ui (AICHAT-239) and the Base UI code they share are shared
+// modules too, downloaded only when a page renders that component.
+const designSystemEntries = ['avatar', 'dialog', 'dropdown-menu', 'select', 'tabs', 'toast', 'tooltip', 'useOpenInteractionType'];
+const sharedCopies = [
+  `${assets}/*prebuild*.js`,
+  `${assets}/*loadShare*.js`,
+  ...designSystemEntries.map((name) => `${assets}/${name}-*.js`),
+];
 
+// AICHAT-239: @app/ui is split into a light barrel and per-component entries; the shared design system
+// moved from the `dist-*` chunk (glue) to the shared-copies group, so glue went down, shared copies up
+// and the total down. Limits re-measured (+10%).
 export default [
   { name: 'mfe-chat remoteEntry.js', path: 'dist/remoteEntry.js', limit: '7 KB', gzip: true },
   {
@@ -34,7 +44,7 @@ export default [
     limit: '70 KB',
     gzip: true,
   },
-  { name: 'mfe-chat federation glue', path: glue, limit: '114 KB', gzip: true },
-  { name: 'mfe-chat shared-library copies', path: sharedCopies, limit: '137 KB', gzip: true },
-  { name: 'mfe-chat all emitted JS', path: [`${assets}/*.js`, 'dist/remoteEntry.js'], limit: '326 KB', gzip: true },
+  { name: 'mfe-chat federation glue', path: glue, limit: '20 KB', gzip: true },
+  { name: 'mfe-chat shared-library copies', path: sharedCopies, limit: '206 KB', gzip: true },
+  { name: 'mfe-chat all emitted JS', path: [`${assets}/*.js`, 'dist/remoteEntry.js'], limit: '306 KB', gzip: true },
 ];

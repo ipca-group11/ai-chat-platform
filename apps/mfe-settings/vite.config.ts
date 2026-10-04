@@ -45,6 +45,8 @@ export default defineConfig({
         "react-dom": { singleton: true, requiredVersion: false },
         "@tanstack/react-query": { singleton: true, requiredVersion: false },
         "@app/ui": { singleton: true, requiredVersion: false },
+        // AICHAT-239: per-component entry of the design system, used by the delete-account dialog.
+        "@app/ui/dialog": { singleton: true, requiredVersion: false },
       },
       // AICHAT-237: take the shared libraries from the shell as loaded, and reuse the shell's
       // federation runtime (globalThis._FEDERATION_RUNTIME_CORE) instead of bundling a copy.

@@ -1,19 +1,6 @@
 import { useState } from "react";
-import {
-  Alert,
-  AlertDescription,
-  Badge,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Label,
-  Skeleton,
-} from "@app/ui";
+import { Alert, AlertDescription, Badge, Button, Input, Label, Skeleton } from "@app/ui";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@app/ui/dialog";
 import { UserPlus, X } from "lucide-react";
 import { useAddChatMember, useChatMembers, useLeaveChat, useRemoveChatMember } from "../api/members";
 

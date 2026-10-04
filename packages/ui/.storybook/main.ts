@@ -25,7 +25,15 @@ const config: StorybookConfig = {
       ...(viteConfig.resolve.alias ?? {}),
       '@': resolve(dirname, '../src'),
       // App stories read the design system from source (not the built dist), so they always
-      // render against the same components and tokens as the primitive stories.
+      // render against the same components and tokens as the primitive stories. The
+      // per-component entries (`@app/ui/dialog`, ..., AICHAT-239) come first: `@app/ui` would
+      // otherwise match them as a prefix.
+      ...Object.fromEntries(
+        ['avatar', 'dialog', 'dropdown-menu', 'select', 'tabs', 'toast', 'tooltip'].map((name) => [
+          `@app/ui/${name}`,
+          resolve(dirname, `../src/${name}.ts`),
+        ]),
+      ),
       '@app/ui': resolve(dirname, '../src/index.ts'),
       // Same source aliases the microfrontends declare in their own vite configs.
       '@app/shared-types/model-capabilities': resolve(repoRoot, 'packages/shared-types/src/model-capabilities.ts'),

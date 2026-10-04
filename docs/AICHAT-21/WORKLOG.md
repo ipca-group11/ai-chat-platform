@@ -312,3 +312,7 @@ Lighthouse (desktop preset, median of 3) on 2026-10-04 with Docker off: the four
 ### AICHAT-238 · Preload the micro-frontend entry points
 
 `apps/shell/remote-preload.ts` (a Vite plugin) adds a `preconnect` per remote origin to `index.html` and an inline script that adds a `modulepreload` for the `remoteEntry.js` of the page being opened, tagged `data-mf-remote`. `main.tsx` reads the tag and starts the federated import of that remote before React mounts, so the remote downloads in parallel with the shell boot and the session check of `RequireAuth` instead of after it. Unit tests: `src/app/remotePreload.test.ts`, `preloadRemote.test.ts`.
+
+### AICHAT-239 · Unused JavaScript on `/chats`
+
+Unused JS on `/chats` 166 → 78 KiB (table above): the shared design system was split by component and the chat view and dialogs are lazy (details in docs/AICHAT-22/WORKLOG.md §8).

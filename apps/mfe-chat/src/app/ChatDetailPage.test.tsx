@@ -45,7 +45,8 @@ describe("ChatDetailPage", () => {
 
     renderPage("/chats/abc");
 
-    expect(await screen.findByRole("region", { name: "Chat abc" })).toBeInTheDocument();
+    // The chat view is a lazy chunk (AICHAT-239); its first transform in the test run can take a moment.
+    expect(await screen.findByRole("region", { name: "Chat abc" }, { timeout: 5000 })).toBeInTheDocument();
     expect(screen.getByTestId("chat-pane-abc")).toBeInTheDocument();
   });
 });

@@ -1,15 +1,6 @@
 import { useState } from "react";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Label,
-} from "@app/ui";
+import { Button, Input, Label } from "@app/ui";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@app/ui/dialog";
 import { supportsReasoning, supportsWebFetch } from "../../../shared/model-capabilities";
 import type { Provider } from "../../../shared/types";
 import { ProviderModelSelect } from "./ProviderModelSelect";

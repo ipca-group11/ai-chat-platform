@@ -1,5 +1,6 @@
 import { useId } from "react";
-import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@app/ui";
+import { Label } from "@app/ui";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@app/ui/select";
 import { PROVIDER_MODELS, PROVIDERS, type Provider } from "../../../shared/types";
 
 export interface ProviderModelSelectProps {

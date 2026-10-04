@@ -48,7 +48,8 @@ describe("ChatList (AC-42, AC-47)", () => {
     await screen.findByText(/no chats yet/i);
 
     await userEvent.click(screen.getByText("New chat"));
-    await userEvent.type(screen.getByLabelText("Chat title"), "First chat");
+    // The dialog is loaded on the first open (AICHAT-239).
+    await userEvent.type(await screen.findByLabelText("Chat title"), "First chat");
     await userEvent.click(screen.getByText("Create"));
 
     await waitFor(() => expect(onOpenChat).toHaveBeenCalledWith("chat-1"));

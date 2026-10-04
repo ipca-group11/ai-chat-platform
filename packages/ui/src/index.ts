@@ -1,10 +1,18 @@
 // Public API barrel for @app/ui.
 //
-// Consumers should only ever import from this file (or `@app/ui/styles.css` for the
-// design tokens stylesheet), never reach into `src/components/**` directly, so this
-// package's internal file layout can change freely. Keep each export line focused on
-// one component's module to minimize merge conflicts between tasks/PRs that add new
-// components in parallel.
+// Consumers should only ever import from this file, from the per-component entries
+// (`@app/ui/dialog`, `@app/ui/select`, `@app/ui/dropdown-menu`, `@app/ui/tooltip`,
+// `@app/ui/tabs`, `@app/ui/toast`, `@app/ui/avatar`) or `@app/ui/styles.css` for the
+// design tokens stylesheet, never reach into `src/components/**` directly, so this
+// package's internal file layout can change freely.
+//
+// The barrel holds the light components every page needs. The components built on the
+// larger Base UI primitives have their own entry (AICHAT-239): `@app/ui` is a Module
+// Federation shared singleton, and a shared module is loaded whole (no tree shaking), so
+// keeping them here made every page download all of them (about 80 kB gzip, mostly unused).
+//
+// Keep each export line focused on one component's module to minimize merge conflicts
+// between tasks/PRs that add new components in parallel.
 
 // Side-effect import so the build extracts these tokens into `dist/styles.css`
 // (see the `exports["./styles.css"]` field in package.json). Consumers import the
@@ -28,68 +36,7 @@ export {
 } from './components/card/card';
 export { Alert, AlertTitle, AlertDescription, alertVariants, type AlertProps } from './components/alert/alert';
 export { Badge, badgeVariants, type BadgeProps } from './components/badge/badge';
-export { Avatar, AvatarImage, AvatarFallback } from './components/avatar/avatar';
 export { Skeleton } from './components/skeleton/skeleton';
-export {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  type TooltipContentProps,
-} from './components/tooltip/tooltip';
-export {
-  Dialog,
-  DialogTrigger,
-  DialogClose,
-  DialogOverlay,
-  DialogContent,
-  type DialogContentProps,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-} from './components/dialog/dialog';
-export {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuGroup,
-  DropdownMenuSub,
-  DropdownMenuRadioGroup,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  type DropdownMenuItemProps,
-  DropdownMenuCheckboxItem,
-  DropdownMenuRadioItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-} from './components/dropdown-menu/dropdown-menu';
-export {
-  Select,
-  SelectGroup,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-  SelectLabel,
-  SelectItem,
-  SelectSeparator,
-} from './components/select/select';
-export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs/tabs';
-export {
-  ToastProvider,
-  useToastManager,
-  createToastManager,
-  ToastViewport,
-  Toast,
-  type ToastProps,
-  ToastTitle,
-  ToastDescription,
-  ToastAction,
-  ToastClose,
-  Toaster,
-} from './components/toast/toast';
 export {
   H1,
   H2,

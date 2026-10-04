@@ -45,6 +45,9 @@ export default defineConfig({
         "@tanstack/react-query": { singleton: true },
         "@tanstack/react-router": { singleton: true },
         "@app/ui": { singleton: true, requiredVersion: false },
+        // AICHAT-239: per-component entries of the design system, loaded with the dialogs that use them.
+        "@app/ui/dialog": { singleton: true, requiredVersion: false },
+        "@app/ui/select": { singleton: true, requiredVersion: false },
       },
       // AICHAT-237: take the shared libraries from the shell as loaded, and reuse the shell's
       // federation runtime (globalThis._FEDERATION_RUNTIME_CORE) instead of bundling a copy.
