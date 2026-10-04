@@ -15,6 +15,9 @@ export function createAttachmentsRouter(service: AttachmentsService, maxBytesCei
   const router = Router();
 
   router.post("/:chatId/messages/:messageId/attachments", upload.single("file"), asyncHandler(controller.upload));
+  // The web client uploads while the message is being written, then sends it with
+  // `attachmentIds` (AICHAT-245).
+  router.post("/:chatId/attachments", upload.single("file"), asyncHandler(controller.upload));
 
   return router;
 }

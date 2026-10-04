@@ -31,6 +31,7 @@ const ROUTE_TESTS: Record<string, string> = {
   "POST /chats/:chatId/stop": "routes.spec.ts",
   "GET /chats/:chatId/stream": "routes.spec.ts",
   "POST /chats/:chatId/messages/:messageId/attachments": "routes.spec.ts",
+  "POST /chats/:chatId/attachments": "routes.spec.ts",
   "POST /internal/erasures": "erasure.spec.ts",
 };
 

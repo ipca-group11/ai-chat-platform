@@ -9,6 +9,7 @@ import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { cookieFor, tokenFor } from "../test-utils/auth-token.js";
 import { buildTestApp, createChatVia, inviteVia } from "../test-utils/build-test-app.js";
+import { attachmentDtoSchema } from "../shared/contracts/chat.js";
 
 async function sentMessage(t: ReturnType<typeof buildTestApp>, chatId: string, userId: string) {
   return t.messagesRepo.create({ chatId, ownerId: userId, authorEmail: `${userId}@example.com`, role: "user", content: "hi", status: "sent" });
@@ -264,5 +265,46 @@ describe("attachments route", () => {
 
     const other = await request(t.app).post(path).set("Cookie", cookieFor("user-2")).attach("file", Buffer.from("x"), { filename: "n.txt", contentType: "text/plain" });
     expect(other.status).toBe(404);
+  });
+
+  // AICHAT-245: the path the web client uses — upload first, then send with attachmentIds.
+  it("POST /chats/:chatId/attachments · 201 stores the file before the send, which links it; 404 for another user", async () => {
+    const t = buildTestApp();
+    const chatId = await createChatVia(t.app, "user-1");
+    const cookie = cookieFor("user-1");
+
+    const up = await request(t.app).post(`/chats/${chatId}/attachments`).set("Cookie", cookie).attach("file", Buffer.from("hello"), { filename: "n.txt", contentType: "text/plain" });
+    expect(up.status).toBe(201);
+    expect(attachmentDtoSchema.strict().parse(up.body.attachment)).toMatchObject({ filename: "n.txt", kind: "text", messageId: "" });
+    const attachmentId = up.body.attachment.id as string;
+
+    const sent = await request(t.app).post(`/chats/${chatId}/messages`).set("Cookie", cookie).send({ content: "read this", attachmentIds: [attachmentId] });
+    expect(sent.status).toBe(201);
+    const messageId = sent.body.message.id as string;
+    expect(sent.body.message.attachments).toMatchObject([{ id: attachmentId, messageId, filename: "n.txt" }]);
+    expect(t.attachmentsRepo.all()).toMatchObject([{ id: attachmentId, chatId, messageId }]);
+
+    const other = await request(t.app).post(`/chats/${chatId}/attachments`).set("Cookie", cookieFor("user-2")).attach("file", Buffer.from("x"), { filename: "n.txt", contentType: "text/plain" });
+    expect(other.status).toBe(404);
+  });
+
+  it("an attachment is linked once, only to a message of its uploader in the same chat", async () => {
+    const t = buildTestApp();
+    const chatId = await createChatVia(t.app, "user-1");
+    const otherChat = await createChatVia(t.app, "user-1");
+    await inviteVia(t.app, "user-1", chatId, "guest@example.com");
+    const cookie = cookieFor("user-1");
+    const up = await request(t.app).post(`/chats/${chatId}/attachments`).set("Cookie", cookie).attach("file", Buffer.from("hello"), { filename: "n.txt", contentType: "text/plain" });
+    const ids = [up.body.attachment.id as string];
+
+    const elsewhere = await request(t.app).post(`/chats/${otherChat}/messages`).set("Cookie", cookie).send({ content: "x", attachmentIds: ids });
+    expect(elsewhere.body.message.attachments).toEqual([]);
+    const byGuest = await request(t.app).post(`/chats/${chatId}/messages`).set("Cookie", cookieFor("guest")).send({ content: "x", attachmentIds: ids });
+    expect(byGuest.body.message.attachments).toEqual([]);
+    const first = await request(t.app).post(`/chats/${chatId}/messages`).set("Cookie", cookie).send({ content: "x", attachmentIds: ids });
+    expect(first.body.message.attachments).toHaveLength(1);
+    const again = await request(t.app).post(`/chats/${chatId}/messages`).set("Cookie", cookie).send({ content: "y", attachmentIds: ids });
+    expect(again.body.message.attachments).toEqual([]);
+    expect(t.attachmentsRepo.all()[0]?.messageId).toBe(first.body.message.id);
   });
 });

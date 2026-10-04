@@ -5,6 +5,7 @@ export {
   toAttachmentDto,
   type AttachmentRecord,
   type AttachmentsRepository,
+  type LinkedAttachmentRecord,
   type UploadFile,
 } from "./service.js";
 export { createFileCleanup, type FileCleanup } from "./file-cleanup.js";

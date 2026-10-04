@@ -45,23 +45,24 @@ enum AttachmentKind {
 }
 
 model Chat {
-  id         String       @id @default(cuid())
-  ownerId    String
+  id          String       @id @default(cuid())
+  ownerId     String
   // Nullable: chats created before sharing existed have no recorded owner email.
-  ownerEmail String?
-  title      String
-  provider   ChatProvider
-  model      String
+  ownerEmail  String?
+  title       String
+  provider    ChatProvider
+  model       String
   /// Ask the model to reason before answering, for models that support it (see
   /// `LlmProvider.supportsReasoning`); ignored for models that don't.
-  reasoning  Boolean      @default(false)
+  reasoning   Boolean      @default(false)
   /// Let the model fetch the web pages behind URLs in the conversation, for models that
   /// support it (see `LlmProvider.supportsWebFetch`); ignored for models that don't.
-  webFetch   Boolean      @default(false)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  messages   Message[]
-  members    ChatMember[]
+  webFetch    Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  messages    Message[]
+  members     ChatMember[]
+  attachments Attachment[]
 
   @@index([ownerId])
 }
@@ -106,10 +107,16 @@ model Message {
   @@index([ownerId])
 }
 
+/// The web client uploads files before it sends the message (AICHAT-245): such an
+/// attachment has only its `chatId` until `POST /chats/:id/messages` links it through
+/// `attachmentIds`.
 model Attachment {
   id            String         @id @default(cuid())
-  messageId     String
-  message       Message        @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  messageId     String?
+  message       Message?       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  // Nullable: rows uploaded before AICHAT-245 have no recorded chat.
+  chatId        String?
+  chat          Chat?          @relation(fields: [chatId], references: [id], onDelete: Cascade)
   ownerId       String
   filename      String
   mimeType      String
@@ -120,5 +127,6 @@ model Attachment {
   createdAt     DateTime       @default(now())
 
   @@index([messageId])
+  @@index([chatId])
   @@index([ownerId])
 }

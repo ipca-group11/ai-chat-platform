@@ -48,7 +48,7 @@ describe("attachments controller", () => {
 
   it("upload: rejects missing route params before looking at the file", async () => {
     const { service, controller } = setup();
-    await expect(controller.upload(fakeReq({ params: { chatId: "c1" } }), fakeRes())).rejects.toBeInstanceOf(ZodError);
+    await expect(controller.upload(fakeReq({ params: { messageId: "m1" } }), fakeRes())).rejects.toBeInstanceOf(ZodError);
     expect(service.upload).not.toHaveBeenCalled();
   });
 

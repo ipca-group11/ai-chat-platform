@@ -191,7 +191,9 @@ function createConversationRouter(ctx: MockContext): Router {
     const user = userOf(res);
     const target = accessibleChat(ctx, user, param(req, "chatId"));
     const input = parse(sendMessageSchema, req.body);
-    const owned = ctx.store.data.attachments.filter((a) => input.attachmentIds.includes(a.id) && a.ownerId === user.id);
+    const owned = ctx.store.data.attachments.filter(
+      (a) => input.attachmentIds.includes(a.id) && a.ownerId === user.id && a.messageId === "",
+    );
     const record: StoredMessage = {
       id: nextId(ctx, "msg", ctx.store.data.messages.map((m) => m.id)),
       chatId: target.id,
@@ -289,7 +291,7 @@ function createConversationRouter(ctx: MockContext): Router {
   const upload = (req: Request, res: Response, messageIdParam: string | undefined): void => {
     const user = userOf(res);
     const target = accessibleChat(ctx, user, param(req, "chatId"));
-    let messageId = "pending";
+    let messageId = ""; // empty until the message is sent, as in the service
     if (messageIdParam !== undefined) {
       const record = findMessage(ctx, messageIdParam);
       if (!record || record.chatId !== target.id || (record.authorId ?? target.ownerId) !== user.id) {

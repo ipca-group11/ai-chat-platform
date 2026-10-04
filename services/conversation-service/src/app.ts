@@ -82,7 +82,7 @@ export function createApp(
       },
     );
 
-  const messagesService = new MessagesService(messagesRepo, chatsService, queueManager, bus, fileCleanup);
+  const messagesService = new MessagesService(messagesRepo, chatsService, queueManager, bus, fileCleanup, attachmentsRepo);
   const attachmentsService = new AttachmentsService(
     attachmentsRepo,
     chatsService,

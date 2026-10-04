@@ -11,7 +11,9 @@ import type { AttachmentStorage } from "./storage.js";
 
 export interface AttachmentRecord {
   id: string;
-  messageId: string;
+  /** Null until the message it was uploaded for is sent (AICHAT-245). */
+  messageId: string | null;
+  chatId: string | null;
   ownerId: string;
   filename: string;
   mimeType: string;
@@ -22,9 +24,13 @@ export interface AttachmentRecord {
   createdAt: Date;
 }
 
+/** An attachment that belongs to a message. */
+export type LinkedAttachmentRecord = AttachmentRecord & { messageId: string };
+
 export interface AttachmentsRepository {
   create(data: {
-    messageId: string;
+    messageId: string | null;
+    chatId?: string;
     ownerId: string;
     filename: string;
     mimeType: string;
@@ -33,7 +39,10 @@ export interface AttachmentsRepository {
     storagePath: string;
     extractedText: string | null;
   }): Promise<AttachmentRecord>;
-  findManyByMessageIds(messageIds: string[]): Promise<AttachmentRecord[]>;
+  findManyByMessageIds(messageIds: string[]): Promise<LinkedAttachmentRecord[]>;
+  /** Links the caller's not-yet-sent uploads of this chat to `messageId`; ids that are
+   * unknown, someone else's, of another chat or already sent are left alone. */
+  linkToMessage(ids: string[], target: { chatId: string; ownerId: string; messageId: string }): Promise<LinkedAttachmentRecord[]>;
   /** Which of these storage paths are referenced by an attachment row. */
   findReferencedPaths(storagePaths: string[]): Promise<Set<string>>;
 }
@@ -45,7 +54,17 @@ export function createAttachmentsRepository(prisma: PrismaClient): AttachmentsRe
     },
     async findManyByMessageIds(messageIds) {
       if (messageIds.length === 0) return [];
-      return prisma.attachment.findMany({ where: { messageId: { in: messageIds } } });
+      const rows = await prisma.attachment.findMany({ where: { messageId: { in: messageIds } } });
+      return rows.filter(isLinked);
+    },
+    async linkToMessage(ids, { chatId, ownerId, messageId }) {
+      if (ids.length === 0) return [];
+      await prisma.attachment.updateMany({
+        where: { id: { in: ids }, chatId, ownerId, messageId: null },
+        data: { messageId },
+      });
+      const rows = await prisma.attachment.findMany({ where: { id: { in: ids }, messageId } });
+      return rows.filter(isLinked);
     },
     async findReferencedPaths(storagePaths) {
       if (storagePaths.length === 0) return new Set();
@@ -53,6 +72,10 @@ export function createAttachmentsRepository(prisma: PrismaClient): AttachmentsRe
       return new Set(rows.map((r) => r.storagePath));
     },
   };
+}
+
+function isLinked(record: AttachmentRecord): record is LinkedAttachmentRecord {
+  return record.messageId !== null;
 }
 
 export interface UploadFile extends UploadCandidate {
@@ -71,14 +94,18 @@ export class AttachmentsService {
 
   /** AC-66: attach one or more files to a message. Validates type/size (AC-67/68),
    * rejects images the chat's selected model can't accept (AC-71), extracts text for
-   * text/PDF (AC-69), and stores the file (STACK.md decision #3). */
-  async upload(user: Principal, chatId: string, messageId: string, file: UploadFile): Promise<AttachmentDto> {
+   * text/PDF (AC-69), and stores the file (STACK.md decision #3). Without a `messageId`
+   * the file waits for the message the web client sends next, which names it in
+   * `attachmentIds` (AICHAT-245). */
+  async upload(user: Principal, chatId: string, messageId: string | undefined, file: UploadFile): Promise<AttachmentDto> {
     const chat = await this.chatsService.getAccessible(user, chatId);
 
     // Only the message's author can attach files to it.
-    const message = await this.messagesRepo.findByIdAndOwner(messageId, user.userId);
-    if (!message || message.chatId !== chatId) {
-      throw new HttpError(404, "MESSAGE_NOT_FOUND", "Message not found");
+    if (messageId !== undefined) {
+      const message = await this.messagesRepo.findByIdAndOwner(messageId, user.userId);
+      if (!message || message.chatId !== chatId) {
+        throw new HttpError(404, "MESSAGE_NOT_FOUND", "Message not found");
+      }
     }
 
     const { extension, kind } = validateAttachment(file, this.maxBytes);
@@ -98,7 +125,8 @@ export class AttachmentsService {
     const extractedText = (await extractText(kind, file.buffer)) ?? null;
 
     const record = await this.repo.create({
-      messageId,
+      messageId: messageId ?? null,
+      chatId,
       ownerId: user.userId,
       filename: file.originalname,
       mimeType: file.mimetype,
@@ -115,7 +143,8 @@ export class AttachmentsService {
 export function toAttachmentDto(record: AttachmentRecord): AttachmentDto {
   return {
     id: record.id,
-    messageId: record.messageId,
+    // Empty until the message is sent; the DTO keeps a plain string (AICHAT-245).
+    messageId: record.messageId ?? "",
     filename: record.filename,
     mimeType: record.mimeType,
     size: record.size,

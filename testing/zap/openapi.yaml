@@ -238,6 +238,22 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "413": { $ref: "#/components/responses/Error" }
+  /api/chats/{chatId}/attachments:
+    post:
+      tags: [messages]
+      summary: Upload an attachment before sending; the send links it through attachmentIds
+      parameters:
+        - { name: chatId, in: path, required: true, schema: { type: string }, example: cm0example0000000000000000 }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { type: object, required: [file], properties: { file: { type: string, format: binary } } }
+      responses:
+        "201": { description: Stored }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
 components:
   securitySchemes:
     sessionCookie:

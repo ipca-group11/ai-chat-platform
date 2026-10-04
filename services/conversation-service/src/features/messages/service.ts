@@ -18,7 +18,7 @@ import type { SendMessageInput } from "./schema.js";
 
 export interface AttachmentSummary {
   id: string;
-  messageId: string;
+  messageId: string | null;
   filename: string;
   mimeType: string;
   size: number;
@@ -104,6 +104,12 @@ export function createMessagesRepository(prisma: PrismaClient): MessagesReposito
   };
 }
 
+/** Links the files uploaded while a message was written to the message once it is sent
+ * (AICHAT-245). Only the sender's own, not-yet-sent uploads of the same chat are linked. */
+export interface AttachmentLinker {
+  linkToMessage(ids: string[], target: { chatId: string; ownerId: string; messageId: string }): Promise<AttachmentSummary[]>;
+}
+
 export class MessagesService {
   constructor(
     private readonly repo: MessagesRepository,
@@ -111,6 +117,7 @@ export class MessagesService {
     private readonly queueManager: QueueManager,
     private readonly bus: ChatEventBus,
     private readonly files?: FileCleanup,
+    private readonly attachments?: AttachmentLinker,
   ) {}
 
   /** AC-43/55: full chat history, restored on reload/relogin. */
@@ -128,7 +135,7 @@ export class MessagesService {
 
     const queue = this.queueManager.getQueue(chatId);
     const isIdle = !queue.isProcessing;
-    const userMessage = await this.repo.create({
+    let userMessage = await this.repo.create({
       chatId,
       ownerId: user.userId,
       authorEmail: user.email,
@@ -136,6 +143,15 @@ export class MessagesService {
       content: input.content,
       status: isIdle ? "sent" : "queued",
     });
+    // Linked before the queue picks the message up, so the reply sees the files.
+    if (this.attachments && input.attachmentIds.length > 0) {
+      const linked = await this.attachments.linkToMessage(input.attachmentIds, {
+        chatId,
+        ownerId: user.userId,
+        messageId: userMessage.id,
+      });
+      userMessage = { ...userMessage, attachments: linked };
+    }
 
     this.queueManager.submit(chatId, {
       messageId: userMessage.id,
@@ -234,7 +250,7 @@ export function toMessageDto(message: MessageRecord): MessageDto {
     error: message.error ?? null,
     attachments: message.attachments.map((a) => ({
       id: a.id,
-      messageId: a.messageId,
+      messageId: a.messageId ?? message.id,
       filename: a.filename,
       mimeType: a.mimeType,
       size: a.size,

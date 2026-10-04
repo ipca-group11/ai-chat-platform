@@ -48,6 +48,20 @@ describe("AttachmentsService", () => {
     expect(attachment.kind).toBe("text");
   });
 
+  it("AICHAT-245: a file uploaded before its message is sent belongs to the chat until then", async () => {
+    const { service, chat, attachmentsRepo } = await setup();
+
+    const attachment = await service.upload(asUser("user-1"), chat.id, undefined, {
+      originalname: "notes.txt",
+      mimetype: "text/plain",
+      size: 5,
+      buffer: Buffer.from("hello"),
+    });
+
+    expect(attachment.messageId).toBe("");
+    expect(attachmentsRepo.all()).toMatchObject([{ id: attachment.id, chatId: chat.id, messageId: null, ownerId: "user-1" }]);
+  });
+
   it("AC-67/68: rejects a disallowed file type with a clear message", async () => {
     const { service, chat, message } = await setup();
 
