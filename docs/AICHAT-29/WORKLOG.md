@@ -10,9 +10,9 @@ title: "AICHAT-29 · Penetration testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-29-penetration-testing` |
-| Started / finished | 2026-10-04 / … |
-| Pull requests | #… |
-| Status | In Progress |
+| Started / finished | 2026-10-04 / 2026-10-04 |
+| Pull requests | [#28](https://github.com/ipca-group11/ai-chat-platform/pull/28) |
+| Status | Done, merged into `integration/testing-epics` |
 
 ## 1. DoR review
 
