@@ -1,0 +1,5 @@
+$ sh -c node --test scripts/lighthouse/config.test.ts scripts/perf/field-pages.test.ts 2>&1 | grep -E "^(✔|✖|ℹ (tests|pass|fail))"; cd e2e && rtk proxy pnpm exec vitest run src/ci/lighthouse-workflow.spec.ts src/ci/web-vitals-dashboard.spec.ts 2>&1 | grep -E "Test Files|Tests"
+ Test Files  2 passed (2)
+      Tests  15 passed (15)
+
+[exit 0]
