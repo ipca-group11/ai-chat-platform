@@ -1,0 +1,43 @@
+$ diff observability/loki.yml /private/tmp/claude-501/-Users-truezone-Projects-ai-chat-platform/eef7d68d-8a8c-448c-9b92-df26c0f970df/scratchpad/loki/raised.yml; cd packages/workspace-config && LOKI_CONFIG_PATH=/private/tmp/claude-501/-Users-truezone-Projects-ai-chat-platform/eef7d68d-8a8c-448c-9b92-df26c0f970df/scratchpad/loki/raised.yml pnpm exec vitest run src/loki-retention.test.ts
+32c32
+<   retention_period: 168h
+---
+>   retention_period: 336h
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/workspace-config
+
+ ❯ src/loki-retention.test.ts (24 tests | 1 failed) 12ms
+   ❯ AICHAT-140: Loki keeps telemetry for at most 7 days (1)
+     × observability/loki.yml has a retention period of 7 days or less, enforced by the compactor 8ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 23 passed (24)
+   Start at  07:19:22
+   Duration  128ms (transform 38%, import 35%, tests 22%, worker 4%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/loki-retention.test.ts > AICHAT-140: Loki keeps telemetry for at most 7 days > observability/loki.yml has a retention period of 7 days or less, enforced by the compactor
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "limits_config.retention_period 336h (336 h) is above the 7 days (168 h) in the retention table",
++ ]
+
+ ❯ src/loki-retention.test.ts:11:53
+      9| describe("AICHAT-140: Loki keeps telemetry for at most 7 days", () => {
+     10|   it("observability/loki.yml has a retention period of 7 days or less,…
+     11|     expect(lokiRetentionProblems(readLokiConfig())).toEqual([]);
+       |                                                     ^
+     12|   });
+     13| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

@@ -1,0 +1,36 @@
+$ cd packages/workspace-config && pnpm exec vitest run src/loki-retention.test.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/packages/workspace-config
+
+ ✓ src/loki-retention.test.ts > AICHAT-140: Loki keeps telemetry for at most 7 days > observability/loki.yml has a retention period of 7 days or less, enforced by the compactor 6ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > accepts 168h 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > accepts 7d 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > accepts 1w 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > accepts 6d23h 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > accepts 10080m 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > accepts 1h 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails when the retention period is removed 1ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails when it is raised to 169h 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails when it is raised to 8d 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails when it is raised to 2w 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails when it is raised to 336h 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails when it is raised to 720h 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails when it is raised to 7d1s 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails when it is raised to 1y 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails for 0s, which Loki reads as keep forever 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails for 0h, which Loki reads as keep forever 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails for "seven days", which is not a duration 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails for 168, which is not a duration 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails for "", which is not a duration 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails for "168", which is not a duration 0ms
+ ✓ src/loki-retention.test.ts > lokiRetentionProblems > fails when the compactor does not apply retention 0ms
+ ✓ src/loki-retention.test.ts > durationToHours > adds the parts of a duration 0ms
+ ✓ src/loki-retention.test.ts > durationToHours > returns undefined for anything else 0ms
+
+ Test Files  1 passed (1)
+      Tests  24 passed (24)
+   Start at  07:19:20
+   Duration  150ms (import 42%, transform 42%, tests 13%, worker 4%)
+
+
+[exit 0]
