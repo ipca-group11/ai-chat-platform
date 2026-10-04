@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { authResponseSchema, loginRequestSchema, registerRequestSchema } from "./dto";
+import { authResponseSchema, deleteAccountRequestSchema, loginRequestSchema, registerRequestSchema } from "./dto";
 
 describe("registerRequestSchema", () => {
   it("AC-8: accepts a valid email and policy-compliant password", () => {
@@ -43,6 +43,18 @@ describe("loginRequestSchema", () => {
       password: "",
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe("deleteAccountRequestSchema", () => {
+  it("accepts the current password", () => {
+    expect(deleteAccountRequestSchema.safeParse({ password: "x" }).success).toBe(true);
+  });
+
+  it("rejects a missing, empty or oversized password", () => {
+    expect(deleteAccountRequestSchema.safeParse({}).success).toBe(false);
+    expect(deleteAccountRequestSchema.safeParse({ password: "" }).success).toBe(false);
+    expect(deleteAccountRequestSchema.safeParse({ password: "x".repeat(1025) }).success).toBe(false);
   });
 });
 

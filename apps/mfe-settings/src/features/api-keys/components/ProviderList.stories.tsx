@@ -9,7 +9,7 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { CurrentUser } from "../api/auth";
 import { ProviderList } from "./ProviderList";
-import { withApiStub, WithQueryClient, type SeedQueryClient, type StubRoute } from "./stories-support";
+import { withApiStub, WithQueryClient, type SeedQueryClient, type StubRoute } from "../../../shared/stories-support";
 
 const user: CurrentUser = { id: "3f2b8c1e-9a4d-4e6f-8b7a-1c2d3e4f5a6b", email: "ana@example.com" };
 

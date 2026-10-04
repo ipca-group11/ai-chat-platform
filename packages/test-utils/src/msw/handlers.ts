@@ -30,6 +30,17 @@ export const authHandlers = [
   http.post("*/auth/refresh", noContent),
   http.post("*/auth/logout", noContent),
   http.get("*/auth/me", () => HttpResponse.json({ id: user.id, email: user.email })),
+  // Deleting the account asks for the password again; any password is right here (override for a 401).
+  http.delete("*/auth/me", async ({ request }) => {
+    const { password } = await bodyOf(request);
+    if (typeof password !== "string" || password.length === 0) {
+      return HttpResponse.json(
+        { error: { code: "VALIDATION_ERROR", message: "Invalid request", fieldErrors: { password: ["Required"] } } },
+        { status: 400 },
+      );
+    }
+    return noContent();
+  }),
 ];
 
 /** conversation-service: chats and their members. */

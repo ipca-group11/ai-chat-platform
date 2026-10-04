@@ -2,3 +2,4 @@
 // import only from here, never from `components/`, `hooks/`, `api/`, or `model/`
 // directly).
 export { ProviderList } from "./components/ProviderList";
+export { useCurrentUserId } from "./hooks/useCurrentUserId";

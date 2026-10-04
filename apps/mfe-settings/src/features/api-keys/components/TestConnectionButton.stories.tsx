@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { getButton, settle, withApiStub, WithQueryClient, type StubRoute } from "./stories-support";
+import { getButton, settle, withApiStub, WithQueryClient, type StubRoute } from "../../../shared/stories-support";
 import { TestConnectionButton } from "./TestConnectionButton";
 
 const TEST_CONNECTION = /^\/providers\/[^/]+\/test-connection$/;

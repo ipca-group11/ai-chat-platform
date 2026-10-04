@@ -3,21 +3,22 @@ import type { Decorator } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 /**
- * Shared helpers for the api-keys stories. Stories never reach auth-service or
- * conversation-service: `GET /auth/me` and `POST /providers/:provider/test-connection` are
- * answered in memory by the routes a story declares in `parameters.api`.
+ * Shared helpers for the settings stories (api-keys and account). Stories never reach
+ * auth-service or conversation-service: `GET /auth/me`, `DELETE /auth/me` and
+ * `POST /providers/:provider/test-connection` are answered in memory by the routes a story
+ * declares in `parameters.api`.
  */
 
 /** How a stubbed endpoint answers: a JSON response, a request that never settles, or a dropped connection. */
 export type StubResponse = { status: number; body?: unknown } | "pending" | "network-error";
 
 export interface StubRoute {
-  method: "GET" | "POST";
+  method: "GET" | "POST" | "DELETE";
   path: RegExp;
   respond: StubResponse;
 }
 
-/** The endpoints this feature calls (see api/auth.ts and api/testConnection.ts); anything unmatched fails offline. */
+/** The endpoints the app calls (see the `api/` folders of its features); anything unmatched fails offline. */
 const APP_ENDPOINTS = /^\/(auth|providers)\//;
 
 function toResponse(answer: StubResponse): Promise<Response> {

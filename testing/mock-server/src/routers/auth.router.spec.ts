@@ -143,6 +143,64 @@ describe("session", () => {
   });
 });
 
+describe("DELETE /auth/me", () => {
+  it("answers 401 UNAUTHENTICATED without a session", async () => {
+    const { app } = setup();
+    const res = await request(app).delete("/auth/me").send({ password: MOCK_PASSWORD });
+    expect(res.status).toBe(401);
+    expect(http.errorResponseSchema.parse(res.body).error.code).toBe("UNAUTHENTICATED");
+  });
+
+  it("answers 400 VALIDATION_ERROR without a password, like auth-service", async () => {
+    const { agent } = setup();
+    await agent.post("/auth/login").send(alice);
+    const res = await agent.delete("/auth/me").send({});
+    expect(res.status).toBe(400);
+    const body = http.errorResponseSchema.parse(res.body);
+    expect(body.error.code).toBe("VALIDATION_ERROR");
+    expect(body.error.fieldErrors?.password).toBeDefined();
+  });
+
+  it("answers 401 INVALID_CREDENTIALS for a wrong password and keeps the account", async () => {
+    const { agent, ctx } = setup();
+    await agent.post("/auth/login").send(alice);
+    const res = await agent.delete("/auth/me").send({ password: "not-the-password" });
+    expect(res.status).toBe(401);
+    expect(http.errorResponseSchema.parse(res.body).error).toEqual({ code: "INVALID_CREDENTIALS", message: "Invalid password" });
+    expect(ctx.store.data.users.some((user) => user.email === alice.email)).toBe(true);
+    expect((await agent.get("/auth/me")).status).toBe(200);
+  });
+
+  it("erases the user and what they own, ends their sessions and clears the cookies", async () => {
+    const { agent, app, ctx } = setup();
+    const bob = request.agent(app);
+    await bob.post("/auth/login").send({ email: "bob@mock.test", password: MOCK_PASSWORD });
+    const bobChat = (await bob.post("/api/chats").send({ title: "Shared", provider: "openai", model: "gpt-4o" })).body.chat.id as string;
+    await bob.post(`/api/chats/${bobChat}/members`).send({ email: alice.email });
+    const login = await agent.post("/auth/login").send(alice);
+    const aliceId = login.body.id as string;
+    const otherSession = /access_token=([^;]+)/.exec(
+      ((await request(app).post("/auth/login").send(alice)).headers["set-cookie"] as unknown as string[]).join(";"),
+    )?.[1];
+    await agent.post(`/api/chats/${bobChat}/messages`).send({ content: "hello from alice" });
+
+    const res = await agent.delete("/auth/me").send({ password: MOCK_PASSWORD });
+
+    expect(res.status).toBe(204);
+    expect((res.headers["set-cookie"] as unknown as string[]).join("\n")).toMatch(/access_token=;/);
+    expect((await agent.get("/auth/me")).status).toBe(401);
+    expect((await request(app).get("/auth/me").set("Authorization", `Bearer ${otherSession}`)).status).toBe(401);
+    const data = ctx.store.data;
+    expect(data.users.map((user) => user.email)).toEqual(["bob@mock.test"]);
+    expect(data.chats.filter((c) => c.ownerId === aliceId)).toEqual([]);
+    expect(data.chats.some((c) => c.id === bobChat)).toBe(true);
+    expect(data.members.filter((m) => m.email === alice.email)).toEqual([]);
+    expect(data.messages.filter((m) => m.content === "hello from alice")).toEqual([]);
+    expect(data.providerKeys.filter((k) => k.userId === aliceId)).toEqual([]);
+    expect((await agent.post("/auth/login").send(alice)).status).toBe(401);
+  });
+});
+
 describe("errors", () => {
   it("answers a malformed JSON body with 400 VALIDATION_ERROR", async () => {
     const { app } = setup();

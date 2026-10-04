@@ -8,7 +8,7 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import App from "./app";
 import type { CurrentUser } from "./features/api-keys/api/auth";
-import { WithQueryClient, type SeedQueryClient } from "./features/api-keys/components/stories-support";
+import { WithQueryClient, type SeedQueryClient } from "./shared/stories-support";
 
 const user: CurrentUser = { id: "3f2b8c1e-9a4d-4e6f-8b7a-1c2d3e4f5a6b", email: "ana@example.com" };
 

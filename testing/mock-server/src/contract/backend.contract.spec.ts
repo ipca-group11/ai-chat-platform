@@ -298,5 +298,8 @@ describe("what shared-types accepts as a request", () => {
     expect(
       (await request(app).post("/auth/register").send(auth.registerRequestSchema.parse({ email: "new@mock.test", password: "Valid-pass-123" }))).status,
     ).toBe(201);
+    expect(
+      (await request(app).delete("/auth/me").set("Cookie", cookie).send(auth.deleteAccountRequestSchema.parse({ password: MOCK_PASSWORD }))).status,
+    ).toBe(204);
   });
 });

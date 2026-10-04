@@ -4,6 +4,8 @@ import { z } from "zod";
 import { accessTokenOf, currentUser, sessionsFor } from "../auth/sessions.js";
 import { jsonBody } from "../core/request-log.js";
 import { cors, errorHandler, HttpError, parseCookies } from "../backend/http.js";
+import type { StoredMessage } from "../conversation/records.js";
+import type { MockUser } from "../data/types.js";
 import { faultInjector, FAULT_SCENARIOS } from "../faults/faults.js";
 import type { MockContext, MockModule } from "../registry.js";
 
@@ -42,7 +44,28 @@ function nextUserId(ctx: MockContext): string {
   return `user_${String(n).padStart(5, "0")}`;
 }
 
-/** auth-service mock: `/auth/register`, `/login`, `/refresh`, `/logout`, `/me` with the session in cookies. */
+/**
+ * What deleting an account erases, as conversation-service's erasure does: the chats the user
+ * owns (with their members, messages and attachments), their memberships and messages in other
+ * people's chats, their attachments and saved provider keys, then the user.
+ */
+function eraseAccount(ctx: MockContext, user: MockUser): void {
+  const data = ctx.store.data;
+  const ownedChats = new Set(data.chats.filter((c) => c.ownerId === user.id).map((c) => c.id));
+  const goneMessages = new Set(
+    (data.messages as StoredMessage[])
+      .filter((m) => ownedChats.has(m.chatId) || m.authorId === user.id)
+      .map((m) => m.id),
+  );
+  data.chats = data.chats.filter((c) => !ownedChats.has(c.id));
+  data.members = data.members.filter((m) => !ownedChats.has(m.chatId) && m.email !== user.email);
+  data.messages = data.messages.filter((m) => !goneMessages.has(m.id));
+  data.attachments = data.attachments.filter((a) => !goneMessages.has(a.messageId) && a.ownerId !== user.id);
+  data.providerKeys = data.providerKeys.filter((k) => k.userId !== user.id);
+  data.users = data.users.filter((u) => u.id !== user.id);
+}
+
+/** auth-service mock: `/auth/register`, `/login`, `/refresh`, `/logout`, `/me` (read and delete) with the session in cookies. */
 function createAuthRouter(ctx: MockContext): Router {
   const router = Router();
   const sessions = sessionsFor(ctx);
@@ -106,6 +129,23 @@ function createAuthRouter(ctx: MockContext): Router {
     const user = currentUser(ctx, req);
     if (!user) throw new HttpError(401, "UNAUTHENTICATED", "Not authenticated");
     res.status(200).json({ id: user.id, email: user.email });
+  });
+
+  // Like auth-service: the password is asked again, then the user and everything they own go,
+  // their sessions end and the cookies are cleared.
+  router.delete("/me", (req, res) => {
+    const user = currentUser(ctx, req);
+    if (!user) throw new HttpError(401, "UNAUTHENTICATED", "Not authenticated");
+    const parsed = auth.deleteAccountRequestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const fieldErrors = z.flattenError(parsed.error).fieldErrors as Record<string, string[]>;
+      throw new HttpError(400, "VALIDATION_ERROR", "Invalid request", fieldErrors);
+    }
+    if (user.password !== parsed.data.password) throw new HttpError(401, "INVALID_CREDENTIALS", "Invalid password");
+    eraseAccount(ctx, user);
+    sessions.closeAllOf(user.id);
+    clearSessionCookies(res);
+    res.status(204).end();
   });
 
   router.use((_req, _res, next) => {

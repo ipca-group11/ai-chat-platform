@@ -53,6 +53,11 @@
       "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
     },
     {
+      "path": "apps/mfe-settings/src/features/account/index.ts",
+      "category": "barrel",
+      "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."
+    },
+    {
       "path": "apps/mfe-settings/src/features/api-keys/index.ts",
       "category": "barrel",
       "reason": "Barrel index file: only re-exports, no logic. What it re-exports is tested in its own module."

@@ -3,271 +3,309 @@
 exports[`./app.stories.tsx > KeysSaved 1`] = `
 <body>
   <div>
-    <section
-      aria-label="LLM provider API keys"
+    <div
       class="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6"
     >
-      <header
-        class="space-y-2"
+      <section
+        aria-label="LLM provider API keys"
       >
-        <h1
-          class="scroll-m-20 tracking-tight text-3xl lg:text-3xl font-bold"
+        <header
+          class="space-y-2"
         >
-          LLM Provider API Keys
-        </h1>
-        <div
-          class="typeset typeset-page max-w-2xl text-muted-foreground"
-        >
-          <p>
-            Configure the API key each LLM provider needs before you can chat with it. Keys are stored only in this browser and are never sent anywhere except once per request to the conversation service, when you send a chat message or test a connection.
-          </p>
-        </div>
-      </header>
-      <div
-        aria-label="Provider list"
-        class="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3"
-      >
-        <div
-          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
-        >
-          <div
-            class="flex flex-col space-y-1.5 p-6"
+          <h1
+            class="scroll-m-20 tracking-tight text-3xl lg:text-3xl font-bold"
           >
-            <div
-              class="flex items-center justify-between gap-2"
-            >
-              <h2
-                class="text-lg font-semibold leading-none tracking-tight"
-              >
-                OpenAI
-              </h2>
-              <span
-                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success text-success-foreground hover:bg-success/80"
-              >
-                Configured
-              </span>
-            </div>
-            <p
-              class="text-sm text-muted-foreground"
-            >
-              Used when a chat runs on OpenAI models.
+            LLM Provider API Keys
+          </h1>
+          <div
+            class="typeset typeset-page max-w-2xl text-muted-foreground"
+          >
+            <p>
+              Configure the API key each LLM provider needs before you can chat with it. Keys are stored only in this browser and are never sent anywhere except once per request to the conversation service, when you send a chat message or test a connection.
             </p>
           </div>
+        </header>
+        <div
+          aria-label="Provider list"
+          class="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3"
+        >
           <div
-            class="p-6 pt-0 space-y-4"
+            class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
           >
             <div
-              class="flex items-center gap-2 text-sm"
+              class="flex flex-col space-y-1.5 p-6"
             >
-              <span
-                class="text-muted-foreground"
+              <div
+                class="flex items-center justify-between gap-2"
               >
-                Current key
-              </span>
-              <code
-                class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
-                data-testid="masked-key"
+                <h2
+                  class="text-lg font-semibold leading-none tracking-tight"
+                >
+                  OpenAI
+                </h2>
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success text-success-foreground hover:bg-success/80"
+                >
+                  Configured
+                </span>
+              </div>
+              <p
+                class="text-sm text-muted-foreground"
               >
-                ••••1b3d
-              </code>
+                Used when a chat runs on OpenAI models.
+              </p>
             </div>
             <div
-              class="space-y-3"
+              class="p-6 pt-0 space-y-4"
             >
-              <form
-                aria-label="OpenAI API key form"
-                class="space-y-3"
-                novalidate=""
+              <div
+                class="flex items-center gap-2 text-sm"
               >
-                <div
-                  class="space-y-2"
+                <span
+                  class="text-muted-foreground"
                 >
-                  <label
-                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    for="openai-api-key"
-                  >
-                    OpenAI
-                     API key
-                  </label>
-                  <input
-                    autocomplete="off"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
-                    id="openai-api-key"
-                    placeholder="Enter a new key to update"
-                    type="password"
-                    value=""
-                  />
-                </div>
-                <div
-                  class="flex flex-wrap gap-2"
+                  Current key
+                </span>
+                <code
+                  class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+                  data-testid="masked-key"
                 >
-                  <button
-                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
-                    tabindex="0"
-                    type="submit"
-                  >
-                    Update key
-                  </button>
-                  <button
-                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
-                    tabindex="0"
-                    type="button"
-                  >
-                    Remove key
-                  </button>
-                </div>
-              </form>
+                  ••••1b3d
+                </code>
+              </div>
               <div
                 class="space-y-3"
               >
-                <button
-                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
-                  data-disabled=""
-                  disabled=""
-                  tabindex="0"
-                  type="button"
+                <form
+                  aria-label="OpenAI API key form"
+                  class="space-y-3"
+                  novalidate=""
                 >
-                  Test OpenAI connection
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
-        >
-          <div
-            class="flex flex-col space-y-1.5 p-6"
-          >
-            <div
-              class="flex items-center justify-between gap-2"
-            >
-              <h2
-                class="text-lg font-semibold leading-none tracking-tight"
-              >
-                Anthropic
-              </h2>
-              <span
-                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success text-success-foreground hover:bg-success/80"
-              >
-                Configured
-              </span>
-            </div>
-            <p
-              class="text-sm text-muted-foreground"
-            >
-              Used when a chat runs on Anthropic models.
-            </p>
-          </div>
-          <div
-            class="p-6 pt-0 space-y-4"
-          >
-            <div
-              class="flex items-center gap-2 text-sm"
-            >
-              <span
-                class="text-muted-foreground"
-              >
-                Current key
-              </span>
-              <code
-                class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
-                data-testid="masked-key"
-              >
-                ••••9d2f
-              </code>
-            </div>
-            <div
-              class="space-y-3"
-            >
-              <form
-                aria-label="Anthropic API key form"
-                class="space-y-3"
-                novalidate=""
-              >
-                <div
-                  class="space-y-2"
-                >
-                  <label
-                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    for="anthropic-api-key"
+                  <div
+                    class="space-y-2"
                   >
-                    Anthropic
-                     API key
-                  </label>
-                  <input
-                    autocomplete="off"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
-                    id="anthropic-api-key"
-                    placeholder="Enter a new key to update"
-                    type="password"
-                    value=""
-                  />
-                </div>
+                    <label
+                      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      for="openai-api-key"
+                    >
+                      OpenAI
+                       API key
+                    </label>
+                    <input
+                      autocomplete="off"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                      id="openai-api-key"
+                      placeholder="Enter a new key to update"
+                      type="password"
+                      value=""
+                    />
+                  </div>
+                  <div
+                    class="flex flex-wrap gap-2"
+                  >
+                    <button
+                      class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                      tabindex="0"
+                      type="submit"
+                    >
+                      Update key
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+                      tabindex="0"
+                      type="button"
+                    >
+                      Remove key
+                    </button>
+                  </div>
+                </form>
                 <div
-                  class="flex flex-wrap gap-2"
+                  class="space-y-3"
                 >
                   <button
-                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
-                    tabindex="0"
-                    type="submit"
-                  >
-                    Update key
-                  </button>
-                  <button
-                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                    data-disabled=""
+                    disabled=""
                     tabindex="0"
                     type="button"
                   >
-                    Remove key
+                    Test OpenAI connection
                   </button>
                 </div>
-              </form>
-              <div
-                class="space-y-3"
-              >
-                <button
-                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
-                  data-disabled=""
-                  disabled=""
-                  tabindex="0"
-                  type="button"
-                >
-                  Test Anthropic connection
-                </button>
               </div>
             </div>
           </div>
-        </div>
-        <div
-          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
-        >
           <div
-            class="flex flex-col space-y-1.5 p-6"
+            class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
           >
             <div
-              class="flex items-center justify-between gap-2"
+              class="flex flex-col space-y-1.5 p-6"
+            >
+              <div
+                class="flex items-center justify-between gap-2"
+              >
+                <h2
+                  class="text-lg font-semibold leading-none tracking-tight"
+                >
+                  Anthropic
+                </h2>
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success text-success-foreground hover:bg-success/80"
+                >
+                  Configured
+                </span>
+              </div>
+              <p
+                class="text-sm text-muted-foreground"
+              >
+                Used when a chat runs on Anthropic models.
+              </p>
+            </div>
+            <div
+              class="p-6 pt-0 space-y-4"
+            >
+              <div
+                class="flex items-center gap-2 text-sm"
+              >
+                <span
+                  class="text-muted-foreground"
+                >
+                  Current key
+                </span>
+                <code
+                  class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+                  data-testid="masked-key"
+                >
+                  ••••9d2f
+                </code>
+              </div>
+              <div
+                class="space-y-3"
+              >
+                <form
+                  aria-label="Anthropic API key form"
+                  class="space-y-3"
+                  novalidate=""
+                >
+                  <div
+                    class="space-y-2"
+                  >
+                    <label
+                      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      for="anthropic-api-key"
+                    >
+                      Anthropic
+                       API key
+                    </label>
+                    <input
+                      autocomplete="off"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                      id="anthropic-api-key"
+                      placeholder="Enter a new key to update"
+                      type="password"
+                      value=""
+                    />
+                  </div>
+                  <div
+                    class="flex flex-wrap gap-2"
+                  >
+                    <button
+                      class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                      tabindex="0"
+                      type="submit"
+                    >
+                      Update key
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+                      tabindex="0"
+                      type="button"
+                    >
+                      Remove key
+                    </button>
+                  </div>
+                </form>
+                <div
+                  class="space-y-3"
+                >
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                    data-disabled=""
+                    disabled=""
+                    tabindex="0"
+                    type="button"
+                  >
+                    Test Anthropic connection
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+          >
+            <div
+              class="flex flex-col space-y-1.5 p-6"
+            >
+              <div
+                class="flex items-center justify-between gap-2"
+              >
+                <h2
+                  class="text-lg font-semibold leading-none tracking-tight"
+                >
+                  Ollama
+                </h2>
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                >
+                  Local
+                </span>
+              </div>
+              <p
+                class="text-sm text-muted-foreground"
+              >
+                Ollama runs locally — no API key is required to use it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section
+        aria-labelledby="_r_0_"
+        class="mt-10"
+      >
+        <div
+          class="rounded-lg border bg-card text-card-foreground shadow-sm border-destructive/50"
+        >
+          <div
+            class="flex flex-col space-y-1.5 p-6 gap-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
+          >
+            <div
+              class="space-y-1.5"
             >
               <h2
                 class="text-lg font-semibold leading-none tracking-tight"
+                id="_r_0_"
               >
-                Ollama
+                Delete account
               </h2>
-              <span
-                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              <p
+                class="text-sm text-muted-foreground"
               >
-                Local
-              </span>
+                Permanently deletes your account, your chats and everything in them. This cannot be undone.
+              </p>
             </div>
-            <p
-              class="text-sm text-muted-foreground"
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2 shrink-0"
+              tabindex="0"
+              type="button"
             >
-              Ollama runs locally — no API key is required to use it.
-            </p>
+              Delete account
+            </button>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </div>
 </body>
 `;
@@ -275,236 +313,497 @@ exports[`./app.stories.tsx > KeysSaved 1`] = `
 exports[`./app.stories.tsx > NoKeysSaved 1`] = `
 <body>
   <div>
-    <section
-      aria-label="LLM provider API keys"
+    <div
       class="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6"
     >
-      <header
-        class="space-y-2"
+      <section
+        aria-label="LLM provider API keys"
       >
-        <h1
-          class="scroll-m-20 tracking-tight text-3xl lg:text-3xl font-bold"
+        <header
+          class="space-y-2"
         >
-          LLM Provider API Keys
-        </h1>
+          <h1
+            class="scroll-m-20 tracking-tight text-3xl lg:text-3xl font-bold"
+          >
+            LLM Provider API Keys
+          </h1>
+          <div
+            class="typeset typeset-page max-w-2xl text-muted-foreground"
+          >
+            <p>
+              Configure the API key each LLM provider needs before you can chat with it. Keys are stored only in this browser and are never sent anywhere except once per request to the conversation service, when you send a chat message or test a connection.
+            </p>
+          </div>
+        </header>
         <div
-          class="typeset typeset-page max-w-2xl text-muted-foreground"
+          aria-label="Provider list"
+          class="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3"
         >
-          <p>
-            Configure the API key each LLM provider needs before you can chat with it. Keys are stored only in this browser and are never sent anywhere except once per request to the conversation service, when you send a chat message or test a connection.
-          </p>
+          <div
+            class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+          >
+            <div
+              class="flex flex-col space-y-1.5 p-6"
+            >
+              <div
+                class="flex items-center justify-between gap-2"
+              >
+                <h2
+                  class="text-lg font-semibold leading-none tracking-tight"
+                >
+                  OpenAI
+                </h2>
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
+                >
+                  Not configured
+                </span>
+              </div>
+              <p
+                class="text-sm text-muted-foreground"
+              >
+                Used when a chat runs on OpenAI models.
+              </p>
+            </div>
+            <div
+              class="p-6 pt-0 space-y-4"
+            >
+              <p
+                class="text-sm text-muted-foreground"
+                data-testid="masked-key-empty"
+              >
+                No key configured
+              </p>
+              <div
+                class="space-y-3"
+              >
+                <form
+                  aria-label="OpenAI API key form"
+                  class="space-y-3"
+                  novalidate=""
+                >
+                  <div
+                    class="space-y-2"
+                  >
+                    <label
+                      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      for="openai-api-key"
+                    >
+                      OpenAI
+                       API key
+                    </label>
+                    <input
+                      autocomplete="off"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                      id="openai-api-key"
+                      placeholder="Enter your API key"
+                      type="password"
+                      value=""
+                    />
+                  </div>
+                  <div
+                    class="flex flex-wrap gap-2"
+                  >
+                    <button
+                      class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                      tabindex="0"
+                      type="submit"
+                    >
+                      Save key
+                    </button>
+                  </div>
+                </form>
+                <div
+                  class="space-y-3"
+                >
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                    data-disabled=""
+                    disabled=""
+                    tabindex="0"
+                    type="button"
+                  >
+                    Test OpenAI connection
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+          >
+            <div
+              class="flex flex-col space-y-1.5 p-6"
+            >
+              <div
+                class="flex items-center justify-between gap-2"
+              >
+                <h2
+                  class="text-lg font-semibold leading-none tracking-tight"
+                >
+                  Anthropic
+                </h2>
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
+                >
+                  Not configured
+                </span>
+              </div>
+              <p
+                class="text-sm text-muted-foreground"
+              >
+                Used when a chat runs on Anthropic models.
+              </p>
+            </div>
+            <div
+              class="p-6 pt-0 space-y-4"
+            >
+              <p
+                class="text-sm text-muted-foreground"
+                data-testid="masked-key-empty"
+              >
+                No key configured
+              </p>
+              <div
+                class="space-y-3"
+              >
+                <form
+                  aria-label="Anthropic API key form"
+                  class="space-y-3"
+                  novalidate=""
+                >
+                  <div
+                    class="space-y-2"
+                  >
+                    <label
+                      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      for="anthropic-api-key"
+                    >
+                      Anthropic
+                       API key
+                    </label>
+                    <input
+                      autocomplete="off"
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                      id="anthropic-api-key"
+                      placeholder="Enter your API key"
+                      type="password"
+                      value=""
+                    />
+                  </div>
+                  <div
+                    class="flex flex-wrap gap-2"
+                  >
+                    <button
+                      class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                      tabindex="0"
+                      type="submit"
+                    >
+                      Save key
+                    </button>
+                  </div>
+                </form>
+                <div
+                  class="space-y-3"
+                >
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                    data-disabled=""
+                    disabled=""
+                    tabindex="0"
+                    type="button"
+                  >
+                    Test Anthropic connection
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+          >
+            <div
+              class="flex flex-col space-y-1.5 p-6"
+            >
+              <div
+                class="flex items-center justify-between gap-2"
+              >
+                <h2
+                  class="text-lg font-semibold leading-none tracking-tight"
+                >
+                  Ollama
+                </h2>
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                >
+                  Local
+                </span>
+              </div>
+              <p
+                class="text-sm text-muted-foreground"
+              >
+                Ollama runs locally — no API key is required to use it.
+              </p>
+            </div>
+          </div>
         </div>
-      </header>
+      </section>
+      <section
+        aria-labelledby="_r_0_"
+        class="mt-10"
+      >
+        <div
+          class="rounded-lg border bg-card text-card-foreground shadow-sm border-destructive/50"
+        >
+          <div
+            class="flex flex-col space-y-1.5 p-6 gap-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
+          >
+            <div
+              class="space-y-1.5"
+            >
+              <h2
+                class="text-lg font-semibold leading-none tracking-tight"
+                id="_r_0_"
+              >
+                Delete account
+              </h2>
+              <p
+                class="text-sm text-muted-foreground"
+              >
+                Permanently deletes your account, your chats and everything in them. This cannot be undone.
+              </p>
+            </div>
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2 shrink-0"
+              tabindex="0"
+              type="button"
+            >
+              Delete account
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/account/components/DeleteAccountCard.stories.tsx > ConfirmDialog 1`] = `
+<body
+  style="overflow-y: hidden; overflow-x: hidden;"
+>
+  <div
+    aria-hidden="true"
+    data-base-ui-inert=""
+  >
+    <section
+      aria-labelledby="_r_0_"
+      class="mt-10"
+    >
       <div
-        aria-label="Provider list"
-        class="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3"
+        class="rounded-lg border bg-card text-card-foreground shadow-sm border-destructive/50"
       >
         <div
-          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+          class="flex flex-col space-y-1.5 p-6 gap-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
         >
           <div
-            class="flex flex-col space-y-1.5 p-6"
+            class="space-y-1.5"
           >
-            <div
-              class="flex items-center justify-between gap-2"
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+              id="_r_0_"
             >
-              <h2
-                class="text-lg font-semibold leading-none tracking-tight"
-              >
-                OpenAI
-              </h2>
-              <span
-                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
-              >
-                Not configured
-              </span>
-            </div>
+              Delete account
+            </h2>
             <p
               class="text-sm text-muted-foreground"
             >
-              Used when a chat runs on OpenAI models.
+              Permanently deletes your account, your chats and everything in them. This cannot be undone.
             </p>
           </div>
-          <div
-            class="p-6 pt-0 space-y-4"
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2 shrink-0"
+            tabindex="0"
+            type="button"
           >
-            <p
-              class="text-sm text-muted-foreground"
-              data-testid="masked-key-empty"
-            >
-              No key configured
-            </p>
-            <div
-              class="space-y-3"
-            >
-              <form
-                aria-label="OpenAI API key form"
-                class="space-y-3"
-                novalidate=""
-              >
-                <div
-                  class="space-y-2"
-                >
-                  <label
-                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    for="openai-api-key"
-                  >
-                    OpenAI
-                     API key
-                  </label>
-                  <input
-                    autocomplete="off"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
-                    id="openai-api-key"
-                    placeholder="Enter your API key"
-                    type="password"
-                    value=""
-                  />
-                </div>
-                <div
-                  class="flex flex-wrap gap-2"
-                >
-                  <button
-                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
-                    tabindex="0"
-                    type="submit"
-                  >
-                    Save key
-                  </button>
-                </div>
-              </form>
-              <div
-                class="space-y-3"
-              >
-                <button
-                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
-                  data-disabled=""
-                  disabled=""
-                  tabindex="0"
-                  type="button"
-                >
-                  Test OpenAI connection
-                </button>
-              </div>
-            </div>
-          </div>
+            Delete account
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div
+    data-base-ui-portal=""
+    id="_r_1_"
+  >
+    <div
+      aria-hidden="true"
+      data-base-ui-inert=""
+      role="presentation"
+      style="position: fixed; inset: 0px; user-select: none; -webkit-user-select: none;"
+    />
+    <div
+      aria-hidden="true"
+      class="fixed inset-0 z-50 bg-black/50 transition-opacity data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
+      data-base-ui-inert=""
+      data-open=""
+      role="presentation"
+      style="user-select: none; -webkit-user-select: none;"
+    />
+    <span
+      aria-hidden="true"
+      data-base-ui-focus-guard=""
+      data-base-ui-inert=""
+      data-type="inside"
+      style="clip-path: inset(50%); overflow: hidden; white-space: nowrap; border: 0px; padding: 0px; width: 1px; height: 1px; margin: -1px; position: fixed; top: 0px; left: 0px;"
+      tabindex="0"
+    />
+    <div
+      aria-describedby="base-ui-_r_4_"
+      aria-labelledby="base-ui-_r_3_"
+      class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-lg transition-all data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
+      data-base-ui-focusable=""
+      data-open=""
+      id="_r_2_"
+      role="dialog"
+      style="--nested-dialogs: 0;"
+      tabindex="-1"
+    >
+      <div
+        class="flex flex-col space-y-1.5 text-center sm:text-left"
+      >
+        <h2
+          class="text-lg font-semibold leading-none tracking-tight"
+          id="base-ui-_r_3_"
+        >
+          Delete your account?
+        </h2>
+        <p
+          class="text-sm text-muted-foreground"
+          id="base-ui-_r_4_"
+        >
+          Your account, your chats with their messages and files, and your place in chats shared with you are deleted for good. Enter your password to confirm.
+        </p>
+      </div>
+      <form
+        class="grid gap-4"
+        novalidate=""
+      >
+        <div
+          class="space-y-2"
+        >
+          <label
+            class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            for="_r_5_"
+          >
+            Password
+          </label>
+          <input
+            autocomplete="current-password"
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+            id="_r_5_"
+            type="password"
+            value=""
+          />
         </div>
         <div
-          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+          class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2"
         >
-          <div
-            class="flex flex-col space-y-1.5 p-6"
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            tabindex="0"
+            type="button"
           >
-            <div
-              class="flex items-center justify-between gap-2"
-            >
-              <h2
-                class="text-lg font-semibold leading-none tracking-tight"
-              >
-                Anthropic
-              </h2>
-              <span
-                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
-              >
-                Not configured
-              </span>
-            </div>
-            <p
-              class="text-sm text-muted-foreground"
-            >
-              Used when a chat runs on Anthropic models.
-            </p>
-          </div>
-          <div
-            class="p-6 pt-0 space-y-4"
+            Cancel
+          </button>
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
+            tabindex="0"
+            type="submit"
           >
-            <p
-              class="text-sm text-muted-foreground"
-              data-testid="masked-key-empty"
-            >
-              No key configured
-            </p>
-            <div
-              class="space-y-3"
-            >
-              <form
-                aria-label="Anthropic API key form"
-                class="space-y-3"
-                novalidate=""
-              >
-                <div
-                  class="space-y-2"
-                >
-                  <label
-                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    for="anthropic-api-key"
-                  >
-                    Anthropic
-                     API key
-                  </label>
-                  <input
-                    autocomplete="off"
-                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
-                    id="anthropic-api-key"
-                    placeholder="Enter your API key"
-                    type="password"
-                    value=""
-                  />
-                </div>
-                <div
-                  class="flex flex-wrap gap-2"
-                >
-                  <button
-                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
-                    tabindex="0"
-                    type="submit"
-                  >
-                    Save key
-                  </button>
-                </div>
-              </form>
-              <div
-                class="space-y-3"
-              >
-                <button
-                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
-                  data-disabled=""
-                  disabled=""
-                  tabindex="0"
-                  type="button"
-                >
-                  Test Anthropic connection
-                </button>
-              </div>
-            </div>
-          </div>
+            Delete account
+          </button>
         </div>
+      </form>
+      <button
+        class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+        tabindex="0"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-x size-4"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 6 6 18"
+          />
+          <path
+            d="m6 6 12 12"
+          />
+        </svg>
+        <span
+          class="sr-only"
+        >
+          Close
+        </span>
+      </button>
+    </div>
+    <span
+      aria-hidden="true"
+      data-base-ui-focus-guard=""
+      data-base-ui-inert=""
+      data-type="inside"
+      style="clip-path: inset(50%); overflow: hidden; white-space: nowrap; border: 0px; padding: 0px; width: 1px; height: 1px; margin: -1px; position: fixed; top: 0px; left: 0px;"
+      tabindex="0"
+    />
+  </div>
+</body>
+`;
+
+exports[`./features/account/components/DeleteAccountCard.stories.tsx > Default 1`] = `
+<body>
+  <div>
+    <section
+      aria-labelledby="_r_0_"
+      class="mt-10"
+    >
+      <div
+        class="rounded-lg border bg-card text-card-foreground shadow-sm border-destructive/50"
+      >
         <div
-          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+          class="flex flex-col space-y-1.5 p-6 gap-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
         >
           <div
-            class="flex flex-col space-y-1.5 p-6"
+            class="space-y-1.5"
           >
-            <div
-              class="flex items-center justify-between gap-2"
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+              id="_r_0_"
             >
-              <h2
-                class="text-lg font-semibold leading-none tracking-tight"
-              >
-                Ollama
-              </h2>
-              <span
-                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              >
-                Local
-              </span>
-            </div>
+              Delete account
+            </h2>
             <p
               class="text-sm text-muted-foreground"
             >
-              Ollama runs locally — no API key is required to use it.
+              Permanently deletes your account, your chats and everything in them. This cannot be undone.
             </p>
           </div>
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2 shrink-0"
+            tabindex="0"
+            type="button"
+          >
+            Delete account
+          </button>
         </div>
       </div>
     </section>
@@ -512,8 +811,596 @@ exports[`./app.stories.tsx > NoKeysSaved 1`] = `
 </body>
 `;
 
+exports[`./features/account/components/DeleteAccountCard.stories.tsx > Deleting 1`] = `
+<body
+  style="overflow-y: hidden; overflow-x: hidden;"
+>
+  <div
+    aria-hidden="true"
+    data-base-ui-inert=""
+  >
+    <section
+      aria-labelledby="_r_0_"
+      class="mt-10"
+    >
+      <div
+        class="rounded-lg border bg-card text-card-foreground shadow-sm border-destructive/50"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6 gap-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
+        >
+          <div
+            class="space-y-1.5"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+              id="_r_0_"
+            >
+              Delete account
+            </h2>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Permanently deletes your account, your chats and everything in them. This cannot be undone.
+            </p>
+          </div>
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2 shrink-0"
+            tabindex="0"
+            type="button"
+          >
+            Delete account
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div
+    data-base-ui-portal=""
+    id="_r_1_"
+  >
+    <div
+      aria-hidden="true"
+      data-base-ui-inert=""
+      role="presentation"
+      style="position: fixed; inset: 0px; user-select: none; -webkit-user-select: none;"
+    />
+    <div
+      aria-hidden="true"
+      class="fixed inset-0 z-50 bg-black/50 transition-opacity data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
+      data-base-ui-inert=""
+      data-open=""
+      role="presentation"
+      style="user-select: none; -webkit-user-select: none;"
+    />
+    <span
+      aria-hidden="true"
+      data-base-ui-focus-guard=""
+      data-base-ui-inert=""
+      data-type="inside"
+      style="clip-path: inset(50%); overflow: hidden; white-space: nowrap; border: 0px; padding: 0px; width: 1px; height: 1px; margin: -1px; position: fixed; top: 0px; left: 0px;"
+      tabindex="0"
+    />
+    <div
+      aria-describedby="base-ui-_r_4_"
+      aria-labelledby="base-ui-_r_3_"
+      class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-lg transition-all data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
+      data-base-ui-focusable=""
+      data-open=""
+      id="_r_2_"
+      role="dialog"
+      style="--nested-dialogs: 0;"
+      tabindex="-1"
+    >
+      <div
+        class="flex flex-col space-y-1.5 text-center sm:text-left"
+      >
+        <h2
+          class="text-lg font-semibold leading-none tracking-tight"
+          id="base-ui-_r_3_"
+        >
+          Delete your account?
+        </h2>
+        <p
+          class="text-sm text-muted-foreground"
+          id="base-ui-_r_4_"
+        >
+          Your account, your chats with their messages and files, and your place in chats shared with you are deleted for good. Enter your password to confirm.
+        </p>
+      </div>
+      <form
+        class="grid gap-4"
+        novalidate=""
+      >
+        <div
+          class="space-y-2"
+        >
+          <label
+            class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            for="_r_5_"
+          >
+            Password
+          </label>
+          <input
+            autocomplete="current-password"
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+            id="_r_5_"
+            type="password"
+            value="Secret-pass-123"
+          />
+        </div>
+        <div
+          class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2"
+        >
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            data-disabled=""
+            disabled=""
+            tabindex="0"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            aria-busy="true"
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
+            data-disabled=""
+            disabled=""
+            tabindex="0"
+            type="submit"
+          >
+            <svg
+              aria-hidden="true"
+              class="size-4 animate-spin"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                fill="currentColor"
+              />
+            </svg>
+            Delete account
+          </button>
+        </div>
+      </form>
+      <button
+        class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+        tabindex="0"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-x size-4"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 6 6 18"
+          />
+          <path
+            d="m6 6 12 12"
+          />
+        </svg>
+        <span
+          class="sr-only"
+        >
+          Close
+        </span>
+      </button>
+    </div>
+    <span
+      aria-hidden="true"
+      data-base-ui-focus-guard=""
+      data-base-ui-inert=""
+      data-type="inside"
+      style="clip-path: inset(50%); overflow: hidden; white-space: nowrap; border: 0px; padding: 0px; width: 1px; height: 1px; margin: -1px; position: fixed; top: 0px; left: 0px;"
+      tabindex="0"
+    />
+  </div>
+</body>
+`;
+
+exports[`./features/account/components/DeleteAccountCard.stories.tsx > PasswordRequired 1`] = `
+<body
+  style="overflow-y: hidden; overflow-x: hidden;"
+>
+  <div
+    aria-hidden="true"
+    data-base-ui-inert=""
+  >
+    <section
+      aria-labelledby="_r_0_"
+      class="mt-10"
+    >
+      <div
+        class="rounded-lg border bg-card text-card-foreground shadow-sm border-destructive/50"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6 gap-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
+        >
+          <div
+            class="space-y-1.5"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+              id="_r_0_"
+            >
+              Delete account
+            </h2>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Permanently deletes your account, your chats and everything in them. This cannot be undone.
+            </p>
+          </div>
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2 shrink-0"
+            tabindex="0"
+            type="button"
+          >
+            Delete account
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div
+    data-base-ui-portal=""
+    id="_r_1_"
+  >
+    <div
+      aria-hidden="true"
+      data-base-ui-inert=""
+      role="presentation"
+      style="position: fixed; inset: 0px; user-select: none; -webkit-user-select: none;"
+    />
+    <div
+      aria-hidden="true"
+      class="fixed inset-0 z-50 bg-black/50 transition-opacity data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
+      data-base-ui-inert=""
+      data-open=""
+      role="presentation"
+      style="user-select: none; -webkit-user-select: none;"
+    />
+    <span
+      aria-hidden="true"
+      data-base-ui-focus-guard=""
+      data-base-ui-inert=""
+      data-type="inside"
+      style="clip-path: inset(50%); overflow: hidden; white-space: nowrap; border: 0px; padding: 0px; width: 1px; height: 1px; margin: -1px; position: fixed; top: 0px; left: 0px;"
+      tabindex="0"
+    />
+    <div
+      aria-describedby="base-ui-_r_4_"
+      aria-labelledby="base-ui-_r_3_"
+      class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-lg transition-all data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
+      data-base-ui-focusable=""
+      data-open=""
+      id="_r_2_"
+      role="dialog"
+      style="--nested-dialogs: 0;"
+      tabindex="-1"
+    >
+      <div
+        class="flex flex-col space-y-1.5 text-center sm:text-left"
+      >
+        <h2
+          class="text-lg font-semibold leading-none tracking-tight"
+          id="base-ui-_r_3_"
+        >
+          Delete your account?
+        </h2>
+        <p
+          class="text-sm text-muted-foreground"
+          id="base-ui-_r_4_"
+        >
+          Your account, your chats with their messages and files, and your place in chats shared with you are deleted for good. Enter your password to confirm.
+        </p>
+      </div>
+      <form
+        class="grid gap-4"
+        novalidate=""
+      >
+        <div
+          class="space-y-2"
+        >
+          <label
+            class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            for="_r_5_"
+          >
+            Password
+          </label>
+          <input
+            aria-describedby="_r_5_-error"
+            aria-invalid="true"
+            autocomplete="current-password"
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+            id="_r_5_"
+            type="password"
+            value=""
+          />
+          <p
+            class="text-sm font-medium text-destructive"
+            id="_r_5_-error"
+            role="alert"
+          >
+            Enter your password.
+          </p>
+        </div>
+        <div
+          class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2"
+        >
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            tabindex="0"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
+            tabindex="0"
+            type="submit"
+          >
+            Delete account
+          </button>
+        </div>
+      </form>
+      <button
+        class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+        tabindex="0"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-x size-4"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 6 6 18"
+          />
+          <path
+            d="m6 6 12 12"
+          />
+        </svg>
+        <span
+          class="sr-only"
+        >
+          Close
+        </span>
+      </button>
+    </div>
+    <span
+      aria-hidden="true"
+      data-base-ui-focus-guard=""
+      data-base-ui-inert=""
+      data-type="inside"
+      style="clip-path: inset(50%); overflow: hidden; white-space: nowrap; border: 0px; padding: 0px; width: 1px; height: 1px; margin: -1px; position: fixed; top: 0px; left: 0px;"
+      tabindex="0"
+    />
+  </div>
+</body>
+`;
+
+exports[`./features/account/components/DeleteAccountCard.stories.tsx > WrongPassword 1`] = `
+<body
+  style="overflow-y: hidden; overflow-x: hidden;"
+>
+  <div
+    aria-hidden="true"
+    data-base-ui-inert=""
+  >
+    <section
+      aria-labelledby="_r_0_"
+      class="mt-10"
+    >
+      <div
+        class="rounded-lg border bg-card text-card-foreground shadow-sm border-destructive/50"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6 gap-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
+        >
+          <div
+            class="space-y-1.5"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+              id="_r_0_"
+            >
+              Delete account
+            </h2>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Permanently deletes your account, your chats and everything in them. This cannot be undone.
+            </p>
+          </div>
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2 shrink-0"
+            tabindex="0"
+            type="button"
+          >
+            Delete account
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div
+    data-base-ui-portal=""
+    id="_r_1_"
+  >
+    <div
+      aria-hidden="true"
+      data-base-ui-inert=""
+      role="presentation"
+      style="position: fixed; inset: 0px; user-select: none; -webkit-user-select: none;"
+    />
+    <div
+      aria-hidden="true"
+      class="fixed inset-0 z-50 bg-black/50 transition-opacity data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
+      data-base-ui-inert=""
+      data-open=""
+      role="presentation"
+      style="user-select: none; -webkit-user-select: none;"
+    />
+    <span
+      aria-hidden="true"
+      data-base-ui-focus-guard=""
+      data-base-ui-inert=""
+      data-type="inside"
+      style="clip-path: inset(50%); overflow: hidden; white-space: nowrap; border: 0px; padding: 0px; width: 1px; height: 1px; margin: -1px; position: fixed; top: 0px; left: 0px;"
+      tabindex="0"
+    />
+    <div
+      aria-describedby="base-ui-_r_4_"
+      aria-labelledby="base-ui-_r_3_"
+      class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-lg transition-all data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
+      data-base-ui-focusable=""
+      data-open=""
+      id="_r_2_"
+      role="dialog"
+      style="--nested-dialogs: 0;"
+      tabindex="-1"
+    >
+      <div
+        class="flex flex-col space-y-1.5 text-center sm:text-left"
+      >
+        <h2
+          class="text-lg font-semibold leading-none tracking-tight"
+          id="base-ui-_r_3_"
+        >
+          Delete your account?
+        </h2>
+        <p
+          class="text-sm text-muted-foreground"
+          id="base-ui-_r_4_"
+        >
+          Your account, your chats with their messages and files, and your place in chats shared with you are deleted for good. Enter your password to confirm.
+        </p>
+      </div>
+      <form
+        class="grid gap-4"
+        novalidate=""
+      >
+        <div
+          class="space-y-2"
+        >
+          <label
+            class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            for="_r_5_"
+          >
+            Password
+          </label>
+          <input
+            aria-describedby="_r_5_-error"
+            aria-invalid="true"
+            autocomplete="current-password"
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+            id="_r_5_"
+            type="password"
+            value="not-my-password"
+          />
+          <p
+            class="text-sm font-medium text-destructive"
+            id="_r_5_-error"
+            role="alert"
+          >
+            That password is not correct.
+          </p>
+        </div>
+        <div
+          class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2"
+        >
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+            tabindex="0"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2"
+            tabindex="0"
+            type="submit"
+          >
+            Delete account
+          </button>
+        </div>
+      </form>
+      <button
+        class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+        tabindex="0"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-x size-4"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 6 6 18"
+          />
+          <path
+            d="m6 6 12 12"
+          />
+        </svg>
+        <span
+          class="sr-only"
+        >
+          Close
+        </span>
+      </button>
+    </div>
+    <span
+      aria-hidden="true"
+      data-base-ui-focus-guard=""
+      data-base-ui-inert=""
+      data-type="inside"
+      style="clip-path: inset(50%); overflow: hidden; white-space: nowrap; border: 0px; padding: 0px; width: 1px; height: 1px; margin: -1px; position: fixed; top: 0px; left: 0px;"
+      tabindex="0"
+    />
+  </div>
+</body>
+`;
+
 exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > KeySaved 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -584,7 +1471,9 @@ exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > KeySaved 1`] = 
 `;
 
 exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > KeyTyped 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -646,7 +1535,9 @@ exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > KeyTyped 1`] = 
 `;
 
 exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > NoKeySaved 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -710,7 +1601,9 @@ exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > NoKeySaved 1`] 
 `;
 
 exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > Required 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -783,7 +1676,9 @@ exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > Required 1`] = 
 `;
 
 exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > SaveFailed 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -861,7 +1756,9 @@ exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > SaveFailed 1`] 
 `;
 
 exports[`./features/api-keys/components/MaskedKeyDisplay.stories.tsx > KeySet 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="flex items-center gap-2 text-sm"
@@ -883,7 +1780,9 @@ exports[`./features/api-keys/components/MaskedKeyDisplay.stories.tsx > KeySet 1`
 `;
 
 exports[`./features/api-keys/components/MaskedKeyDisplay.stories.tsx > NoKey 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <p
       class="text-sm text-muted-foreground"
@@ -896,7 +1795,9 @@ exports[`./features/api-keys/components/MaskedKeyDisplay.stories.tsx > NoKey 1`]
 `;
 
 exports[`./features/api-keys/components/ProviderList.stories.tsx > KeysConfigured 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       aria-label="Provider list"
@@ -1147,7 +2048,9 @@ exports[`./features/api-keys/components/ProviderList.stories.tsx > KeysConfigure
 `;
 
 exports[`./features/api-keys/components/ProviderList.stories.tsx > Loading 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
@@ -1178,7 +2081,9 @@ exports[`./features/api-keys/components/ProviderList.stories.tsx > Loading 1`] =
 `;
 
 exports[`./features/api-keys/components/ProviderList.stories.tsx > NoKeysConfigured 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       aria-label="Provider list"
@@ -1397,7 +2302,9 @@ exports[`./features/api-keys/components/ProviderList.stories.tsx > NoKeysConfigu
 `;
 
 exports[`./features/api-keys/components/ProviderList.stories.tsx > ReEnterKey 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       aria-label="Provider list"
@@ -1660,7 +2567,9 @@ exports[`./features/api-keys/components/ProviderList.stories.tsx > ReEnterKey 1`
 `;
 
 exports[`./features/api-keys/components/ProviderList.stories.tsx > SignedOut 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(theme(spacing.4))_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 border-destructive/50 bg-card text-destructive [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90 mt-8"
@@ -1679,7 +2588,9 @@ exports[`./features/api-keys/components/ProviderList.stories.tsx > SignedOut 1`]
 `;
 
 exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > NetworkError 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -1713,7 +2624,9 @@ exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Netwo
 `;
 
 exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > NoKey 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -1737,7 +2650,9 @@ exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > NoKey
 `;
 
 exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Ready 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -1759,7 +2674,9 @@ exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Ready
 `;
 
 exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Rejected 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -1793,7 +2710,9 @@ exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Rejec
 `;
 
 exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Success 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"
@@ -1827,7 +2746,9 @@ exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Succe
 `;
 
 exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Testing 1`] = `
-<body>
+<body
+  style=""
+>
   <div>
     <div
       class="max-w-sm"

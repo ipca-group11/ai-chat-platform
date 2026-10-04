@@ -32,6 +32,14 @@ describe("App (/settings page)", () => {
     expect(screen.queryAllByRole("heading", { level: 3 })).toEqual([]);
   });
 
+  it("ends with the account deletion section, outside the API keys section", () => {
+    renderWithClient(<App />);
+
+    const account = screen.getByRole("region", { name: "Delete account" });
+    expect(account).toContainElement(screen.getByRole("button", { name: "Delete account" }));
+    expect(screen.getByLabelText("LLM provider API keys")).not.toContainElement(account);
+  });
+
   it("AC-75: the `./routes` module federation entry point default-exports the same page component", () => {
     expect(routesDefault).toBe(App);
   });

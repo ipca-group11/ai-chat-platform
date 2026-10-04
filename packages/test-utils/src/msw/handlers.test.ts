@@ -36,6 +36,21 @@ describe("auth handlers", () => {
     expect((await post("/auth/logout")).status).toBe(204);
   });
 
+  it("deleting the account answers 204 with a password, and 400 VALIDATION_ERROR without one", async () => {
+    const remove = (body?: unknown) =>
+      fetch("/auth/me", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+
+    expect((await remove({ password: "Secret-123" })).status).toBe(204);
+    const missing = await remove({});
+    expect(missing.status).toBe(400);
+    expect((await json(missing)).error.code).toBe("VALIDATION_ERROR");
+    expect((await remove()).status).toBe(400);
+  });
+
   it("me answers with the current user, whatever the base URL", async () => {
     const same = await json(await fetch("/auth/me"));
     const other = await json(await fetch("http://auth-service:4001/auth/me"));

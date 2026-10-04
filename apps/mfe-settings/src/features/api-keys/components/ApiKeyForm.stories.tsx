@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ApiKeyForm } from "./ApiKeyForm";
-import { getButton, settle, typeInto, withApiStub, WithQueryClient } from "./stories-support";
+import { getButton, settle, typeInto, withApiStub, WithQueryClient } from "../../../shared/stories-support";
 
 /**
  * Add, update or remove one provider's key, with "Test connection" underneath. In the app

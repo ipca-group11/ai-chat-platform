@@ -84,7 +84,7 @@ unit tests (AICHAT-17 spike) and can reuse the same fixtures.
 |---|---|---|
 | **LLM: Anthropic** | `POST /anthropic/v1/messages` | `ok`, `long`, `thinking`, `web-fetch`, `pause-turn`, `max-tokens`, `error-401/429/500/529`, `drop`, `slow`, `replay:<fixture>` |
 | **LLM: OpenAI** | `POST /openai/v1/chat/completions` | `ok`, `long`, `max-tokens` (`finish_reason: length`), errors, `drop`, `slow`, `replay:<fixture>` |
-| **auth-service** | `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/me` | seeded users; `session-expired` (401 on next call), `error-500`, `slow` |
+| **auth-service** | `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/me` (`GET`, and `DELETE` to delete the account) | seeded users; `session-expired` (401 on next call), `error-500`, `slow` |
 | **conversation-service** | `/api/chats`, members, messages (send, edit, cancel, retry), `GET /api/chats/:id/stream` (SSE), attachments, provider-key settings | in-memory state with seed data; streamed answers reuse the LLM mock scenarios; `error-500`, `slow`, `stream-drop` |
 | **MFE remotes** | `/remotes/<name>/remoteEntry.js` | `ok` (proxy to the real build), `slow`, `404`, `broken-js` |
 | **Telemetry sink** | `POST /collect` | captures Faro payloads for inspection |

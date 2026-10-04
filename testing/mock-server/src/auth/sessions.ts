@@ -26,6 +26,13 @@ export class Sessions {
     if (token) this.byToken.delete(token);
   }
 
+  /** Ends every session of a user, as deleting the account does. */
+  closeAllOf(userId: string): void {
+    for (const [token, owner] of this.byToken) {
+      if (owner === userId) this.byToken.delete(token);
+    }
+  }
+
   clear(): void {
     this.byToken.clear();
     this.counter = 0;
