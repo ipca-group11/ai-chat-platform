@@ -48,6 +48,7 @@ COPY --from=build /workspace/apps/shell/vite.config.ts ./apps/shell/vite.config.
 # vite.config.ts imports the shared coverage preset, so `vite preview` needs it at runtime
 COPY --from=build /workspace/packages/test-config ./packages/test-config
 COPY --from=build /workspace/apps/shell/module-federation.config.ts ./apps/shell/module-federation.config.ts
+COPY --from=build /workspace/apps/shell/remote-preload.ts ./apps/shell/remote-preload.ts
 
 RUN addgroup -S app && adduser -S app -G app && chown -R app:app /workspace
 USER app

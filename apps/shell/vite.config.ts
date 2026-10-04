@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { federation } from '@module-federation/vite';
 import moduleFederationConfig from './module-federation.config';
+import { remotePreload } from './remote-preload';
 
 /**
  * conversation-service routes the `/api` proxy must not forward: its Prometheus metrics
@@ -87,6 +88,8 @@ export default defineConfig({
     }),
     react(),
     federation(moduleFederationConfig),
+    // AICHAT-238: preconnect to the remotes and modulepreload the remoteEntry.js of the opened page.
+    remotePreload(moduleFederationConfig.remotes),
   ],
   build: {
     target: 'esnext',

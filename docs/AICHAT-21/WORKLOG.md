@@ -297,3 +297,18 @@ pnpm test:scripts && (cd e2e && pnpm exec vitest run src/ci)           # unit te
 - **Found.** All five pages pass their budgets by a wide margin on the local stack. The only items worth a change are fonts (AICHAT-230), the request chain to the remotes, and unused JavaScript. The suspected duplicated react-dom is not there.
 - **Not done.** The workflow has not run on GitHub yet (the branch is not pushed). The required check is a team rule, not a branch protection. Field data is from the local stack, not the VM: the same dashboard works on the VM once the stack runs there. `/login` and `/register` are audited with the session cookie. Nothing is audited with CPU or network throttling.
 - **Lessons.** A report summary must not depend on a file name pattern you have not looked at. A table panel is the safest way to show a per-page breakdown from Loki. `networkidle` does not work on pages with an open stream.
+
+## 8. Follow-ups
+
+Lighthouse (desktop preset, median of 3) on 2026-10-04 with Docker off: the four apps built and served with `vite preview` (shell :15000, remotes :15001-15003), backend = the mock server run with `tsx` (`testing/mock-server`). Before = `integration/develop`, after = AICHAT-237 to 240 together.
+
+| Page | JS requests | JS transferred | Unused JS | LCP |
+|---|---|---|---|---|
+| `/chats` | 51 → 32 | 453 → 316 KiB | 166 → 78 KiB | 1277 → 982 ms |
+| `/chats/:id` | 52 → 36 | 454 → 372 KiB | 161 → 119 KiB | 1255 → 1108 ms |
+| `/login` | 49 → 28 | 414 → 268 KiB | 119 → 55 KiB | 1237 → 943 ms |
+| `/settings` | 49 → 29 | 414 → 307 KiB | 118 → 55 KiB | 1246 → 981 ms |
+
+### AICHAT-238 · Preload the micro-frontend entry points
+
+`apps/shell/remote-preload.ts` (a Vite plugin) adds a `preconnect` per remote origin to `index.html` and an inline script that adds a `modulepreload` for the `remoteEntry.js` of the page being opened, tagged `data-mf-remote`. `main.tsx` reads the tag and starts the federated import of that remote before React mounts, so the remote downloads in parallel with the shell boot and the session check of `RequireAuth` instead of after it. Unit tests: `src/app/remotePreload.test.ts`, `preloadRemote.test.ts`.
