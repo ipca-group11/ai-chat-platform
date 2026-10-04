@@ -11,6 +11,13 @@ describe("loadEnv", () => {
     expect(() => loadEnv({ DATABASE_URL: base.DATABASE_URL })).toThrow();
   });
 
+  it("refuses to start without JWT_SECRET in every NODE_ENV, with no fallback secret (AICHAT-210)", () => {
+    for (const NODE_ENV of ["production", "development", "test", undefined]) {
+      expect(() => loadEnv({ DATABASE_URL: base.DATABASE_URL, NODE_ENV })).toThrow(/JWT_SECRET is required/);
+    }
+    expect(() => loadEnv({ ...base, JWT_SECRET: "" })).toThrow(/JWT_SECRET is required/);
+  });
+
   it("applies sane defaults for optional variables", () => {
     const env = loadEnv(base);
     expect(env.PORT).toBe(4001);

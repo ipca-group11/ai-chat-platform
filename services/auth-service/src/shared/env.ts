@@ -10,7 +10,8 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4001),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-  JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+  // Required in every environment, never defaulted: a missing secret stops the service at boot (AICHAT-210).
+  JWT_SECRET: z.string({ error: "JWT_SECRET is required" }).min(1, "JWT_SECRET is required"),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
   // Account deletion (AICHAT-79) calls conversation-service with this shared secret. No default on
   // purpose: when either value is missing, DELETE /auth/me answers 503 and deletes nothing.

@@ -4,9 +4,10 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4002),
   DATABASE_URL: z.string().min(1).default("postgresql://postgres:postgres@localhost:5432/conversation?schema=public"),
-  // Known High bug: the default secret is not fixed in this epic (AICHAT-210, WAIVERS.md W5).
-  // nosemgrep: aichat.secret-with-literal-default-zod
-  JWT_SECRET: z.string().min(1).default("change-me-in-every-environment"),
+  // Required, with no default: a missing secret must stop the service at boot instead of letting it
+  // accept tokens signed with a publicly known value (AICHAT-210). Compose, scripts/dev.sh and the test
+  // setup files pass one explicitly.
+  JWT_SECRET: z.string({ error: "JWT_SECRET is required" }).min(1, "JWT_SECRET is required"),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
   UPLOAD_DIR: z.string().default("./data/uploads"),
   MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(10 * 1024 * 1024),
@@ -36,6 +37,13 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     cached = envSchema.parse(source);
   }
   return cached;
+}
+
+const providerEnvSchema = envSchema.pick({ ANTHROPIC_BASE_URL: true, OPENAI_BASE_URL: true, OLLAMA_BASE_URL: true });
+
+/** Only the LLM provider base URLs, for code that needs nothing else (the adapter registry). */
+export function parseProviderEnv(source: NodeJS.ProcessEnv): z.infer<typeof providerEnvSchema> {
+  return providerEnvSchema.parse(source);
 }
 
 /** Test-only helper to bypass memoization. */

@@ -70,7 +70,7 @@ services:
       NODE_ENV: production
       PORT: "4002"
       DATABASE_URL: postgresql://llmchat:${POSTGRES_PASSWORD}@postgres:5432/llmchat?schema=conversation
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:?}
       UPLOAD_DIR: /data/uploads
       CORS_ORIGIN: https://${DOMAIN}
     volumes:

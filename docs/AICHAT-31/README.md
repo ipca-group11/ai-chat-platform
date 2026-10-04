@@ -72,7 +72,7 @@ No keys, passwords or tokens are committed. **gitleaks on every PR**, a **one-ti
 | `compose.yaml` (Postgres, JWT defaults) | `llmchat_local_dev`, `local-dev-only-change-me` |
 | `docker-compose.yml` | Grafana admin `admin`, Postgres default |
 | `scripts/dev.sh:19`, `services/*/.env.example` | Dev defaults |
-| `services/conversation-service/src/shared/env.ts:7` | `JWT_SECRET` code default (also a SAST High, see AICHAT-27) |
+| `services/conversation-service/src/shared/env.ts:7` | `JWT_SECRET` code default (also a SAST High, see AICHAT-27). Removed in AICHAT-210 |
 
 Production (`deploy/azure/docker-compose.yml`) uses `${JWT_SECRET:?}`, `${GRAFANA_ADMIN_PASSWORD:?}`, so it fails without real values. Good.
 **Check:** the production secrets must not equal any committed default.

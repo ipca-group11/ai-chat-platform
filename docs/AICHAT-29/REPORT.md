@@ -78,6 +78,10 @@ or whose secret leaks, is fully impersonatable.
 and consider short-lived asymmetric (RS256) tokens so the verifier never holds a signing key.
 Tracked in AICHAT-210.
 
+**Status:** the default is removed in AICHAT-210. Both services now refuse to boot without
+`JWT_SECRET` (no code default in any environment). Rotation per environment and RS256 remain
+recommendations.
+
 ### H1 — Chat sharing by unverified email (High)
 
 Membership is matched on the email claim (`chats/service.ts`, `findManyAccessible` /
