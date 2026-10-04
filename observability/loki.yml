@@ -31,11 +31,16 @@ schema_config:
 limits_config:
   retention_period: 168h
   allow_structured_metadata: true
+  # Erasure on request (AICHAT-249): lines matching a delete request are hidden from queries at once and purged
+  # from the chunks by the compactor. scripts/gdpr/loki-delete.ts submits the requests.
+  deletion_mode: filter-and-delete
 
 compactor:
   working_directory: /loki/compactor
   retention_enabled: true
   delete_request_store: filesystem
+  # A delete request can be cancelled for this long, then the compactor purges the lines (default 24h).
+  delete_request_cancel_period: 1h
 
 analytics:
   reporting_enabled: false

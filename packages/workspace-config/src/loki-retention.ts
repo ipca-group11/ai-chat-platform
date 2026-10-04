@@ -45,6 +45,28 @@ export function lokiRetentionProblems(config: unknown): string[] {
   return problems;
 }
 
+/**
+ * What stops Loki from erasing lines on request (AICHAT-249): the delete API of scripts/gdpr/loki-delete.ts needs a
+ * delete request store on the compactor and `deletion_mode: filter-and-delete`. An empty list means it is fine.
+ */
+export function lokiDeletionProblems(config: unknown): string[] {
+  const doc = (config ?? {}) as {
+    limits_config?: { deletion_mode?: unknown };
+    compactor?: { retention_enabled?: unknown; delete_request_store?: unknown };
+  };
+  const problems: string[] = [];
+  if (doc.compactor?.retention_enabled !== true) {
+    problems.push("compactor.retention_enabled must be true, otherwise the compactor never processes delete requests");
+  }
+  if (typeof doc.compactor?.delete_request_store !== "string" || doc.compactor.delete_request_store === "") {
+    problems.push("compactor.delete_request_store is missing: the delete API is not served");
+  }
+  if (doc.limits_config?.deletion_mode !== "filter-and-delete") {
+    problems.push(`limits_config.deletion_mode must be filter-and-delete, not ${JSON.stringify(doc.limits_config?.deletion_mode)}`);
+  }
+  return problems;
+}
+
 /** The Loki config to check: `LOKI_CONFIG_PATH` (an absolute path to a copy, used to show the test fails) or the one in the repo. */
 export function readLokiConfig(): unknown {
   const override = process.env.LOKI_CONFIG_PATH;

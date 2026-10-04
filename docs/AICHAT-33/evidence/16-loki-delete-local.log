@@ -1,0 +1,57 @@
+# AICHAT-249 · scripts/gdpr/loki-delete.ts against grafana/loki:3.7.8 (observability/loki.yml mounted), 2026-10-04
+# 5 Faro-like lines pushed: 3 with correlation_id=3f2b1c9e-... (user A), 2 with correlation_id=9a7d0e11-... (user B)
+
+## run 1: Loki with the repo config (delete_request_cancel_period 1h)
+$ LOKI_URL=http://localhost:3199 node scripts/gdpr/loki-delete.ts --id 3f2b1c9e-6d7a-4e0b-9c1d-2a8f5e4b7c60
+query: {app_name=~".+"} |= "3f2b1c9e-6d7a-4e0b-9c1d-2a8f5e4b7c60"
+range: 2026-09-27T14:23:21.000Z .. 2026-10-04T14:23:22.000Z
+matching lines now: 3
+dry run: nothing deleted (add --yes to submit the delete request)
+exit=0
+$ ... --id 3f2b1c9e-6d7a-4e0b-9c1d-2a8f5e4b7c60 --yes
+matching lines now: 3
+delete request accepted; Loki filters the lines from queries now and purges them after the cancel period
+exit=0
+$ ... --list
+[
+  {
+    "request_id": "f5ee9394",
+    "start_time": 1790519001,
+    "end_time": 1791123802,
+    "query": "{app_name=~\".+\"} |= \"3f2b1c9e-6d7a-4e0b-9c1d-2a8f5e4b7c60\"",
+    "status": "received",
+    "created_at": 1791123802.316,
+    "user_id": ""
+  }
+]
+# user A still 3 lines and user B 2 lines over the next minute: the request is only applied once the
+# cancel period (1h here) has passed.
+
+## run 2: same config, -compactor.delete-request-cancel-period=30s -compactor.compaction-interval=20s
+$ ... --id 3f2b1c9e-6d7a-4e0b-9c1d-2a8f5e4b7c60 --yes
+matching lines now: 3
+delete: HTTP 400 deletes in the future are not allowed
+# Bug in the first version: the end was rounded up to the next second. Fixed: the end is floored and
+# never after now (unit test "the end is never in the future"). The re-run could not be done: Docker
+# was switched off on the laptop at this point (not run locally: Docker off).
+
+## unit tests (mocked fetch), after the fix
+$ node --test scripts/gdpr/loki-delete.test.ts
+✔ builds a selector plus a line filter on the id
+✔ rejects ids that could inject LogQL or match too much
+✔ rejects a selector that is not a single stream selector
+✔ the default range is the 7-day retention window, in whole seconds
+✔ the end is never in the future (Loki rejects it with 400)
+✔ explicit dates are used and checked
+✔ submitDelete POSTs query, start and end in seconds with the tenant header
+✔ submitDelete reports the error Loki returns
+✔ countMatches adds the lines of every stream, with the range in nanoseconds
+✔ listDeletes returns the requests Loki knows about
+ℹ tests 10
+ℹ pass 10
+ℹ fail 0
+
+## an id that could inject LogQL is refused before any request
+$ node scripts/gdpr/loki-delete.ts --id 'abcdefgh"} |= "'
+id must be 8 to 128 characters of [A-Za-z0-9._:-] (a correlation or session id)
+exit=1

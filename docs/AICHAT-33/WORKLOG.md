@@ -261,6 +261,46 @@ cd packages/workspace-config && pnpm exec vitest run src/loki-retention.test.ts
 
 **Problems and fixes.** None.
 
+### AICHAT-249 · Telemetry erasure on request
+
+**What and why.** Loki lines carry no user id, so until now the only erasure of telemetry was the 7-day retention. The ticket offered two options: document a procedure, or build one. **We built it**: Loki's delete API removes the lines that contain an identifier the user can give us (a correlation id from `X-Correlation-Id`, a Faro session id, or any other token in the line) within a time range. `scripts/gdpr/loki-delete.ts` submits that request. Loki filters the matching lines out of queries once the cancel period is over and the compactor purges them from the chunks; the 7-day retention stays as the backstop.
+
+**Files.**
+- `observability/loki.yml`: `limits_config.deletion_mode: filter-and-delete` (explicit, it is Loki's default) and `compactor.delete_request_cancel_period: 1h` (default 24h). `retention_enabled` and `delete_request_store: filesystem` were already set.
+- `scripts/gdpr/loki-delete.ts` (new): dependency-free TypeScript run by Node. Dry run by default (counts the matching lines), `--yes` submits, `--list` shows the requests and their status. The id is limited to `[A-Za-z0-9._:-]{8,128}` so it cannot inject LogQL; the end of the range is never in the future.
+- `scripts/gdpr/loki-delete.test.ts` (new): 10 unit tests, `fetch` mocked (query, range, headers, errors).
+- `packages/workspace-config/src/loki-retention.ts`, `loki-retention.test.ts`: `lokiDeletionProblems` fails if the delete store, `retention_enabled` or `deletion_mode: filter-and-delete` is removed from the config.
+- `docs/AICHAT-33/RETENTION.md`: the telemetry row and the erasure procedure.
+
+**How to run.**
+
+```sh
+# unit tests and the config guard
+node --test scripts/gdpr/loki-delete.test.ts
+pnpm exec nx test workspace-config
+
+# on the host that runs compose (Loki publishes no port, so the script runs in a Node container on the compose network;
+# the network is llm-chat_llm-chat locally and ai-chat_llm-chat on the Azure VM)
+docker run --rm --network llm-chat_llm-chat -v "$PWD/scripts:/s:ro" -e LOKI_URL=http://loki:3100 node:24-alpine \
+  node /s/gdpr/loki-delete.ts --id <correlation-or-session-id>                      # dry run: how many lines match
+docker run ... node /s/gdpr/loki-delete.ts --id <id> --yes                          # submit the delete request
+docker run ... node /s/gdpr/loki-delete.ts --list                                   # status: received, then processed
+```
+
+Options: `--start`/`--end` (ISO 8601, default the last 7 days), `--selector` (default `{app_name=~".+"}`), `--tenant` (default `fake`, the tenant of a Loki with `auth_enabled: false`).
+
+**How to repeat it manually.**
+
+1. Start Loki with the repo config: `docker run -d --name loki-erasure-test -p 3199:3100 -v $PWD/observability/loki.yml:/etc/loki/config.yml:ro grafana/loki:3.7.8 -config.file=/etc/loki/config.yml`; add `-compactor.delete-request-cancel-period=30s -compactor.compaction-interval=20s` to see the purge in minutes.
+2. Push a few lines that contain two different correlation ids to `/loki/api/v1/push` (stream labels `app_name`, `kind`, like Alloy writes).
+3. `LOKI_URL=http://localhost:3199 node scripts/gdpr/loki-delete.ts --id <id A>`: the dry run counts the lines of A.
+4. Same with `--yes`, then `--list`: the request is `received`. `curl -X POST localhost:3199/flush` writes the chunks.
+5. After the cancel period and a compaction, `--list` shows `processed` and the dry run counts 0 lines for A and still all lines for B.
+
+**Result.** Partly proved on a real Loki 3.7.8 with the repo config: the dry run counted the 3 lines of user A (2 of user B), the delete request was accepted and listed with status `received`. A second run, with a 30 s cancel period, exposed a bug (the end of the range was rounded up into the next second, and Loki answers `400 deletes in the future are not allowed`); it is fixed and covered by a unit test. The last part, lines gone after the cancel period, was **not run locally: Docker off** (Docker was switched off on the laptop before the re-run). The script logic is covered by 10 unit tests with a mocked `fetch`, and the config by the workspace-config guard. Log: [16](evidence/16-loki-delete-local.log).
+
+**Problems and fixes.** The `400 deletes in the future` above. Loki applies a delete request only after `delete_request_cancel_period`, also to queries, so the lines stay visible for up to 1 hour; the 24 h default was lowered to 1 h, which still leaves time to cancel a mistaken request (`DELETE /loki/api/v1/delete?request_id=...`). Lines that do not contain the identifier (for example a web-vitals line without a correlation id) cannot be found this way; for those the 7-day retention remains the erasure mechanism.
+
 ## 4. How to run everything
 
 ```sh
@@ -329,7 +369,7 @@ Gates, run on the final code:
 - **Tickets to create.**
   1. *Web client: Delete account in settings.* Add a section to `apps/mfe-settings` with a confirm dialog and a password field that calls `DELETE /auth/me`, clears the client state and goes to sign-in; add the route to the mock server and the MSW handlers.
   2. *Block `/api/internal/*` at the shell proxy and the Caddy file.* The internal erasure route should not be reachable from the browser at all.
-  3. *Telemetry erasure on request.* Loki and Faro have no user id; document or build a delete-by-correlation-id procedure if a user asks for their logs before 7 days.
+  3. *Telemetry erasure on request.* Loki and Faro have no user id; document or build a delete-by-correlation-id procedure if a user asks for their logs before 7 days. Done in AICHAT-249 (section 3).
   4. *Database migration testing.* Switch `postgres-global-setup.ts` and the compose start-up from `prisma db push` to `migrate deploy` once migrations exist; add `lastActiveAt` to the first migration.
   5. *Rotate `INTERNAL_SERVICE_TOKEN` per environment.* Put it in the deployment secrets (Azure) and the env checklist; the compose default is for local use only.
   6. *Stabilise the auth-service tests under load.* The unit tests that hash with bcrypt at the real cost should use a low cost in tests (an env value), so the 20 s timeout is not needed.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { durationToHours, lokiRetentionProblems, readLokiConfig } from "./loki-retention.ts";
+import { durationToHours, lokiDeletionProblems, lokiRetentionProblems, readLokiConfig } from "./loki-retention.ts";
 
 const config = (retentionPeriod: unknown, retentionEnabled: unknown = true) => ({
   limits_config: retentionPeriod === undefined ? {} : { retention_period: retentionPeriod },
@@ -37,6 +37,37 @@ describe("lokiRetentionProblems", () => {
   it("fails when the compactor does not apply retention", () => {
     expect(lokiRetentionProblems(config("168h", false))).toEqual([expect.stringContaining("retention_enabled")]);
     expect(lokiRetentionProblems({ limits_config: { retention_period: "168h" } })).toHaveLength(1);
+  });
+});
+
+describe("AICHAT-249: Loki erases lines on request", () => {
+  const deletable = {
+    limits_config: { deletion_mode: "filter-and-delete" },
+    compactor: { retention_enabled: true, delete_request_store: "filesystem" },
+  };
+
+  it("observability/loki.yml serves the delete API and purges deleted lines", () => {
+    expect(lokiDeletionProblems(readLokiConfig())).toEqual([]);
+  });
+
+  it("accepts a store plus filter-and-delete", () => {
+    expect(lokiDeletionProblems(deletable)).toEqual([]);
+  });
+
+  it("fails without a delete request store", () => {
+    expect(lokiDeletionProblems({ ...deletable, compactor: { retention_enabled: true } })).toEqual([
+      expect.stringContaining("delete_request_store"),
+    ]);
+  });
+
+  it.each(["disabled", "filter-only", undefined])("fails when deletion_mode is %s", (mode) => {
+    expect(lokiDeletionProblems({ ...deletable, limits_config: { deletion_mode: mode } })).toEqual([
+      expect.stringContaining("deletion_mode"),
+    ]);
+  });
+
+  it("fails when the compactor is off", () => {
+    expect(lokiDeletionProblems({})).toHaveLength(3);
   });
 });
 
