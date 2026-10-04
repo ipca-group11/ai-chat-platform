@@ -114,32 +114,32 @@ move to the next line. To resume an epic that was interrupted, use `continue AIC
 - [x] Merge `main` into `integration/testing-epics` (nothing new on `main`)
 
 **Wave 3: code quality**
-- [ ] `start AICHAT-17`
-- [ ] `start AICHAT-18`
-- [ ] `start AICHAT-23`
-- [ ] `start AICHAT-20`
+- [x] `start AICHAT-17`
+- [x] `start AICHAT-18`
+- [x] `start AICHAT-23`
+- [x] `start AICHAT-20`
 - [ ] Merge `main` into `integration/testing-epics`
 
 **Wave 4: running system**
-- [ ] `start AICHAT-24`
-- [ ] `start AICHAT-28`
-- [ ] `start AICHAT-32`
-- [ ] `start AICHAT-30`
+- [x] `start AICHAT-24`
+- [x] `start AICHAT-28`
+- [x] `start AICHAT-32`
+- [x] `start AICHAT-30`
 - [ ] Merge `main` into `integration/testing-epics`
 
 **Wave 5: frontend budgets**
-- [ ] `start AICHAT-22`
-- [ ] `start AICHAT-21`
-- [ ] `start AICHAT-19`
+- [x] `start AICHAT-22`
+- [x] `start AICHAT-21`
+- [x] `start AICHAT-19`
 - [ ] Merge `main` into `integration/testing-epics`
 
 **Wave 6: decisions and features**
-- [ ] `start AICHAT-26`
-- [ ] `start AICHAT-33`
+- [x] `start AICHAT-26`
+- [x] `start AICHAT-33`
 - [ ] `start AICHAT-29`
 
 **Final**
-- [ ] `git switch integration/testing-epics && git merge origin/main`, run the full suite (`pnpm lint && pnpm typecheck && pnpm test && pnpm build`)
+- [x] `git switch integration/testing-epics && git merge origin/main`, run the full suite (`pnpm lint && pnpm typecheck && pnpm test && pnpm build`)
 - [ ] Open the PR `integration/testing-epics → main` listing every epic, its work log and its evidence folder
 - [ ] Request review from the team; after approval, merge and move the remaining epics from **Review** to **Done**
 
