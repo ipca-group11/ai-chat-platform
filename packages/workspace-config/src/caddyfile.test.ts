@@ -61,6 +61,11 @@ describe("deploy/azure/Caddyfile security headers (AICHAT-228)", () => {
     expect(shell).toMatch(/Cross-Origin-Resource-Policy "same-origin"/);
   });
 
+  it("the CSP allows no font or style host besides our own (fonts are self-hosted, AICHAT-230)", () => {
+    expect(shell).toMatch(/font-src 'self';/);
+    expect(shell).not.toMatch(/fonts\.googleapis\.com|fonts\.gstatic\.com/);
+  });
+
   it("the remotes stay loadable from the shell's origin (CORP cross-origin)", () => {
     expect(remote).toMatch(/Cross-Origin-Resource-Policy "cross-origin"/);
     expect(remote).toMatch(/Access-Control-Allow-Origin "https:\/\/{\$DOMAIN}"/);

@@ -10,7 +10,7 @@ The `visual` Playwright project takes a screenshot of nine key screens, each in 
 
 1. **Baselines come from the Playwright Docker image only.** Fonts and anti-aliasing differ between macOS, Windows and Linux, so an image made on your machine will not match the one made in CI. The image tag is the installed `@playwright/test` version: `mcr.microsoft.com/playwright:v1.63.0-noble`. When you upgrade `@playwright/test`, change the tag in `e2e/package.json` (the structural test `e2e/src/ci/visual-workflow.spec.ts` fails if they differ) and regenerate all baselines in the same pull request.
 2. **Only the `visual` project runs.** The full e2e suite is disabled (too slow); `pnpm --filter e2e run e2e` runs the `chromium` project and never the visual specs.
-3. **No backend is needed.** The tests serve the production builds of the shell and the three remotes on ports 5000 to 5003 inside the container, answer every API call with fixed JSON, freeze the clock at 2026-03-10 10:00 UTC and load Inter and JetBrains Mono from `e2e/src/visual/fonts/` instead of Google Fonts.
+3. **No backend is needed.** The tests serve the production builds of the shell and the three remotes on ports 5000 to 5003 inside the container, answer every API call with fixed JSON, freeze the clock at 2026-03-10 10:00 UTC and use the Inter and JetBrains Mono files the shell bundles (`packages/ui/src/styles/fonts/`, self-hosted since AICHAT-230).
 
 ## Run the comparison
 

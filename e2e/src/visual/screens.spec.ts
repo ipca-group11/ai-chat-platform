@@ -1,7 +1,6 @@
 import type { Server } from "node:http";
 import { expect, test, type Page } from "@playwright/test";
 import { FIXED_TIME } from "./lib/data.js";
-import { installFonts } from "./lib/fonts.js";
 import { EMPTY_CHATS, installApiMocks, SIGNED_OUT, WITH_CHATS, type ApiScenario } from "./lib/mock-api.js";
 import { STABLE_CSS } from "./lib/stable-css.js";
 import { startApps, stopApps } from "./lib/servers.js";
@@ -9,9 +8,9 @@ import { startApps, stopApps } from "./lib/servers.js";
 /**
  * Visual regression of the nine key screens, light and dark (AICHAT-19). The built shell and
  * remotes are served from `apps/*\/dist`, every API call is answered with fixed JSON, the clock
- * is frozen and the fonts come from local files, so a run needs no stack and the images are the
- * same on every run. Baselines are made in the Playwright Docker image only, see
- * docs/AICHAT-19/RUNNING.md.
+ * is frozen and the fonts are bundled with the shell (AICHAT-230), so a run needs no stack and
+ * the images are the same on every run. Baselines are made in the Playwright Docker image only,
+ * see docs/AICHAT-19/RUNNING.md.
  */
 
 const THEMES = ["light", "dark"] as const;
@@ -119,7 +118,6 @@ for (const screen of SCREENS) {
       await page.clock.setFixedTime(new Date(FIXED_TIME));
       await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
       await page.addInitScript((value) => localStorage.setItem("theme", value), theme);
-      await installFonts(page);
       const unexpected = await installApiMocks(page, screen.scenario);
       if (screen.blockAuthRemote) await page.route("http://localhost:5001/**", (route) => route.abort());
 

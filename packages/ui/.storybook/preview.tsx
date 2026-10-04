@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import type { Decorator, Preview } from '@storybook/react-vite';
 import '../src/styles/globals.css';
+import '../src/styles/fonts.css';
 
 // Start in the same theme the app would pick (apps/shell/src/shared/theme): the OS
 // preference, until the toolbar overrides it.

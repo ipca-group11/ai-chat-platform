@@ -1,0 +1,31 @@
+/*
+ * Self-hosted Inter and JetBrains Mono (AICHAT-230), Latin subset; see fonts/README.md.
+ *
+ * Kept out of globals.css on purpose: Vite's library build inlines every asset as base64,
+ * which would put ~90 KB of fonts into the render-blocking dist/styles.css. The shell
+ * imports this file from source instead (`import '@app/ui/fonts.css'`), so its own build
+ * emits the font files as hashed, cacheable assets on our origin.
+ */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/inter-latin-wght-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./fonts/jetbrains-mono-latin-600-normal.woff2') format('woff2');
+}
