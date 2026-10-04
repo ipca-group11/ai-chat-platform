@@ -293,7 +293,7 @@ pnpm test:scripts && (cd e2e && pnpm exec vitest run src/ci)           # unit te
 
 ## 7. Notes for the report
 
-- **Checks before the pull request.** See the line below, filled in after the final run.
+- **Checks before the pull request.** `pnpm exec nx affected -t lint typecheck test build --base=origin/integration/testing-epics`: 18 projects, all green. `pnpm test:scripts` (28 tests) and `pnpm typecheck:scripts`: green. `pnpm sast`: no ERROR finding. `gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD`: no leaks. No session cookie or token is in a committed file (`grep` for `access_token=` and `eyJ` over `docs/AICHAT-21` and `lighthouserc.json`); the cookie is only in a temporary config (mode 600, deleted) and masked in CI.
 - **Found.** All five pages pass their budgets by a wide margin on the local stack. The only items worth a change are fonts (AICHAT-230), the request chain to the remotes, and unused JavaScript. The suspected duplicated react-dom is not there.
 - **Not done.** The workflow has not run on GitHub yet (the branch is not pushed). The required check is a team rule, not a branch protection. Field data is from the local stack, not the VM: the same dashboard works on the VM once the stack runs there. `/login` and `/register` are audited with the session cookie. Nothing is audited with CPU or network throttling.
 - **Lessons.** A report summary must not depend on a file name pattern you have not looked at. A table panel is the safest way to show a per-page breakdown from Loki. `networkidle` does not work on pages with an open stream.
