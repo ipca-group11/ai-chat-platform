@@ -114,12 +114,19 @@ jobs:
           output-file: sbom-${{ matrix.name }}.cdx.json
           upload-artifact-retention: 90
 
-  # Reports known vulnerabilities found in the SBOMs. It does not fail the run: the
-  # severity threshold that blocks a deploy belongs to AICHAT-7 (see SBOM-INTERFACE.md).
+  # Scans the 12 SBOMs with Grype. The table goes to the job summary for every finding; the
+  # gate (AICHAT-236) fails the job on any Critical not accepted in .grype.yaml, and `deploy`
+  # waits for it, so an image with an unaccepted Critical is never rolled out.
   scan-sbom:
     needs: [build, sbom-third-party]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SHA }}
+          sparse-checkout: .grype.yaml
+          sparse-checkout-cone-mode: false
+
       - uses: actions/download-artifact@v4
         with:
           pattern: sbom-*.cdx.json
@@ -129,17 +136,30 @@ jobs:
       - uses: anchore/scan-action/download-grype@v6
         id: grype
 
-      - name: Grype report (does not fail)
+      - name: Grype report (all severities)
         run: |
           for f in sbom/sbom-*.cdx.json; do
             echo "### $(basename "$f")" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
-            ${{ steps.grype.outputs.cmd }} "sbom:$f" -o table >> "$GITHUB_STEP_SUMMARY" || true
+            ${{ steps.grype.outputs.cmd }} "sbom:$f" -c .grype.yaml -o table >> "$GITHUB_STEP_SUMMARY" || true
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           done
 
+      # Severity gate (AICHAT-236): exit 2 from Grype on a Critical fails the job. Exceptions
+      # live in .grype.yaml, each with a reason (docs/AICHAT-30/results/sbom-triage.md).
+      - name: Grype gate (fail on Critical)
+        run: |
+          status=0
+          for f in sbom/sbom-*.cdx.json; do
+            if ! ${{ steps.grype.outputs.cmd }} "sbom:$f" -c .grype.yaml --fail-on critical -o table -q > /dev/null; then
+              echo "::error title=Critical vulnerability::$(basename "$f") has a Critical finding not accepted in .grype.yaml"
+              status=1
+            fi
+          done
+          exit "$status"
+
   deploy:
-    needs: [build, sbom-third-party]
+    needs: [build, sbom-third-party, scan-sbom]
     runs-on: ubuntu-latest
     environment:
       name: production

@@ -1,0 +1,17 @@
+# Grype configuration for the SBOM gate (AICHAT-236). The CI scans pass it with `-c .grype.yaml` and fail on any
+# Critical finding that is not listed here. Every exception names the package, its location and why it is accepted;
+# review the list when the base image changes (docs/AICHAT-30/results/sbom-triage.md).
+ignore:
+  # postgres:16-alpine ships gosu built with Go 1.24.6. gosu only drops root privileges and execs postgres at container
+  # start: it opens no TLS connection, so the crypto/tls session-resumption flaw cannot be reached. The fix needs an
+  # upstream rebuild of the image (latest 16-alpine checked 2026-10-04 still has go1.24.6).
+  - vulnerability: GO-2026-4337
+    reason: gosu in postgres:16-alpine makes no TLS connections; fix needs an upstream image rebuild
+    package:
+      name: stdlib
+      location: /usr/local/bin/gosu
+  - vulnerability: CVE-2025-68121
+    reason: same flaw as GO-2026-4337 (NVD id); gosu makes no TLS connections
+    package:
+      name: stdlib
+      location: /usr/local/bin/gosu

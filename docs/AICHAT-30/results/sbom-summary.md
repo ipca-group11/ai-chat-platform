@@ -17,3 +17,5 @@ Local run, 2026-10-03: images built for linux/arm64 and pushed to a local regist
 | `sbom-prometheus.cdx.json` | 444 | 0 | 0 | 0 | 439 | 0 | 3 | 0 | 0 | 5 |
 | `sbom-shell.cdx.json` | 2571 | 18 | 0 | 1235 | 0 | 0 | 26 | 28 | 4 | 58 |
 | `sbom-source.cdx.json` | 2323 | 0 | 0 | 2295 | 0 | 2 | 26 | 32 | 6 | 66 |
+
+Triage of the Critical findings and the severity gate: [sbom-triage.md](sbom-triage.md) (AICHAT-236).

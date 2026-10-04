@@ -5,8 +5,8 @@ import { describe, expect, it } from "vitest";
 /**
  * Structural checks on the SBOM steps of `deploy.yml` and `ci.yml` (AICHAT-30). The workflows
  * cannot run against Azure from here, so these tests pin what the epic added: the BuildKit
- * attestations, one CycloneDX artifact per image, the two third-party images, a Grype step
- * that reports without failing, and the source SBOM on pull requests.
+ * attestations, one CycloneDX artifact per image, the two third-party images, the Grype report
+ * and the source SBOM on pull requests. AICHAT-236 added the severity gate: fail on Critical.
  */
 
 const read = (name: string): string =>
@@ -86,8 +86,8 @@ describe("deploy.yml CycloneDX artifacts (AICHAT-70)", () => {
     expect(third).toContain("format: cyclonedx-json");
   });
 
-  it("does not deploy before all SBOMs exist", () => {
-    expect(job(deploy, "deploy")).toMatch(/needs: \[build, sbom-third-party\]/);
+  it("does not deploy before all SBOMs exist and pass the gate", () => {
+    expect(job(deploy, "deploy")).toMatch(/needs: \[build, sbom-third-party, scan-sbom\]/);
   });
 });
 
@@ -106,14 +106,23 @@ describe("deploy.yml vulnerability scan of the SBOMs (AICHAT-88)", () => {
     expect(scan).toContain('"sbom:$f"');
   });
 
-  it("only reports: the severity threshold belongs to AICHAT-7", () => {
-    expect(scan).toContain("|| true");
-    expect(scan).not.toContain("--fail-on");
-    expect(scan).toContain("GITHUB_STEP_SUMMARY");
+  it("reports every finding in the job summary without failing on it", () => {
+    const report = scan.slice(scan.indexOf("Grype report"), scan.indexOf("Grype gate"));
+    expect(report).toContain("|| true");
+    expect(report).not.toContain("--fail-on");
+    expect(report).toContain("GITHUB_STEP_SUMMARY");
   });
 
-  it("is not a dependency of the deploy job", () => {
-    expect(job(deploy, "deploy")).not.toContain("scan-sbom");
+  it("fails on Critical, with the exceptions of .grype.yaml (AICHAT-236)", () => {
+    const gate = scan.slice(scan.indexOf("Grype gate"));
+    expect(gate).toContain("--fail-on critical");
+    expect(gate).toContain("-c .grype.yaml");
+    expect(gate).not.toContain("|| true");
+    expect(scan).toContain("sparse-checkout: .grype.yaml");
+  });
+
+  it("blocks the deploy job", () => {
+    expect(job(deploy, "deploy")).toContain("scan-sbom");
   });
 });
 
@@ -128,9 +137,26 @@ describe("ci.yml source SBOM (AICHAT-108)", () => {
     expect(source).toContain("artifact-name: sbom-source.cdx.json");
   });
 
+  it("fails on a Critical in the workspace dependencies (AICHAT-236)", () => {
+    expect(source).toMatch(/uses: anchore\/scan-action\/download-grype@v\d+/);
+    expect(source).toContain("sbom:sbom-source.cdx.json -c .grype.yaml --fail-on critical");
+    expect(source).toContain('exit "$code"');
+    expect(source.indexOf("anchore/sbom-action")).toBeLessThan(source.indexOf("--fail-on critical"));
+  });
+
   it("runs on pull requests (the workflow trigger) and is independent of the Nx job", () => {
     expect(ci).toMatch(/^\s+pull_request:/m);
     expect(source).not.toContain("needs:");
+  });
+});
+
+describe(".grype.yaml exceptions (AICHAT-236)", () => {
+  const config = readFileSync(fileURLToPath(new URL("../../../.grype.yaml", import.meta.url)), "utf-8");
+
+  it("gives a reason for every ignore rule", () => {
+    const rules = config.match(/^ {2}- vulnerability: /gm) ?? [];
+    expect(rules.length).toBeGreaterThan(0);
+    expect(config.match(/^ {4}reason: \S/gm)).toHaveLength(rules.length);
   });
 });
 

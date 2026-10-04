@@ -207,6 +207,43 @@ git archive HEAD | tar -x -C /tmp/src && docker run --rm -v /tmp/src:/src:ro anc
 
 **Problems and fixes.** Running Syft on the working directory with `node_modules` installed took more than five minutes and was stopped; the CI checkout has no `node_modules`, so the proof uses a clean `git archive`, the same input as the runner.
 
+### AICHAT-236 · Triage of the Critical findings and the severity gate
+
+**What and why.** The first scan (US4) found 1 Critical in `postgres:16-alpine`, 2 Critical in the source SBOM and 20 to 26 High per Node image, with no gate. Each Critical was triaged (fixed or accepted with a reason), the Highs summarised, and Grype now fails on Critical in CI.
+
+**Files.**
+- `apps/mfe-chat/pnpm-lock.yaml`, `packages/shared-types/pnpm-lock.yaml`, `packages/ui/pnpm-lock.yaml`: deleted. Stale lockfiles from the first commit; pnpm uses only the root lockfile, but Syft read them and reported `vitest` 2.1.9 (the two Criticals of the source SBOM).
+- `.grype.yaml` (new): one exception, Go `stdlib` in `gosu` of `postgres:16-alpine`, with the reason.
+- `.github/workflows/ci.yml`: Grype gate (`--fail-on critical`) after the source SBOM.
+- `.github/workflows/deploy.yml`: `scan-sbom` checks out `.grype.yaml`, keeps the report and adds a gate step; `deploy` waits for `scan-sbom`.
+- `e2e/src/ci/sbom-workflow.spec.ts`: tests of the gate, of `deploy` waiting for it, and of a reason on every exception (18 tests).
+- `docs/AICHAT-30/results/sbom-triage.md` (new): the triage. `SBOM-INTERFACE.md`: the gate is now decided.
+
+**How to run.**
+
+```sh
+grype sbom:./sbom-source.cdx.json -c .grype.yaml --fail-on critical   # exit 2 when a Critical is left
+pnpm --filter e2e exec vitest run src/ci/sbom-workflow.spec.ts
+```
+
+**How to repeat it manually.**
+
+1. Make the source SBOM from a clean tree, as in US5 (`git archive HEAD`, then Syft on the copy). For Postgres: `syft docker:postgres:16-alpine -o cyclonedx-json`.
+2. `grype sbom:<file> --fail-on critical`: exit 2 on the old tree (vitest in the stale lockfiles) and on Postgres without the config.
+3. Again with `-c .grype.yaml`: exit 0; the Postgres finding is listed under ignored matches with its reason.
+
+**Result.** 0 Critical left in the scanned artifacts; Highs reported, not blocking.
+
+| Artifact | Before | After |
+|---|---|---|
+| source SBOM | 3175 components, Critical 2, High 33 (gate exit 2) | 2180 components, Critical 0, High 24 (gate exit 0) |
+| `postgres:16-alpine` | Critical 1, High 24 (gate exit 2) | Critical 0 (1 accepted in `.grype.yaml`), High 24 (gate exit 0) |
+| Node and Go images | 0 Critical in the first scan | not run locally: Docker off |
+
+Details, the list of Highs and the follow-up are in [results/sbom-triage.md](results/sbom-triage.md).
+
+**Problems and fixes.** Docker was switched off on the laptop half-way through, so the image re-scan could not run and the last scans used Grype installed with Homebrew (0.120.0, same version as the image). The ten image builds needed for the Node images take close to an hour; their re-scan is the first follow-up. The workflow changes are checked by the structural test and by YAML parsing only; they have not run on GitHub.
+
 ## 4. How to run everything
 
 ```sh
@@ -250,5 +287,5 @@ docker rm -f sbom-registry && docker buildx rm sbomx
 
 - **Checks before the pull request.** `pnpm exec nx affected -t lint typecheck test build --base=origin/integration/testing-epics`: green. It first failed on `workspace-config:test`, whose CI test required `ci.yml` to have a single job; it now lists `affected` and `source-sbom`. `pnpm sast`: no ERROR finding. `gitleaks git --redact --log-opts=origin/integration/testing-epics..HEAD`: no leaks. The SBOM JSON files are not in git (`sbom-results/` is ignored) and the local registry and builder were removed.
 - **Found.** The runtime images carry the whole workspace `node_modules` (about 1200 npm packages in each micro frontend), which makes the SBOM, and the list of CVEs, much longer than the application needs. Postgres 16 and the source SBOM have one or two Critical findings each on the day of the scan; the Go images show findings in Go modules and the Alpine base.
-- **Not done.** The workflows have not run on GitHub (the branch is not pushed), so the first Actions run can still show differences (for example the amd64 images, and how `download-grype` exposes the binary). The interface with João Delgado is a written note, not a talk. No signing of the SBOM or the images. No severity gate: AICHAT-7.
+- **Not done.** The workflows have not run on GitHub (the branch is not pushed), so the first Actions run can still show differences (for example the amd64 images, and how `download-grype` exposes the binary). The interface with João Delgado is a written note, not a talk. No signing of the SBOM or the images. The severity gate (fail on Critical) was added later by AICHAT-236.
 - **Lessons.** Syft in a container needs the registry address of the host and plain HTTP for a local registry. A scan of the source tree must run on a clean checkout, not on a tree with `node_modules`. `mode=max` provenance is recognisable by `buildConfig` in the SLSA v1 `internalParameters`.

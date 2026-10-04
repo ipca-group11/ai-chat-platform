@@ -124,7 +124,8 @@ jobs:
         run: pnpm exec nx run-many -t test-db -p auth-service,conversation-service --parallel=1
 
   # Source SBOM of the pnpm workspace (AICHAT-108): lists the npm packages the lockfile
-  # resolves, for SCA on every pull request. Independent of the Nx job.
+  # resolves, for SCA on every pull request. Independent of the Nx job. Grype then fails the
+  # job on any Critical not accepted in .grype.yaml (severity gate, AICHAT-236).
   source-sbom:
     name: source SBOM (pnpm workspace)
     runs-on: ubuntu-latest
@@ -139,3 +140,15 @@ jobs:
           artifact-name: sbom-source.cdx.json
           output-file: sbom-source.cdx.json
           upload-artifact-retention: 90
+
+      - uses: anchore/scan-action/download-grype@v6
+        id: grype
+
+      - name: Grype gate (fail on Critical)
+        run: |
+          set +e
+          ${{ steps.grype.outputs.cmd }} sbom:sbom-source.cdx.json -c .grype.yaml --fail-on critical -o table > grype.txt
+          code=$?
+          cat grype.txt
+          { echo '### Grype, source SBOM (fails on Critical)'; echo '```'; cat grype.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit "$code"

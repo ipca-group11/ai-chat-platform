@@ -39,7 +39,8 @@ trivy sbom ./sbom-auth-service.cdx.json --severity HIGH,CRITICAL --exit-code 1
 
 ## What is and is not decided
 
-- The `scan-sbom` job in `deploy.yml` downloads the 12 artifacts and runs Grype on each one. It writes the table to the job summary and **never fails the run**.
-- The severity threshold that fails the build, and the choice between Trivy and Grype, belong to AICHAT-7. To enforce it, change the `|| true` in that step, or replace the step with your own; the artifact names above are the contract.
-- The `deploy` job does not wait for `scan-sbom`. If AICHAT-7 wants a block before the rollout, add `scan-sbom` to `needs` of `deploy`.
+- The `scan-sbom` job in `deploy.yml` downloads the 12 artifacts and runs Grype on each one. The report step writes the table to the job summary and never fails.
+- **Severity gate (AICHAT-236):** a second step runs `grype sbom:<file> -c .grype.yaml --fail-on critical` and fails the job on any Critical that `.grype.yaml` does not accept. `deploy` now has `scan-sbom` in its `needs`, so an image with an unaccepted Critical is not rolled out. `ci.yml` (`source-sbom`) applies the same gate to `sbom-source.cdx.json` on every pull request. High and lower are reported only.
+- Exceptions live in `.grype.yaml` at the repo root, each with a `reason`; the triage is in [results/sbom-triage.md](results/sbom-triage.md).
+- Choosing Trivy instead of Grype, or a stricter threshold, is still open to AICHAT-7; the artifact names above are the contract.
 - Today the images are pushed before they are scanned (see the analysis, section 4). A scan before the push needs a build, scan, push order, which is also an AICHAT-7 decision.
