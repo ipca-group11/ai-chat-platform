@@ -41,24 +41,20 @@ Blockers: none.
 
 ## 3. Steps
 
-### US1 · <story summary> ([AICHAT-<key>](https://ipca-grupo11.atlassian.net/browse/AICHAT-<key>))
+### US1 · Written rules of engagement for the pentest ([AICHAT-38](https://ipca-grupo11.atlassian.net/browse/AICHAT-38))
 
-**What and why.** …
+**What and why.** Before any active testing we wrote down the scope, the time box, the accounts, the stop conditions and how evidence is handled, so the assessment stays inside agreed limits and nobody's real data or shared service is at risk. The document follows the draft in the README (§5) and the Definition of Ready decisions in §1.
 
 **Files.**
-- `path/to/file` (new): …
+- `docs/AICHAT-29/RULES-OF-ENGAGEMENT.md` (new): the approved rules of engagement.
 
-**How to run.**
-
-```sh
-<one command from the repo root>
-```
+**How to run.** Not runnable; it is a document. Read it before starting the assessment.
 
 **How to repeat it manually.**
 
-1. …
-2. …
-3. Expected output: …
+1. Open `docs/AICHAT-29/RULES-OF-ENGAGEMENT.md`.
+2. Check that the in-scope list matches the hypotheses H1–H11 in the README and that the out-of-scope list excludes the providers, other tenants, the Azure control plane and volumetric denial of service.
+3. Expected output: the scope, accounts, time box, stop conditions and data-handling rules are all present and dated 2026-10-04.
 
 **Result.** …
 
