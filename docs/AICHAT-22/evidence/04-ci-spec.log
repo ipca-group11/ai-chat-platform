@@ -1,0 +1,11 @@
+$ bash /private/tmp/claude-501/cit.sh
+15:  NX_AFFECTED_TARGETS: lint typecheck test build size
+ ✓ src/ci.test.ts > AICHAT-83: CI fails when a bundle exceeds its size-limit budget > runs the `size` target in the same `nx affected` step as build 0ms
+ ✓ src/ci.test.ts > AICHAT-83: CI fails when a bundle exceeds its size-limit budget > every app defines a `size` target and a size-limit config next to it 1ms
+ ✓ src/ci.test.ts > AICHAT-83: CI fails when a bundle exceeds its size-limit budget > nx.json makes `size` depend on `build`, so the budget is checked on a fresh build 0ms
+ ✓ src/ci.test.ts > AICHAT-83: CI fails when a bundle exceeds its size-limit budget > is mirrored in .factory/commands.json 0ms
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Duration  134ms (import 50%, transform 35%, tests 9%, worker 5%)
+
+[exit 0]

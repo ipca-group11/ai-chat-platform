@@ -11,8 +11,8 @@ title: "AICHAT-21 · Performance testing (frontend): work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-21-performance-testing` |
 | Started / finished | 2026-10-03 / 2026-10-04 |
-| Pull requests | #… |
-| Status | Done, pull request not yet opened |
+| Pull requests | [#23](https://github.com/ipca-group11/ai-chat-platform/pull/23) |
+| Status | Done, merged into `integration/testing-epics` |
 
 ## 1. DoR review
 

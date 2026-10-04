@@ -46,6 +46,11 @@
       "outputs": ["{projectRoot}/coverage"],
       "cache": true
     },
+    "size": {
+      "dependsOn": ["build"],
+      "inputs": ["default", "^production"],
+      "cache": true
+    },
     "serve": {
       "cache": false
     },

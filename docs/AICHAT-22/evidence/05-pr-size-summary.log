@@ -1,0 +1,24 @@
+$ bash /private/tmp/claude-501/pr.sh
+# base build
+# change: a 6 KB import in the chat list page (not committed)
+# job summary
+## Bundle size change (gzip)
+
+| App | Before | After | Change |
+| --- | ---: | ---: | ---: |
+| mfe-auth (all JS and CSS) | 271.61 kB | 271.61 kB | 0 B (0.0%) |
+| mfe-chat (all JS and CSS) | 316.15 kB | 321.43 kB | +5.28 kB (+1.7%) |
+| mfe-settings (all JS and CSS) | 238.25 kB | 238.25 kB | 0 B (0.0%) |
+| shell (all JS and CSS) | 304.85 kB | 304.85 kB | 0 B (0.0%) |
+
+| App | File | Before | After | Change |
+| --- | --- | ---: | ---: | ---: |
+| mfe-chat | `assets/mf-entry-bootstrap-10.js` | 0.70 kB | 0.70 kB | +1 B (+0.1%) |
+| mfe-chat | `assets/mf-entry-bootstrap-9.js` | 0.70 kB | 0.70 kB | -2 B (-0.3%) |
+| mfe-chat | `assets/remote-entry.js` | 0.46 kB | 0.46 kB | -1 B (-0.2%) |
+| mfe-chat | `assets/routes.js` | 60.97 kB | 66.24 kB | +5.28 kB (+8.7%) |
+| mfe-chat | `remoteEntry.js` | 6.26 kB | 6.26 kB | +2 B (+0.0%) |
+
+Updated 1 path from the index
+
+[exit 0]

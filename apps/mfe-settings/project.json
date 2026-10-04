@@ -20,6 +20,10 @@
       "executor": "nx:run-commands",
       "options": { "command": "vite build", "cwd": "apps/mfe-settings" }
     },
+    "size": {
+      "executor": "nx:run-commands",
+      "options": { "command": "size-limit", "cwd": "apps/mfe-settings" }
+    },
     "serve": {
       "executor": "nx:run-commands",
       "options": { "command": "vite", "cwd": "apps/mfe-settings" }
