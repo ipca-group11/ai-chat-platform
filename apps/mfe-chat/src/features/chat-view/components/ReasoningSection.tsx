@@ -26,14 +26,17 @@ export function ReasoningSection({ reasoning, thinking }: ReasoningSectionProps)
         onClick={() => setUserOpen(!open)}
       >
         <ChevronRight className={cn("size-3.5 transition-transform", open && "rotate-90")} aria-hidden="true" />
-        <Brain className="size-3.5" aria-hidden="true" />
-        {thinking ? <span className="animate-pulse">Thinking…</span> : "Thinking"}
+        {/* The pulse sits on the icon, not the label: fading the text drops it below AA contrast. */}
+        <Brain className={cn("size-3.5", thinking && "animate-pulse")} aria-hidden="true" />
+        {thinking ? "Thinking…" : "Thinking"}
       </button>
       {open ? (
         <div
           role="region"
           aria-label="Model reasoning"
-          className="mt-2 max-h-72 overflow-y-auto whitespace-pre-wrap break-words border-l-2 border-border pl-3 text-xs leading-relaxed text-muted-foreground"
+          // Long reasoning scrolls; focusable so keyboard users can scroll it too.
+          tabIndex={0}
+          className="mt-2 max-h-72 overflow-y-auto rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring whitespace-pre-wrap break-words border-l-2 border-border pl-3 text-xs leading-relaxed text-muted-foreground"
         >
           {reasoning}
         </div>

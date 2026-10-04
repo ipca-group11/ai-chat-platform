@@ -116,7 +116,7 @@ Below, each epic lists only what it adds to these.
 ### AICHAT-20 · [Foundations] Snapshot testing
 
 - **DoR:** DTOs to snapshot listed
-- **DoD:** only serialized DTOs snapshotted; no component-tree snapshots remain
+- **DoD:** serialized DTOs and wire output snapshotted; every UI component has a story whose DOM is snapshotted (owner decision of 2026-10-04, replacing "no component-tree snapshots")
 
 ### AICHAT-21 · [Foundations] Performance testing (frontend)
 

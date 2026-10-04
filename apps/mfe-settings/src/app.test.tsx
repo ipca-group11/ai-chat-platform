@@ -24,6 +24,14 @@ describe("App (/settings page)", () => {
     expect(screen.getByLabelText("OpenAI API key")).toBeInTheDocument();
   });
 
+  it("nests each provider heading directly under the page heading", () => {
+    renderWithClient(<App />);
+
+    expect(screen.getByRole("heading", { level: 1, name: /llm provider api keys/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "OpenAI" })).toBeInTheDocument();
+    expect(screen.queryAllByRole("heading", { level: 3 })).toEqual([]);
+  });
+
   it("AC-75: the `./routes` module federation entry point default-exports the same page component", () => {
     expect(routesDefault).toBe(App);
   });

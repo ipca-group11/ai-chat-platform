@@ -28,6 +28,7 @@
     "@platform/eslint-config": "workspace:*",
     "@platform/test-config": "workspace:*",
     "@platform/test-utils": "workspace:*",
+    "@storybook/react-vite": "^10.0.0",
     "@tanstack/router-cli": "^1.167.38",
     "@tanstack/router-plugin": "^1.168.40",
     "@testing-library/dom": "^10.4.2",

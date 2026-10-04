@@ -9,6 +9,7 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./dom-snapshot": "./src/dom-snapshot.ts",
     "./msw": "./src/msw/index.ts",
     "./pii": "./src/pii.ts",
     "./setup": "./src/setup.ts"

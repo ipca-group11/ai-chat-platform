@@ -21,6 +21,7 @@ const NOT_SOURCE = [
   /\.(test|spec)\.(ts|tsx)$/, // the tests themselves
   /\.d\.ts$/,
   /\.stories\.tsx?$/,
+  /(^|\/)stories-support\.tsx?$/, // fixtures and decorators of the stories (story code, snapshotted with them)
   /(^|\/)routeTree\.gen\.ts$/, // generated
   /(^|\/)@mf-types\//,
   /\/generated\//,

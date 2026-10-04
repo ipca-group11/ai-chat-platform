@@ -1,5 +1,4 @@
 import featureFolderBoundaries from "./rules/feature-folder-boundaries.ts";
-import noComponentSnapshots from "./rules/no-component-snapshots.ts";
 
 /**
  * A tiny local ESLint plugin exposing this workspace's custom rule(s), so they can be
@@ -11,7 +10,6 @@ const localPlugin = {
   },
   rules: {
     "feature-folder-boundaries": featureFolderBoundaries,
-    "no-component-snapshots": noComponentSnapshots,
   },
 };
 

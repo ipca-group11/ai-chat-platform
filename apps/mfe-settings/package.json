@@ -25,6 +25,7 @@
     "@platform/eslint-config": "workspace:*",
     "@platform/test-config": "workspace:*",
     "@platform/test-utils": "workspace:*",
+    "@storybook/react-vite": "^10.0.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",

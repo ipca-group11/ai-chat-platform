@@ -49,18 +49,20 @@ export function usePendingAttachments(chatId: string, provider: Provider, model:
       }
 
       setPending((existing) => [...existing, { id, file, status: "uploading" }]);
-      uploadAttachment.mutate(file, {
-        onSuccess: (attachment) => {
+      // mutateAsync, not mutate(file, { onSuccess }): per-call mutate callbacks only fire for the
+      // latest call, so with several files picked at once all but the last stayed "uploading".
+      uploadAttachment.mutateAsync(file).then(
+        (attachment) => {
           setPending((existing) =>
             existing.map((p) => (p.id === id ? { ...p, status: "uploaded", attachment } : p))
           );
         },
-        onError: (error) => {
+        (error: Error) => {
           setPending((existing) =>
             existing.map((p) => (p.id === id ? { ...p, status: "rejected", error: error.message } : p))
           );
         },
-      });
+      );
     }
   }
 

@@ -24,7 +24,7 @@ Items marked **★** cover risks specific to this architecture: multi-user data,
 | ⬜ | SSE reconnection testing | João Vieira | A network drop during streaming leads to a resume or a clear error | Playwright network emulation |
 | ⬜ | Session expiry testing | — | The access token expires mid-chat or mid-stream and is refreshed or the user is sent to login | Playwright |
 | ⬜ | Visual regression testing | JP | Pixel differences of key screens in light and dark themes | Playwright `toHaveScreenshot` |
-| 🟡 | Snapshot testing | JP | Only small, stable outputs (serialized DTOs), not large component trees | Vitest |
+| 🟡 | Snapshot testing | JP | Serialized DTOs and wire output, plus the rendered DOM of every Storybook story (every UI component) | Vitest |
 | ✅ | Accessibility testing | João Vieira | WCAG checks on every page | axe-core (`@axe-core/playwright`) |
 | ⬜ | Performance testing | JP | LCP / INP / CLS budgets per page | Lighthouse CI; Grafana Faro for real-user data |
 | ⬜ | Bundle size budget testing | JP | Each remote's `remoteEntry.js` and chunks stay under a size limit | size-limit |

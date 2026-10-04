@@ -18,6 +18,11 @@ title: "AICHAT-20 · [Foundations] Snapshot testing"
 Use snapshots **only for small, stable serialized outputs (DTOs)**: API responses, SSE events, error bodies. Never
 snapshot large component trees, which become brittle and get rubber-stamped with `-u`.
 
+> **Scope change, 2026-10-04 (owner).** Every UI component now also has a DOM snapshot: each `.tsx` of the apps
+> and of `packages/ui` has a Storybook story, and a runner per project snapshots the rendered DOM of every story.
+> The `platform/no-component-snapshots` lint rule was removed. See the work log, US6. The rest of this analysis is
+> kept as written at discovery.
+
 ## 2. Definition of Ready / Done (from Jira)
 
 **DoR**

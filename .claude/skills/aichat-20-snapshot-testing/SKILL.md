@@ -24,6 +24,10 @@ This file only holds what is specific to AICHAT-20. **Do not read the whole READ
 Use snapshots **only for small, stable serialized outputs (DTOs)**: API responses, SSE events, error bodies. Never
 snapshot large component trees, which become brittle and get rubber-stamped with `-u`.
 
+Scope change, 2026-10-04 (owner): every UI component also gets a DOM snapshot through its Storybook story
+(`src/stories.snapshot.test.tsx` per project, guard in `packages/workspace-config/src/stories-coverage.ts`). The
+`platform/no-component-snapshots` rule is gone. Work log US6.
+
 ## Context loaders (give agents only the ones they need)
 
 | Need | Command |

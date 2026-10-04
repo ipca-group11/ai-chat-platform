@@ -2,7 +2,6 @@ import { RuleTester } from "eslint";
 import { describe, expect, it } from "vitest";
 import localPlugin from "./local-plugin.ts";
 import featureFolderBoundaries from "./rules/feature-folder-boundaries.ts";
-import noComponentSnapshots from "./rules/no-component-snapshots.ts";
 
 RuleTester.describe = describe;
 RuleTester.it = it;
@@ -13,10 +12,9 @@ describe("local plugin", () => {
     expect(localPlugin.meta.name).toBe("platform");
   });
 
-  it("exposes the feature-folder-boundaries and no-component-snapshots rules", () => {
-    expect(Object.keys(localPlugin.rules)).toEqual(["feature-folder-boundaries", "no-component-snapshots"]);
+  it("exposes the feature-folder-boundaries rule", () => {
+    expect(Object.keys(localPlugin.rules)).toEqual(["feature-folder-boundaries"]);
     expect(localPlugin.rules["feature-folder-boundaries"]).toBe(featureFolderBoundaries);
-    expect(localPlugin.rules["no-component-snapshots"]).toBe(noComponentSnapshots);
   });
 });
 

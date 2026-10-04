@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Skeleton } from "@app/ui";
+import { Alert, AlertDescription, Badge, Card, CardContent, CardDescription, CardHeader, Skeleton } from "@app/ui";
 import { useApiKeys } from "../hooks/useApiKeys";
 import { useCurrentUserId } from "../hooks/useCurrentUserId";
 import { PROVIDER_NO_KEY_DESCRIPTIONS, providerLabel } from "../model/providerMeta";
@@ -42,7 +42,8 @@ export function ProviderList() {
           <Card key={provider}>
             <CardHeader>
               <div className="flex items-center justify-between gap-2">
-                <CardTitle className="text-lg">{label}</CardTitle>
+                {/* CardTitle is an h3; on the settings page these sit right under the page's h1. */}
+                <h2 className="text-lg font-semibold leading-none tracking-tight">{label}</h2>
                 {requiresKey ? (
                   <Badge variant={usableThisSession ? "success" : "outline"}>
                     {usableThisSession ? "Configured" : record ? "Re-enter key" : "Not configured"}

@@ -43,7 +43,9 @@ describe('Storybook Axe (a11y) addon configuration (AC-20)', () => {
     // The `a11y` parameter lives on the shared `preview` default export (applied to
     // every story), not scoped inside an individual story's own `parameters`.
     expect(previewSource).toMatch(/const preview: Preview = \{[\s\S]*parameters: \{[\s\S]*a11y: \{/);
-    // ...and that shared preview config applies to every story matched by this glob.
-    expect(mainSource).toContain("stories: ['../src/**/*.stories.@(ts|tsx)']");
+    // ...and that shared preview config applies to every story matched by these globs
+    // (the design-system primitives plus the app-level stories in the microfrontends).
+    expect(mainSource).toMatch(/stories: \[[^\]]*'\.\.\/src\/\*\*\/\*\.stories\.@\(ts\|tsx\)'/);
+    expect(mainSource).toMatch(/stories: \[[^\]]*'\.\.\/\.\.\/\.\.\/apps\/\*\/src\/\*\*\/\*\.stories\.@\(ts\|tsx\)'/);
   });
 });

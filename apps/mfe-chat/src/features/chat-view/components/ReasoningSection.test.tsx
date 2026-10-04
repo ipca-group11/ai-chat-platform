@@ -58,4 +58,12 @@ describe("ReasoningSection", () => {
 
     expect(screen.queryByRole("region", { name: "Model reasoning" })).not.toBeInTheDocument();
   });
+
+  it("lets keyboard users reach the reasoning so a long one can be scrolled", async () => {
+    render(<ReasoningSection reasoning="Step one" thinking />);
+
+    await userEvent.tab();
+    await userEvent.tab();
+    expect(screen.getByRole("region", { name: "Model reasoning" })).toHaveFocus();
+  });
 });

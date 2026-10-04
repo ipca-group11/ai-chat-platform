@@ -49,6 +49,7 @@ describe("the rules, on a scratch repository", () => {
   write("apps/demo/src/index.ts");
   write("apps/demo/src/types.d.ts");
   write("apps/demo/src/button.stories.tsx");
+  write("apps/demo/src/stories-support.tsx");
   write("apps/demo/README.md", "# demo\n");
   write("services/api/src/handler.ts");
   write("services/api/src/handler.spec.ts");

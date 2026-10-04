@@ -33,6 +33,28 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
     expect(result.current.uploadedAttachmentIds).toEqual(["att-1"]);
   });
 
+  it("AC-66: settles every file when several are picked at once", async () => {
+    const attachment = (id: string, filename: string): Attachment => ({
+      id,
+      messageId: "",
+      filename,
+      mimeType: "text/plain",
+      size: 100,
+      kind: "text",
+    });
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(Response.json({ attachment: attachment("att-a", "a.txt") }, { status: 201 }))
+      .mockResolvedValueOnce(Response.json({ attachment: attachment("att-b", "b.txt") }, { status: 201 }));
+
+    const { result } = renderHookWithClient(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"));
+
+    act(() => result.current.addFiles([makeFile("a.txt", "text/plain"), makeFile("b.txt", "text/plain")]));
+
+    await waitFor(() => expect(result.current.pending.map((p) => p.status)).toEqual(["uploaded", "uploaded"]));
+    expect(result.current.uploadedAttachmentIds).toEqual(["att-a", "att-b"]);
+    expect(result.current.hasBlockingUploads).toBe(false);
+  });
+
   it("AC-68: rejects an oversized file before upload, with no network call", () => {
     const requests = recordRequests();
 

@@ -74,21 +74,14 @@ const base: ConfigArray = tseslint.config(
       "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
-  // Snapshot policy (docs/AICHAT-20): snapshots are for DTOs and wire output only.
+  // Snapshot policy (docs/AICHAT-20): DTOs, wire output and the rendered DOM of every app
+  // story (apps/*/src/stories.snapshot.test.tsx). Big outputs go to .snap files.
   {
     files: ["**/*.{test,spec}.{ts,tsx}"],
     plugins: { vitest: vitestPlugin },
     rules: {
-      // Inline snapshots and .snap files above 50 lines are too big to review.
+      // Inline snapshots above 50 lines are too big to review in the test file.
       "vitest/no-large-snapshots": ["error", { maxSize: 50 }],
-    },
-  },
-  {
-    files: ["**/*.{test,spec}.tsx"],
-    plugins: { platform: localPlugin },
-    rules: {
-      // No snapshot of a component tree, ever.
-      "platform/no-component-snapshots": "error",
     },
   },
 );

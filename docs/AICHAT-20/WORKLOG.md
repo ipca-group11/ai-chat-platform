@@ -134,6 +134,8 @@ pnpm --dir services/auth-service exec vitest run snapshot
 
 ### US4 · Lint rule against component-tree and large snapshots ([AICHAT-95](https://ipca-grupo11.atlassian.net/browse/AICHAT-95))
 
+> Superseded in part on 2026-10-04: the owner asked for a snapshot of every UI component, so `platform/no-component-snapshots` was removed (US6). `vitest/no-large-snapshots` and the PR template question stay.
+
 **What and why.** The policy is that only DTOs and wire output are snapshotted. Two rules enforce it in `packages/eslint-config`, so every project gets them from the shared preset. `platform/no-component-snapshots` (new, in the local plugin) reports `toMatchSnapshot`, `toMatchInlineSnapshot`, `toMatchFileSnapshot` and the two `toThrowErrorMatching...Snapshot` matchers in `*.test.tsx` and `*.spec.tsx` files. `vitest/no-large-snapshots` from `@vitest/eslint-plugin` (it was not in the repo; added as a dev dependency of `eslint-config`) fails an inline snapshot or `.snap` over 50 lines in `*.test|spec.ts|tsx` files. We also added `.github/pull_request_template.md`, with a checklist that asks "Why did this snapshot change?".
 
 **Files.**
@@ -175,6 +177,8 @@ pnpm --dir packages/eslint-config exec vitest run
 
 ```sh
 pnpm --dir apps/mfe-chat exec vitest run src/shared/sse-drift.test.ts
+for p in apps/mfe-auth apps/mfe-chat apps/mfe-settings apps/shell packages/ui; do pnpm --dir $p exec vitest run src/stories.snapshot.test.tsx; done
+pnpm --dir packages/workspace-config exec vitest run src/stories-coverage.test.ts
 ```
 
 **How to repeat it manually.**
@@ -190,6 +194,50 @@ pnpm --dir apps/mfe-chat exec vitest run src/shared/sse-drift.test.ts
 
 **Problems and fixes.** The test only compares names. Optional against required (`done.stopped`, `queued.position`) is written in `SSE-DRIFT.md`, not checked, because the mfe-chat type has no runtime form to inspect. The Jira ticket for the chat owner is not created yet; it is raised from `SSE-DRIFT.md`.
 
+### US6 · DOM snapshots of every UI component (owner decision, 2026-10-04)
+
+**What and why.** The owner changed the scope after review: every UI component must have a snapshot. Every `.tsx` of the four apps and of `packages/ui` now has a Storybook story, and each project has one runner that renders every story and snapshots its DOM. The story is the single description of a component state: the same story is shown in Storybook and snapshotted in Vitest, so nothing is written twice. This replaces the rule of US4: `platform/no-component-snapshots` is removed. `vitest/no-large-snapshots` stays for inline snapshots; the DOM snapshots are in `.snap` files.
+
+How the runner works (`src/stories.snapshot.test.tsx` in each project):
+- It loads every `*.stories.tsx` with `import.meta.glob` and builds them with `composeStories`. `await Story.run()` runs the decorators, `beforeEach` and `play`, as Storybook does.
+- `waitForStableDom` (new, `@platform/test-utils/dom-snapshot`) waits until the DOM has not changed for 50 ms, so a rejected query or a stub answer that lands after `play` is in the snapshot. Stories that load a whole remote (`apps/shell/src/app/pages.stories.tsx`) wait for their final text in `play`.
+- `stableDom` (new, same module) snapshots a copy of `document.body`, so portals (dialogs, toasts) are included. It renumbers React `useId` values per snapshot (React counts them across the whole file, so a new story would shift every id after it) and replaces UUIDs and ISO dates in attributes and text with `<uuid>` and `<date>`.
+- The clock is frozen at 2026-10-03 10:00 UTC (only `Date`; timers stay real so `play` can run), and `Math.random` is a seeded sequence that restarts for every story (pending attachment ids use it).
+
+A guard keeps it complete: `packages/workspace-config/src/stories-coverage.ts` fails when a `.tsx` of the apps or of `packages/ui` has no `*.stories.tsx` next to it, or when a project with UI files has no runner. The 15 files that cannot have a story of their own are in `packages/workspace-config/stories-exempt.json`: 4 `bootstrap` entries (`main.tsx`, `remote-entry.tsx`) and 11 `covered-by` entries for route wiring, each naming the story that mounts it (the App/Pages stories). Test helpers (`test/`) and story support files are not UI files.
+
+**Files.**
+- `apps/*/src/stories.snapshot.test.tsx`, `packages/ui/src/stories.snapshot.test.tsx` (new) and their `__snapshots__/*.snap` (new).
+- Stories for the app-level files (new): `apps/mfe-chat/src/app/{ChatWorkspace,ChatListPage,ChatDetailPage,auth-context}.stories.tsx` and `app/stories-support.tsx`, `apps/mfe-settings/src/app.stories.tsx`, `apps/shell/src/features/auth-guard/components/RequireAuth.stories.tsx`, `apps/shell/src/features/remote-loader/createRemoteRoute.stories.tsx`. The feature component stories and `pages.stories.tsx` come from the Storybook work on the apps.
+- `apps/shell/src/app/pages.stories.tsx`: a `play` per page that waits for the finished page. `apps/mfe-chat/src/features/composer/stories-support.tsx`: `chooseFiles` sets a FileList-shaped value (jsdom has no `DataTransfer`).
+- `apps/shell/vite.config.ts`: `test.alias` maps `mfeAuth/routes`, `mfeChat/routes`, `mfeSettings/routes` to source, as `packages/ui/.storybook/main.ts` does.
+- `packages/test-utils/src/dom-snapshot.ts` and `.test.ts` (new), export `./dom-snapshot`; `packages/test-config/package.json`: export `./snapshot-serializer`; `packages/ui/package.json`: dev dependency `@platform/test-utils`.
+- `packages/workspace-config/src/stories-coverage.ts`, `.test.ts`, `stories-exempt.json` (new); `source-files.ts`: `stories-support.tsx` is story code, not a source file for the unit-test guard.
+- `packages/eslint-config`: `rules/no-component-snapshots.ts` and its test removed; `base.ts`, `local-plugin.ts` and their tests updated (a `.tsx` test with `toMatchSnapshot` now lints clean).
+- `.github/pull_request_template.md`, `docs/TEST-TYPES.md`, `docs/TEST-PLAN.md`, `README.md` of this epic: the new scope.
+
+**How to run.**
+
+```sh
+pnpm --dir apps/mfe-chat exec vitest run src/stories.snapshot.test.tsx    # same for the other apps and packages/ui
+pnpm --dir packages/workspace-config exec vitest run src/stories-coverage.test.ts
+```
+
+**How to repeat it manually.**
+
+1. Run the runner of each project with `CI=true`. Expected: 12 (mfe-auth), 95 (mfe-chat), 19 (mfe-settings), 21 (shell) and 61 (ui) tests pass and no snapshot is written.
+2. Change a visible text, for example "Could not load chats." in `ChatList.tsx`, and run the mfe-chat runner. Expected: the `ChatList › LoadError` snapshot fails and the diff shows the text. Undo the change.
+3. Add `apps/mfe-chat/src/features/chat-list/components/Empty.tsx` without a story and run the guard. Expected: `…/Empty.tsx: no Empty.stories.tsx and no entry in packages/workspace-config/stories-exempt.json`. Delete the file.
+
+**Result.** 208 story snapshots (mfe-auth 12, mfe-chat 95, mfe-settings 19, shell 21, ui 61), the same on three runs in a row and with nine projects tested in parallel. Every UI file has a story or an exempt entry. Lint, typecheck and test (with coverage) pass for shell, the three remotes, ui, eslint-config, test-utils, test-config and workspace-config, and the Storybook build passes.
+
+**Problems and fixes.**
+- The first snapshots of the shell pages were an empty `<div />`: the router and the lazily loaded remotes resolve after `Story.run()`. The page stories now wait for their final text.
+- Five snapshots first caught a loading state instead of the error the story is about (a query rejects a few ticks after `play`). `waitForStableDom` fixed them; checked by reading each entry.
+- Two Composer snapshots changed on every run because pending attachment ids use `Math.random`; seeded per story in the runner.
+- Under load (nine projects at once) two page stories timed out at 5 s; their wait is now 15 s and each story test has 30 s.
+- Running the shell regenerates `apps/shell/@mf-types`; those files were restored and are not part of this change.
+
 ## 4. How to run everything
 
 ```sh
@@ -200,6 +248,8 @@ pnpm --dir packages/eslint-config exec vitest run
 pnpm --dir services/conversation-service exec vitest run snapshot
 pnpm --dir services/auth-service exec vitest run snapshot
 pnpm --dir apps/mfe-chat exec vitest run src/shared/sse-drift.test.ts
+for p in apps/mfe-auth apps/mfe-chat apps/mfe-settings apps/shell packages/ui; do pnpm --dir $p exec vitest run src/stories.snapshot.test.tsx; done
+pnpm --dir packages/workspace-config exec vitest run src/stories-coverage.test.ts
 # the full gate
 pnpm exec nx affected -t lint typecheck test build --base=origin/integration/testing-epics
 pnpm sast
@@ -215,9 +265,9 @@ pnpm --dir <project> exec vitest run -u
 | Snapshot assertions in the repo | 0 | 36 (12 shared-types, 13 conversation-service, 10 auth-service, 1 mfe-chat) |
 | DTO fixtures in shared-types | 0 | 15, all pass `schema.parse` |
 | Snapshot test files | 0 | 5 (`.snap` files: 4) |
-| Component-tree snapshots | 0 | 0, and the lint rule blocks new ones |
+| Component (story DOM) snapshots | 0 | 208, one per story; every UI file has a story (US6) |
 | Tests in shared-types | 114 | 125 |
-| Lint rules about snapshots | 0 | 2 (`platform/no-component-snapshots`, `vitest/no-large-snapshots`) |
+| Lint rules about snapshots | 0 | 1 (`vitest/no-large-snapshots`); `platform/no-component-snapshots` added in US4, removed in US6 |
 | Known SSE drift mfe-chat vs shared-types | not recorded | recorded and pinned by a test |
 
 ![nx affected: lint, typecheck, test, build](evidence/11-affected-lint-typecheck-test-build.png)
@@ -231,7 +281,8 @@ pnpm --dir <project> exec vitest run -u
 | Snapshots of SSE frames and error middleware in both services (AICHAT-77) | ✅ | [05](evidence/05-wire-snapshots-run.png), [06](evidence/06-error-body-change-fails.png) |
 | ESLint rule active in `packages/eslint-config`; a test `.tsx` with `toMatchSnapshot` fails lint (AICHAT-95) | ✅ | [07](evidence/07-lint-rule-fails-on-tsx-snapshot.png), [08](evidence/08-eslint-config-tests.png) |
 | SSE drift reported with both definitions side by side (AICHAT-113) | ✅ file, Jira ticket to raise | [SSE-DRIFT.md](SSE-DRIFT.md), [09](evidence/09-sse-drift-test.png), [10](evidence/10-sse-drift-change-fails.png) |
-| No component-tree snapshots remain | ✅ | none exist; rule blocks new ones |
+| No component-tree snapshots remain | replaced | owner decision of 2026-10-04: every UI component has a DOM snapshot (US6) |
+| Every UI component has a story and a DOM snapshot (US6) | ✅ | runners in 5 projects, guard `stories-coverage.test.ts` |
 | A missing snapshot fails in CI | ✅ | [04](evidence/04-missing-snapshot-fails-in-ci.png) |
 | Coverage thresholds stay met | ✅ | [11](evidence/11-affected-lint-typecheck-test-build.png) |
 | Lint, typecheck, test, build of affected projects, local | ✅ | [11](evidence/11-affected-lint-typecheck-test-build.png) |

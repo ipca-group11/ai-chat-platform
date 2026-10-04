@@ -88,25 +88,8 @@ describe("base preset", () => {
       "",
     ].join("\n");
 
-    it("fails a .tsx test that uses toMatchSnapshot", async () => {
-      expect(await lintRuleIds(base, componentTest, "src/Button.test.tsx")).toContain(
-        "platform/no-component-snapshots",
-      );
-    });
-
-    it("fails a .tsx spec that uses toMatchInlineSnapshot", async () => {
-      const code = componentTest.replace("toMatchSnapshot", "toMatchInlineSnapshot");
-      expect(await lintRuleIds(base, code, "src/Button.spec.tsx")).toContain("platform/no-component-snapshots");
-    });
-
-    it("allows the same snapshot in a .ts test (DTOs and wire output)", async () => {
-      const code = componentTest.replace("<div />", "{ a: 1 }");
-      expect(await lintRuleIds(base, code, "src/dto.test.ts")).not.toContain("platform/no-component-snapshots");
-    });
-
-    it("does not apply to non-test .tsx files", async () => {
-      const code = "export const f = (e: { toMatchSnapshot(): void }) => e.toMatchSnapshot();\n";
-      expect(await lintRuleIds(base, code, "src/Button.tsx")).not.toContain("platform/no-component-snapshots");
+    it("allows a DOM snapshot in a component test (.tsx)", async () => {
+      expect(await lintRuleIds(base, componentTest, "src/Button.test.tsx")).toEqual([]);
     });
 
     it("fails an inline snapshot longer than 50 lines", async () => {

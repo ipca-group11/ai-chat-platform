@@ -1,0 +1,92 @@
+{
+  "$comment": "UI files (.tsx in apps/*/src and packages/ui/src) without a story of their own (docs/AICHAT-20, component snapshots). Format: entries[] of { path, category: covered-by|bootstrap, coveredBy (story file, for covered-by), reason }. Checked by packages/workspace-config/src/stories-coverage.test.ts.",
+  "version": 1,
+  "entries": [
+    {
+      "path": "apps/mfe-auth/src/main.tsx",
+      "category": "bootstrap",
+      "reason": "Standalone dev entry: creates the root, router and QueryClient and renders the routes."
+    },
+    {
+      "path": "apps/mfe-auth/src/routes.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "Route wiring with no markup of its own; the Login and Register page stories mount it inside the shell."
+    },
+    {
+      "path": "apps/mfe-chat/src/app/remote-entry.tsx",
+      "category": "bootstrap",
+      "reason": "Module Federation mount function: creates a root in the element the host gives it."
+    },
+    {
+      "path": "apps/mfe-chat/src/app/routes.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "Route wiring with no markup of its own; the Chats, ChatsEmpty and ChatOpen page stories mount it inside the shell."
+    },
+    {
+      "path": "apps/mfe-settings/src/main.tsx",
+      "category": "bootstrap",
+      "reason": "Standalone dev entry: creates the root, router and QueryClient and renders the routes."
+    },
+    {
+      "path": "apps/mfe-settings/src/routes.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "Route wiring with no markup of its own; the Settings page story mounts it inside the shell."
+    },
+    {
+      "path": "apps/shell/src/App.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "Renders the router provider only; the page stories render the same route tree with a memory history."
+    },
+    {
+      "path": "apps/shell/src/main.tsx",
+      "category": "bootstrap",
+      "reason": "Entry point: creates the root and renders App."
+    },
+    {
+      "path": "apps/shell/src/routes/__root.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "Root route (query client and layout around the outlet); in every page story."
+    },
+    {
+      "path": "apps/shell/src/routes/chats.$chatId.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "File route that mounts the chat remote behind the auth guard; the ChatOpen page story."
+    },
+    {
+      "path": "apps/shell/src/routes/chats.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "File route that mounts the chat remote behind the auth guard; the Chats and ChatsEmpty page stories."
+    },
+    {
+      "path": "apps/shell/src/routes/index.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "Redirect from / to /chats with no markup; the page stories run the same route tree."
+    },
+    {
+      "path": "apps/shell/src/routes/login.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "File route that mounts the auth remote; the Login page story."
+    },
+    {
+      "path": "apps/shell/src/routes/register.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "File route that mounts the auth remote; the Register page story."
+    },
+    {
+      "path": "apps/shell/src/routes/settings.tsx",
+      "category": "covered-by",
+      "coveredBy": "apps/shell/src/app/pages.stories.tsx",
+      "reason": "File route that mounts the settings remote behind the auth guard; the Settings page story."
+    }
+  ]
+}

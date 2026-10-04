@@ -1,4 +1,5 @@
 import { coveragePreset, appCoverageThresholds } from '@platform/test-config';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
@@ -77,6 +78,20 @@ export default defineConfig({
       NODE_ENV: 'test',
     },
     setupFiles: ['./src/test-setup.ts', '@platform/test-utils/setup'],
+    // The page stories (src/app/pages.stories.tsx) mount the remotes' routes; for their DOM
+    // snapshots the federated names point at the remotes' source, as in Storybook
+    // (packages/ui/.storybook/main.ts). Nothing else in the shell's tests imports them.
+    alias: {
+      'mfeAuth/routes': fileURLToPath(new URL('../mfe-auth/src/routes.tsx', import.meta.url)),
+      'mfeChat/routes': fileURLToPath(new URL('../mfe-chat/src/app/routes.tsx', import.meta.url)),
+      'mfeSettings/routes': fileURLToPath(new URL('../mfe-settings/src/routes.tsx', import.meta.url)),
+      '@app/shared-types/model-capabilities': fileURLToPath(
+        new URL('../../packages/shared-types/src/model-capabilities.ts', import.meta.url),
+      ),
+      '@app/shared-types/api-keys': fileURLToPath(
+        new URL('../../packages/shared-types/src/api-keys/index.ts', import.meta.url),
+      ),
+    },
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     // Cold-cache transform of module-federation.config.ts (and its
     // @module-federation/vite import) can exceed the 5s default, especially

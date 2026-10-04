@@ -1,0 +1,1165 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`./features/login/components/LoginForm.stories.tsx > Empty 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Sign in
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Enter your email and password to continue.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <form
+            aria-label="Login form"
+            class="grid gap-4"
+            novalidate=""
+          >
+            <div
+              class="space-y-2"
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="base-ui-_r_1_"
+                id="base-ui-_r_0_"
+              >
+                Email
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_0_"
+                autocomplete="email"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                id="base-ui-_r_1_"
+                name="email"
+                placeholder="you@example.com"
+                type="email"
+                value=""
+              />
+            </div>
+            <div
+              class="space-y-2"
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="base-ui-_r_3_"
+                id="base-ui-_r_2_"
+              >
+                Password
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_2_"
+                autocomplete="current-password"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                id="base-ui-_r_3_"
+                name="password"
+                type="password"
+                value=""
+              />
+            </div>
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+              tabindex="0"
+              type="submit"
+            >
+              Sign in
+            </button>
+          </form>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Don't have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/register"
+          >
+            Create one
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/login/components/LoginForm.stories.tsx > InvalidCredentials 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Sign in
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Enter your email and password to continue.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <form
+            aria-label="Login form"
+            class="grid gap-4"
+            novalidate=""
+          >
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_1_"
+                id="base-ui-_r_0_"
+              >
+                Email
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_0_"
+                autocomplete="email"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_1_"
+                name="email"
+                placeholder="you@example.com"
+                type="email"
+                value="user@example.com"
+              />
+            </div>
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_3_"
+                id="base-ui-_r_2_"
+              >
+                Password
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_2_"
+                autocomplete="current-password"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_3_"
+                name="password"
+                type="password"
+                value="wrong-password1"
+              />
+            </div>
+            <div
+              class="relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(theme(spacing.4))_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 border-destructive/50 bg-card text-destructive [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90"
+              data-slot="alert"
+              role="alert"
+            >
+              <div
+                class="col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed"
+                data-slot="alert-description"
+              >
+                Invalid email or password
+              </div>
+            </div>
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+              tabindex="0"
+              type="submit"
+            >
+              Sign in
+            </button>
+          </form>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Don't have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/register"
+          >
+            Create one
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/login/components/LoginForm.stories.tsx > Submitting 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Sign in
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Enter your email and password to continue.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <form
+            aria-label="Login form"
+            class="grid gap-4"
+            novalidate=""
+          >
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_1_"
+                id="base-ui-_r_0_"
+              >
+                Email
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_0_"
+                autocomplete="email"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_1_"
+                name="email"
+                placeholder="you@example.com"
+                type="email"
+                value="user@example.com"
+              />
+            </div>
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_3_"
+                id="base-ui-_r_2_"
+              >
+                Password
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_2_"
+                autocomplete="current-password"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_3_"
+                name="password"
+                type="password"
+                value="correct-password1"
+              />
+            </div>
+            <button
+              aria-busy="true"
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+              data-disabled=""
+              disabled=""
+              tabindex="0"
+              type="submit"
+            >
+              <svg
+                aria-hidden="true"
+                class="size-4 animate-spin"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-75"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  fill="currentColor"
+                />
+              </svg>
+              Signing in…
+            </button>
+          </form>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Don't have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/register"
+          >
+            Create one
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/login/components/LoginForm.stories.tsx > ValidationError 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Sign in
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Enter your email and password to continue.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <form
+            aria-label="Login form"
+            class="grid gap-4"
+            novalidate=""
+          >
+            <div
+              class="space-y-2"
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="base-ui-_r_1_"
+                id="base-ui-_r_0_"
+              >
+                Email
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_0_"
+                autocomplete="email"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                id="base-ui-_r_1_"
+                name="email"
+                placeholder="you@example.com"
+                type="email"
+                value=""
+              />
+            </div>
+            <div
+              class="space-y-2"
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="base-ui-_r_3_"
+                id="base-ui-_r_2_"
+              >
+                Password
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_2_"
+                autocomplete="current-password"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                id="base-ui-_r_3_"
+                name="password"
+                type="password"
+                value=""
+              />
+            </div>
+            <div
+              class="relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(theme(spacing.4))_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 border-destructive/50 bg-card text-destructive [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90"
+              data-slot="alert"
+              role="alert"
+            >
+              <div
+                class="col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed"
+                data-slot="alert-description"
+              >
+                Email is required
+              </div>
+            </div>
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+              tabindex="0"
+              type="submit"
+            >
+              Sign in
+            </button>
+          </form>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Don't have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/register"
+          >
+            Create one
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/login/components/LogoutButton.stories.tsx > Default 1`] = `
+<body>
+  <div>
+    <button
+      class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+      tabindex="0"
+      type="button"
+    >
+      Sign out
+    </button>
+  </div>
+</body>
+`;
+
+exports[`./features/login/components/LogoutButton.stories.tsx > SigningOut 1`] = `
+<body>
+  <div>
+    <button
+      aria-busy="true"
+      class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+      data-disabled=""
+      disabled=""
+      tabindex="0"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="size-4 animate-spin"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        />
+        <path
+          class="opacity-75"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          fill="currentColor"
+        />
+      </svg>
+      Signing out…
+    </button>
+  </div>
+</body>
+`;
+
+exports[`./features/register/components/RegisterForm.stories.tsx > DuplicateEmail 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Create an account
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Sign up with your email to start chatting.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <form
+            aria-label="Registration form"
+            class="grid gap-4"
+            novalidate=""
+          >
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_1_"
+                id="base-ui-_r_0_"
+              >
+                Email
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_0_"
+                autocomplete="email"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_1_"
+                name="email"
+                placeholder="you@example.com"
+                type="email"
+                value="taken@example.com"
+              />
+            </div>
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_3_"
+                id="base-ui-_r_2_"
+              >
+                Password
+              </label>
+              <input
+                aria-describedby="base-ui-_r_4_"
+                aria-labelledby="base-ui-_r_2_"
+                autocomplete="new-password"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_3_"
+                name="password"
+                type="password"
+                value="password123"
+              />
+              <p
+                class="text-sm text-muted-foreground"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_4_"
+              >
+                At least 8 characters, including a letter and a number.
+              </p>
+            </div>
+            <div
+              class="relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(theme(spacing.4))_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 border-destructive/50 bg-card text-destructive [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90"
+              data-slot="alert"
+              role="alert"
+            >
+              <div
+                class="col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed"
+                data-slot="alert-description"
+              >
+                Email already registered
+              </div>
+            </div>
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+              tabindex="0"
+              type="submit"
+            >
+              Create account
+            </button>
+          </form>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Already have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/login"
+          >
+            Sign in
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/register/components/RegisterForm.stories.tsx > Empty 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Create an account
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Sign up with your email to start chatting.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <form
+            aria-label="Registration form"
+            class="grid gap-4"
+            novalidate=""
+          >
+            <div
+              class="space-y-2"
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="base-ui-_r_1_"
+                id="base-ui-_r_0_"
+              >
+                Email
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_0_"
+                autocomplete="email"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                id="base-ui-_r_1_"
+                name="email"
+                placeholder="you@example.com"
+                type="email"
+                value=""
+              />
+            </div>
+            <div
+              class="space-y-2"
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                for="base-ui-_r_3_"
+                id="base-ui-_r_2_"
+              >
+                Password
+              </label>
+              <input
+                aria-describedby="base-ui-_r_4_"
+                aria-labelledby="base-ui-_r_2_"
+                autocomplete="new-password"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                id="base-ui-_r_3_"
+                name="password"
+                type="password"
+                value=""
+              />
+              <p
+                class="text-sm text-muted-foreground"
+                id="base-ui-_r_4_"
+              >
+                At least 8 characters, including a letter and a number.
+              </p>
+            </div>
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+              tabindex="0"
+              type="submit"
+            >
+              Create account
+            </button>
+          </form>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Already have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/login"
+          >
+            Sign in
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/register/components/RegisterForm.stories.tsx > Submitting 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Create an account
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Sign up with your email to start chatting.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <form
+            aria-label="Registration form"
+            class="grid gap-4"
+            novalidate=""
+          >
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_1_"
+                id="base-ui-_r_0_"
+              >
+                Email
+              </label>
+              <input
+                aria-labelledby="base-ui-_r_0_"
+                autocomplete="email"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_1_"
+                name="email"
+                placeholder="you@example.com"
+                type="email"
+                value="new.user@example.com"
+              />
+            </div>
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_3_"
+                id="base-ui-_r_2_"
+              >
+                Password
+              </label>
+              <input
+                aria-describedby="base-ui-_r_4_"
+                aria-labelledby="base-ui-_r_2_"
+                autocomplete="new-password"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_3_"
+                name="password"
+                type="password"
+                value="password123"
+              />
+              <p
+                class="text-sm text-muted-foreground"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_4_"
+              >
+                At least 8 characters, including a letter and a number.
+              </p>
+            </div>
+            <button
+              aria-busy="true"
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+              data-disabled=""
+              disabled=""
+              tabindex="0"
+              type="submit"
+            >
+              <svg
+                aria-hidden="true"
+                class="size-4 animate-spin"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-75"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  fill="currentColor"
+                />
+              </svg>
+              Creating account…
+            </button>
+          </form>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Already have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/login"
+          >
+            Sign in
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/register/components/RegisterForm.stories.tsx > ValidationErrors 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Create an account
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Sign up with your email to start chatting.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <form
+            aria-label="Registration form"
+            class="grid gap-4"
+            novalidate=""
+          >
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_1_"
+                id="base-ui-_r_0_"
+              >
+                Email
+              </label>
+              <input
+                aria-describedby="base-ui-_r_2_"
+                aria-invalid="true"
+                aria-labelledby="base-ui-_r_0_"
+                autocomplete="email"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_1_"
+                name="email"
+                placeholder="you@example.com"
+                type="email"
+                value="not-an-email"
+              />
+              <div
+                class="text-sm font-medium text-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_2_"
+              >
+                Enter a valid email address
+              </div>
+            </div>
+            <div
+              class="space-y-2"
+              data-dirty=""
+              data-filled=""
+              data-touched=""
+            >
+              <label
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                for="base-ui-_r_4_"
+                id="base-ui-_r_3_"
+              >
+                Password
+              </label>
+              <input
+                aria-describedby="base-ui-_r_5_"
+                aria-invalid="true"
+                aria-labelledby="base-ui-_r_3_"
+                autocomplete="new-password"
+                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_4_"
+                name="password"
+                type="password"
+                value="short"
+              />
+              <div
+                class="text-sm font-medium text-destructive"
+                data-dirty=""
+                data-filled=""
+                data-touched=""
+                id="base-ui-_r_5_"
+              >
+                Password must be at least 8 characters
+              </div>
+            </div>
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+              tabindex="0"
+              type="submit"
+            >
+              Create account
+            </button>
+          </form>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Already have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/login"
+          >
+            Sign in
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./shared/components/AuthCard.stories.tsx > CreateAccount 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Create an account
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Sign up with your email to start chatting.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            The form for this screen renders here.
+          </p>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Already have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/login"
+          >
+            Sign in
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./shared/components/AuthCard.stories.tsx > SignIn 1`] = `
+<body>
+  <div>
+    <div
+      class="flex flex-1 items-start justify-center px-4 py-12 sm:py-20"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full max-w-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="text-2xl font-semibold leading-none tracking-tight"
+          >
+            Sign in
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Enter your email and password to continue.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0"
+        >
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            The form for this screen renders here.
+          </p>
+        </div>
+        <div
+          class="flex items-center p-6 pt-0 justify-center text-sm text-muted-foreground"
+        >
+          Don't have an account?
+           
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/register"
+          >
+            Create one
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

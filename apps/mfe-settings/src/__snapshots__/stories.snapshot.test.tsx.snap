@@ -1,0 +1,1773 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`./app.stories.tsx > KeysSaved 1`] = `
+<body>
+  <div>
+    <section
+      aria-label="LLM provider API keys"
+      class="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6"
+    >
+      <header
+        class="space-y-2"
+      >
+        <h1
+          class="scroll-m-20 tracking-tight text-3xl lg:text-3xl font-bold"
+        >
+          LLM Provider API Keys
+        </h1>
+        <div
+          class="typeset typeset-page max-w-2xl text-muted-foreground"
+        >
+          <p>
+            Configure the API key each LLM provider needs before you can chat with it. Keys are stored only in this browser and are never sent anywhere except once per request to the conversation service, when you send a chat message or test a connection.
+          </p>
+        </div>
+      </header>
+      <div
+        aria-label="Provider list"
+        class="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3"
+      >
+        <div
+          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+        >
+          <div
+            class="flex flex-col space-y-1.5 p-6"
+          >
+            <div
+              class="flex items-center justify-between gap-2"
+            >
+              <h2
+                class="text-lg font-semibold leading-none tracking-tight"
+              >
+                OpenAI
+              </h2>
+              <span
+                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success text-success-foreground hover:bg-success/80"
+              >
+                Configured
+              </span>
+            </div>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Used when a chat runs on OpenAI models.
+            </p>
+          </div>
+          <div
+            class="p-6 pt-0 space-y-4"
+          >
+            <div
+              class="flex items-center gap-2 text-sm"
+            >
+              <span
+                class="text-muted-foreground"
+              >
+                Current key
+              </span>
+              <code
+                class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+                data-testid="masked-key"
+              >
+                ••••1b3d
+              </code>
+            </div>
+            <div
+              class="space-y-3"
+            >
+              <form
+                aria-label="OpenAI API key form"
+                class="space-y-3"
+                novalidate=""
+              >
+                <div
+                  class="space-y-2"
+                >
+                  <label
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    for="openai-api-key"
+                  >
+                    OpenAI
+                     API key
+                  </label>
+                  <input
+                    autocomplete="off"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                    id="openai-api-key"
+                    placeholder="Enter a new key to update"
+                    type="password"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="flex flex-wrap gap-2"
+                >
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                    tabindex="0"
+                    type="submit"
+                  >
+                    Update key
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+                    tabindex="0"
+                    type="button"
+                  >
+                    Remove key
+                  </button>
+                </div>
+              </form>
+              <div
+                class="space-y-3"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                  data-disabled=""
+                  disabled=""
+                  tabindex="0"
+                  type="button"
+                >
+                  Test OpenAI connection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+        >
+          <div
+            class="flex flex-col space-y-1.5 p-6"
+          >
+            <div
+              class="flex items-center justify-between gap-2"
+            >
+              <h2
+                class="text-lg font-semibold leading-none tracking-tight"
+              >
+                Anthropic
+              </h2>
+              <span
+                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success text-success-foreground hover:bg-success/80"
+              >
+                Configured
+              </span>
+            </div>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Used when a chat runs on Anthropic models.
+            </p>
+          </div>
+          <div
+            class="p-6 pt-0 space-y-4"
+          >
+            <div
+              class="flex items-center gap-2 text-sm"
+            >
+              <span
+                class="text-muted-foreground"
+              >
+                Current key
+              </span>
+              <code
+                class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+                data-testid="masked-key"
+              >
+                ••••9d2f
+              </code>
+            </div>
+            <div
+              class="space-y-3"
+            >
+              <form
+                aria-label="Anthropic API key form"
+                class="space-y-3"
+                novalidate=""
+              >
+                <div
+                  class="space-y-2"
+                >
+                  <label
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    for="anthropic-api-key"
+                  >
+                    Anthropic
+                     API key
+                  </label>
+                  <input
+                    autocomplete="off"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                    id="anthropic-api-key"
+                    placeholder="Enter a new key to update"
+                    type="password"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="flex flex-wrap gap-2"
+                >
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                    tabindex="0"
+                    type="submit"
+                  >
+                    Update key
+                  </button>
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+                    tabindex="0"
+                    type="button"
+                  >
+                    Remove key
+                  </button>
+                </div>
+              </form>
+              <div
+                class="space-y-3"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                  data-disabled=""
+                  disabled=""
+                  tabindex="0"
+                  type="button"
+                >
+                  Test Anthropic connection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+        >
+          <div
+            class="flex flex-col space-y-1.5 p-6"
+          >
+            <div
+              class="flex items-center justify-between gap-2"
+            >
+              <h2
+                class="text-lg font-semibold leading-none tracking-tight"
+              >
+                Ollama
+              </h2>
+              <span
+                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              >
+                Local
+              </span>
+            </div>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Ollama runs locally — no API key is required to use it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+`;
+
+exports[`./app.stories.tsx > NoKeysSaved 1`] = `
+<body>
+  <div>
+    <section
+      aria-label="LLM provider API keys"
+      class="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6"
+    >
+      <header
+        class="space-y-2"
+      >
+        <h1
+          class="scroll-m-20 tracking-tight text-3xl lg:text-3xl font-bold"
+        >
+          LLM Provider API Keys
+        </h1>
+        <div
+          class="typeset typeset-page max-w-2xl text-muted-foreground"
+        >
+          <p>
+            Configure the API key each LLM provider needs before you can chat with it. Keys are stored only in this browser and are never sent anywhere except once per request to the conversation service, when you send a chat message or test a connection.
+          </p>
+        </div>
+      </header>
+      <div
+        aria-label="Provider list"
+        class="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3"
+      >
+        <div
+          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+        >
+          <div
+            class="flex flex-col space-y-1.5 p-6"
+          >
+            <div
+              class="flex items-center justify-between gap-2"
+            >
+              <h2
+                class="text-lg font-semibold leading-none tracking-tight"
+              >
+                OpenAI
+              </h2>
+              <span
+                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
+              >
+                Not configured
+              </span>
+            </div>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Used when a chat runs on OpenAI models.
+            </p>
+          </div>
+          <div
+            class="p-6 pt-0 space-y-4"
+          >
+            <p
+              class="text-sm text-muted-foreground"
+              data-testid="masked-key-empty"
+            >
+              No key configured
+            </p>
+            <div
+              class="space-y-3"
+            >
+              <form
+                aria-label="OpenAI API key form"
+                class="space-y-3"
+                novalidate=""
+              >
+                <div
+                  class="space-y-2"
+                >
+                  <label
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    for="openai-api-key"
+                  >
+                    OpenAI
+                     API key
+                  </label>
+                  <input
+                    autocomplete="off"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                    id="openai-api-key"
+                    placeholder="Enter your API key"
+                    type="password"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="flex flex-wrap gap-2"
+                >
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                    tabindex="0"
+                    type="submit"
+                  >
+                    Save key
+                  </button>
+                </div>
+              </form>
+              <div
+                class="space-y-3"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                  data-disabled=""
+                  disabled=""
+                  tabindex="0"
+                  type="button"
+                >
+                  Test OpenAI connection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+        >
+          <div
+            class="flex flex-col space-y-1.5 p-6"
+          >
+            <div
+              class="flex items-center justify-between gap-2"
+            >
+              <h2
+                class="text-lg font-semibold leading-none tracking-tight"
+              >
+                Anthropic
+              </h2>
+              <span
+                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
+              >
+                Not configured
+              </span>
+            </div>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Used when a chat runs on Anthropic models.
+            </p>
+          </div>
+          <div
+            class="p-6 pt-0 space-y-4"
+          >
+            <p
+              class="text-sm text-muted-foreground"
+              data-testid="masked-key-empty"
+            >
+              No key configured
+            </p>
+            <div
+              class="space-y-3"
+            >
+              <form
+                aria-label="Anthropic API key form"
+                class="space-y-3"
+                novalidate=""
+              >
+                <div
+                  class="space-y-2"
+                >
+                  <label
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    for="anthropic-api-key"
+                  >
+                    Anthropic
+                     API key
+                  </label>
+                  <input
+                    autocomplete="off"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                    id="anthropic-api-key"
+                    placeholder="Enter your API key"
+                    type="password"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="flex flex-wrap gap-2"
+                >
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                    tabindex="0"
+                    type="submit"
+                  >
+                    Save key
+                  </button>
+                </div>
+              </form>
+              <div
+                class="space-y-3"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                  data-disabled=""
+                  disabled=""
+                  tabindex="0"
+                  type="button"
+                >
+                  Test Anthropic connection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+        >
+          <div
+            class="flex flex-col space-y-1.5 p-6"
+          >
+            <div
+              class="flex items-center justify-between gap-2"
+            >
+              <h2
+                class="text-lg font-semibold leading-none tracking-tight"
+              >
+                Ollama
+              </h2>
+              <span
+                class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              >
+                Local
+              </span>
+            </div>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Ollama runs locally — no API key is required to use it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > KeySaved 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <form
+          aria-label="Anthropic API key form"
+          class="space-y-3"
+          novalidate=""
+        >
+          <div
+            class="space-y-2"
+          >
+            <label
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="anthropic-api-key"
+            >
+              Anthropic
+               API key
+            </label>
+            <input
+              autocomplete="off"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+              id="anthropic-api-key"
+              placeholder="Enter a new key to update"
+              type="password"
+              value=""
+            />
+          </div>
+          <div
+            class="flex flex-wrap gap-2"
+          >
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+              tabindex="0"
+              type="submit"
+            >
+              Update key
+            </button>
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+              tabindex="0"
+              type="button"
+            >
+              Remove key
+            </button>
+          </div>
+        </form>
+        <div
+          class="space-y-3"
+        >
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+            data-disabled=""
+            disabled=""
+            tabindex="0"
+            type="button"
+          >
+            Test Anthropic connection
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > KeyTyped 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <form
+          aria-label="OpenAI API key form"
+          class="space-y-3"
+          novalidate=""
+        >
+          <div
+            class="space-y-2"
+          >
+            <label
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="openai-api-key"
+            >
+              OpenAI
+               API key
+            </label>
+            <input
+              autocomplete="off"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+              id="openai-api-key"
+              placeholder="Enter your API key"
+              type="password"
+              value="sk-proj-4f9c2a7e1b3d"
+            />
+          </div>
+          <div
+            class="flex flex-wrap gap-2"
+          >
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+              tabindex="0"
+              type="submit"
+            >
+              Save key
+            </button>
+          </div>
+        </form>
+        <div
+          class="space-y-3"
+        >
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+            tabindex="0"
+            type="button"
+          >
+            Test OpenAI connection
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > NoKeySaved 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <form
+          aria-label="OpenAI API key form"
+          class="space-y-3"
+          novalidate=""
+        >
+          <div
+            class="space-y-2"
+          >
+            <label
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="openai-api-key"
+            >
+              OpenAI
+               API key
+            </label>
+            <input
+              autocomplete="off"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+              id="openai-api-key"
+              placeholder="Enter your API key"
+              type="password"
+              value=""
+            />
+          </div>
+          <div
+            class="flex flex-wrap gap-2"
+          >
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+              tabindex="0"
+              type="submit"
+            >
+              Save key
+            </button>
+          </div>
+        </form>
+        <div
+          class="space-y-3"
+        >
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+            data-disabled=""
+            disabled=""
+            tabindex="0"
+            type="button"
+          >
+            Test OpenAI connection
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > Required 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <form
+          aria-label="OpenAI API key form"
+          class="space-y-3"
+          novalidate=""
+        >
+          <div
+            class="space-y-2"
+          >
+            <label
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="openai-api-key"
+            >
+              OpenAI
+               API key
+            </label>
+            <input
+              aria-describedby="openai-api-key-error"
+              aria-invalid="true"
+              autocomplete="off"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+              id="openai-api-key"
+              placeholder="Enter your API key"
+              type="password"
+              value=""
+            />
+            <p
+              class="text-sm font-medium text-destructive"
+              id="openai-api-key-error"
+              role="alert"
+            >
+              API key is required.
+            </p>
+          </div>
+          <div
+            class="flex flex-wrap gap-2"
+          >
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+              tabindex="0"
+              type="submit"
+            >
+              Save key
+            </button>
+          </div>
+        </form>
+        <div
+          class="space-y-3"
+        >
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+            data-disabled=""
+            disabled=""
+            tabindex="0"
+            type="button"
+          >
+            Test OpenAI connection
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/MaskedKeyDisplay.stories.tsx > KeySet 1`] = `
+<body>
+  <div>
+    <div
+      class="flex items-center gap-2 text-sm"
+    >
+      <span
+        class="text-muted-foreground"
+      >
+        Current key
+      </span>
+      <code
+        class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+        data-testid="masked-key"
+      >
+        ••••a1b2
+      </code>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/MaskedKeyDisplay.stories.tsx > NoKey 1`] = `
+<body>
+  <div>
+    <p
+      class="text-sm text-muted-foreground"
+      data-testid="masked-key-empty"
+    >
+      No key configured
+    </p>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/ProviderList.stories.tsx > KeysConfigured 1`] = `
+<body>
+  <div>
+    <div
+      aria-label="Provider list"
+      class="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <div
+            class="flex items-center justify-between gap-2"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+            >
+              OpenAI
+            </h2>
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success text-success-foreground hover:bg-success/80"
+            >
+              Configured
+            </span>
+          </div>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Used when a chat runs on OpenAI models.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0 space-y-4"
+        >
+          <div
+            class="flex items-center gap-2 text-sm"
+          >
+            <span
+              class="text-muted-foreground"
+            >
+              Current key
+            </span>
+            <code
+              class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+              data-testid="masked-key"
+            >
+              ••••1b3d
+            </code>
+          </div>
+          <div
+            class="space-y-3"
+          >
+            <form
+              aria-label="OpenAI API key form"
+              class="space-y-3"
+              novalidate=""
+            >
+              <div
+                class="space-y-2"
+              >
+                <label
+                  class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  for="openai-api-key"
+                >
+                  OpenAI
+                   API key
+                </label>
+                <input
+                  autocomplete="off"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                  id="openai-api-key"
+                  placeholder="Enter a new key to update"
+                  type="password"
+                  value=""
+                />
+              </div>
+              <div
+                class="flex flex-wrap gap-2"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                  tabindex="0"
+                  type="submit"
+                >
+                  Update key
+                </button>
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+                  tabindex="0"
+                  type="button"
+                >
+                  Remove key
+                </button>
+              </div>
+            </form>
+            <div
+              class="space-y-3"
+            >
+              <button
+                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                data-disabled=""
+                disabled=""
+                tabindex="0"
+                type="button"
+              >
+                Test OpenAI connection
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <div
+            class="flex items-center justify-between gap-2"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+            >
+              Anthropic
+            </h2>
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success text-success-foreground hover:bg-success/80"
+            >
+              Configured
+            </span>
+          </div>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Used when a chat runs on Anthropic models.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0 space-y-4"
+        >
+          <div
+            class="flex items-center gap-2 text-sm"
+          >
+            <span
+              class="text-muted-foreground"
+            >
+              Current key
+            </span>
+            <code
+              class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+              data-testid="masked-key"
+            >
+              ••••9d2f
+            </code>
+          </div>
+          <div
+            class="space-y-3"
+          >
+            <form
+              aria-label="Anthropic API key form"
+              class="space-y-3"
+              novalidate=""
+            >
+              <div
+                class="space-y-2"
+              >
+                <label
+                  class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  for="anthropic-api-key"
+                >
+                  Anthropic
+                   API key
+                </label>
+                <input
+                  autocomplete="off"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                  id="anthropic-api-key"
+                  placeholder="Enter a new key to update"
+                  type="password"
+                  value=""
+                />
+              </div>
+              <div
+                class="flex flex-wrap gap-2"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                  tabindex="0"
+                  type="submit"
+                >
+                  Update key
+                </button>
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+                  tabindex="0"
+                  type="button"
+                >
+                  Remove key
+                </button>
+              </div>
+            </form>
+            <div
+              class="space-y-3"
+            >
+              <button
+                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                data-disabled=""
+                disabled=""
+                tabindex="0"
+                type="button"
+              >
+                Test Anthropic connection
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <div
+            class="flex items-center justify-between gap-2"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+            >
+              Ollama
+            </h2>
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            >
+              Local
+            </span>
+          </div>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Ollama runs locally — no API key is required to use it.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/ProviderList.stories.tsx > Loading 1`] = `
+<body>
+  <div>
+    <div
+      class="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+    >
+      <span
+        class="sr-only"
+      >
+        Loading your account…
+      </span>
+      <div
+        aria-label="Loading"
+        class="animate-pulse rounded-md bg-muted h-56"
+        role="status"
+      />
+      <div
+        aria-label="Loading"
+        class="animate-pulse rounded-md bg-muted h-56"
+        role="status"
+      />
+      <div
+        aria-label="Loading"
+        class="animate-pulse rounded-md bg-muted h-56"
+        role="status"
+      />
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/ProviderList.stories.tsx > NoKeysConfigured 1`] = `
+<body>
+  <div>
+    <div
+      aria-label="Provider list"
+      class="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <div
+            class="flex items-center justify-between gap-2"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+            >
+              OpenAI
+            </h2>
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
+            >
+              Not configured
+            </span>
+          </div>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Used when a chat runs on OpenAI models.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0 space-y-4"
+        >
+          <p
+            class="text-sm text-muted-foreground"
+            data-testid="masked-key-empty"
+          >
+            No key configured
+          </p>
+          <div
+            class="space-y-3"
+          >
+            <form
+              aria-label="OpenAI API key form"
+              class="space-y-3"
+              novalidate=""
+            >
+              <div
+                class="space-y-2"
+              >
+                <label
+                  class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  for="openai-api-key"
+                >
+                  OpenAI
+                   API key
+                </label>
+                <input
+                  autocomplete="off"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                  id="openai-api-key"
+                  placeholder="Enter your API key"
+                  type="password"
+                  value=""
+                />
+              </div>
+              <div
+                class="flex flex-wrap gap-2"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                  tabindex="0"
+                  type="submit"
+                >
+                  Save key
+                </button>
+              </div>
+            </form>
+            <div
+              class="space-y-3"
+            >
+              <button
+                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                data-disabled=""
+                disabled=""
+                tabindex="0"
+                type="button"
+              >
+                Test OpenAI connection
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <div
+            class="flex items-center justify-between gap-2"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+            >
+              Anthropic
+            </h2>
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
+            >
+              Not configured
+            </span>
+          </div>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Used when a chat runs on Anthropic models.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0 space-y-4"
+        >
+          <p
+            class="text-sm text-muted-foreground"
+            data-testid="masked-key-empty"
+          >
+            No key configured
+          </p>
+          <div
+            class="space-y-3"
+          >
+            <form
+              aria-label="Anthropic API key form"
+              class="space-y-3"
+              novalidate=""
+            >
+              <div
+                class="space-y-2"
+              >
+                <label
+                  class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  for="anthropic-api-key"
+                >
+                  Anthropic
+                   API key
+                </label>
+                <input
+                  autocomplete="off"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                  id="anthropic-api-key"
+                  placeholder="Enter your API key"
+                  type="password"
+                  value=""
+                />
+              </div>
+              <div
+                class="flex flex-wrap gap-2"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                  tabindex="0"
+                  type="submit"
+                >
+                  Save key
+                </button>
+              </div>
+            </form>
+            <div
+              class="space-y-3"
+            >
+              <button
+                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                data-disabled=""
+                disabled=""
+                tabindex="0"
+                type="button"
+              >
+                Test Anthropic connection
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <div
+            class="flex items-center justify-between gap-2"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+            >
+              Ollama
+            </h2>
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            >
+              Local
+            </span>
+          </div>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Ollama runs locally — no API key is required to use it.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/ProviderList.stories.tsx > ReEnterKey 1`] = `
+<body>
+  <div>
+    <div
+      aria-label="Provider list"
+      class="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3"
+    >
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <div
+            class="flex items-center justify-between gap-2"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+            >
+              OpenAI
+            </h2>
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success text-success-foreground hover:bg-success/80"
+            >
+              Configured
+            </span>
+          </div>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Used when a chat runs on OpenAI models.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0 space-y-4"
+        >
+          <div
+            class="flex items-center gap-2 text-sm"
+          >
+            <span
+              class="text-muted-foreground"
+            >
+              Current key
+            </span>
+            <code
+              class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+              data-testid="masked-key"
+            >
+              ••••1b3d
+            </code>
+          </div>
+          <div
+            class="space-y-3"
+          >
+            <form
+              aria-label="OpenAI API key form"
+              class="space-y-3"
+              novalidate=""
+            >
+              <div
+                class="space-y-2"
+              >
+                <label
+                  class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  for="openai-api-key"
+                >
+                  OpenAI
+                   API key
+                </label>
+                <input
+                  autocomplete="off"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                  id="openai-api-key"
+                  placeholder="Enter a new key to update"
+                  type="password"
+                  value=""
+                />
+              </div>
+              <div
+                class="flex flex-wrap gap-2"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                  tabindex="0"
+                  type="submit"
+                >
+                  Update key
+                </button>
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+                  tabindex="0"
+                  type="button"
+                >
+                  Remove key
+                </button>
+              </div>
+            </form>
+            <div
+              class="space-y-3"
+            >
+              <button
+                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                data-disabled=""
+                disabled=""
+                tabindex="0"
+                type="button"
+              >
+                Test OpenAI connection
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <div
+            class="flex items-center justify-between gap-2"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+            >
+              Anthropic
+            </h2>
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
+            >
+              Re-enter key
+            </span>
+          </div>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Used when a chat runs on Anthropic models.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0 space-y-4"
+        >
+          <div
+            class="flex items-center gap-2 text-sm"
+          >
+            <span
+              class="text-muted-foreground"
+            >
+              Current key
+            </span>
+            <code
+              class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+              data-testid="masked-key"
+            >
+              ••••9d2f
+            </code>
+          </div>
+          <div
+            class="relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(theme(spacing.4))_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current border-border bg-card text-card-foreground"
+            data-slot="alert"
+            role="alert"
+          >
+            <div
+              class="col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed"
+              data-slot="alert-description"
+            >
+              Keys are only kept for this browser tab session. Enter the key again to use it in chats.
+            </div>
+          </div>
+          <div
+            class="space-y-3"
+          >
+            <form
+              aria-label="Anthropic API key form"
+              class="space-y-3"
+              novalidate=""
+            >
+              <div
+                class="space-y-2"
+              >
+                <label
+                  class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  for="anthropic-api-key"
+                >
+                  Anthropic
+                   API key
+                </label>
+                <input
+                  autocomplete="off"
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+                  id="anthropic-api-key"
+                  placeholder="Enter a new key to update"
+                  type="password"
+                  value=""
+                />
+              </div>
+              <div
+                class="flex flex-wrap gap-2"
+              >
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+                  tabindex="0"
+                  type="submit"
+                >
+                  Update key
+                </button>
+                <button
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+                  tabindex="0"
+                  type="button"
+                >
+                  Remove key
+                </button>
+              </div>
+            </form>
+            <div
+              class="space-y-3"
+            >
+              <button
+                class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+                data-disabled=""
+                disabled=""
+                tabindex="0"
+                type="button"
+              >
+                Test Anthropic connection
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <div
+            class="flex items-center justify-between gap-2"
+          >
+            <h2
+              class="text-lg font-semibold leading-none tracking-tight"
+            >
+              Ollama
+            </h2>
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            >
+              Local
+            </span>
+          </div>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Ollama runs locally — no API key is required to use it.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/ProviderList.stories.tsx > SignedOut 1`] = `
+<body>
+  <div>
+    <div
+      class="relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(theme(spacing.4))_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 border-destructive/50 bg-card text-destructive [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90 mt-8"
+      data-slot="alert"
+      role="alert"
+    >
+      <div
+        class="col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed"
+        data-slot="alert-description"
+      >
+        Sign in to manage your LLM provider API keys.
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > NetworkError 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <button
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+          tabindex="0"
+          type="button"
+        >
+          Test OpenAI connection
+        </button>
+        <div
+          class="relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(theme(spacing.4))_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 border-destructive/50 bg-card text-destructive [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90"
+          data-slot="alert"
+          role="alert"
+        >
+          <div
+            class="col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed"
+            data-slot="alert-description"
+          >
+            Network error: unable to reach the connection test service.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > NoKey 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <button
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+          data-disabled=""
+          disabled=""
+          tabindex="0"
+          type="button"
+        >
+          Test OpenAI connection
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Ready 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <button
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+          tabindex="0"
+          type="button"
+        >
+          Test OpenAI connection
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Rejected 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <button
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+          tabindex="0"
+          type="button"
+        >
+          Test Anthropic connection
+        </button>
+        <div
+          class="relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(theme(spacing.4))_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 border-destructive/50 bg-card text-destructive [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90"
+          data-slot="alert"
+          role="alert"
+        >
+          <div
+            class="col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed"
+            data-slot="alert-description"
+          >
+            The provider rejected the API key
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Success 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <button
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+          tabindex="0"
+          type="button"
+        >
+          Test OpenAI connection
+        </button>
+        <div
+          class="relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(theme(spacing.4))_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 border-success/50 bg-card text-success [&>svg]:text-current"
+          data-slot="alert"
+          role="status"
+        >
+          <div
+            class="col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed text-success"
+            data-slot="alert-description"
+          >
+            Connection successful.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`./features/api-keys/components/TestConnectionButton.stories.tsx > Testing 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <button
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+          data-disabled=""
+          disabled=""
+          tabindex="0"
+          type="button"
+        >
+          Testing…
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+`;

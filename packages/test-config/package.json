@@ -7,6 +7,7 @@
   "main": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./snapshot-serializer": "./snapshot-serializer.ts",
     "./postgres-global-setup": "./test-utils/postgres-global-setup.ts"
   },
   "scripts": {
