@@ -111,3 +111,14 @@ export const Loading: Story = {
 export const NotFound: Story = {
   parameters: chatApi({ chat: "not-found" }),
 };
+
+/** Turning reasoning off failed: the toggle stays on and the error says what did not change. */
+export const ToggleUpdateFailed: Story = {
+  parameters: chatApi({ chat: storyChat, messages: storyConversation(), failUpdates: true }),
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLButtonElement>('button[aria-label="Reasoning"]')?.click();
+    for (let i = 0; i < 100 && !canvasElement.querySelector('[role="alert"]'); i++) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+  },
+};

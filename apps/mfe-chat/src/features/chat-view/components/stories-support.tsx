@@ -161,6 +161,8 @@ export interface ChatApiParameters {
   /** The chat itself; `"loading"` never answers, `"not-found"` answers 404. */
   chat: Chat | "loading" | "not-found";
   messages?: Message[];
+  /** Changing the chat (the reasoning and web fetch toggles) fails with a 500. */
+  failUpdates?: boolean;
 }
 
 const json = (body: unknown, status = 200) =>
@@ -194,6 +196,7 @@ function fakeFetch(api: ChatApiParameters): typeof fetch {
       return json({ message: userMessage(String(body.content ?? "")) }, 201);
     }
     if (path.endsWith("/messages")) return json({ messages });
+    if (method === "PATCH" && api.failUpdates) return json({ error: { code: "INTERNAL_ERROR", message: "Internal server error" } }, 500);
     if (method === "PATCH") return json({ chat: { ...chat, ...body } });
     return json({ chat });
   };

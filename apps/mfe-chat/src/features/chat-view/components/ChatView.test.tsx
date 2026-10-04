@@ -476,5 +476,34 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
       expect(toggle).toHaveAttribute("aria-pressed", "false");
       expect(toggle).toBeEnabled();
     });
+
+    it("a failed reasoning update says so, and the message goes once a retry succeeds", async () => {
+      serveChat({ ...reasoningChat, reasoning: true });
+      server.use(http.patch("*/chats/:chatId", () => HttpResponse.json({ message: "Boom" }, { status: 500 }), { once: true }));
+      renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
+
+      await userEvent.click(await screen.findByRole("button", { name: "Reasoning" }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent("Could not turn reasoning off. Please try again.");
+      expect(screen.getByRole("button", { name: "Reasoning" })).toHaveAttribute("aria-pressed", "true");
+
+      await userEvent.click(screen.getByRole("button", { name: "Reasoning" }));
+
+      await waitFor(() => expect(screen.getByRole("button", { name: "Reasoning" })).toHaveAttribute("aria-pressed", "false"));
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("a failed web fetch update says so and leaves the toggle as it was", async () => {
+      serveChat({ ...chat, model: "claude-opus-5-5", webFetch: false });
+      server.use(http.patch("*/chats/:chatId", () => HttpResponse.error()));
+      renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
+
+      await userEvent.click(await screen.findByRole("button", { name: "Web fetch" }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent("Could not turn web fetch on. Please try again.");
+      const toggle = screen.getByRole("button", { name: "Web fetch", busy: false });
+      expect(toggle).toHaveAttribute("aria-pressed", "false");
+      expect(toggle).toBeEnabled();
+    });
   });
 });

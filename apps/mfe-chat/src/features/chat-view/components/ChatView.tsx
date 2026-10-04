@@ -101,6 +101,15 @@ export function ChatView({ chatId, userId, onBack, onClose, compact = false }: C
   const canFetch = supportsWebFetch(chat.provider, chat.model);
   // Both toggles share one mutation; only the one being changed shows as loading.
   const updating = (field: "reasoning" | "webFetch") => updateChat.isPending && updateChat.variables?.[field] !== undefined;
+  // The chat only changes once the service answers, so after a failure the toggle still shows
+  // the previous setting; say what could not be changed. Cleared by the next attempt.
+  const failedUpdate = updateChat.isError ? updateChat.variables : undefined;
+  const updateError =
+    failedUpdate?.reasoning !== undefined
+      ? `Could not turn reasoning ${failedUpdate.reasoning ? "on" : "off"}. Please try again.`
+      : failedUpdate?.webFetch !== undefined
+        ? `Could not turn web fetch ${failedUpdate.webFetch ? "on" : "off"}. Please try again.`
+        : null;
 
   return (
     <section aria-label={chat.title} className="flex min-h-0 flex-1 flex-col">
@@ -194,6 +203,14 @@ export function ChatView({ chatId, userId, onBack, onClose, compact = false }: C
         </Button>
         {closeButton}
       </header>
+      {updateError ? (
+        <div className="border-b border-border px-4 py-2">
+          <Alert variant="destructive" className="mx-auto max-w-3xl">
+            <CircleAlert />
+            <AlertDescription>{updateError}</AlertDescription>
+          </Alert>
+        </div>
+      ) : null}
       <MembersDialog
         chatId={chatId}
         chatTitle={chat.title}
