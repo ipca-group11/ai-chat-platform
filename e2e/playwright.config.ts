@@ -66,8 +66,9 @@ export default defineConfig({
       snapshotPathTemplate: "{testDir}/__screenshots__/{projectName}/{arg}{ext}",
       expect: {
         toHaveScreenshot: {
-          // Up to 1% of the pixels may differ (sub-pixel anti-aliasing); each pixel may differ a little.
-          maxDiffPixelRatio: 0.01,
+          // At most 50 pixels (of 1 024 000) may differ, and each of them only a little. The images are the same
+          // from run to run, so the limit is only for anti-aliasing noise; 1% let a changed heading through.
+          maxDiffPixels: 50,
           threshold: 0.2,
           animations: "disabled",
           caret: "hide",

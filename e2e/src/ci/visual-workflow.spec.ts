@@ -73,7 +73,8 @@ describe("visual Playwright project (AICHAT-56)", () => {
     expect(config).toContain('testIgnore: "**/lib/**"');
     expect(config).toContain('snapshotPathTemplate: "{testDir}/__screenshots__/{projectName}/{arg}{ext}"');
     expect(config).toContain("viewport: { width: 1280, height: 800 }");
-    expect(config).toMatch(/maxDiffPixelRatio: 0\.01/);
+    expect(config).toMatch(/maxDiffPixels: 50/);
+    expect(config).toMatch(/threshold: 0\.2/);
     expect(config).toMatch(/animations: "disabled"/);
     expect(config).toMatch(/caret: "hide"/);
   });
