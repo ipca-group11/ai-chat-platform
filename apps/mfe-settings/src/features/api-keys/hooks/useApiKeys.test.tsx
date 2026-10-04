@@ -1,6 +1,6 @@
 import { buildApiKeyStorageKey, buildSessionApiKeyStorageKey } from "@app/shared-types/api-keys";
 import { act, renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useApiKeys } from "./useApiKeys";
 
 describe("useApiKeys", () => {
@@ -124,5 +124,58 @@ describe("useApiKeys", () => {
     const anthropic = result.current.providers.find((p) => p.provider === "anthropic");
     expect(anthropic?.record).not.toBeNull();
     expect(anthropic?.usableThisSession).toBe(false);
+  });
+
+  describe("when the browser refuses to store the key", () => {
+    const quotaExceeded = () => new DOMException("The quota has been exceeded.", "QuotaExceededError");
+    const refuse = (refused: Storage) => {
+      const setItem = Storage.prototype.setItem;
+      vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key: string, value: string) {
+        if (this === refused) throw quotaExceeded();
+        setItem.call(this, key, value);
+      });
+    };
+    const sessionKey = () => window.sessionStorage.getItem(buildSessionApiKeyStorageKey("user-1", "openai"));
+    const storedRecord = () => window.localStorage.getItem(buildApiKeyStorageKey("user-1", "openai"));
+
+    afterEach(() => vi.restoreAllMocks());
+
+    it("keeps the previous key whole when the masked record cannot be written", () => {
+      const { result } = renderHook(() => useApiKeys("user-1"));
+      act(() => result.current.saveKey("openai", "sk-old-1111"));
+      const previousRecord = storedRecord();
+      refuse(window.localStorage);
+
+      expect(() => act(() => result.current.saveKey("openai", "sk-new-2222"))).toThrow(/quota/i);
+
+      expect(storedRecord()).toBe(previousRecord);
+      expect(sessionKey()).toBe("sk-old-1111");
+      const openai = result.current.providers.find((p) => p.provider === "openai");
+      expect(openai?.record?.last4).toBe("1111");
+      expect(openai?.usableThisSession).toBe(true);
+    });
+
+    it("leaves no session key behind when there was no key before", () => {
+      const { result } = renderHook(() => useApiKeys("user-1"));
+      refuse(window.localStorage);
+
+      expect(() => act(() => result.current.saveKey("openai", "sk-new-2222"))).toThrow(/quota/i);
+
+      expect(storedRecord()).toBeNull();
+      expect(sessionKey()).toBeNull();
+      expect(result.current.providers.find((p) => p.provider === "openai")?.record).toBeNull();
+    });
+
+    it("changes nothing when the session key cannot be written", () => {
+      const { result } = renderHook(() => useApiKeys("user-1"));
+      act(() => result.current.saveKey("openai", "sk-old-1111"));
+      const previousRecord = storedRecord();
+      refuse(window.sessionStorage);
+
+      expect(() => act(() => result.current.saveKey("openai", "sk-new-2222"))).toThrow(/quota/i);
+
+      expect(storedRecord()).toBe(previousRecord);
+      expect(sessionKey()).toBe("sk-old-1111");
+    });
   });
 });

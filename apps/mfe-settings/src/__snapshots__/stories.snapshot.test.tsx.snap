@@ -782,6 +782,84 @@ exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > Required 1`] = 
 </body>
 `;
 
+exports[`./features/api-keys/components/ApiKeyForm.stories.tsx > SaveFailed 1`] = `
+<body>
+  <div>
+    <div
+      class="max-w-sm"
+    >
+      <div
+        class="space-y-3"
+      >
+        <form
+          aria-label="OpenAI API key form"
+          class="space-y-3"
+          novalidate=""
+        >
+          <div
+            class="space-y-2"
+          >
+            <label
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              for="openai-api-key"
+            >
+              OpenAI
+               API key
+            </label>
+            <input
+              aria-describedby="openai-api-key-error"
+              aria-invalid="true"
+              autocomplete="off"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"
+              id="openai-api-key"
+              placeholder="Enter a new key to update"
+              type="password"
+              value="sk-proj-4f9c2a7e1b3d"
+            />
+            <p
+              class="text-sm font-medium text-destructive"
+              id="openai-api-key-error"
+              role="alert"
+            >
+              The key could not be saved in this browser. Your previous key is still in use.
+            </p>
+          </div>
+          <div
+            class="flex flex-wrap gap-2"
+          >
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3"
+              tabindex="0"
+              type="submit"
+            >
+              Update key
+            </button>
+            <button
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent h-9 rounded-md px-3 text-destructive hover:text-destructive"
+              tabindex="0"
+              type="button"
+            >
+              Remove key
+            </button>
+          </div>
+        </form>
+        <div
+          class="space-y-3"
+        >
+          <button
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 w-full"
+            tabindex="0"
+            type="button"
+          >
+            Test OpenAI connection
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
 exports[`./features/api-keys/components/MaskedKeyDisplay.stories.tsx > KeySet 1`] = `
 <body>
   <div>

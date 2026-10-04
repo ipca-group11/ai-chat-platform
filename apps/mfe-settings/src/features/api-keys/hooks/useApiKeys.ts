@@ -61,8 +61,21 @@ export function useApiKeys(userId: string | undefined): UseApiKeysResult {
       if (!userId) {
         return;
       }
-      const record = writeStoredApiKey(userId, provider, rawKey);
+      // A failed write leaves its storage as it was, so write the session key first: if the
+      // masked record then fails, putting the previous session key back keeps the old key whole.
+      const previousSessionKey = readSessionApiKey(userId, provider);
       writeSessionApiKey(userId, provider, rawKey);
+      let record: StoredApiKeyRecord;
+      try {
+        record = writeStoredApiKey(userId, provider, rawKey);
+      } catch (error) {
+        if (previousSessionKey) {
+          writeSessionApiKey(userId, provider, previousSessionKey);
+        } else {
+          removeSessionApiKey(userId, provider);
+        }
+        throw error;
+      }
       setRecords((prev) => ({ ...prev, [provider]: record }));
     },
     [userId],

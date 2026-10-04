@@ -55,3 +55,20 @@ export const Required: Story = {
     await settle();
   },
 };
+
+/** The browser refused to store the new key: the error says the previous key is still in use. */
+export const SaveFailed: Story = {
+  args: {
+    hasKey: true,
+    onSave: () => {
+      throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const input = canvasElement.querySelector<HTMLInputElement>("#openai-api-key");
+    if (input) typeInto(input, "sk-proj-4f9c2a7e1b3d");
+    await settle();
+    getButton(canvasElement, "Update key").click();
+    await settle();
+  },
+};

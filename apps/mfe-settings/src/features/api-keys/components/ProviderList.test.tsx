@@ -177,28 +177,17 @@ describe("ProviderList", () => {
   });
 
   describe("when the browser refuses to store the key", () => {
-    let uncaught: ErrorEvent[];
-    const swallowUncaught = (event: ErrorEvent) => {
-      event.preventDefault();
-      uncaught.push(event);
-    };
-
-    beforeEach(() => {
-      // The save throws inside the submit handler and React reports it as an uncaught error on
-      // `window`. That is expected here: collect it so that it does not fail the run.
-      uncaught = [];
-      window.addEventListener("error", swallowUncaught);
+    const refuseStorage = () =>
       vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
         throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
       });
-    });
 
     afterEach(() => {
-      window.removeEventListener("error", swallowUncaught);
       vi.restoreAllMocks();
     });
 
-    it("does not mark the provider as configured, shows no masked key and keeps the form available", async () => {
+    it("shows an error next to the form, does not mark the provider as configured and keeps the form available", async () => {
+      refuseStorage();
       const user = userEvent.setup();
       renderWithClient(<ProviderList />);
       const openaiForm = screen.getByRole("form", { name: "OpenAI API key form" });
@@ -206,11 +195,45 @@ describe("ProviderList", () => {
       await user.type(screen.getByLabelText("OpenAI API key"), "sk-abcd1234");
       await user.click(within(openaiForm).getByRole("button", { name: "Save key" }));
 
-      expect(uncaught.map((event) => (event.error as Error).name)).toEqual(["QuotaExceededError"]);
+      expect(within(openaiForm).getByRole("alert")).toHaveTextContent(/could not be saved in this browser/i);
+      expect(screen.getByLabelText("OpenAI API key")).toHaveAccessibleDescription(/could not be saved/i);
       expect(screen.getAllByText("Not configured")).toHaveLength(2);
       expect(screen.queryByText("Configured")).not.toBeInTheDocument();
       expect(screen.queryByTestId("masked-key")).not.toBeInTheDocument();
       expect(within(openaiForm).getByRole("button", { name: "Save key" })).toBeEnabled();
+    });
+
+    it("keeps the previous key when an update cannot be stored", async () => {
+      const user = userEvent.setup();
+      renderWithClient(<ProviderList />);
+      const openaiForm = screen.getByRole("form", { name: "OpenAI API key form" });
+      await user.type(screen.getByLabelText("OpenAI API key"), "sk-abcd1234");
+      await user.click(within(openaiForm).getByRole("button", { name: "Save key" }));
+      refuseStorage();
+
+      await user.type(screen.getByLabelText("OpenAI API key"), "sk-wxyz9876");
+      await user.click(within(openaiForm).getByRole("button", { name: "Update key" }));
+
+      expect(within(openaiForm).getByRole("alert")).toHaveTextContent(/your previous key is still in use/i);
+      expect(screen.getByTestId("masked-key")).toHaveTextContent("1234");
+      expect(screen.getAllByText("Configured")).toHaveLength(1);
+      expect(window.sessionStorage.getItem("llm-api-key-session:user-1:openai")).toBe("sk-abcd1234");
+    });
+
+    it("clears the error once the key is saved", async () => {
+      const refused = refuseStorage();
+      const user = userEvent.setup();
+      renderWithClient(<ProviderList />);
+      const openaiForm = screen.getByRole("form", { name: "OpenAI API key form" });
+      await user.type(screen.getByLabelText("OpenAI API key"), "sk-abcd1234");
+      await user.click(within(openaiForm).getByRole("button", { name: "Save key" }));
+      expect(within(openaiForm).getByRole("alert")).toBeInTheDocument();
+
+      refused.mockRestore();
+      await user.click(within(openaiForm).getByRole("button", { name: "Save key" }));
+
+      expect(within(openaiForm).queryByRole("alert")).not.toBeInTheDocument();
+      expect(screen.getByTestId("masked-key")).toHaveTextContent("1234");
     });
   });
 });

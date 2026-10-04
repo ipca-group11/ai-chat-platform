@@ -7,6 +7,7 @@ export interface ApiKeyFormProps {
   provider: Provider;
   providerLabel: string;
   hasKey: boolean;
+  /** Throws when the key could not be stored; the form then shows an error and keeps the input. */
   onSave: (rawKey: string) => void;
   onRemove: () => void;
 }
@@ -29,8 +30,18 @@ export function ApiKeyForm({ provider, providerLabel, hasKey, onSave, onRemove }
       setError("API key is required.");
       return;
     }
+    try {
+      onSave(trimmed);
+    } catch {
+      // Nothing was saved (the browser refused to store it); the previous key, if any, stays.
+      setError(
+        hasKey
+          ? "The key could not be saved in this browser. Your previous key is still in use."
+          : "The key could not be saved in this browser. Check that this site may store data, then try again.",
+      );
+      return;
+    }
     setError(null);
-    onSave(trimmed);
     setRawKey("");
   }
 
