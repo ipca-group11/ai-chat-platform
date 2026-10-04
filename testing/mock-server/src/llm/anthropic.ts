@@ -11,7 +11,7 @@ const FETCH_PAGE = "This domain is for use in illustrative examples.";
 type Block =
   | { type: "thinking"; tokens: string[]; signature: string }
   | { type: "text"; tokens: string[] }
-  | { type: "web_fetch"; id: string };
+  | { type: "web_fetch"; id: string; url: string };
 
 export interface AnthropicReply {
   blocks: Block[];
@@ -38,8 +38,14 @@ export function anthropicReply(plan: ScenarioPlan, seed: string, resumed: boolea
       signature: "mock-signature",
     });
   }
-  if (plan.webFetch && !resumed) {
-    blocks.push({ type: "text", tokens: [FETCH_INTRO] }, { type: "web_fetch", id: "srvtoolu_mock0001" });
+  if (plan.scripted) {
+    const words = plan.scripted.answer.split(/(?<=\s)/);
+    if (plan.scripted.fetchUrl) {
+      blocks.push({ type: "text", tokens: [FETCH_INTRO] }, { type: "web_fetch", id: "srvtoolu_mock0001", url: plan.scripted.fetchUrl });
+    }
+    blocks.push({ type: "text", tokens: words });
+  } else if (plan.webFetch && !resumed) {
+    blocks.push({ type: "text", tokens: [FETCH_INTRO] }, { type: "web_fetch", id: "srvtoolu_mock0001", url: FETCH_URL });
     if (stopReason !== "pause_turn") blocks.push({ type: "text", tokens: answer });
   } else {
     if (stopReason === "pause_turn") stopReason = "end_turn";
@@ -49,13 +55,13 @@ export function anthropicReply(plan: ScenarioPlan, seed: string, resumed: boolea
   return { blocks, stopReason, outputTokens, dropped: plan.drop, firstTokenDelayMs: plan.firstTokenDelayMs };
 }
 
-const fetchInput = JSON.stringify({ url: FETCH_URL });
-const fetchResult = (id: string) => ({
+const fetchInput = (url: string): string => JSON.stringify({ url });
+const fetchResult = (id: string, url: string) => ({
   type: "web_fetch_tool_result",
   tool_use_id: id,
   content: {
     type: "web_fetch_result",
-    url: FETCH_URL,
+    url,
     retrieved_at: "1970-01-01T00:00:00Z",
     content: {
       type: "document",
@@ -81,8 +87,8 @@ export function anthropicMessage(reply: AnthropicReply, model: string, id: strin
     }
     if (block.type === "text") return [{ type: "text", text: block.tokens.join("") }];
     return [
-      { type: "server_tool_use", id: block.id, name: "web_fetch", input: { url: FETCH_URL } },
-      fetchResult(block.id),
+      { type: "server_tool_use", id: block.id, name: "web_fetch", input: { url: block.url } },
+      fetchResult(block.id, block.url),
     ];
   });
   return {
@@ -136,14 +142,14 @@ export async function* anthropicStream(
       yield anthropicFrame("content_block_delta", {
         type: "content_block_delta",
         index,
-        delta: { type: "input_json_delta", partial_json: fetchInput },
+        delta: { type: "input_json_delta", partial_json: fetchInput(block.url) },
       });
       yield anthropicFrame("content_block_stop", { type: "content_block_stop", index });
       index++;
       yield anthropicFrame("content_block_start", {
         type: "content_block_start",
         index,
-        content_block: fetchResult(block.id),
+        content_block: fetchResult(block.id, block.url),
       });
       yield anthropicFrame("content_block_stop", { type: "content_block_stop", index });
       index++;

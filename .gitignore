@@ -30,3 +30,6 @@ sbom-results/
 # Lighthouse CI output (AICHAT-62)
 lighthouse-results/
 .lighthouseci/
+
+# prompt injection test output (AICHAT-26)
+redteam-results/

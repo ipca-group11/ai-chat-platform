@@ -1,0 +1,33 @@
+$ sh -c ls -l testing/promptfoo/payloads testing/promptfoo/pages && file testing/promptfoo/payloads/a1-image-injection.png testing/promptfoo/payloads/a2-hidden-text.pdf
+CHANGELOG.md
+README.md
+apps
+compose.load.yaml
+compose.mock.yaml
+compose.redteam.yaml
+compose.yaml
+deploy
+docker-compose.yml
+docs
+e2e
+lighthouse-results
+lighthouserc.json
+node_modules
+nx.json
+observability
+package.json
+packages
+pnpm-lock.yaml
+pnpm-workspace.yaml
+private
+sbom-results
+scripts
+semgrep-results
+services
+testing
+tsconfig.base.json
+tsconfig.scripts.json
+testing/promptfoo/payloads/a1-image-injection.png: PNG image data, 900 x 260, 8-bit/color RGB, non-interlaced
+testing/promptfoo/payloads/a2-hidden-text.pdf:     PDF document, version 1.4, 1 pages
+
+[exit 0]

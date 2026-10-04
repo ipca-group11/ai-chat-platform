@@ -7,3 +7,6 @@ cd64fd22d8841aee77857621e5d0a8d9d31d9ed9:services/auth-service/src/integration/s
 933864272e9235957e016ea4dd2042a197a9ca39:docs/AICHAT-32/evidence/08-us6-faro-collect-red.log:generic-api-key:29
 933864272e9235957e016ea4dd2042a197a9ca39:docs/AICHAT-32/evidence/08-us6-faro-collect-red.log:generic-api-key:66
 933864272e9235957e016ea4dd2042a197a9ca39:docs/AICHAT-32/evidence/08-us6-faro-collect-red.log:generic-api-key:86
+# Test canary and fake victim note of the prompt injection tests (AICHAT-26); not credentials.
+2403b0817d6edb63783a5b93c0b86c98e5f65b58:testing/promptfoo/src/canary.ts:generic-api-key:5
+932d0cfbfbbe0857f8099f7834b57a4d143da263:docs/AICHAT-26/evidence/05-request-path-at-the-llm-mock.log:generic-api-key:12

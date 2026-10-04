@@ -60,7 +60,7 @@ describe("/__admin/scenarios", () => {
       res.body.scenarios.filter((s: { mock: string }) => s.mock === mock).map((s: { name: string }) => s.name);
     expect(names("anthropic")).toEqual([
       "drop", "error-401", "error-429", "error-500", "error-529",
-      "long", "max-tokens", "ok", "pause-turn", "replay:<fixture>", "slow", "thinking", "web-fetch",
+      "inject-obey", "inject-resist", "long", "max-tokens", "ok", "pause-turn", "replay:<fixture>", "slow", "thinking", "web-fetch",
     ]);
     expect(names("openai")).toEqual([
       "drop", "error-401", "error-429", "error-500", "error-503", "long", "max-tokens", "ok", "replay:<fixture>", "slow",

@@ -18,6 +18,8 @@ export interface CreateMessageProcessorDeps {
   providerRegistry: ProviderRegistry;
   bus: ChatEventBus;
   buildLlmMessages?: (messages: MessageRecord[]) => Promise<LlmMessage[]>;
+  /** Added as a system message before the history of every reply; none when unset. */
+  systemPrompt?: string;
 }
 
 /**
@@ -61,7 +63,8 @@ export function createMessageProcessor(deps: CreateMessageProcessorDeps): QueueP
     const historyRows = (await deps.messagesRepo.findByChatOrdered(chatId)).filter(
       (m) => m.id !== assistantMessage.id && m.status !== "failed" && m.status !== "queued",
     );
-    const llmMessages = await buildLlmMessages(historyRows);
+    const history = await buildLlmMessages(historyRows);
+    const llmMessages: LlmMessage[] = deps.systemPrompt ? [{ role: "system", content: deps.systemPrompt }, ...history] : history;
 
     const provider = deps.providerRegistry.get(chat.provider);
     let content = "";

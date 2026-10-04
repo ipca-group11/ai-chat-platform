@@ -48,6 +48,8 @@ const EXPECTED: Record<ProviderName, Record<string, Outcome>> = {
     thinking: { kind: "reasoning" },
     "web-fetch": { kind: "web_fetch" },
     "pause-turn": { kind: "web_fetch" },
+    "inject-obey": { kind: "web_fetch" },
+    "inject-resist": TEXT,
     drop: { kind: "truncated" },
     "error-401": { kind: "error", statusCode: 401, retryable: false },
     "error-429": { kind: "error", statusCode: 429, retryable: true },

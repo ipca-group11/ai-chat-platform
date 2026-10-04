@@ -1,0 +1,25 @@
+# Prompt injection tests (AICHAT-26). Run from this folder or with `-c testing/promptfoo/promptfooconfig.yaml`.
+# Settings come from the environment, see README.md: REDTEAM_APP_URL, REDTEAM_MODEL, ANTHROPIC_API_KEY,
+# PAGES_BASE_URL, REDTEAM_BUDGET_USD (hard cap 2 USD), REDTEAM_GRADER, REDTEAM_SURFACES.
+description: Prompt injection against the AI chat app (files, web pages, direct)
+
+# The prompt is only a label: the provider plays the attack named in `vars.attack`.
+prompts:
+  - "{{attack}}"
+
+providers:
+  - id: file://src/provider.ts
+    label: app-api
+
+defaultTest:
+  options:
+    # The llm-rubric grader. Default: the same cheap model as the target. Against the mock: file://src/mock-grader.ts
+    provider: "{{ env.REDTEAM_GRADER | default('anthropic:messages:claude-haiku-4-5') }}"
+
+tests: file://src/tests.ts:buildTests
+
+# One call at a time and no cache: every run must really hit the app, and the cost estimate assumes it.
+evaluateOptions:
+  maxConcurrency: 1
+  repeat: 1
+  cache: false

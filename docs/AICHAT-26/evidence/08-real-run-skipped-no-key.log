@@ -1,0 +1,6 @@
+$ echo "variables named like ANTHROPIC in .env.credentials: $(grep -ci anthropic .env.credentials)"; if [ -n "${ANTHROPIC_API_KEY:-}" ]; then echo "ANTHROPIC_API_KEY in the environment: set"; else echo "ANTHROPIC_API_KEY in the environment: not set"; fi; echo "-> no Anthropic key available: the real-model run is skipped"
+variables named like ANTHROPIC in .env.credentials: 0
+ANTHROPIC_API_KEY in the environment: not set
+-> no Anthropic key available: the real-model run is skipped
+
+[exit 0]

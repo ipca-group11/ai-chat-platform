@@ -5,3 +5,4 @@ packages:
   - "e2e"
   - "testing/k6"
   - "testing/mock-server"
+  - "testing/promptfoo"
