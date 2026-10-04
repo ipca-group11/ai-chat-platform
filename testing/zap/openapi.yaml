@@ -237,6 +237,7 @@ paths:
         "201": { description: Stored }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
 components:
   securitySchemes:
     sessionCookie:

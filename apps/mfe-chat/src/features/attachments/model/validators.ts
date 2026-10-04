@@ -39,13 +39,15 @@ export function validateAttachmentFile(file: File): FileValidationError | null {
   }
 
   if (file.size > MAX_FILE_SIZE_BYTES) {
-    return {
-      code: "too_large",
-      message: `"${file.name}" is larger than the 10 MB limit.`,
-    };
+    return { code: "too_large", message: tooLargeMessage(file) };
   }
 
   return null;
+}
+
+/** AC-68: shown when the client or the server (413) rejects a file for its size. */
+export function tooLargeMessage(file: Pick<File, "name">): string {
+  return `"${file.name}" is larger than the 10 MB limit.`;
 }
 
 export function attachmentKindFromMime(mimeType: string): AttachmentKind {

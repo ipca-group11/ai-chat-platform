@@ -52,7 +52,7 @@ export function validateAttachment(
   if (file.size > maxBytes) {
     const limitMb = Math.floor(maxBytes / (1024 * 1024));
     throw new HttpError(
-      400,
+      413,
       "ATTACHMENT_TOO_LARGE",
       `File "${file.originalname}" exceeds the ${limitMb} MB size limit`,
     );

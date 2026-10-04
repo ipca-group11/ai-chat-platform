@@ -122,8 +122,21 @@ exports[`conversation-service error bodies > upload rejected by multer 1`] = `
   "body": {
     "correlationId": "<uuid>",
     "error": {
+      "code": "ATTACHMENT_TOO_LARGE",
+      "message": "The file exceeds the upload size limit",
+    },
+  },
+  "status": 413,
+}
+`;
+
+exports[`conversation-service error bodies > upload with an unexpected field rejected by multer 1`] = `
+{
+  "body": {
+    "correlationId": "<uuid>",
+    "error": {
       "code": "ATTACHMENT_UPLOAD_ERROR",
-      "message": "File too large",
+      "message": "Unexpected file field",
     },
   },
   "status": 400,

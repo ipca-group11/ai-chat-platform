@@ -582,6 +582,18 @@ describe("attachments", () => {
     expect(http.errorResponseSchema.parse(res.body).error.code).toBe(code);
   });
 
+  it.each([
+    ["over the 10 MB limit", 10 * 1024 * 1024 + 1],
+    ["over the body parser limit", 13 * 1024 * 1024],
+  ])("answers 413 ATTACHMENT_TOO_LARGE for a file %s", async (_label, size) => {
+    const { app } = setup();
+    const { as } = await signIn(app);
+    const id = await firstChatId(as);
+    const res = await send(as("post", `/chats/${id}/attachments`), multipart("big.txt", "text/plain", "x".repeat(size)));
+    expect(res.status).toBe(413);
+    expect(http.errorResponseSchema.parse(res.body).error.code).toBe("ATTACHMENT_TOO_LARGE");
+  });
+
   it("answers 404 MESSAGE_NOT_FOUND for a message that is not the user's", async () => {
     const { app } = setup();
     const { as } = await signIn(app);

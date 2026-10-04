@@ -51,6 +51,10 @@ describe("conversation-service error bodies", () => {
     expect(handle(new MulterError("LIMIT_FILE_SIZE"))).toMatchSnapshot();
   });
 
+  it("upload with an unexpected field rejected by multer", () => {
+    expect(handle(new MulterError("LIMIT_UNEXPECTED_FILE", "attachment"))).toMatchSnapshot();
+  });
+
   it("unexpected error is redacted to a 500", () => {
     expect(handle(new Error("db connection string leaked"))).toMatchSnapshot();
   });

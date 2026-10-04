@@ -67,6 +67,33 @@ describe("usePendingAttachments (AC-66, AC-67, AC-68, AC-71)", () => {
     expect(requests).toHaveLength(0);
   });
 
+  it("AICHAT-218: a 413 from the server marks the file as too large, even without a JSON body", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response("<h1>413 Request Entity Too Large</h1>", { status: 413, statusText: "Payload Too Large" })
+    );
+
+    const { result } = renderHookWithClient(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"));
+
+    act(() => result.current.addFiles([makeFile("notes.txt", "text/plain")]));
+
+    await waitFor(() => expect(result.current.pending[0]?.status).toBe("rejected"));
+    expect(result.current.pending[0]?.error).toBe('"notes.txt" is larger than the 10 MB limit.');
+    expect(result.current.uploadedAttachmentIds).toEqual([]);
+  });
+
+  it("keeps the server's message for any other upload error", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      Response.json({ error: { code: "ATTACHMENT_TYPE_NOT_ALLOWED", message: "Not allowed here" } }, { status: 400 })
+    );
+
+    const { result } = renderHookWithClient(() => usePendingAttachments("chat-1", "anthropic", "claude-3-5-haiku-latest"));
+
+    act(() => result.current.addFiles([makeFile("notes.txt", "text/plain")]));
+
+    await waitFor(() => expect(result.current.pending[0]?.status).toBe("rejected"));
+    expect(result.current.pending[0]?.error).toBe("Not allowed here");
+  });
+
   it("AC-71: rejects an image attachment for a model without vision support, before sending", () => {
     const requests = recordRequests();
 

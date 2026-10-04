@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { Attachment, Provider } from "../../../shared/types";
+import { ApiError } from "../../../shared/api-client";
 import { useUploadAttachment } from "../api/useUploadAttachment";
 import { supportsAttachmentKind } from "../model/model-capabilities";
-import { attachmentKindFromMime, validateAttachmentFile } from "../model/validators";
+import { attachmentKindFromMime, tooLargeMessage, validateAttachmentFile } from "../model/validators";
 
 export interface PendingAttachment {
   id: string;
@@ -58,8 +59,10 @@ export function usePendingAttachments(chatId: string, provider: Provider, model:
           );
         },
         (error: Error) => {
+          // 413 can also come from a proxy with a non-JSON body, so word it here.
+          const message = error instanceof ApiError && error.status === 413 ? tooLargeMessage(file) : error.message;
           setPending((existing) =>
-            existing.map((p) => (p.id === id ? { ...p, status: "rejected", error: error.message } : p))
+            existing.map((p) => (p.id === id ? { ...p, status: "rejected", error: message } : p))
           );
         },
       );

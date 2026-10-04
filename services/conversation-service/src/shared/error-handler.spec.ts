@@ -52,10 +52,22 @@ describe("errorHandler", () => {
     expect(body.error.message).not.toContain("leaked");
   });
 
-  it("AC-68: maps a MulterError to a 400 with a clear message", () => {
+  it("AC-68/AICHAT-218: maps multer's size limit to a 413 ATTACHMENT_TOO_LARGE", () => {
     const req = { correlationId: "corr-5", log: { warn: vi.fn(), error: vi.fn() } } as unknown as Request;
     const res = makeRes();
-    const err = new MulterError("LIMIT_FILE_SIZE");
+
+    errorHandler(new MulterError("LIMIT_FILE_SIZE"), req, res, vi.fn());
+
+    expect(res.status).toHaveBeenCalledWith(413);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: expect.objectContaining({ code: "ATTACHMENT_TOO_LARGE" }) }),
+    );
+  });
+
+  it("AC-68: maps any other MulterError to a 400 with a clear message", () => {
+    const req = { correlationId: "corr-5", log: { warn: vi.fn(), error: vi.fn() } } as unknown as Request;
+    const res = makeRes();
+    const err = new MulterError("LIMIT_UNEXPECTED_FILE", "attachment");
 
     errorHandler(err, req, res, vi.fn());
 

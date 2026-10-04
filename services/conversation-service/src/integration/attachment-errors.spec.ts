@@ -61,24 +61,21 @@ describe("POST /chats/:chatId/messages/:messageId/attachments errors", () => {
     expect(res.body.error.code).toBe("MESSAGE_NOT_FOUND");
   });
 
-  // Pinned current behaviour: the acceptance criterion expects 413 Payload Too Large, but
-  // the service answers 400 ATTACHMENT_TOO_LARGE. The frontend and the mock server both
-  // rely on that 400, so changing it is a contract change, not a one-line fix (WORKLOG §7).
-  it("400 ATTACHMENT_TOO_LARGE for a file over the configured limit (pinned: not 413)", async () => {
+  // AICHAT-218: 413 Payload Too Large, as the acceptance criterion expects.
+  it("413 ATTACHMENT_TOO_LARGE for a file over the configured limit", async () => {
     const { app, path, attachmentsRepo } = await setup();
     const res = await request(app).post(path).set("Cookie", cookieFor("user-1")).attach("file", Buffer.alloc(SMALL_LIMIT + 1, 1), { filename: "big.txt", contentType: "text/plain" });
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(413);
     expect(res.body.error.code).toBe("ATTACHMENT_TOO_LARGE");
     expect(attachmentsRepo.all()).toHaveLength(0);
   });
 
-  // Pinned current behaviour: above the hard ceiling (2x the limit) multer stops the
-  // upload first and the error handler maps it to 400 ATTACHMENT_UPLOAD_ERROR, not 413.
-  it("400 ATTACHMENT_UPLOAD_ERROR for a file over the hard ceiling (pinned: not 413)", async () => {
+  // Above the hard ceiling multer stops the upload first; still a 413 (AICHAT-218).
+  it("413 ATTACHMENT_TOO_LARGE for a file over the hard ceiling", async () => {
     const { app, path, attachmentsRepo } = await setup();
     const res = await request(app).post(path).set("Cookie", cookieFor("user-1")).attach("file", Buffer.alloc(SMALL_LIMIT * 2 + 1, 1), { filename: "huge.txt", contentType: "text/plain" });
-    expect(res.status).toBe(400);
-    expect(res.body.error.code).toBe("ATTACHMENT_UPLOAD_ERROR");
+    expect(res.status).toBe(413);
+    expect(res.body.error.code).toBe("ATTACHMENT_TOO_LARGE");
     expect(attachmentsRepo.all()).toHaveLength(0);
   });
 });

@@ -37,8 +37,15 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
 
   if (err instanceof MulterError) {
     // AC-68: files rejected before upload get a clear, specific error message, even
-    // when rejected by multer's own size ceiling before reaching our validator.
+    // when rejected by multer's own size ceiling before reaching our validator. A file
+    // over the size limit is a 413, like the one the validator answers (AICHAT-218).
     req.log?.warn({ err }, "attachment upload rejected");
+    if (err.code === "LIMIT_FILE_SIZE") {
+      res
+        .status(413)
+        .json(toErrorResponse("ATTACHMENT_TOO_LARGE", "The file exceeds the upload size limit", { correlationId }));
+      return;
+    }
     res
       .status(400)
       .json(toErrorResponse("ATTACHMENT_UPLOAD_ERROR", err.message, { correlationId }));

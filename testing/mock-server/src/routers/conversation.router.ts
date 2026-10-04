@@ -1,4 +1,4 @@
-import express, { Router, type Request, type Response } from "express";
+import express, { Router, type Request, type RequestHandler, type Response } from "express";
 import type { chat } from "@app/shared-types";
 import { currentUser } from "../auth/sessions.js";
 import { jsonBody } from "../core/request-log.js";
@@ -321,7 +321,7 @@ function createConversationRouter(ctx: MockContext): Router {
     const start = raw.indexOf("\r\n\r\n", raw.indexOf(name)) + 4;
     const size = Math.max(1, raw.lastIndexOf("\r\n--") - start);
     if (size > MAX_UPLOAD_BYTES) {
-      throw new HttpError(400, "ATTACHMENT_TOO_LARGE", `File "${name}" exceeds the 10 MB size limit`);
+      throw new HttpError(413, "ATTACHMENT_TOO_LARGE", `File "${name}" exceeds the 10 MB size limit`);
     }
     const attachment: chat.Attachment = {
       id: nextId(ctx, "att", ctx.store.data.attachments.map((a) => a.id)),
@@ -337,7 +337,17 @@ function createConversationRouter(ctx: MockContext): Router {
     ctx.store.data.attachments.push(attachment);
     res.status(201).json({ attachment: toAttachmentDto(attachment) });
   };
-  const multipart = express.raw({ type: "multipart/form-data", limit: "12mb" });
+  const rawMultipart = express.raw({ type: "multipart/form-data", limit: "12mb" });
+  // A body over the parser's own limit is also "too large" (413), like the service.
+  const multipart: RequestHandler = (req, res, next) => {
+    rawMultipart(req, res, (err?: unknown) => {
+      if ((err as { type?: string } | undefined)?.type === "entity.too.large") {
+        next(new HttpError(413, "ATTACHMENT_TOO_LARGE", "The file exceeds the upload size limit"));
+        return;
+      }
+      next(err);
+    });
+  };
   router.post("/chats/:chatId/messages/:messageId/attachments", multipart, (req, res) => {
     upload(req, res, param(req, "messageId"));
   });
