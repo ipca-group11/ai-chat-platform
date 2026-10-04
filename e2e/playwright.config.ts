@@ -50,5 +50,41 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    // Visual regression (AICHAT-19). Own folder, so `chromium` never runs these specs and this
+    // project never runs the e2e specs. Serves the built apps itself and mocks every API call,
+    // so it needs no stack and no BASE_URL. Baselines are only valid from the Playwright Docker
+    // image (`pnpm --filter e2e visual`, see docs/AICHAT-19/RUNNING.md).
+    {
+      name: "visual",
+      testDir: "./src/visual",
+      // One browser at a time: the specs share four fixed ports.
+      fullyParallel: false,
+      retries: 0,
+      timeout: 30_000,
+      snapshotPathTemplate: "{testDir}/__screenshots__/{projectName}/{arg}{ext}",
+      expect: {
+        toHaveScreenshot: {
+          // Up to 1% of the pixels may differ (sub-pixel anti-aliasing); each pixel may differ a little.
+          maxDiffPixelRatio: 0.01,
+          threshold: 0.2,
+          animations: "disabled",
+          caret: "hide",
+          scale: "css",
+        },
+      },
+      use: {
+        ...devices["Desktop Chrome"],
+        // The shell, served by the spec itself.
+        baseURL: "http://localhost:5000",
+        viewport: { width: 1280, height: 800 },
+        deviceScaleFactor: 1,
+        locale: "en-GB",
+        timezoneId: "UTC",
+        colorScheme: "light",
+        screenshot: "off",
+        video: "off",
+        trace: "off",
+      },
+    },
   ],
 });
