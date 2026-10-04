@@ -47,6 +47,9 @@ success.
 - The inactive-account retention job uses the same flow, so it also erases the chats of the accounts it removes.
 - Without `INTERNAL_SERVICE_TOKEN` (or the conversation-service URL) `DELETE /auth/me` answers `503` and deletes
   nothing: a partial deletion is never done silently.
+- The browser cannot reach the endpoint: the shell's `/api` proxy (`apps/shell/vite.config.ts`) and Caddy
+  (`deploy/azure/Caddyfile`) answer `404` for `/api/internal*` (AICHAT-248), so the token is a second line of defence,
+  not the only one.
 
 **Telemetry.** Log lines carry no user id; minimisation (AICHAT-32) plus the 7-day Loki retention is the erasure
 mechanism for them. The config test keeps the 7 days from being removed or raised.

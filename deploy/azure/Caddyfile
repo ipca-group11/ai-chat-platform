@@ -63,9 +63,10 @@
 	import security
 	import access_log
 	# Routes of the services that browsers must never reach through the shell's /api proxy:
-	# Prometheus scrapes /metrics inside the compose network (AICHAT-229). Caddy's path
-	# matcher ignores case, like Express's router.
-	@private path /api/metrics*
+	# Prometheus scrapes /metrics inside the compose network (AICHAT-229), and /internal is
+	# the service-to-service API (account erasure) that auth-service calls directly
+	# (AICHAT-248). Caddy's path matcher ignores case, like Express's router.
+	@private path /api/metrics* /api/internal /api/internal/*
 	handle @private {
 		respond 404
 	}

@@ -8,11 +8,12 @@ import moduleFederationConfig from './module-federation.config';
 
 /**
  * conversation-service routes the `/api` proxy must not forward: its Prometheus metrics
- * (AICHAT-229). Compared on the decoded, lower-cased path with repeated slashes merged,
+ * (AICHAT-229) and the service-to-service `/internal` API that only auth-service calls
+ * (AICHAT-248). Compared on the decoded, lower-cased path with repeated slashes merged,
  * because Express matches routes case-insensitively. deploy/azure/Caddyfile blocks the
  * same paths in production.
  */
-const privateApiPaths = [/^\/api\/metrics/];
+const privateApiPaths = [/^\/api\/metrics/, /^\/api\/internal(\/|$)/];
 
 export function isPrivateApiPath(url: string): boolean {
   let path = url.split(/[?#]/)[0] ?? '';

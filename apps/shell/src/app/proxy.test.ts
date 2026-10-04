@@ -22,7 +22,18 @@ describe('shell /api proxy keeps service-only routes private', () => {
     },
   );
 
-  it.each(['/api/chats', '/api/chats/1/messages?after=2', '/api/models'])('forwards %s', (url) => {
+  it.each([
+    '/api/internal',
+    '/api/internal/erasures',
+    '/api/internal/erasures?x=1',
+    '/api/Internal/Erasures',
+    '/api//internal/erasures',
+    '/api/%69nternal/erasures',
+  ])('rejects %s (AICHAT-248)', (url) => {
+    for (const proxy of apiProxies) expect(forwards(proxy, url)).toBe(false);
+  });
+
+  it.each(['/api/chats', '/api/chats/1/messages?after=2', '/api/models', '/api/internalize'])('forwards %s', (url) => {
     for (const proxy of apiProxies) expect(forwards(proxy, url)).toBe(true);
   });
 

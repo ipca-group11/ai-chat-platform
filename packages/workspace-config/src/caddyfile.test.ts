@@ -30,6 +30,10 @@ describe("deploy/azure/Caddyfile keeps service-only routes private", () => {
     expect(privatePaths).toContain("/api/metrics*");
   });
 
+  it("answers 404 for /api/internal and everything under it (AICHAT-248)", () => {
+    expect(privatePaths).toEqual(expect.arrayContaining(["/api/internal", "/api/internal/*"]));
+  });
+
   it("handles the private paths before any proxy", () => {
     expect(block(site, "handle @private {").trim()).toBe("respond 404");
     expect(site.indexOf("handle @private")).toBeLessThan(site.indexOf("reverse_proxy"));
