@@ -34,4 +34,28 @@ describe("createFileSystemStorage", () => {
 
     expect(storagePath.startsWith(nested)).toBe(true);
   });
+
+  it("AICHAT-97: delete removes a saved file", async () => {
+    const storage = createFileSystemStorage(dir);
+    const storagePath = await storage.save(Buffer.from("x"), ".txt");
+
+    await storage.delete(storagePath);
+
+    await expect(storage.read(storagePath)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it("AICHAT-97: delete is idempotent, a missing file is not an error", async () => {
+    const storage = createFileSystemStorage(dir);
+    const storagePath = await storage.save(Buffer.from("x"), ".txt");
+
+    await storage.delete(storagePath);
+    await expect(storage.delete(storagePath)).resolves.toBeUndefined();
+  });
+
+  it("AICHAT-97: delete refuses a path outside the upload directory", async () => {
+    const storage = createFileSystemStorage(dir);
+    const outside = path.join(dir, "..", "outside.txt");
+
+    await expect(storage.delete(outside)).rejects.toThrow("outside the upload directory");
+  });
 });

@@ -7,6 +7,7 @@ export {
   type AttachmentsRepository,
   type UploadFile,
 } from "./service.js";
+export { createFileCleanup, type FileCleanup } from "./file-cleanup.js";
 export { createFileSystemStorage, type AttachmentStorage } from "./storage.js";
 export { createAttachmentAwareContextBuilder } from "./llm-context.js";
 export { ALLOWED_TYPES, validateAttachment } from "./validators.js";

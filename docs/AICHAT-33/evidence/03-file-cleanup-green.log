@@ -1,0 +1,12 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/file-cleanup.spec.ts src/features/attachments
+
+ RUN  v5.0.1 /Users/truezone/Projects/ai-chat-platform/services/conversation-service
+
+
+ Test Files  11 passed (11)
+      Tests  47 passed (47)
+   Start at  07:05:17
+   Duration  524ms (import 45%, transform 34%, tests 11%, worker 8%, setup 1%)
+
+
+[exit 0]

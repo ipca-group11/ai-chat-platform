@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 
@@ -8,6 +8,8 @@ import path from "node:path";
 export interface AttachmentStorage {
   save(buffer: Buffer, extension: string): Promise<string>;
   read(storagePath: string): Promise<Buffer>;
+  /** Removes a stored file. A file that is already gone is not an error (the call is idempotent). */
+  delete(storagePath: string): Promise<void>;
 }
 
 export function createFileSystemStorage(uploadDir: string): AttachmentStorage {
@@ -21,6 +23,19 @@ export function createFileSystemStorage(uploadDir: string): AttachmentStorage {
     },
     async read(storagePath) {
       return readFile(storagePath);
+    },
+    async delete(storagePath) {
+      // Only files inside the upload directory are ever removed, whatever a database row says.
+      const root = path.resolve(uploadDir);
+      const target = path.resolve(storagePath);
+      if (!target.startsWith(root + path.sep)) {
+        throw new Error("Refusing to delete a file outside the upload directory");
+      }
+      try {
+        await unlink(target);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      }
     },
   };
 }

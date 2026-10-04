@@ -16,6 +16,10 @@ export class FakeStorage implements AttachmentStorage {
     return buffer;
   }
 
+  async delete(storagePath: string): Promise<void> {
+    this.files.delete(storagePath);
+  }
+
   /** Test helper: is a file still stored? */
   has(storagePath: string): boolean {
     return this.files.has(storagePath);
