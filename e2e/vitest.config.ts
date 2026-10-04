@@ -8,12 +8,12 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     environment: "node",
-    include: ["src/fixtures/**/*.spec.ts", "src/a11y/**/*.spec.ts", "src/ci/**/*.spec.ts"],
+    include: ["src/fixtures/**/*.spec.ts", "src/a11y/**/*.spec.ts", "src/ci/**/*.spec.ts", "src/visual/lib/**/*.spec.ts"],
     coverage: coveragePreset({
       thresholds: e2eCoverageThresholds,
       // The Playwright flow helpers are unit-tested against a recording fake page (src/test-utils);
       // the specs under src/tests are Playwright specs and run through the `e2e` target.
-      include: ["src/fixtures/**/*.ts", "src/a11y/axe-helper.ts"],
+      include: ["src/fixtures/**/*.ts", "src/a11y/axe-helper.ts", "src/visual/lib/**/*.ts"],
       exclude: ["**/*.spec.ts"],
     }),
   },
