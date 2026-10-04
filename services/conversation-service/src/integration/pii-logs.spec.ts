@@ -77,6 +77,19 @@ describe("conversation-service logs carry no PII", () => {
     expectNoPii(t.logs);
   });
 
+  it("stay clean when a database error echoes the message content (AICHAT-234)", async () => {
+    // Prisma prints the failed query with its values, the message text included.
+    const error = Object.assign(new Error(`Invalid \`prisma.chat.findMany()\` invocation: { title: "${BODY_TEXT}" }`), {
+      name: "PrismaClientValidationError",
+      clientVersion: "6.1.0",
+    });
+    const t = capturedApp({ overrides: { chatsRepo: throwingRepository<ChatsRepository>(error) } });
+    const res = await request(t.app).get("/chats").set("Cookie", cookieFor("user-1"));
+    expect(res.status).toBe(500);
+    expect(t.logs.lines().join("\n")).toContain("Invalid database query");
+    expectNoPii(t.logs);
+  });
+
   it("stay clean when an unexpected error mentions an email and an address", async () => {
     const error = new Error(`insert failed for ${GUEST_EMAIL} from ${CLIENT_IP}`);
     const t = capturedApp({ overrides: { chatsRepo: throwingRepository<ChatsRepository>(error) } });

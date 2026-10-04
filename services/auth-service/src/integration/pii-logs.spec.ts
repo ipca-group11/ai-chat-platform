@@ -58,6 +58,19 @@ describe("auth-service logs carry no PII", () => {
     expectNoPii(logs);
   });
 
+  it("stay clean when a database error echoes a value that is not an email or an address (AICHAT-234)", async () => {
+    const error = Object.assign(new Error(`Unique constraint failed on the fields: (\`email\`) value ${CANARY}`), {
+      name: "PrismaClientKnownRequestError",
+      code: "P2002",
+      clientVersion: "6.1.0",
+    });
+    const { app, logs } = capturedApp(throwingPrisma(error));
+    const res = await request(app).post("/auth/login").send({ email: EMAIL, password: PASSWORD });
+    expect(res.status).toBe(500);
+    expect(logs.lines().join("\n")).toContain("Database request failed (P2002: unique constraint failed)");
+    expectNoPii(logs);
+  });
+
   it("stay clean when an unexpected error mentions an email", async () => {
     const error = new Error(`Unique constraint failed on email ${EMAIL} (${CLIENT_IP})`);
     const { app, logs } = capturedApp(throwingPrisma(error));
