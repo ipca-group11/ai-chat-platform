@@ -23,6 +23,19 @@ const shell = block(site, "handle {");
 const remote = block(caddyfile, "(remote) {");
 const security = block(caddyfile, "(security) {");
 
+describe("deploy/azure/Caddyfile keeps service-only routes private", () => {
+  const privatePaths = site.match(/^\s*@private path (.+)$/m)?.[1]?.split(/\s+/) ?? [];
+
+  it("answers 404 for /api/metrics* (AICHAT-229)", () => {
+    expect(privatePaths).toContain("/api/metrics*");
+  });
+
+  it("handles the private paths before any proxy", () => {
+    expect(block(site, "handle @private {").trim()).toBe("respond 404");
+    expect(site.indexOf("handle @private")).toBeLessThan(site.indexOf("reverse_proxy"));
+  });
+});
+
 describe("deploy/azure/Caddyfile security headers (AICHAT-228)", () => {
   it.each([
     ["Strict-Transport-Security", /"max-age=\d+/],

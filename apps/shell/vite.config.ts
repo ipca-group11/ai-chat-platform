@@ -6,6 +6,30 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { federation } from '@module-federation/vite';
 import moduleFederationConfig from './module-federation.config';
 
+/**
+ * conversation-service routes the `/api` proxy must not forward: its Prometheus metrics
+ * (AICHAT-229). Compared on the decoded, lower-cased path with repeated slashes merged,
+ * because Express matches routes case-insensitively. deploy/azure/Caddyfile blocks the
+ * same paths in production.
+ */
+const privateApiPaths = [/^\/api\/metrics/];
+
+export function isPrivateApiPath(url: string): boolean {
+  let path = url.split(/[?#]/)[0] ?? '';
+  try {
+    path = decodeURIComponent(path);
+  } catch {
+    return true;
+  }
+  path = path.replace(/\/{2,}/g, '/').toLowerCase();
+  return privateApiPaths.some((pattern) => pattern.test(path));
+}
+
+/** Vite's proxy answers 404 instead of forwarding when `bypass` returns `false`. */
+export function blockPrivateApiPaths(req: { url?: string }): false | undefined {
+  return isPrivateApiPath(req.url ?? '') ? false : undefined;
+}
+
 export default defineConfig({
   cacheDir: '../../node_modules/.vite/apps/shell',
   server: {
@@ -22,6 +46,7 @@ export default defineConfig({
         target: process.env.CONVERSATION_SERVICE_URL ?? 'http://localhost:4002',
         changeOrigin: true,
         rewrite: (proxyPath: string) => proxyPath.replace(/^\/api/, ''),
+        bypass: blockPrivateApiPaths,
       },
     },
   },
@@ -46,6 +71,7 @@ export default defineConfig({
         target: process.env.CONVERSATION_SERVICE_URL ?? 'http://conversation-service:4002',
         changeOrigin: true,
         rewrite: (proxyPath: string) => proxyPath.replace(/^\/api/, ''),
+        bypass: blockPrivateApiPaths,
       },
     },
   },

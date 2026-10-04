@@ -30,6 +30,13 @@
 {$DOMAIN} {
 	encode gzip
 	import security
+	# Routes of the services that browsers must never reach through the shell's /api proxy:
+	# Prometheus scrapes /metrics inside the compose network (AICHAT-229). Caddy's path
+	# matcher ignores case, like Express's router.
+	@private path /api/metrics*
+	handle @private {
+		respond 404
+	}
 	# Grafana serves itself under /grafana (GF_SERVER_SERVE_FROM_SUB_PATH), so the prefix
 	# is passed through unchanged.
 	handle /grafana* {
