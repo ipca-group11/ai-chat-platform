@@ -11,8 +11,8 @@ title: "AICHAT-33 · GDPR retention and deletion testing: work log"
 | Owner | Jean-Pierre Carvalho |
 | Branch | `test/AICHAT-33-gdpr-retention-and-deletion-testing` |
 | Started / finished | 2026-10-04 / 2026-10-04 |
-| Pull requests | not opened yet |
-| Status | Done on the branch, pull request not opened yet |
+| Pull requests | [#26](https://github.com/ipca-group11/ai-chat-platform/pull/26) |
+| Status | Done, merged into `integration/testing-epics` |
 
 ## 1. DoR review
 
