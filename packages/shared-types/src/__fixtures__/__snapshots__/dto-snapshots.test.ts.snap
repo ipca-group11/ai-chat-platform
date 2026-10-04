@@ -3,6 +3,42 @@
 exports[`DTO snapshots > every SSE event, in the order of sseEventSchema 1`] = `
 [
   {
+    "message": {
+      "attachments": [
+        {
+          "createdAt": "<date>",
+          "filename": "notes.pdf",
+          "id": "<uuid>",
+          "kind": "pdf",
+          "messageId": "<uuid>",
+          "mimeType": "application/pdf",
+          "size": 20480,
+        },
+      ],
+      "authorEmail": "ana@example.com",
+      "authorId": "<uuid>",
+      "chatId": "<uuid>",
+      "content": "Summarise the attached notes.",
+      "createdAt": "<date>",
+      "error": null,
+      "id": "<uuid>",
+      "reasoning": null,
+      "role": "user",
+      "status": "sent",
+      "truncated": false,
+      "webFetches": [],
+    },
+    "type": "message",
+  },
+  {
+    "messageId": "<uuid>",
+    "type": "queued",
+  },
+  {
+    "messageId": "<uuid>",
+    "type": "started",
+  },
+  {
     "messageId": "<uuid>",
     "token": "Hel",
     "type": "token",
@@ -24,17 +60,14 @@ exports[`DTO snapshots > every SSE event, in the order of sseEventSchema 1`] = `
   },
   {
     "messageId": "<uuid>",
+    "truncated": true,
     "type": "done",
   },
   {
     "message": "provider timeout",
     "messageId": "<uuid>",
+    "retryable": true,
     "type": "error",
-  },
-  {
-    "messageId": "<uuid>",
-    "position": 2,
-    "type": "queued",
   },
 ]
 `;

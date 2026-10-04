@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { webFetchSchema } from "../stream-events";
 
 export const messageRoleSchema = z.enum(["user", "assistant"]);
 export type MessageRole = z.infer<typeof messageRoleSchema>;
@@ -14,15 +15,7 @@ export const messageStatusSchema = z.enum([
 export type MessageStatus = z.infer<typeof messageStatusSchema>;
 
 /** A page the model fetched while writing a reply (`fetching` only while streaming). */
-export const webFetchSchema = z.object({
-  id: z.string(),
-  url: z.string(),
-  status: z.enum(["fetching", "done", "error"]),
-  title: z.string().optional(),
-  /** Why the fetch failed, e.g. `url_not_accessible`. */
-  errorCode: z.string().optional(),
-});
-export type WebFetch = z.infer<typeof webFetchSchema>;
+export { webFetchSchema, type WebFetch } from "../stream-events";
 
 export const messageSchema = z.object({
   id: z.string(),

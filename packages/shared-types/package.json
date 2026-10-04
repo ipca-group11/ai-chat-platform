@@ -15,6 +15,10 @@
     "./model-capabilities": {
       "types": "./dist/model-capabilities.d.ts",
       "default": "./dist/model-capabilities.js"
+    },
+    "./stream-events": {
+      "types": "./dist/stream-events.d.ts",
+      "default": "./dist/stream-events.js"
     }
   },
   "dependencies": {

@@ -1,17 +1,16 @@
+import * as streamEvents from "@app/shared-types/stream-events";
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import {
+  attachmentDtoSchema,
   attachmentKindSchema,
   chatDtoSchema,
   chatMemberDtoSchema,
   messageDtoSchema,
   messageStatusSchema,
   providerSchema,
-  sseDoneEventSchema,
-  sseErrorEventSchema,
-  sseMessageEventSchema,
-  sseTokenEventSchema,
-  sseWebFetchEventSchema,
   webFetchDtoSchema,
+  type SseEvent,
 } from "./chat.js";
 
 const now = "2026-01-01T00:00:00.000Z";
@@ -78,31 +77,25 @@ describe("DTO schemas", () => {
   });
 });
 
-describe("SSE event schemas", () => {
-  it("discriminates on the literal type", () => {
-    expect(sseTokenEventSchema.safeParse({ type: "token", messageId: "m", token: "a" }).success).toBe(true);
-    expect(sseTokenEventSchema.safeParse({ type: "done", messageId: "m", token: "a" }).success).toBe(false);
+describe("stream events (AICHAT-221)", () => {
+  it("carry the same message, attachment and web fetch shapes as the service DTOs", () => {
+    expect(z.toJSONSchema(messageDtoSchema)).toEqual(z.toJSONSchema(streamEvents.messageDtoSchema));
+    expect(z.toJSONSchema(attachmentDtoSchema)).toEqual(z.toJSONSchema(streamEvents.attachmentDtoSchema));
+    expect(z.toJSONSchema(webFetchDtoSchema)).toEqual(z.toJSONSchema(streamEvents.webFetchSchema));
   });
 
-  it("allows done with or without stopped", () => {
-    expect(sseDoneEventSchema.safeParse({ type: "done", messageId: "m" }).success).toBe(true);
-    expect(sseDoneEventSchema.safeParse({ type: "done", messageId: "m", stopped: true }).success).toBe(true);
-  });
-
-  it("allows done with truncated (AICHAT-212)", () => {
-    expect(sseDoneEventSchema.safeParse({ type: "done", messageId: "m", truncated: true }).success).toBe(true);
-    expect(sseDoneEventSchema.safeParse({ type: "done", messageId: "m", truncated: "yes" }).success).toBe(false);
-  });
-
-  it("requires retryable on error events", () => {
-    expect(sseErrorEventSchema.safeParse({ type: "error", messageId: "m", message: "x" }).success).toBe(false);
-    expect(sseErrorEventSchema.safeParse({ type: "error", messageId: "m", message: "x", retryable: false }).success).toBe(true);
-  });
-
-  it("nests full DTOs in message and web_fetch events", () => {
-    expect(sseMessageEventSchema.safeParse({ type: "message", message }).success).toBe(true);
-    expect(
-      sseWebFetchEventSchema.safeParse({ type: "web_fetch", messageId: "m", fetch: { id: "f", url: "u", status: "fetching" } }).success,
-    ).toBe(true);
+  it("accept every event the service publishes", () => {
+    const events: SseEvent[] = [
+      { type: "message", message },
+      { type: "queued", messageId: "m" },
+      { type: "started", messageId: "m" },
+      { type: "token", messageId: "m", token: "a" },
+      { type: "reasoning", messageId: "m", token: "a" },
+      { type: "web_fetch", messageId: "m", fetch: { id: "f", url: "u", status: "fetching" } },
+      { type: "done", messageId: "m", stopped: true },
+      { type: "done", messageId: "m", truncated: true },
+      { type: "error", messageId: "m", message: "x", retryable: false },
+    ];
+    for (const event of events) expect(streamEvents.sseEventSchema.safeParse(event).success).toBe(true);
   });
 });

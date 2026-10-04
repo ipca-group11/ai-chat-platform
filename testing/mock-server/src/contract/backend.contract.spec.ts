@@ -229,16 +229,17 @@ const DRIFT: Record<string, Diff[]> = {
   error: [],
 };
 
-/** Stream events of the service that shared-types does not describe, or describes differently. */
+/** Stream events of the service that shared-types does not describe, or describes differently.
+ * Empty since AICHAT-221: shared-types describes the events the service sends. */
 const STREAM_DRIFT: Record<string, Diff[]> = {
-  message: ["type: invalid_union"],
-  queued: ["position: invalid_type"],
-  started: ["type: invalid_union"],
+  message: [],
+  queued: [],
+  started: [],
   token: [],
   reasoning: [],
   web_fetch: [],
   done: [],
-  error: ["extra retryable"],
+  error: [],
 };
 
 describe("backend mock responses", () => {

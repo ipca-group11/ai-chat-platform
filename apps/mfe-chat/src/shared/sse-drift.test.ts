@@ -1,23 +1,27 @@
 import { chat } from "@app/shared-types";
-import { describe, expect, it } from "vitest";
+import { SSE_EVENT_TYPES, type SseEvent } from "@app/shared-types/stream-events";
+import { FakeEventSource, installFakeEventSource } from "@platform/test-utils";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { subscribeToChatStream } from "./sse";
 import type { SSEEvent } from "./types";
 
 /**
- * Drift guard for the stream events (AICHAT-113, docs/AICHAT-20/SSE-DRIFT.md).
+ * Drift guard for the stream events (AICHAT-113, fixed in AICHAT-221; docs/AICHAT-20/SSE-DRIFT.md).
  *
- * mfe-chat declares its own `SSEEvent` (src/shared/types.ts) instead of using the
- * `SseEvent` of `@platform/shared-types`, and the two have drifted. This test pins the
- * drift as it is today. It fails when either definition changes, so nobody changes one
- * side without noticing. When the chat owner fixes the drift (mfe-chat imports the shared
- * type, or shared-types gets `message` and `started`), update the expectations below on
- * purpose and delete the part that no longer applies.
+ * mfe-chat no longer declares its own event type: `SSEEvent` is the `SseEvent` of
+ * `@app/shared-types/stream-events`, the module that describes what conversation-service sends
+ * (the service publishes the same type). This test fails when someone brings a local copy back,
+ * when the two exports of shared-types differ, or when the chat stops listening to an event.
  */
 
-type EventType = SSEEvent["type"];
-type FieldsOf<K extends EventType> = keyof Extract<SSEEvent, { type: K }>;
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
+const mfeChatUsesTheSharedType: Equal<SSEEvent, SseEvent> = true;
 
-/** Field names of every mfe-chat event. The type checks make a missing or unknown name a compile error. */
-const mfeChatFields = {
+type EventType = SseEvent["type"];
+type FieldsOf<K extends EventType> = keyof Extract<SseEvent, { type: K }>;
+
+/** Field names of every event. The type checks make a missing or unknown name a compile error. */
+const eventFields = {
   message: ["type", "message"],
   queued: ["type", "messageId"],
   started: ["type", "messageId"],
@@ -29,71 +33,38 @@ const mfeChatFields = {
 } as const satisfies { [K in EventType]: readonly FieldsOf<K>[] };
 
 type UnlistedFields = {
-  [K in EventType]: Exclude<FieldsOf<K>, (typeof mfeChatFields)[K][number]>;
+  [K in EventType]: Exclude<FieldsOf<K>, (typeof eventFields)[K][number]>;
 }[EventType];
-const everyMfeChatFieldIsListed: [UnlistedFields] extends [never] ? true : never = true;
+const everyFieldIsListed: [UnlistedFields] extends [never] ? true : never = true;
 
 function sharedTypesFields(): Record<string, string[]> {
-  const entries = chat.sseEventSchema.options.map((option) => [
-    option.shape.type.value as string,
-    Object.keys(option.shape),
-  ]);
+  const entries = chat.sseEventSchema.options.map((option) => [option.shape.type.value as string, Object.keys(option.shape)]);
   return Object.fromEntries(entries) as Record<string, string[]>;
 }
 
-function compare(mfe: Record<string, readonly string[]>, shared: Record<string, readonly string[]>) {
-  const onlyInMfeChat = Object.keys(mfe).filter((type) => !(type in shared));
-  const onlyInSharedTypes = Object.keys(shared).filter((type) => !(type in mfe));
-  const fieldDifferences: Record<string, { onlyInMfeChat: string[]; onlyInSharedTypes: string[] }> = {};
-  for (const type of Object.keys(mfe).filter((t) => t in shared)) {
-    const a = mfe[type] ?? [];
-    const b = shared[type] ?? [];
-    const diff = {
-      onlyInMfeChat: a.filter((field) => !b.includes(field)),
-      onlyInSharedTypes: b.filter((field) => !a.includes(field)),
-    };
-    if (diff.onlyInMfeChat.length > 0 || diff.onlyInSharedTypes.length > 0) {
-      fieldDifferences[type] = diff;
-    }
-  }
-  return { onlyInMfeChat, onlyInSharedTypes, fieldDifferences };
-}
-
-describe("SSE event drift between mfe-chat and shared-types", () => {
-  it("lists every field of the mfe-chat events", () => {
-    expect(everyMfeChatFieldIsListed).toBe(true);
+describe("SSE events of mfe-chat and shared-types", () => {
+  beforeEach(() => {
+    installFakeEventSource();
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
-  it("pins today's drift: event names and fields that differ", () => {
-    expect(compare(mfeChatFields, sharedTypesFields())).toMatchInlineSnapshot(`
-      {
-        "fieldDifferences": {
-          "done": {
-            "onlyInMfeChat": [
-              "stopped",
-              "truncated",
-            ],
-            "onlyInSharedTypes": [],
-          },
-          "error": {
-            "onlyInMfeChat": [
-              "retryable",
-            ],
-            "onlyInSharedTypes": [],
-          },
-          "queued": {
-            "onlyInMfeChat": [],
-            "onlyInSharedTypes": [
-              "position",
-            ],
-          },
-        },
-        "onlyInMfeChat": [
-          "message",
-          "started",
-        ],
-        "onlyInSharedTypes": [],
-      }
-    `);
+  it("uses the shared type, with every field listed", () => {
+    expect(mfeChatUsesTheSharedType).toBe(true);
+    expect(everyFieldIsListed).toBe(true);
+  });
+
+  it("has no drift: the event names and fields of shared-types are the ones the chat handles", () => {
+    expect(sharedTypesFields()).toEqual(Object.fromEntries(Object.entries(eventFields).map(([type, fields]) => [type, [...fields]])));
+    expect(Object.keys(eventFields)).toEqual([...SSE_EVENT_TYPES]);
+  });
+
+  it("listens to every event the service sends except queued (a refetch shows the queue)", () => {
+    const addListener = vi.spyOn(FakeEventSource.prototype, "addEventListener");
+    subscribeToChatStream("chat-1", { onToken: () => {}, onDone: () => {}, onError: () => {} });
+    const listened = addListener.mock.calls.map(([type]) => type);
+    expect(SSE_EVENT_TYPES.filter((type) => !listened.includes(type))).toEqual(["queued"]);
   });
 });

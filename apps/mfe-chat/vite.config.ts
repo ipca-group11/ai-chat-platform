@@ -20,6 +20,8 @@ export default defineConfig({
         dirname,
         "../../packages/shared-types/src/model-capabilities.ts",
       ),
+      // The stream event types of conversation-service (AICHAT-221), from source for the same reason.
+      "@app/shared-types/stream-events": path.resolve(dirname, "../../packages/shared-types/src/stream-events.ts"),
     },
   },
   // Dev port the shell expects for this remote (apps/shell/module-federation.config.ts).

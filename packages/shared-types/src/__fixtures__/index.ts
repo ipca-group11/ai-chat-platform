@@ -8,8 +8,10 @@ import { messageSchema } from "../chat/message";
 import {
   sseDoneEventSchema,
   sseErrorEventSchema,
+  sseMessageEventSchema,
   sseQueuedEventSchema,
   sseReasoningEventSchema,
+  sseStartedEventSchema,
   sseTokenEventSchema,
   sseWebFetchEventSchema,
 } from "../chat/sse";
@@ -99,6 +101,36 @@ export const fixtures = {
     extractedTextStatus: "extracted",
     createdAt: CREATED_AT,
   }),
+  sseMessage: fixture(sseMessageEventSchema, {
+    type: "message",
+    message: {
+      id: MESSAGE_ID,
+      chatId: CHAT_ID,
+      authorId: USER_ID,
+      authorEmail: "ana@example.com",
+      role: "user",
+      content: "Summarise the attached notes.",
+      reasoning: null,
+      webFetches: [],
+      attachments: [
+        {
+          id: ATTACHMENT_ID,
+          messageId: MESSAGE_ID,
+          filename: "notes.pdf",
+          mimeType: "application/pdf",
+          size: 20480,
+          kind: "pdf",
+          createdAt: CREATED_AT,
+        },
+      ],
+      status: "sent",
+      error: null,
+      truncated: false,
+      createdAt: CREATED_AT,
+    },
+  }),
+  sseQueued: fixture(sseQueuedEventSchema, { type: "queued", messageId: MESSAGE_ID }),
+  sseStarted: fixture(sseStartedEventSchema, { type: "started", messageId: MESSAGE_ID }),
   sseToken: fixture(sseTokenEventSchema, { type: "token", messageId: MESSAGE_ID, token: "Hel" }),
   sseReasoning: fixture(sseReasoningEventSchema, {
     type: "reasoning",
@@ -110,13 +142,13 @@ export const fixtures = {
     messageId: MESSAGE_ID,
     fetch: webFetch,
   }),
-  sseDone: fixture(sseDoneEventSchema, { type: "done", messageId: MESSAGE_ID }),
+  sseDone: fixture(sseDoneEventSchema, { type: "done", messageId: MESSAGE_ID, truncated: true }),
   sseError: fixture(sseErrorEventSchema, {
     type: "error",
     messageId: MESSAGE_ID,
     message: "provider timeout",
+    retryable: true,
   }),
-  sseQueued: fixture(sseQueuedEventSchema, { type: "queued", messageId: MESSAGE_ID, position: 2 }),
   errorResponse: fixture(
     errorResponseSchema,
     toErrorResponse("VALIDATION_ERROR", "Request validation failed", {

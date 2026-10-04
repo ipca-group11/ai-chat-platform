@@ -91,71 +91,18 @@ export const chatMemberDtoSchema = z.object({
 export type ChatMemberDto = z.infer<typeof chatMemberDtoSchema>;
 
 // --- SSE event payloads (GET /chats/:id/stream) -------------------------------------
-export const sseTokenEventSchema = z.object({
-  type: z.literal("token"),
-  messageId: z.string(),
-  token: z.string(),
-});
-export type SseTokenEvent = z.infer<typeof sseTokenEventSchema>;
-
-/** A piece of the model's reasoning, streamed before (or between) the answer tokens. */
-export const sseReasoningEventSchema = z.object({
-  type: z.literal("reasoning"),
-  messageId: z.string(),
-  token: z.string(),
-});
-export type SseReasoningEvent = z.infer<typeof sseReasoningEventSchema>;
-
-/** The model started fetching a page, or a fetch finished (same `fetch.id`). */
-export const sseWebFetchEventSchema = z.object({
-  type: z.literal("web_fetch"),
-  messageId: z.string(),
-  fetch: webFetchDtoSchema,
-});
-export type SseWebFetchEvent = z.infer<typeof sseWebFetchEventSchema>;
-
-export const sseQueuedEventSchema = z.object({
-  type: z.literal("queued"),
-  messageId: z.string(),
-});
-export type SseQueuedEvent = z.infer<typeof sseQueuedEventSchema>;
-
-export const sseStartedEventSchema = z.object({
-  type: z.literal("started"),
-  messageId: z.string(),
-});
-export type SseStartedEvent = z.infer<typeof sseStartedEventSchema>;
-
-export const sseDoneEventSchema = z.object({
-  type: z.literal("done"),
-  messageId: z.string(),
-  stopped: z.boolean().optional(),
-  /** The model stopped at its output token limit; the saved answer is cut off (AICHAT-212). */
-  truncated: z.boolean().optional(),
-});
-export type SseDoneEvent = z.infer<typeof sseDoneEventSchema>;
-
-export const sseErrorEventSchema = z.object({
-  type: z.literal("error"),
-  messageId: z.string(),
-  message: z.string(),
-  retryable: z.boolean(),
-});
-export type SseErrorEvent = z.infer<typeof sseErrorEventSchema>;
-
-/** A user message was posted, so every member viewing the chat sees it live. */
-export const sseMessageEventSchema = z.object({
-  type: z.literal("message"),
-  message: messageDtoSchema,
-});
-export type SseMessageEvent = z.infer<typeof sseMessageEventSchema>;
-
-export type SseEvent =
-  | SseMessageEvent
-  | SseTokenEvent
-  | SseReasoningEvent
-  | SseWebFetchEvent
-  | SseQueuedEvent
-  | SseStartedEvent
-  | SseDoneEvent
-  | SseErrorEvent;
+// The stream events are defined once, in `@app/shared-types/stream-events` (AICHAT-221), and
+// imported as types only: the runtime image does not ship the package's own dependencies.
+// `chat.spec.ts` checks that the DTO schemas above match the ones the events carry.
+export type {
+  SseEvent,
+  SseEventType,
+  SseMessageEvent,
+  SseQueuedEvent,
+  SseStartedEvent,
+  SseTokenEvent,
+  SseReasoningEvent,
+  SseWebFetchEvent,
+  SseDoneEvent,
+  SseErrorEvent,
+} from "@app/shared-types/stream-events";

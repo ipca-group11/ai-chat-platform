@@ -126,12 +126,14 @@ describe("DTO snapshots", () => {
 
   it("every SSE event, in the order of sseEventSchema", () => {
     const events = [
+      fixtures.sseMessage,
+      fixtures.sseQueued,
+      fixtures.sseStarted,
       fixtures.sseToken,
       fixtures.sseReasoning,
       fixtures.sseWebFetch,
       fixtures.sseDone,
       fixtures.sseError,
-      fixtures.sseQueued,
     ].map(({ schema, input }) => schema.parse(input));
     expect(events).toMatchSnapshot();
   });

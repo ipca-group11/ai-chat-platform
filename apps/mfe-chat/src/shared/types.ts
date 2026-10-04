@@ -11,6 +11,8 @@
 
 // The model catalogue lives in packages/shared-types, shared with conversation-service (AICHAT-133).
 import { PROVIDER_MODELS, PROVIDERS, type Provider } from "@app/shared-types/model-capabilities";
+// The stream events of conversation-service live in packages/shared-types too (AICHAT-221).
+import type { SseEvent, WebFetch as SharedWebFetch } from "@app/shared-types/stream-events";
 
 export { PROVIDER_MODELS, PROVIDERS };
 export type { Provider };
@@ -31,7 +33,8 @@ export interface Chat {
   updatedAt: string;
 }
 
-export type MessageRole = "user" | "assistant";
+/** `system` only appears when the service stores a system message; the chat shows user and assistant turns. */
+export type MessageRole = "user" | "assistant" | "system";
 
 /**
  * `sent`: persisted, not queued/streaming (user messages land here immediately;
@@ -64,16 +67,9 @@ export interface Message {
   createdAt: string;
 }
 
-/** A page the model fetched while writing a reply (conversation-service `WebFetchDto`).
+/** A page the model fetched while writing a reply (`@app/shared-types/stream-events`).
  * `fetching` only while the reply streams; saved replies hold `done` or `error`. */
-export interface WebFetch {
-  id: string;
-  url: string;
-  status: "fetching" | "done" | "error";
-  title?: string;
-  /** Why the fetch failed, e.g. `url_not_accessible`. */
-  errorCode?: string;
-}
+export type WebFetch = SharedWebFetch;
 
 export type ChatMemberRole = "owner" | "member";
 
@@ -96,17 +92,9 @@ export interface Attachment {
   kind: AttachmentKind;
 }
 
-/** Events on `GET /chats/:id/stream`, as published by conversation-service
- * (services/conversation-service/src/shared/contracts/chat.ts `SseEvent`). */
-export type SSEEvent =
-  | { type: "message"; message: Message }
-  | { type: "queued"; messageId: string }
-  | { type: "started"; messageId: string }
-  | { type: "token"; messageId: string; token: string }
-  | { type: "reasoning"; messageId: string; token: string }
-  | { type: "web_fetch"; messageId: string; fetch: WebFetch }
-  | { type: "done"; messageId: string; stopped?: boolean; truncated?: boolean }
-  | { type: "error"; messageId: string; message: string; retryable: boolean };
+/** Events on `GET /chats/:id/stream`, as published by conversation-service. The type is the
+ * one of `@app/shared-types/stream-events` (AICHAT-221); no local copy, so it cannot drift. */
+export type SSEEvent = SseEvent;
 
 /** `X-Correlation-Id` per docs/STACK.md decision #8 (defined by `platform`, reused here). */
 export const CORRELATION_HEADER = "X-Correlation-Id";
