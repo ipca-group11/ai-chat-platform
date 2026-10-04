@@ -3,7 +3,7 @@
  * the full-app suite). Supports the calls the service makes: `user.findUnique` (by email
  * or id), `user.create` and `refreshToken.findUnique/create/update`. No database.
  */
-import bcrypt from "bcrypt";
+import { hashPassword } from "../shared/password.js";
 import type { PrismaClient } from "../generated/prisma-client/index.js";
 import { vi } from "vitest";
 
@@ -29,7 +29,7 @@ export async function makeUser(email: string, password: string): Promise<FakeUse
   return {
     id: `user-${email}`,
     email,
-    passwordHash: await bcrypt.hash(password, 4),
+    passwordHash: await hashPassword(password),
     createdAt: new Date(),
     lastActiveAt: new Date(),
   };

@@ -6,12 +6,10 @@
  * password with bcrypt before persisting. The plaintext password is never logged or
  * returned.
  */
-import bcrypt from "bcrypt";
 import type { PrismaClient } from "../../generated/prisma-client/index.js";
 import type { auth } from "../../shared/contracts/index.js";
 import { HttpError } from "../../shared/error-middleware.js";
-
-const BCRYPT_SALT_ROUNDS = 12;
+import { hashPassword } from "../../shared/password.js";
 
 export interface RegisteredUser {
   id: string;
@@ -33,7 +31,7 @@ export async function registerUser(
     );
   }
 
-  const passwordHash = await bcrypt.hash(input.password, BCRYPT_SALT_ROUNDS);
+  const passwordHash = await hashPassword(input.password);
 
   const user = await prisma.user.create({
     data: { email: input.email, passwordHash },

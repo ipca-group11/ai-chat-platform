@@ -10,12 +10,12 @@
  * token is rejected even though it was once valid.
  */
 import { randomBytes, createHash } from "node:crypto";
-import bcrypt from "bcrypt";
 import type { PrismaClient } from "../../generated/prisma-client/index.js";
 import { auth } from "../../shared/contracts/index.js";
 import { env } from "../../shared/env.js";
 import { HttpError } from "../../shared/error-middleware.js";
 import { signAccessToken } from "../../shared/jwt.js";
+import { burnPasswordCheck, verifyPassword } from "../../shared/password.js";
 
 const REFRESH_TOKEN_BYTES = 64;
 
@@ -47,15 +47,13 @@ export async function verifyCredentials(
 
   const user = await prisma.user.findUnique({ where: { email: input.email } });
   if (!user) {
-    // Still hash a dummy value so unknown-email and wrong-password requests take a
+    // Still run a bcrypt compare so unknown-email and wrong-password requests take a
     // comparable amount of time (defense against email-enumeration by timing).
-    // Dummy hash for constant-time compare, not a credential (WAIVERS.md W3)
-    // nosemgrep: detected-bcrypt-hash
-    await bcrypt.compare(input.password, "$2b$12$CwTycUXWue0Thq9StjUM0uJ8i6C6/EF9j5sMz6E7L2X4Y0h4h4h4u");
+    await burnPasswordCheck(input.password);
     throw invalidCredentials();
   }
 
-  const valid = await bcrypt.compare(input.password, user.passwordHash);
+  const valid = await verifyPassword(input.password, user.passwordHash);
   if (!valid) {
     throw invalidCredentials();
   }

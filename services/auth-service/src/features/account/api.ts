@@ -1,11 +1,11 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
-import bcrypt from "bcrypt";
 import type { PrismaClient } from "../../generated/prisma-client/index.js";
 import { auth } from "../../shared/contracts/index.js";
 import { env } from "../../shared/env.js";
 import type { ErasureClient } from "../../shared/erasure-client.js";
 import { HttpError } from "../../shared/error-middleware.js";
+import { verifyPassword } from "../../shared/password.js";
 import { clearAuthCookies, requireAuth } from "../session/index.js";
 import { deleteAccount } from "./model.js";
 
@@ -48,7 +48,7 @@ export function createAccountRouter(prisma: PrismaClient, options: AccountRouter
 
       if (user) {
         // Asked again, so a stolen session cannot erase the account.
-        if (!(await bcrypt.compare(password, user.passwordHash))) {
+        if (!(await verifyPassword(password, user.passwordHash))) {
           throw new HttpError(401, "INVALID_CREDENTIALS", "Invalid password");
         }
         await runDeletion(() => deleteAccount(prisma, options.erasure as ErasureClient, user));

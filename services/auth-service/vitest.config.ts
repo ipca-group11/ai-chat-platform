@@ -4,8 +4,6 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     environment: "node",
-    // bcrypt at the real cost is slow when several projects test at once (nx --parallel).
-    testTimeout: 20_000,
     include: ["src/**/*.spec.ts"],
     exclude: ["src/**/*.db.spec.ts", "node_modules/**"],
     snapshotSerializers: [snapshotSerializerPath],

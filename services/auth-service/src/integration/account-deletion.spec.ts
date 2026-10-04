@@ -21,8 +21,7 @@ function fakeErasure() {
 
 async function signedIn(options: Parameters<typeof buildTestApp>[1] = {}) {
   const t = buildTestApp(undefined, options);
-  // Seeded directly (a cheap password hash) instead of through register and login: bcrypt at the real cost
-  // would make these tests slow when the machine is busy.
+  // Seeded directly instead of through register and login, so each test only exercises the deletion.
   const user = await makeUser("ana@example.com", PASSWORD);
   t.prisma.__addUser(user);
   const tokens = await issueTokens(t.prisma, user);
