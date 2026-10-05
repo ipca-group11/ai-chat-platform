@@ -39,7 +39,7 @@ export function ChatList({
   return (
     <nav aria-label="Chats" className="flex h-full min-h-0 flex-col">
       <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
-        <h2 className="text-sm font-semibold tracking-tight">Chats</h2>
+        <h2 data-testid="chats-heading" className="text-sm font-semibold tracking-tight">Chats</h2>
         <Button
           type="button"
           size="sm"

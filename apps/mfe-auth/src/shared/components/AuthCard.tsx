@@ -25,7 +25,7 @@ export function AuthCard({ title, description, children, switchPrompt, switchLab
     <div className="flex flex-1 items-start justify-center px-4 py-12 sm:py-20">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle data-testid="auth-card-title">{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent>{children}</CardContent>
