@@ -57,8 +57,9 @@ export function RegisterForm() {
       switchTo="/login"
     >
       <form aria-label="Registration form" className="grid gap-4" noValidate onSubmit={handleSubmit}>
-        <FormField label="Email" error={fieldErrors.email}>
+        <FormField label="Email" error={fieldErrors.email} errorTestId="email-error">
           <Input
+            data-testid="email"
             autoComplete="email"
             name="email"
             onChange={(event) => setEmail(event.target.value)}
@@ -72,8 +73,10 @@ export function RegisterForm() {
           label="Password"
           description="At least 8 characters, including a letter and a number."
           error={fieldErrors.password}
+          errorTestId="password-error"
         >
           <Input
+            data-testid="password"
             autoComplete="new-password"
             name="password"
             onChange={(event) => setPassword(event.target.value)}
@@ -83,12 +86,12 @@ export function RegisterForm() {
         </FormField>
 
         {serverErrorMessage ? (
-          <Alert variant="destructive">
+          <Alert variant="destructive" data-testid="register-error">
             <AlertDescription>{serverErrorMessage}</AlertDescription>
           </Alert>
         ) : null}
 
-        <Button className="w-full" loading={isPending} type="submit">
+        <Button className="w-full" data-testid="create-account" loading={isPending} type="submit">
           {isPending ? "Creating account…" : "Create account"}
         </Button>
       </form>

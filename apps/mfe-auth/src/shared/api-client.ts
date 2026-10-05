@@ -78,6 +78,10 @@ async function extractErrorMessage(response: Response): Promise<string> {
     if (data && typeof data.message === "string") {
       return data.message;
     }
+    // auth-service's error envelope: `{ error: { code, message, fieldErrors } }`.
+    if (data && typeof data.error?.message === "string") {
+      return data.error.message;
+    }
   } catch {
     // Body wasn't JSON (or was empty); fall through to the status text.
   }
