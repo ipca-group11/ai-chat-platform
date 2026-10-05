@@ -18,9 +18,9 @@ export function MessageError({ message, onRetry, retrying }: MessageErrorProps) 
   return (
     <Alert variant="destructive" data-testid={`message-error-${message.id}`}>
       <CircleAlert />
-      <AlertTitle>Response failed</AlertTitle>
+      <AlertTitle data-testid="message-error-title">Response failed</AlertTitle>
       <AlertDescription>
-        <p>{message.error || "The provider could not complete this response."}</p>
+        <p data-testid="message-error-text">{message.error || "The provider could not complete this response."}</p>
         <Button type="button" variant="outline" size="sm" className="mt-1" onClick={() => onRetry(message.id)} loading={retrying}>
           {retrying ? null : <RotateCw aria-hidden="true" />}
           Retry

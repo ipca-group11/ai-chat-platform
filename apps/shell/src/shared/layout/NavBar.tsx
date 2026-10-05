@@ -37,6 +37,7 @@ export function NavBar({ userEmail, onLogout }: NavBarProps) {
             <nav aria-label="Main" className="flex items-center gap-1">
               <Link
                 to="/chats"
+                data-testid="nav-chats"
                 className={navLinkClassName}
                 activeProps={activeLinkProps}
                 inactiveProps={inactiveLinkProps}
@@ -45,6 +46,7 @@ export function NavBar({ userEmail, onLogout }: NavBarProps) {
               </Link>
               <Link
                 to="/settings"
+                data-testid="nav-settings"
                 className={navLinkClassName}
                 activeProps={activeLinkProps}
                 inactiveProps={inactiveLinkProps}
@@ -55,7 +57,7 @@ export function NavBar({ userEmail, onLogout }: NavBarProps) {
 
             <div className="ml-auto flex items-center gap-2 sm:gap-3">
               <span className="hidden text-sm text-muted-foreground sm:inline">{userEmail}</span>
-              <Button variant="outline" size="sm" onClick={onLogout}>
+              <Button variant="outline" size="sm" data-testid="log-out" onClick={onLogout}>
                 <LogOut aria-hidden="true" />
                 Log out
               </Button>

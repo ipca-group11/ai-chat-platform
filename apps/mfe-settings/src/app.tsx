@@ -14,7 +14,7 @@ export default function App() {
   return (
     <section aria-label="LLM provider API keys" className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
       <header className="space-y-2">
-        <H1 className="text-3xl lg:text-3xl font-bold">LLM Provider API Keys</H1>
+        <H1 data-testid="settings-heading" className="text-3xl lg:text-3xl font-bold">LLM Provider API Keys</H1>
         <div className="typeset typeset-page max-w-2xl text-muted-foreground">
           <p>
             Configure the API key each LLM provider needs before you can chat with it. Keys

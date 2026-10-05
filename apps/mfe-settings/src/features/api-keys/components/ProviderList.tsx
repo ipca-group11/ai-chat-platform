@@ -35,16 +35,16 @@ export function ProviderList() {
   }
 
   return (
-    <div aria-label="Provider list" className="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div aria-label="Provider list" data-testid="provider-list" className="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
       {providers.map(({ provider, requiresKey, record, usableThisSession }) => {
         const label = providerLabel(provider);
         return (
-          <Card key={provider}>
+          <Card key={provider} data-testid={`provider-card-${provider}`}>
             <CardHeader>
               <div className="flex items-center justify-between gap-2">
-                <CardTitle className="text-lg">{label}</CardTitle>
+                <CardTitle data-testid="provider-name" className="text-lg">{label}</CardTitle>
                 {requiresKey ? (
-                  <Badge variant={usableThisSession ? "success" : "outline"}>
+                  <Badge data-testid="provider-badge" variant={usableThisSession ? "success" : "outline"}>
                     {usableThisSession ? "Configured" : record ? "Re-enter key" : "Not configured"}
                   </Badge>
                 ) : (
@@ -61,7 +61,7 @@ export function ProviderList() {
               <CardContent className="space-y-4">
                 <MaskedKeyDisplay record={record} />
                 {record && !usableThisSession ? (
-                  <Alert>
+                  <Alert data-testid="reenter-key-notice">
                     <AlertDescription>
                       Keys are only kept for this browser tab session. Enter the key again to use it in chats.
                     </AlertDescription>

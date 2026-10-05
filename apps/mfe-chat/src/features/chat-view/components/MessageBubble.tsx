@@ -82,7 +82,7 @@ export function MessageBubble({ message, currentUserId, onStop, onRetry, retryin
 
         {isOtherMember || isUser ? null : message.content ? (
           // Assistant replies are markdown; shadcn Typeset styles the rendered prose.
-          <div className="typeset typeset-chat min-w-0">
+          <div data-testid="assistant-reply" className="typeset typeset-chat min-w-0">
             <Markdown remarkPlugins={[remarkGfm]} components={{ img: BlockedImage }}>{message.content}</Markdown>
           </div>
         ) : streaming && !reasoning && webFetches.length === 0 ? (

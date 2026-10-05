@@ -44,6 +44,7 @@ export function ApiKeyForm({ provider, providerLabel, hasKey, onSave, onRemove }
           <Input
             aria-describedby={error ? `${inputId}-error` : undefined}
             autoComplete="off"
+            data-testid="api-key"
             id={inputId}
             invalid={Boolean(error)}
             onChange={(event) => setRawKey(event.target.value)}
@@ -52,18 +53,18 @@ export function ApiKeyForm({ provider, providerLabel, hasKey, onSave, onRemove }
             value={rawKey}
           />
           {error ? (
-            <p id={`${inputId}-error`} role="alert" className="text-sm font-medium text-destructive">
+            <p id={`${inputId}-error`} role="alert" data-testid="api-key-error" className="text-sm font-medium text-destructive">
               {error}
             </p>
           ) : null}
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Button type="submit" size="sm">
+          <Button type="submit" size="sm" data-testid={hasKey ? "update-key" : "save-key"}>
             {hasKey ? "Update key" : "Save key"}
           </Button>
           {hasKey ? (
-            <Button onClick={onRemove} size="sm" type="button" variant="ghost" className="text-destructive hover:text-destructive">
+            <Button data-testid="remove-key" onClick={onRemove} size="sm" type="button" variant="ghost" className="text-destructive hover:text-destructive">
               Remove key
             </Button>
           ) : null}

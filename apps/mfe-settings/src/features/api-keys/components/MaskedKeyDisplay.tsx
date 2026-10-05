@@ -16,7 +16,7 @@ export function MaskedKeyDisplay({ record }: MaskedKeyDisplayProps) {
 
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="text-muted-foreground">Current key</span>
+      <span data-testid="masked-key-label" className="text-muted-foreground">Current key</span>
       <InlineCode data-testid="masked-key">{maskStoredApiKey(record)}</InlineCode>
     </div>
   );
