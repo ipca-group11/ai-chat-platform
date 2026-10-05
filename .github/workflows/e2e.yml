@@ -14,6 +14,9 @@ name: e2e
 # (workflow_dispatch) before a release or when a change touches the user flows.
 on:
   workflow_dispatch: {}
+  pull_request:
+  push:
+    branches: [main]
 
 jobs:
   e2e:
@@ -30,6 +33,8 @@ jobs:
       # (compose.mock.yaml), so the chat flows need no provider account. The mock accepts any
       # key; this value is a placeholder, not a secret.
       ANTHROPIC_API_KEY: mock-key-not-a-secret
+      # The suite sends more than auth-service's 300 requests per 15 minutes, all from one address.
+      AUTH_RATE_LIMIT_MAX: "0"
     steps:
       # Building every app image fills the runner's ~14 GB free disk; drop preinstalled
       # SDKs this job never uses.

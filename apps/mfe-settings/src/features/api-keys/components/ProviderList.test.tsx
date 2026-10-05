@@ -25,10 +25,10 @@ describe("ProviderList", () => {
     expect(screen.getByLabelText("Anthropic API key")).toBeInTheDocument();
   });
 
-  it("AC-77: renders Ollama as a static 'no API key required' state with no input", () => {
+  it("AC-77: lists only the providers that need a key, so Ollama has no card", () => {
     renderWithClient(<ProviderList />);
 
-    expect(screen.getByText(/no api key is required/i)).toBeInTheDocument();
+    expect(screen.getAllByTestId("provider-name").map((name) => name.textContent)).toEqual(["OpenAI", "Anthropic"]);
     expect(screen.queryByLabelText("Ollama API key")).not.toBeInTheDocument();
   });
 

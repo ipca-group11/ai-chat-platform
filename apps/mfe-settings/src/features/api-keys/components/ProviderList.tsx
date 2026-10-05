@@ -1,15 +1,15 @@
 import { Alert, AlertDescription, Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Skeleton } from "@app/ui";
 import { useApiKeys } from "../hooks/useApiKeys";
 import { useCurrentUserId } from "../hooks/useCurrentUserId";
-import { PROVIDER_NO_KEY_DESCRIPTIONS, providerLabel } from "../model/providerMeta";
+import { providerLabel } from "../model/providerMeta";
 import { ApiKeyForm } from "./ApiKeyForm";
 import { MaskedKeyDisplay } from "./MaskedKeyDisplay";
 
 /**
- * Lists every supported provider (OpenAI, Anthropic, Ollama) with its key management
- * UI (US-23, US-24, AC-76, AC-77): OpenAI/Anthropic show a masked key display plus an
- * add/update/remove form, Ollama shows a static "no API key required" state with no
- * input. Keys are namespaced to the current user (AC-78, AC-80).
+ * Lists the providers that need an API key (OpenAI, Anthropic) with their key management
+ * UI (US-23, US-24, AC-76, AC-77): a masked key display plus an add/update/remove form.
+ * Ollama needs no key, so it has no card. Keys are namespaced to the current user
+ * (AC-78, AC-80).
  */
 export function ProviderList() {
   const { userId, isLoading, isError } = useCurrentUserId();
@@ -19,7 +19,6 @@ export function ProviderList() {
     return (
       <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <span className="sr-only">Loading your account…</span>
-        <Skeleton className="h-56" />
         <Skeleton className="h-56" />
         <Skeleton className="h-56" />
       </div>
@@ -36,46 +35,36 @@ export function ProviderList() {
 
   return (
     <div aria-label="Provider list" data-testid="provider-list" className="mt-8 grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {providers.map(({ provider, requiresKey, record, usableThisSession }) => {
+      {providers.filter(({ requiresKey }) => requiresKey).map(({ provider, record, usableThisSession }) => {
         const label = providerLabel(provider);
         return (
           <Card key={provider} data-testid={`provider-card-${provider}`}>
             <CardHeader>
               <div className="flex items-center justify-between gap-2">
                 <CardTitle data-testid="provider-name" className="text-lg">{label}</CardTitle>
-                {requiresKey ? (
-                  <Badge data-testid="provider-badge" variant={usableThisSession ? "success" : "outline"}>
-                    {usableThisSession ? "Configured" : record ? "Re-enter key" : "Not configured"}
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary">Local</Badge>
-                )}
+                <Badge data-testid="provider-badge" variant={usableThisSession ? "success" : "outline"}>
+                  {usableThisSession ? "Configured" : record ? "Re-enter key" : "Not configured"}
+                </Badge>
               </div>
-              <CardDescription>
-                {requiresKey
-                  ? `Used when a chat runs on ${label} models.`
-                  : (PROVIDER_NO_KEY_DESCRIPTIONS[provider] ?? "No API key required.")}
-              </CardDescription>
+              <CardDescription>{`Used when a chat runs on ${label} models.`}</CardDescription>
             </CardHeader>
-            {requiresKey ? (
-              <CardContent className="space-y-4">
-                <MaskedKeyDisplay record={record} />
-                {record && !usableThisSession ? (
-                  <Alert data-testid="reenter-key-notice">
-                    <AlertDescription>
-                      Keys are only kept for this browser tab session. Enter the key again to use it in chats.
-                    </AlertDescription>
-                  </Alert>
-                ) : null}
-                <ApiKeyForm
-                  hasKey={record !== null}
-                  onRemove={() => removeKey(provider)}
-                  onSave={(rawKey) => saveKey(provider, rawKey)}
-                  provider={provider}
-                  providerLabel={label}
-                />
-              </CardContent>
-            ) : null}
+            <CardContent className="space-y-4">
+              <MaskedKeyDisplay record={record} />
+              {record && !usableThisSession ? (
+                <Alert data-testid="reenter-key-notice">
+                  <AlertDescription>
+                    Keys are only kept for this browser tab session. Enter the key again to use it in chats.
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+              <ApiKeyForm
+                hasKey={record !== null}
+                onRemove={() => removeKey(provider)}
+                onSave={(rawKey) => saveKey(provider, rawKey)}
+                provider={provider}
+                providerLabel={label}
+              />
+            </CardContent>
           </Card>
         );
       })}

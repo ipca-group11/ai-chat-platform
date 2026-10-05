@@ -60,14 +60,16 @@ export function createApp(deps: AppDeps = {}): Express {
       credentials: true,
     }),
   );
-  app.use(
-    rateLimit({
-      windowMs: 15 * 60 * 1000,
-      limit: 300,
-      standardHeaders: true,
-      legacyHeaders: false,
-    }),
-  );
+  if (env.RATE_LIMIT_MAX > 0) {
+    app.use(
+      rateLimit({
+        windowMs: 15 * 60 * 1000,
+        limit: env.RATE_LIMIT_MAX,
+        standardHeaders: true,
+        legacyHeaders: false,
+      }),
+    );
+  }
   app.use(express.json());
   app.use(cookieParser());
   app.use(correlationIdMiddleware);

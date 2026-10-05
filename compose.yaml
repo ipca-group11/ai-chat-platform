@@ -96,6 +96,8 @@ services:
       REFRESH_TOKEN_TTL_SECONDS: ${REFRESH_TOKEN_TTL_SECONDS:-604800}
       CORS_ORIGIN: http://localhost:${APP_PORT:-8000},http://127.0.0.1:${APP_PORT:-8000}
       COOKIE_SECURE: "false"
+      # 0 turns the request limit off: the end-to-end suite sends more than 300 requests in 15 minutes.
+      RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-300}
     ports:
       - "127.0.0.1:${AUTH_SERVICE_PORT:-4001}:4001"
     healthcheck:

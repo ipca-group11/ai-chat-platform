@@ -38,6 +38,12 @@ describe("loadEnv", () => {
     expect(() => loadEnv({ ...base, RETENTION_INTERVAL_MINUTES: "-1" })).toThrow();
   });
 
+  it("allows 300 requests per 15 minutes by default, and 0 turns the limit off", () => {
+    expect(loadEnv(base).RATE_LIMIT_MAX).toBe(300);
+    expect(loadEnv({ ...base, RATE_LIMIT_MAX: "0" }).RATE_LIMIT_MAX).toBe(0);
+    expect(() => loadEnv({ ...base, RATE_LIMIT_MAX: "-1" })).toThrow();
+  });
+
   it("parses a comma-separated CORS_ORIGIN into a list", () => {
     const env = loadEnv({
       ...base,
