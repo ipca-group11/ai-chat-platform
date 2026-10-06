@@ -6,26 +6,32 @@ const container = process.env["E2E_POSTGRES_CONTAINER"] ?? "llm-chat-postgres-1"
 const user = process.env["POSTGRES_USER"] ?? "llmchat";
 const database = process.env["POSTGRES_DB"] ?? "llmchat";
 
-/** Runs one statement against the auth schema; `:'email'` in the SQL is the quoted `email` value. */
-function query(sql: string, email: string): string {
+/** Runs one statement; each entry of `vars` is a psql variable, so `:'email'` in the SQL is the quoted `email` value. */
+function query(sql: string, vars: Record<string, string>): string {
+  const args = Object.entries(vars).flatMap(([name, value]) => ["-v", `${name}=${value}`]);
   return execFileSync(
     "docker",
-    ["exec", "-i", container, "psql", "-U", user, "-d", database, "-At", "-q", "-v", "ON_ERROR_STOP=1", "-v", `email=${email}`],
+    ["exec", "-i", container, "psql", "-U", user, "-d", database, "-At", "-q", "-v", "ON_ERROR_STOP=1", ...args],
     { input: sql, encoding: "utf8" },
   ).trim();
 }
 
 /** Stored password hash of the user with this email (case-insensitive), or null when there is none. */
 export function findPasswordHash(email: string): string | null {
-  const hash = query(`SELECT "passwordHash" FROM auth."User" WHERE lower(email) = lower(:'email');`, email);
+  const hash = query(`SELECT "passwordHash" FROM auth."User" WHERE lower(email) = lower(:'email');`, { email });
   return hash === "" ? null : hash;
 }
 
 /** Number of accounts with this email, ignoring case. */
 export function countUsers(email: string): number {
-  return Number(query(`SELECT count(*) FROM auth."User" WHERE lower(email) = lower(:'email');`, email));
+  return Number(query(`SELECT count(*) FROM auth."User" WHERE lower(email) = lower(:'email');`, { email }));
 }
 
 export function deleteUser(email: string): void {
-  query(`DELETE FROM auth."User" WHERE lower(email) = lower(:'email');`, email);
+  query(`DELETE FROM auth."User" WHERE lower(email) = lower(:'email');`, { email });
+}
+
+/** Number of messages stored for this chat (conversation-service schema). */
+export function countMessages(chatId: string): number {
+  return Number(query(`SELECT count(*) FROM conversation."Message" WHERE "chatId" = :'chatId';`, { chatId }));
 }

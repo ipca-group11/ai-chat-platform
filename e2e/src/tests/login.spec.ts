@@ -1,9 +1,8 @@
 import { test, expect, type Page, type Request } from "@playwright/test";
+import { accountPassword, registerAccount } from "./support/auth.js";
 import { deleteUser } from "./support/db.js";
 
-const authUrl = process.env["E2E_AUTH_URL"] ?? "http://localhost:4001";
 const accountEmail = "tester@example.com";
-const accountPassword = "Passw0rd1";
 
 /** Records the login requests the page sends, for 'no request is sent to "/auth/login"'. */
 function trackLoginRequests(page: Page): Request[] {
@@ -36,13 +35,11 @@ async function expectStillOnLoginPage(page: Page) {
 }
 
 test.describe("Login", () => {
-  test.beforeEach(async ({ page, context, request }) => {
+  test.beforeEach(async ({ page, context }) => {
     await test.step(`Given an account exists with email "${accountEmail}" and password "${accountPassword}"`, async () => {
       // The database outlives a run and the scenarios depend on the password: start without the account.
       deleteUser(accountEmail);
-      const registered = await request.post(`${authUrl}/auth/register`, {
-        data: { email: accountEmail, password: accountPassword },
-      });
+      const registered = await registerAccount(page, { email: accountEmail, password: accountPassword });
       expect(registered.status()).toBe(201);
     });
     await test.step("And I am not signed in", async () => {

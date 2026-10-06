@@ -1,8 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { test, expect, type APIRequestContext, type Locator, type Page } from "@playwright/test";
+import { test, expect, type Locator, type Page } from "@playwright/test";
+import { registerAndLogIn } from "./support/auth.js";
 
-const authUrl = process.env["E2E_AUTH_URL"] ?? "http://localhost:4001";
-const accountPassword = "Passw0rd1";
 /** A real OpenAI key, for "Test connection succeeds with a valid key". The scenario is skipped without it. */
 const validOpenAiKey = process.env["E2E_OPENAI_API_KEY"];
 
@@ -14,18 +13,8 @@ function providerCard(page: Page, provider: string): Locator {
 }
 
 /** Registers a new account and signs in with it through the login page. */
-async function logInAsNewUser(page: Page, request: APIRequestContext) {
-  const email = `api-keys-${randomUUID()}@example.com`;
-  const registered = await request.post(`${authUrl}/auth/register`, {
-    data: { email, password: accountPassword },
-  });
-  expect(registered.status()).toBe(201);
-
-  await page.goto("/login");
-  await page.getByTestId("email").fill(email);
-  await page.getByTestId("password").fill(accountPassword);
-  await page.getByTestId("sign-in").click();
-  await expect(page).toHaveURL(/\/chats$/);
+async function logInAsNewUser(page: Page) {
+  await registerAndLogIn(page, "api-keys");
 }
 
 async function openSettingsPage(page: Page) {
@@ -77,9 +66,9 @@ async function expectCurrentKey(page: Page, keyword: string, provider: string, m
 }
 
 test.describe("Configure an API key", () => {
-  test.beforeEach(async ({ page, request }) => {
+  test.beforeEach(async ({ page }) => {
     await test.step("Given I am logged in as a registered user", async () => {
-      await logInAsNewUser(page, request);
+      await logInAsNewUser(page);
     });
     await test.step("And I have no API key saved for OpenAI or Anthropic", async () => {
       await page.evaluate(() => {
@@ -267,7 +256,7 @@ test.describe("Configure an API key", () => {
     });
   });
 
-  test("Another user does not see my key (AC-80)", async ({ page, request }) => {
+  test("Another user does not see my key (AC-80)", async ({ page }) => {
     await givenSavedOpenAiKey(page, "sk-test-1234567890abcd");
 
     await test.step("When I log out", async () => {
@@ -275,7 +264,7 @@ test.describe("Configure an API key", () => {
       await expect(page).toHaveURL(/\/login/);
     });
     await test.step("And I log in as a different registered user", async () => {
-      await logInAsNewUser(page, request);
+      await logInAsNewUser(page);
     });
     await test.step('And I open the "Settings" page', async () => {
       await openSettingsPage(page);

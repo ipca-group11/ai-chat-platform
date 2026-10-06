@@ -1,13 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { test, expect, type APIRequestContext, type Page, type Request } from "@playwright/test";
+import { test, expect, type Page, type Request } from "@playwright/test";
+import { accountPassword as validPassword, logIn, registerAccount } from "./support/auth.js";
 import { countUsers, deleteUser, findPasswordHash } from "./support/db.js";
-
-const authUrl = process.env["E2E_AUTH_URL"] ?? "http://localhost:4001";
-const validPassword = "Passw0rd1";
-
-function registerViaApi(request: APIRequestContext, email: string, password: string) {
-  return request.post(`${authUrl}/auth/register`, { data: { email, password } });
-}
 
 /** Records the registration requests the page sends, for "no request is sent to the server". */
 function trackRegisterRequests(page: Page): Request[] {
@@ -60,16 +54,13 @@ test.describe("User registration", () => {
       await expect(page).toHaveURL(/\/login$/);
     });
     await test.step(`And I can log in with "${email}" and "${validPassword}"`, async () => {
-      await page.getByTestId("email").fill(email);
-      await page.getByTestId("password").fill(validPassword);
-      await page.getByTestId("sign-in").click();
-      await expect(page).toHaveURL(/\/chats/);
+      await logIn(page, { email, password: validPassword });
     });
   });
 
-  test("An already registered email is rejected (AC-31)", async ({ page, request }) => {
+  test("An already registered email is rejected (AC-31)", async ({ page }) => {
     await test.step('Given an account already exists for "existing@example.com"', async () => {
-      const response = await registerViaApi(request, "existing@example.com", validPassword);
+      const response = await registerAccount(page, { email: "existing@example.com", password: validPassword });
       expect([201, 409]).toContain(response.status());
     });
 
@@ -127,13 +118,13 @@ test.describe("User registration", () => {
     });
   }
 
-  test("The password is never stored in plain text (AC-33)", { tag: "@api" }, async ({ request }) => {
+  test("The password is never stored in plain text (AC-33)", { tag: "@api" }, async ({ page }) => {
     const email = "hash.check@example.com";
 
     const response = await test.step(`Given I registered with "${email}" and "${validPassword}"`, async () => {
       // The database outlives a run: start without the account so the API answers 201 again.
       deleteUser(email);
-      const registered = await registerViaApi(request, email, validPassword);
+      const registered = await registerAccount(page, { email, password: validPassword });
       expect(registered.status()).toBe(201);
       return registered;
     });

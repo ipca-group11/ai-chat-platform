@@ -109,11 +109,11 @@ export function MessageBubble({ message, currentUserId, onStop, onRetry, retryin
 
         {streaming ? (
           <div className="flex items-center gap-2">
-            <span role="status" aria-label="Generating response" className="text-xs text-muted-foreground">
+            <span role="status" aria-label="Generating response" data-testid="generating" className="text-xs text-muted-foreground">
               Generating…
             </span>
             {onStop ? (
-              <Button type="button" variant="outline" size="sm" className="h-7 px-2 text-xs" onClick={() => onStop(message.id)}>
+              <Button type="button" variant="outline" size="sm" className="h-7 px-2 text-xs" data-testid="stop-response" onClick={() => onStop(message.id)}>
                 <Square className="size-3 fill-current" aria-hidden="true" />
                 Stop
               </Button>

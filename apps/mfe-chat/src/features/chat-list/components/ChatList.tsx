@@ -43,6 +43,7 @@ export function ChatList({
         <Button
           type="button"
           size="sm"
+          data-testid="new-chat"
           onClick={() => {
             setDialogKey((key) => key + 1);
             setDialogOpen(true);
@@ -84,11 +85,11 @@ export function ChatList({
 
         {chatsQuery.data &&
           (chatsQuery.data.length === 0 ? (
-            <p className="px-3 py-8 text-center text-sm text-muted-foreground">
+            <p data-testid="chat-list-empty" className="px-3 py-8 text-center text-sm text-muted-foreground">
               No chats yet. Create one to get started.
             </p>
           ) : (
-            <ul aria-label="Chats" className="space-y-1">
+            <ul aria-label="Chats" data-testid="chat-list" className="space-y-1">
               {chatsQuery.data.map((chat) => (
                 <ChatListItem
                   key={chat.id}

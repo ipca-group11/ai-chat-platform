@@ -32,10 +32,10 @@ export function MessageList({
   const historyMessages = messages.filter((m) => m.status !== "queued");
 
   return (
-    <div role="log" aria-label="Messages" aria-live="polite">
+    <div role="log" aria-label="Messages" aria-live="polite" data-testid="messages">
       {historyMessages.length === 0 ? (
         <div className={cn("flex flex-col items-center gap-1 text-center", compact ? "py-4" : "py-16")}>
-          <p className="text-sm font-medium">No messages yet. Say hello!</p>
+          <p data-testid="messages-empty" className="text-sm font-medium">No messages yet. Say hello!</p>
           <p className="text-sm text-muted-foreground">Your conversation will appear here.</p>
         </div>
       ) : (
