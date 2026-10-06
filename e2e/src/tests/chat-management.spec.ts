@@ -291,10 +291,11 @@ test.describe("Chat management and messaging", () => {
       await expect(page).toHaveURL(/\/chats\/[^/]+$/);
       return new URL(page.url()).pathname.split("/").pop() ?? "";
     });
-    await test.step('And the "Chats" list shows "Trip planning" with "anthropic · claude-haiku-4-5"', async () => {
+    await test.step('And the "Chats" list shows "Trip planning" with "ollama · llama3.2:1b"', async () => {
       const row = chatItem(page, chatId);
       await expect(row.getByTestId("chat-item-title")).toHaveText("Trip planning");
-      await expect(row.getByTestId("chat-item-model")).toHaveText("anthropic · claude-haiku-4-5");
+      // The dialog's default provider and model (NewChatDialog); chats created through the API use Anthropic.
+      await expect(row.getByTestId("chat-item-model")).toHaveText("ollama · llama3.2:1b");
     });
     await test.step('And I see "No messages yet. Say hello!"', async () => {
       await expect(page.getByTestId("messages-empty")).toHaveText("No messages yet. Say hello!");
