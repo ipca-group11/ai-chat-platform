@@ -97,13 +97,14 @@ export function ensureChatStream(chatId: string, queryClient: QueryClient): void
     },
     // AC-55: the completed response is saved server-side; mark it done locally and
     // refetch so the cache matches what was persisted.
-    onDone: ({ messageId }) => {
+    // AICHAT-202: a stopped reply says so right away; the refetch below reads the same flag back.
+    onDone: ({ messageId, stopped }) => {
       upsertMessage(
         queryClient,
         chatId,
         messageId,
-        (m) => ({ ...m, status: "sent" }),
-        () => assistantMessage(messageId, { status: "sent" })
+        (m) => ({ ...m, status: "sent", stopped: stopped === true }),
+        () => assistantMessage(messageId, { status: "sent", stopped: stopped === true })
       );
       // AC-59: the next queued message (if any) may now be picked up server-side;
       // refetch so its status (queued -> streaming) is reflected in the UI.

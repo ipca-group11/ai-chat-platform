@@ -122,6 +122,14 @@ export function MessageBubble({ message, currentUserId, onStop, onRetry, retryin
           </div>
         ) : null}
 
+        {message.role === "assistant" && message.stopped && !streaming ? (
+          // AICHAT-202: the partial text above is all there is; the user stopped the reply.
+          <span data-testid="stopped-indicator" className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Square className="size-3" aria-hidden="true" />
+            Stopped
+          </span>
+        ) : null}
+
         {onRetry && <MessageError message={message} onRetry={onRetry} retrying={retrying} />}
       </div>
     </li>

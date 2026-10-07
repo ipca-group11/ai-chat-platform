@@ -34,6 +34,8 @@ export function toMessageDto(record: chat.Message, attachments: chat.Attachment[
     attachments: attachments.map(toAttachmentDto),
     status: record.status === "complete" ? "sent" : record.status === "canceled" ? "failed" : record.status,
     error: record.status === "failed" ? "The provider returned an error" : null,
+    // conversation-service always sends it (AICHAT-202); shared-types records have no such field.
+    stopped: false,
     createdAt: record.createdAt,
   };
 }

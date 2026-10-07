@@ -1,0 +1,60 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/logout-stop.spec.ts src/features/messages/internal-routes.spec.ts --reporter=verbose && cd ../auth-service && pnpm exec vitest run src/features/session/api.spec.ts src/shared/reply-stop-client.spec.ts src/features/session/model.spec.ts -t 'AICHAT-203' --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/features/messages/internal-routes.spec.ts > createInternalSessionsRouter (AICHAT-203) > stops the replies of the user named in the path and answers with the count 13ms
+ ✓ src/features/messages/internal-routes.spec.ts > createInternalSessionsRouter (AICHAT-203) > does nothing without the service token 2ms
+ ✓ src/integration/logout-stop.spec.ts > POST /internal/sessions/:userId/stop > POST /internal/sessions/:userId/stop stops the replies the user started and only those 24ms
+ ✓ src/integration/logout-stop.spec.ts > POST /internal/sessions/:userId/stop > POST /internal/sessions/:userId/stop leaves a reply another member started in a shared chat running 4ms
+ ✓ src/integration/logout-stop.spec.ts > POST /internal/sessions/:userId/stop > POST /internal/sessions/:userId/stop is safe to repeat: nothing running answers stopped 0 4ms
+ ✓ src/integration/logout-stop.spec.ts > POST /internal/sessions/:userId/stop > POST /internal/sessions/:userId/stop rejects a missing or wrong service token and a user session 4ms
+
+ Test Files  2 passed (2)
+      Tests  6 passed (6)
+   Start at  23:27:41
+   Duration  312ms (import 50%, transform 31%, tests 14%, worker 5%)
+
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/auth-service
+
+ ✓ src/shared/reply-stop-client.spec.ts > createReplyStopClient (AICHAT-203) > posts to the internal stop route of the user with the service token and returns the count 11ms
+ ✓ src/shared/reply-stop-client.spec.ts > createReplyStopClient (AICHAT-203) > encodes the user id so it cannot change the path 0ms
+ ✓ src/shared/reply-stop-client.spec.ts > createReplyStopClient (AICHAT-203) > rejects on an error status, so logout can report it 0ms
+ ↓ src/features/session/model.spec.ts > verifyCredentials > AC-35: valid credentials resolve with the user's id/email
+ ↓ src/features/session/model.spec.ts > verifyCredentials > AC-36: an unknown email is rejected with the generic invalid-credentials error
+ ↓ src/features/session/model.spec.ts > verifyCredentials > AC-36: a wrong password is rejected with the exact same status/code/message as an unknown email
+ ↓ src/features/session/model.spec.ts > issueTokens > AC-37: issues an access token verifiable with JWT_SECRET and a random opaque refresh token
+ ↓ src/features/session/model.spec.ts > issueTokens > AICHAT-137: records the sign-in as activity, so the account is not deleted as inactive
+ ↓ src/features/session/model.spec.ts > issueTokens > never persists the refresh token in plaintext (only its hash)
+ ↓ src/features/session/model.spec.ts > rotateRefreshToken > AC-37: rotates a valid refresh token: old row is revoked, a new token is issued
+ ↓ src/features/session/model.spec.ts > rotateRefreshToken > AC-37: a reused/rotated-out refresh token is rejected on the next use
+ ↓ src/features/session/model.spec.ts > rotateRefreshToken > rejects an unknown refresh token
+ ↓ src/features/session/model.spec.ts > rotateRefreshToken > rejects an expired refresh token
+ ↓ src/features/session/model.spec.ts > revokeRefreshToken (logout) > AC-38: revokes the refresh token so a subsequent refresh is rejected
+ ↓ src/features/session/model.spec.ts > revokeRefreshToken (logout) > is a no-op for an unknown token (no throw) and reports no ended session
+ ✓ src/features/session/model.spec.ts > revokeRefreshToken (logout) > AICHAT-203: reports the user whose session ended, only on the call that revoked it 4ms
+ ↓ src/features/session/model.spec.ts > getUserById > AC-35: returns the user's public profile for a known id
+ ↓ src/features/session/model.spec.ts > getUserById > returns null for an unknown id
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/login > AC-35: valid credentials log in and return the user's public profile
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/login > AC-37: sets access_token and refresh_token as httpOnly, Secure, SameSite=Lax cookies
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/login > AC-36: an unknown email returns the generic invalid-credentials error (401)
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/login > AC-36: a wrong password returns the identical status/message as an unknown email
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/refresh > rotates the refresh token and issues new cookies
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/refresh > rejects a missing refresh cookie
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/refresh > rejects a reused/rotated-out refresh token
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/logout and GET /auth/me > AC-38: logout revokes the refresh token and clears both cookies
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/logout and GET /auth/me > AC-35: GET /auth/me returns the current user when the access token cookie is valid
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/logout and GET /auth/me > AC-38: GET /auth/me is 401 after logout (access cookie cleared client-side / no cookie sent)
+ ↓ src/features/session/api.spec.ts > session routes > POST /auth/logout and GET /auth/me > GET /auth/me is 401 with a garbage access token cookie
+ ✓ src/features/session/api.spec.ts > session routes > POST /auth/logout stops the user's running replies (AICHAT-203) > asks conversation-service to stop the replies of the user whose session ended 15ms
+ ✓ src/features/session/api.spec.ts > session routes > POST /auth/logout stops the user's running replies (AICHAT-203) > still logs out (204, cookies cleared) when conversation-service fails, and reports the failure 4ms
+ ✓ src/features/session/api.spec.ts > session routes > POST /auth/logout stops the user's running replies (AICHAT-203) > does not act again when an already revoked refresh token is replayed 5ms
+ ✓ src/features/session/api.spec.ts > session routes > POST /auth/logout stops the user's running replies (AICHAT-203) > does not call conversation-service when there is no session to end 1ms
+
+ Test Files  3 passed (3)
+      Tests  8 passed | 25 skipped (33)
+   Start at  23:27:42
+   Duration  207ms (import 46%, transform 28%, tests 14%, worker 11%, setup 1%)
+
+
+[exit 0]
