@@ -123,16 +123,20 @@ export async function rotateRefreshToken(
 }
 
 /** Revokes the refresh token row matching the presented token, if any (logout). */
-export async function revokeRefreshToken(prisma: PrismaClient, presentedToken: string): Promise<void> {
+/** Revokes the presented refresh token. Returns the id of the user whose session this call
+ * ended, or `null` when the token is unknown or was already revoked (so replaying an old token
+ * does not act on the user again, see AICHAT-203). */
+export async function revokeRefreshToken(prisma: PrismaClient, presentedToken: string): Promise<string | null> {
   const tokenHash = hashRefreshToken(presentedToken);
   const row = await prisma.refreshToken.findUnique({ where: { tokenHash } });
   if (!row || row.revokedAt) {
-    return;
+    return null;
   }
   await prisma.refreshToken.update({
     where: { id: row.id },
     data: { revokedAt: new Date() },
   });
+  return row.userId;
 }
 
 export async function getUserById(

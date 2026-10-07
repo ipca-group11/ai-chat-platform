@@ -5,7 +5,7 @@ import helmet from "helmet";
 import { createAttachmentsRepository, createAttachmentsRouter, createFileCleanup, createFileSystemStorage, AttachmentsService, createAttachmentAwareContextBuilder, type AttachmentsRepository, type AttachmentStorage } from "./features/attachments/index.js";
 import { createChatsRepository, createChatsRouter, ChatsService, type ChatsRepository } from "./features/chats/index.js";
 import { createProviderRegistry, type ProviderRegistry } from "./features/llm-adapters/index.js";
-import { createMessageProcessor, createMessagesRepository, createMessagesRouter, MessagesService, type MessagesRepository } from "./features/messages/index.js";
+import { createInternalSessionsRouter, createMessageProcessor, createMessagesRepository, createMessagesRouter, MessagesService, type MessagesRepository } from "./features/messages/index.js";
 import { createErasureRepository, createErasureRouter, ErasureService, type ErasureRepository } from "./features/erasure/index.js";
 import { QueueManager } from "./features/queue/index.js";
 import { ChatEventBus, createStreamingRouter } from "./features/streaming/index.js";
@@ -97,6 +97,7 @@ export function createApp(
   if (env.INTERNAL_SERVICE_TOKEN) {
     const erasureService = new ErasureService(overrides.erasureRepo ?? createErasureRepository(prisma), fileCleanup);
     app.use("/internal", createErasureRouter(erasureService, env.INTERNAL_SERVICE_TOKEN));
+    app.use("/internal", createInternalSessionsRouter(messagesService, env.INTERNAL_SERVICE_TOKEN));
   }
 
   app.use(authMiddleware(env.JWT_SECRET));

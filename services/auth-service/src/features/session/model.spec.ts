@@ -175,9 +175,19 @@ describe("revokeRefreshToken (logout)", () => {
     });
   });
 
-  it("is a no-op for an unknown token (no throw)", async () => {
+  it("is a no-op for an unknown token (no throw) and reports no ended session", async () => {
     const prisma = fakePrisma();
-    await expect(revokeRefreshToken(prisma, "unknown")).resolves.toBeUndefined();
+    await expect(revokeRefreshToken(prisma, "unknown")).resolves.toBeNull();
+  });
+
+  it("AICHAT-203: reports the user whose session ended, only on the call that revoked it", async () => {
+    const user = await makeUser("ended@example.com", "password1");
+    const prisma = fakePrisma({ users: [user] });
+    const { tokens } = await issueTokensDirect(prisma, user);
+
+    await expect(revokeRefreshToken(prisma, tokens.refreshToken)).resolves.toBe(user.id);
+    // A replayed (already revoked) token ends nothing.
+    await expect(revokeRefreshToken(prisma, tokens.refreshToken)).resolves.toBeNull();
   });
 });
 
