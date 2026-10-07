@@ -101,8 +101,9 @@ export function createMessageProcessor(deps: CreateMessageProcessorDeps): QueueP
       deps.bus.publish(chatId, { type: "done", messageId: assistantMessage.id });
     } catch (err) {
       if (isAbortError(err)) {
-        // AC-54: partial response saved to history.
-        await deps.messagesRepo.updateContent(assistantMessage.id, { ...saved(), status: "sent" });
+        // AC-54: partial response saved to history; AICHAT-202: marked as stopped so it still
+        // reads as stopped after a reload.
+        await deps.messagesRepo.updateContent(assistantMessage.id, { ...saved(), status: "sent", stopped: true });
         deps.bus.publish(chatId, { type: "done", messageId: assistantMessage.id, stopped: true });
         return;
       }

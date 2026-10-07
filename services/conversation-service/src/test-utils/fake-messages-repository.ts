@@ -44,6 +44,7 @@ export class FakeMessagesRepository implements MessagesRepository {
       webFetches?: WebFetchDto[] | null;
       status: MessageStatus;
       error?: string | null;
+      stopped?: boolean;
     },
   ): Promise<MessageRecord> {
     const existing = this.get(id);

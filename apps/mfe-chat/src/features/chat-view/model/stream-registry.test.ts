@@ -41,6 +41,29 @@ describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", ()
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.messages("chat-1") });
   });
 
+  it("AICHAT-202: a done event with stopped marks the reply stopped right away, before any refetch", () => {
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    const source = FakeEventSource.instances[0]!;
+
+    source.emit("token", { messageId: "msg-assistant-1", token: "Once" });
+    source.emit("done", { type: "done", messageId: "msg-assistant-1", stopped: true });
+
+    const messages = client.getQueryData<Message[]>(queryKeys.messages("chat-1"));
+    expect(messages?.[0]).toMatchObject({ id: "msg-assistant-1", content: "Once", status: "sent", stopped: true });
+  });
+
+  it("AICHAT-202: a done event without stopped leaves the reply unstopped", () => {
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    const source = FakeEventSource.instances[0]!;
+
+    source.emit("token", { messageId: "msg-assistant-1", token: "Hi" });
+    source.emit("done", { type: "done", messageId: "msg-assistant-1" });
+
+    expect(client.getQueryData<Message[]>(queryKeys.messages("chat-1"))?.[0]?.stopped).toBeFalsy();
+  });
+
   it("AC-72/AC-74: on a provider error, marks the message failed without throwing and refetches so the queue can proceed", () => {
     const client = createTestQueryClient();
     const invalidateSpy = vi.spyOn(client, "invalidateQueries");

@@ -27,6 +27,7 @@ const message = {
   webFetches: [],
   attachments: [],
   status: "sent" as const,
+  stopped: false,
   createdAt: now,
 };
 
@@ -45,6 +46,12 @@ describe("DTO schemas", () => {
   it("accepts a message with every optional part empty and keeps error optional", () => {
     expect(messageDtoSchema.safeParse(message).success).toBe(true);
     expect(messageDtoSchema.safeParse({ ...message, error: null }).success).toBe(true);
+  });
+
+  it("AICHAT-202: requires a boolean stopped flag on a message", () => {
+    expect(messageDtoSchema.safeParse({ ...message, stopped: true }).success).toBe(true);
+    expect(messageDtoSchema.safeParse({ ...message, stopped: undefined }).success).toBe(false);
+    expect(messageDtoSchema.safeParse({ ...message, stopped: "yes" }).success).toBe(false);
   });
 
   it("rejects a message with an unknown role or a missing author", () => {

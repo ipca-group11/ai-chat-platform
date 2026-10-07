@@ -163,3 +163,117 @@ typecheck pass.
 
 **Problems and fixes.** None. The adapters were already correct; the gap was in the tests, which could not have detected a
 missing signal.
+
+### US5 · Logout stops the user's running replies ([AICHAT-203](https://ipca-grupo11.atlassian.net/browse/AICHAT-203)), service level
+
+**What and why.** The epic DoD says "navigating away aborts the upstream request", but the product keeps a reply running
+when the user switches chats (AC-60/61): streams live in a module-level registry in mfe-chat, and closing an SSE connection
+does not touch the queue. The owner decided (§1): switching chats and closing the tab keep the reply running; **logout**
+stops the replies the user started, because they spend that user's API key.
+
+Logout happens in auth-service, which conversation-service never hears about. Following the account-erasure pattern
+(AICHAT-33), auth-service calls conversation-service service-to-service:
+
+```
+POST /auth/logout (auth-service)
+  ├─ revoke the refresh token, clear the cookies (as before)
+  └─ best-effort: POST /internal/sessions/:userId/stop (service token) → conversation-service
+                  QueueManager.stopForUser(userId): aborts only the replies that user started
+```
+
+Design points the tests pin down:
+- **Only the user's own replies.** Queue entries now record `userId`; in a shared chat, a reply another member started keeps
+  running.
+- **Best-effort.** Logout never fails because conversation-service is slow or down: 2 s timeout, the error is logged and
+  logout still answers 204 with the cookies cleared.
+- **No replay.** `revokeRefreshToken` returns the user id only when it ends a live session, so replaying an old (revoked)
+  refresh token cannot be used to keep stopping someone's replies.
+- **Path safety.** The client URL-encodes the user id (`../erasures` → `..%2Ferasures`).
+- The service-token guard moved from `features/erasure` to `shared/` (now used by two features; the lint rule
+  `feature-folder-boundaries` forbids importing another feature's internals).
+
+**Files.**
+- conversation-service: `features/queue/chat-queue.ts` (`QueueEntry.userId`), `features/queue/queue-manager.ts`
+  (`stopForUser`), `features/messages/service.ts` (records the user, `stopAllForUser`),
+  `features/messages/internal-routes.ts` (new route) and `.spec.ts`, `app.ts` (mounted under `/internal`),
+  `integration/logout-stop.spec.ts` (new), `integration/route-inventory.spec.ts` (entry for the route),
+  `shared/service-token.ts` (moved), `test-utils/fake-queue.ts` (`stoppableProcessor`).
+- auth-service: `shared/reply-stop-client.ts` and `.spec.ts` (new), `features/session/model.ts` (`revokeRefreshToken`
+  returns the ended user), `features/session/api.ts` (logout calls the client), `main.ts` (wiring), tests in
+  `features/session/api.spec.ts` and `model.spec.ts`.
+
+**How to run.**
+
+```sh
+pnpm exec nx run-many -t test -p conversation-service auth-service
+```
+
+**How to repeat it manually.**
+
+1. Start the stack with the mock LLM (`pnpm mock:up`), sign in, send "Write a very long story" in a chat whose model ends in
+   `@long`.
+2. While it streams, log out. Sign in again and open the chat.
+3. Expected: the reply is cut where it was when you logged out (and marked "Stopped", see US4). Repeat with a chat switch
+   instead of a logout: the reply finishes.
+
+**Result.** Integration: 4 tests on the real app (only the user's replies stop, another member's reply keeps running, safe to
+repeat, service token required). auth-service: logout calls the client with the ended user, still answers 204 when the
+call fails, does not act on a replayed token or when there is no session. The browser check is in US6.
+
+![Logout stop tests](evidence/07-logout-stop.png)
+
+**Problems and fixes.**
+- The first version of the "safe to repeat" test used `hangingProcessor`, which ignores the abort; the reply then stayed
+  active and the second call stopped it again. The real processor finishes on abort, so we added `stoppableProcessor`, a
+  double that does the same.
+- Known limit: messages the user queued but that have not started yet are not removed; they would still run after logout.
+  Recorded for the owner.
+
+### US4 · Stopped reply is saved and shown as stopped ([AICHAT-202](https://ipca-grupo11.atlassian.net/browse/AICHAT-202))
+
+**What and why.** A stopped reply was saved with `status: "sent"`, the same as a finished one, so after a reload nothing
+showed it was cut short. Owner decision: a new boolean column `stopped` (additive, existing rows read as `false`; the
+container applies the schema with `prisma db push`, so no migration file is needed).
+
+The change crosses every layer, each with its own test:
+
+| Layer | Change | Test |
+|---|---|---|
+| Database | `Message.stopped Boolean @default(false)` | — (schema) |
+| Processor | the abort path saves `stopped: true` | `integration/stopped-reply.spec.ts` |
+| API contract | `messageDtoSchema.stopped: z.boolean()` (always sent) | `shared/contracts/chat.spec.ts` |
+| HTTP | `GET /chats/:chatId/messages` after a stop returns `stopped: true` and the partial text | `integration/stopped-reply.spec.ts` |
+| Stream (mfe-chat) | `done { stopped: true }` marks the reply at once | `model/stream-registry.test.ts` |
+| UI (mfe-chat) | "Stopped" label on a stopped assistant reply, not while streaming | `components/MessageBubble.test.tsx` |
+| Frontend mocks | the MSW message DTO sends `stopped: false`, like the server | `packages/test-utils` |
+
+The UI part was written test-first: the two positive tests failed (red), the three negative ones already passed and guard
+against showing the label too often.
+
+**How to run.**
+
+```sh
+pnpm exec nx run-many -t test -p conversation-service mfe-chat test-utils
+```
+
+**How to repeat it manually.**
+
+1. In `services/conversation-service/src/features/messages/processor.ts`, remove `stopped: true` from the abort path.
+2. Run `pnpm exec vitest run src/integration/stopped-reply.spec.ts` in `services/conversation-service`.
+3. Expected: the first test fails with `"stopped": true` expected and `"stopped": false` received. Restore the line.
+
+**Result.**
+
+![UI tests before the change](evidence/05-stopped-ui-red.png)
+
+![UI tests after the change](evidence/06-stopped-ui-green.png)
+
+![Stopped flag read back after a reload](evidence/08-stopped-after-reload.png)
+
+**Problems and fixes.**
+- `packages/shared-types` has no `stopped` field, and the mock server's contract test validates against shared-types, not
+  the service contract. This is the drift recorded in `docs/AICHAT-20/SSE-DRIFT.md`; the source of truth is decided in
+  AICHAT-183.
+- `testing/mock-server/src/faults/faults.spec.ts` ("stream-drop cuts the chat stream after a few events") fails on this
+  machine before and after our change: its inputs are identical to `main`. The repo pins Node 24 (`.nvmrc`, used by CI);
+  this machine runs Node 26. Not caused by this epic; reported to the owner.

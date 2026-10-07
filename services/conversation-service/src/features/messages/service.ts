@@ -38,6 +38,8 @@ export interface MessageRecord {
   webFetches?: unknown;
   status: MessageStatus;
   error?: string | null;
+  /** The user stopped this reply before it finished (AICHAT-202). Missing on old fakes = false. */
+  stopped?: boolean;
   createdAt: Date;
   updatedAt: Date;
   attachments: AttachmentSummary[];
@@ -64,6 +66,7 @@ export interface MessagesRepository {
       webFetches?: WebFetchDto[] | null;
       status: MessageStatus;
       error?: string | null;
+      stopped?: boolean;
     },
   ): Promise<MessageRecord>;
   delete(id: string): Promise<void>;
@@ -237,6 +240,7 @@ export function toMessageDto(message: MessageRecord): MessageDto {
     webFetches: savedWebFetches.safeParse(message.webFetches ?? []).data ?? [],
     status: message.status,
     error: message.error ?? null,
+    stopped: message.stopped ?? false,
     attachments: message.attachments.map((a) => ({
       id: a.id,
       messageId: a.messageId,

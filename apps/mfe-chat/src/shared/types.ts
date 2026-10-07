@@ -59,6 +59,8 @@ export interface Message {
   status: MessageStatus;
   /** Provider error text, set when `status` is `failed` (conversation-service `MessageDto.error`). */
   error?: string | null;
+  /** The user stopped this reply before it finished; `content` is the partial text (AICHAT-202). */
+  stopped?: boolean;
   createdAt: string;
 }
 
