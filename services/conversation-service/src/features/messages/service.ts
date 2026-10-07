@@ -143,6 +143,7 @@ export class MessagesService {
       attachmentIds: input.attachmentIds,
       apiKey,
       kind: "send",
+      userId: user.userId,
     });
 
     const dto = toMessageDto(userMessage);
@@ -185,6 +186,12 @@ export class MessagesService {
     return { stopped: this.queueManager.stop(chatId) };
   }
 
+  /** AICHAT-203: on logout, auth-service asks to stop every reply the user started
+   * (service-to-service, so no user session is checked here). */
+  stopAllForUser(userId: string): { stopped: number } {
+    return { stopped: this.queueManager.stopForUser(userId) };
+  }
+
   /** AC-73: retry a message that previously failed due to a provider error. */
   async retry(user: Principal, chatId: string, messageId: string, apiKey?: string): Promise<MessageDto> {
     await this.chatsService.getAccessible(user, chatId);
@@ -202,6 +209,7 @@ export class MessagesService {
       attachmentIds: [],
       apiKey,
       kind: "retry",
+      userId: user.userId,
     });
     return toMessageDto(reset);
   }

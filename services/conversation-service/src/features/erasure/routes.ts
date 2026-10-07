@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../../shared/async-handler.js";
 import { eraseUserSchema } from "./schema.js";
 import type { ErasureService } from "./service.js";
-import { requireServiceToken } from "./service-token.js";
+import { requireServiceToken } from "../../shared/service-token.js";
 
 /** Mounted at `/internal`, before the user authentication. Called by auth-service only,
  * with the service token (no user session exists at that point of the account deletion). */

@@ -18,6 +18,7 @@ import { runRetention, scheduleRetention } from "./features/retention/index.js";
 import { createRegisterRouter } from "./features/register/index.js";
 import { createSessionRouter } from "./features/session/index.js";
 import { createErasureClient, type ErasureClient } from "./shared/erasure-client.js";
+import { createReplyStopClient, type ReplyStopClient } from "./shared/reply-stop-client.js";
 import { correlationIdMiddleware } from "./shared/correlation-id.js";
 import { env } from "./shared/env.js";
 import { errorMiddleware, notFoundMiddleware } from "./shared/error-middleware.js";
@@ -37,6 +38,9 @@ export interface AppDeps {
   /** Calls conversation-service to erase a user's data; tests pass a fake. Defaults to the
    * real client when INTERNAL_SERVICE_TOKEN and CONVERSATION_SERVICE_URL are set. */
   erasure?: ErasureClient;
+  /** Calls conversation-service to stop a user's replies on logout (AICHAT-203); tests pass a
+   * fake. Defaults to the real client when INTERNAL_SERVICE_TOKEN and CONVERSATION_SERVICE_URL are set. */
+  replies?: ReplyStopClient;
   /** Account deletions per client and hour (default 10). */
   deletionsPerHour?: number;
 }
@@ -44,6 +48,11 @@ export interface AppDeps {
 function defaultErasureClient(): ErasureClient | undefined {
   if (!env.INTERNAL_SERVICE_TOKEN || !env.CONVERSATION_SERVICE_URL) return undefined;
   return createErasureClient({ baseUrl: env.CONVERSATION_SERVICE_URL, token: env.INTERNAL_SERVICE_TOKEN });
+}
+
+function defaultReplyStopClient(): ReplyStopClient | undefined {
+  if (!env.INTERNAL_SERVICE_TOKEN || !env.CONVERSATION_SERVICE_URL) return undefined;
+  return createReplyStopClient({ baseUrl: env.CONVERSATION_SERVICE_URL, token: env.INTERNAL_SERVICE_TOKEN });
 }
 
 export function createApp(deps: AppDeps = {}): Express {
@@ -92,7 +101,13 @@ export function createApp(deps: AppDeps = {}): Express {
   });
 
   app.use("/auth", createRegisterRouter(prisma));
-  app.use("/auth", createSessionRouter(prisma));
+  app.use(
+    "/auth",
+    createSessionRouter(prisma, {
+      replies: deps.replies ?? defaultReplyStopClient(),
+      onReplyStopError: (err, userId) => logger.warn({ err, userId }, "could not stop the user's replies on logout"),
+    }),
+  );
   app.use("/auth", createAccountRouter(prisma, { erasure: deps.erasure ?? defaultErasureClient(), deletionsPerHour: deps.deletionsPerHour }));
 
   app.use(notFoundMiddleware);
