@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
 import { ScriptedProvider, fakeProviderRegistry } from "../../test-utils/fake-provider-registry.js";
 import { FakeMessagesRepository } from "../../test-utils/fake-messages-repository.js";
+import { mockAbortableStreamResponse } from "../../test-utils/mock-stream.js";
 import { ChatsService } from "../chats/index.js";
 import {
+  AnthropicProvider,
   ProviderError,
   type ProviderRegistry,
   type LlmProvider,
@@ -232,6 +234,46 @@ describe("createMessageProcessor", () => {
     expect(assistant?.status).toBe("sent");
     const doneEvent = events.find((e) => e.type === "done") as { stopped?: boolean } | undefined;
     expect(doneEvent?.stopped).toBe(true);
+  });
+
+  // AICHAT-200: the same stop, through the real Anthropic adapter and a fetch that honours the
+  // signal (the body is errored with an AbortError, as real fetch does), instead of a scripted provider.
+  it("AICHAT-200: Stop during a real adapter stream saves the partial reply as stopped, never as an error", async () => {
+    const { chatsService, messagesRepo, bus, chat, userMessage } = await setupChatWithUserMessage();
+    const controller = new AbortController();
+    const sse = (event: unknown) => `data: ${JSON.stringify(event)}\n\n`;
+    const chunks = [
+      sse({ type: "content_block_start", index: 0, content_block: { type: "text", text: "" } }),
+      ...["Once ", "upon ", "a ", "time"].map((text) =>
+        sse({ type: "content_block_delta", index: 0, delta: { type: "text_delta", text } }),
+      ),
+      sse({ type: "message_stop" }),
+    ];
+    const fetchImpl = async (_url: unknown, init?: RequestInit) =>
+      mockAbortableStreamResponse(chunks, init?.signal ?? undefined).response;
+    const provider = new AnthropicProvider({ fetchImpl: fetchImpl as unknown as typeof fetch });
+    const processor = createMessageProcessor({ messagesRepo, chatsService, providerRegistry: fakeProviderRegistry(provider), bus });
+
+    // The user presses Stop as soon as the first token reaches the stream.
+    const stopOnFirstToken = bus.subscribe(chat.id, (event) => {
+      if (event.type === "token") controller.abort();
+    });
+    const events = await collectEvents(bus, chat.id, () =>
+      processor(
+        chat.id,
+        { messageId: userMessage.id, content: "hello", attachmentIds: [], apiKey: "sk-ant-test" },
+        controller.signal,
+      ),
+    );
+    stopOnFirstToken();
+
+    const tokens = events.filter((e) => e.type === "token").map((e) => (e as { token: string }).token);
+    expect(tokens).toEqual(["Once "]);
+    expect(events.some((e) => e.type === "error")).toBe(false);
+    expect(events.at(-1)).toMatchObject({ type: "done", stopped: true });
+    const assistant = messagesRepo.all().find((m) => m.role === "assistant");
+    expect(assistant?.content).toBe("Once ");
+    expect(assistant?.status).toBe("sent");
   });
 
   it("AC-72/74: a provider error is caught, surfaced, and marks the message failed without throwing", async () => {
