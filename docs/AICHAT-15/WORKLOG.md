@@ -10,9 +10,9 @@ title: "AICHAT-15 · Stream cancellation testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | João Vieira |
 | Branch | `test/AICHAT-15-stream-cancellation` |
-| Started / finished | 2026-10-07 / … |
+| Started / finished | 2026-10-07 / 2026-10-08 |
 | Pull requests | … |
-| Status | In Progress |
+| Status | Review |
 
 ## 1. DoR review
 
@@ -320,3 +320,118 @@ cd testing/mock-server && pnpm exec vitest run src/contract/abort.contract.spec.
 **Problems and fixes.** The new spec imports the adapters from conversation-service on purpose (they are the code under
 test), with the same scoped `@nx/enforce-module-boundaries` exception as `llm.contract.spec.ts`. The browser-to-provider check
 (Stop button → `POST /chats/:chatId/stop` → closed upstream connection) is in US6.
+
+### US6 · Strengthen the Stop E2E tests so they prove cancellation ([AICHAT-204](https://ipca-grupo11.atlassian.net/browse/AICHAT-204))
+
+**What and why.** Two browser tests covered Stop, and both passed even when Stop did nothing: the AC-54 step in
+`e2e/src/tests/chat.spec.ts` and "cancel: Stop keeps the part that was already written" in `e2e/src/tests/chat-mock.spec.ts`.
+They only checked that some text was saved after the reply ended, which is also true when the reply ends on its own.
+
+We added `stopReplyAndExpectCancelled(page)` (`e2e/src/fixtures/chat-flows.ts`), used by both tests. It checks that:
+1. the stop request reaches a real route and answers `{ stopped: true }`;
+2. the reply shows the "Stopped" label;
+3. the text stops growing (unchanged after 1 s).
+
+`chat-mock.spec.ts` also reads the LLM mock's request log (`e2e/src/fixtures/llm-mock.ts`): the provider request for this
+prompt has `clientClosedAt` and no `finishedAt`. That is the full chain of US3: **Stop button → `POST /chats/:chatId/stop` →
+queue → adapter → the provider connection closes**. After a reload the partial text and the "Stopped" label are still there
+(US4).
+
+The same file holds the browser checks of US5 (`e2e/src/tests/stream-cancellation.spec.ts`): switching chats and closing the
+tab keep the reply running until the provider finishes it; logging out closes the provider connection, and after logging in
+again the reply is marked "Stopped".
+
+**Files.**
+- `e2e/src/fixtures/chat-flows.ts`: `stopReplyAndExpectCancelled`; `createChat` fills the "New chat" dialog (see Problems).
+- `e2e/src/fixtures/llm-mock.ts` (new) and `.spec.ts`: reads `/__admin/requests` of the LLM mock and finds the request of a
+  prompt (string or Anthropic content blocks).
+- `e2e/src/tests/chat-mock.spec.ts`, `e2e/src/tests/chat.spec.ts` (AC-54 step moved onto the mock's `@long` answer, so the
+  reply is still streaming when Stop is pressed), `e2e/src/tests/stream-cancellation.spec.ts` (new).
+- `e2e/src/fixtures/chat-flows.spec.ts`: unit test of the new `createChat` steps.
+- `TESTING.md`: section "Stream cancellation (AICHAT-15)".
+
+**How to run.**
+
+```sh
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 ANTHROPIC_API_KEY=mock-key-not-a-secret \
+  pnpm exec playwright test --project=chromium src/tests/stream-cancellation.spec.ts src/tests/chat-mock.spec.ts
+```
+
+**How to repeat it manually.**
+
+1. Add to a copy of the cancel test, before sending: `await page.route(/\/chats\/[^/]+\/stop$/, (r) => r.fulfill({ status: 404, body: "{}" }))`
+   (Stop now hits a missing route, as before US1).
+2. Run it once with the old assertions (click Stop, wait, text not empty) and once with `stopReplyAndExpectCancelled`.
+3. Expected: the old assertions **pass**; the new helper fails with `the stop request must reach a real route`,
+   `Expected: 200, Received: 404`.
+
+**Result.**
+
+![Old assertions pass with a broken Stop, the new helper fails](evidence/10-old-vs-new-stop-test.png)
+
+![Stream cancellation E2E tests](evidence/11-e2e-stream-cancellation.png)
+
+8 E2E tests pass in one run (36.8 s): the 3 leave cases of US5, the 4 mock chat flows (with the stronger cancel test) and
+`chat.spec.ts` US-16 (its first steps use the real local Ollama model; AC-54 uses the mock).
+
+**Problems and fixes.**
+- **New tab, missing key.** The first run of "closing the tab" failed with "Missing Anthropic API key": the provider key lives
+  in `sessionStorage`, which is per tab, so the second tab must enter it again. Fixed in the test.
+- **`createChat` was out of date.** "New chat" now opens a dialog (title, provider, model; Create disabled until a title is
+  set), so the shared helper never reached a chat URL and every `chat.spec.ts` test that creates a chat timed out on `main`
+  too. The helper now fills the dialog; this was needed for the AC-54 step.
+- **Rate limit in local runs.** Running the suite several times in 15 minutes made registration fail with "Too Many
+  Requests": auth-service keeps one rate-limit bucket per client IP without `trust proxy`, and every browser request comes
+  through the shell's proxy (finding F6 of AICHAT-29). Restarting the auth-service container resets it.
+- **Other E2E failures, not caused by this epic.** In a full run, 13 tests fail on selectors that no longer match the UI
+  (configuration.spec: `getByLabel(/OpenAI.*api key/i)` matches 2 elements; chat.spec US-15/US-19 use `selectOption`/`<option>`
+  on what is now a custom combobox; US-13 rename, US-17/US-21 Send, US-20/US-22 texts; shell.spec US-9, replaced by AICHAT-8).
+  None touches code changed here; reported to the team.
+
+## 4. How to run everything
+
+```sh
+pnpm exec nx run-many -t test lint typecheck -p conversation-service auth-service mfe-chat test-utils mock-server e2e workspace-config
+cd testing/mock-server && pnpm exec vitest run src/contract/abort.contract.spec.ts
+pnpm mock:up && cd e2e && BASE_URL=http://localhost:8000 ANTHROPIC_API_KEY=mock-key-not-a-secret \
+  pnpm exec playwright test --project=chromium src/tests/stream-cancellation.spec.ts src/tests/chat-mock.spec.ts
+```
+
+## 5. Results
+
+| Metric | Before | After |
+|---|---|---|
+| Stop button reaches the server | No (no route for the client's path) | Yes (`POST /chats/:chatId/stop`, 200) |
+| Tests that fail when Stop does nothing | 0 (both E2E tests passed anyway) | Hook test, both E2E tests, provider contract |
+| Adapters checked for passing the signal / stopping mid-reply | 0 of 3 | 3 of 3 (OpenAI, Anthropic, Ollama) |
+| Provider connection closed after Stop | Not measured | Within a few ms (limit 500 ms), both formats |
+| Stopped reply after a reload | Looked finished | Partial text + "Stopped" label |
+| Logout | Replies kept spending the user's key | The user's running replies stop; other members' keep running |
+| conversation-service test files / tests | 68 / 546 | 72 / 569 |
+
+## 6. DoD check
+
+| DoD item | Met | Evidence |
+|---|---|---|
+| Tests run in CI and pass on `main` | Pending merge | Unit, integration and contract tests run in `ci.yml` (nx affected); E2E in `e2e.yml` |
+| Failure blocks the merge | ✅ (after merge) | Both workflows are required checks |
+| Run instructions added | ✅ | `TESTING.md` "Stream cancellation (AICHAT-15)", §4 above |
+| Stop button and navigating away (per the agreed rule) abort the upstream request | ✅ | [09](evidence/09-provider-connection-closed.png), [11](evidence/11-e2e-stream-cancellation.png): Stop and logout close the provider connection; switching chats and closing the tab keep it, as agreed |
+| The message is marked as stopped | ✅ | [08](evidence/08-stopped-after-reload.png), [06](evidence/06-stopped-ui-green.png) |
+
+## 7. Notes for the report
+
+- **Found:** the Stop button called a route that does not exist, so Stop never reached the server. Every test stayed green
+  because the frontend mocks copied the client's wrong path, and the two E2E tests only checked that some text was saved.
+  The upload of attachments has the same kind of mismatch (handed to AICHAT-11).
+- **Lesson:** a test double proves something only if it behaves like the real thing on the path under test. Three times in
+  this epic the fix was in the double, not the app: the MSW handlers (wrong path), `mockStreamResponse` (ignored the abort
+  signal) and `hangingProcessor` (ignored the abort).
+- **Fixed:** client stop route; stopped replies are saved and labelled; logout stops the user's replies through a
+  service-to-service call (best-effort, only the user's own replies, no replay with an old token).
+- **Measured:** after Stop the provider connection closes within a few milliseconds; without the abort signal the same test
+  streamed the whole 8 s answer.
+- **Decided with the owner:** switching chats and closing the tab keep the reply running (AC-60/61); logout stops it.
+- **Open:** messages the user queued but that have not started still run after logout; Node 26 breaks one mock-server test
+  (the repo pins Node 24); 13 E2E tests fail on outdated selectors.
