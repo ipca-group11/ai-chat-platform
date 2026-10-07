@@ -1,0 +1,26 @@
+$ cd testing/mock-server && PNPM_HOME=/Users/joaovieira/Library/pnpm pnpm exec vitest run src/contract/abort.contract.spec.ts src/core/request-log.spec.ts -t 'AICHAT-201|Stop|control' --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/testing/mock-server
+
+ ↓ src/core/request-log.spec.ts > request log > records requests of every mock and filters by mock
+ ↓ src/core/request-log.spec.ts > request log > does not log the admin endpoints
+ ↓ src/core/request-log.spec.ts > request log > masks API keys, tokens and cookies in headers
+ ↓ src/core/request-log.spec.ts > request log > masks body and query fields named like key, token or password at any depth
+ ↓ src/core/request-log.spec.ts > request log > is cleared by /__admin/reset
+ ↓ src/core/request-log.spec.ts > request log > logs a body that is not valid JSON without a body and leaves the answer to the router
+ ↓ src/core/request-log.spec.ts > request log > keeps only the newest entries when the capacity is reached
+ ✓ src/core/request-log.spec.ts > request log > finished vs closed by the client (AICHAT-201) > an answer read to the end has finishedAt and no clientClosedAt (control case) 567ms
+ ✓ src/core/request-log.spec.ts > request log > finished vs closed by the client (AICHAT-201) > a client that leaves mid-answer is logged with clientClosedAt and no finishedAt 20ms
+ ↓ src/core/request-log.spec.ts > request log > maskValue leaves primitives alone
+ ✓ src/contract/abort.contract.spec.ts > anthropic: Stop closes the provider connection (AICHAT-201) > closes the connection to the provider within the agreed time after Stop 23ms
+ ✓ src/contract/abort.contract.spec.ts > anthropic: Stop closes the provider connection (AICHAT-201) > without Stop, the provider sends the whole answer (control case) 828ms
+ ✓ src/contract/abort.contract.spec.ts > openai: Stop closes the provider connection (AICHAT-201) > closes the connection to the provider within the agreed time after Stop 20ms
+ ✓ src/contract/abort.contract.spec.ts > openai: Stop closes the provider connection (AICHAT-201) > without Stop, the provider sends the whole answer (control case) 825ms
+
+ Test Files  2 passed (2)
+      Tests  6 passed | 8 skipped (14)
+   Start at  23:29:55
+   Duration  1.90s (tests 89%, transform 6%, import 5%)
+
+
+[exit 0]

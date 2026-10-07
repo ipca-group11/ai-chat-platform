@@ -275,5 +275,48 @@ pnpm exec nx run-many -t test -p conversation-service mfe-chat test-utils
   the service contract. This is the drift recorded in `docs/AICHAT-20/SSE-DRIFT.md`; the source of truth is decided in
   AICHAT-183.
 - `testing/mock-server/src/faults/faults.spec.ts` ("stream-drop cuts the chat stream after a few events") fails on this
-  machine before and after our change: its inputs are identical to `main`. The repo pins Node 24 (`.nvmrc`, used by CI);
-  this machine runs Node 26. Not caused by this epic; reported to the owner.
+  machine before and after our change: its inputs are identical to `main`. Run under three Node versions: passes on 22 and
+  25, fails only on 26. The repo pins Node 24 (`.nvmrc`, used by CI), so CI is not affected; developers should run
+  `nvm install 24 && nvm use`. Not caused by this epic.
+
+### US3 · Mock LLM proves the upstream connection is closed on stop ([AICHAT-201](https://ipca-grupo11.atlassian.net/browse/AICHAT-201))
+
+**What and why.** US2 proved with a test double that the adapters stop reading. This story proves it over **real HTTP**: the
+real adapters call the LLM mock with real `fetch`, and the mock reports whether the client left before the answer was
+complete. That is what saves money: the provider stops generating once its connection is closed.
+
+The mock already aborted its own stream when the client left (`testing/mock-server/src/llm/sse.ts`) but did not record it.
+Node's HTTP server gives two signals on a response: `finish` (the whole answer was sent) and `close` (the connection ended).
+A `close` before `finish` (`res.writableFinished === false`) means the client left mid-answer. The request log now stores
+both times.
+
+**Files.**
+- `testing/mock-server/src/core/request-log.ts`: each entry has `finishedAt` and `clientClosedAt`.
+- `testing/mock-server/src/core/request-log.spec.ts`: control (read to the end → `finishedAt`) and a client that leaves after
+  the first chunk (→ `clientClosedAt`, no `finishedAt`).
+- `testing/mock-server/src/contract/abort.contract.spec.ts` (new): for Anthropic and OpenAI, the real adapter reads the
+  first token of a paced `long` answer and is aborted; the mock must log `clientClosedAt` within **500 ms** and no
+  `finishedAt`. Control: without Stop the whole answer is sent.
+- `docs/AICHAT-144/MOCK-SERVER.md`: the new fields of `/__admin/requests`.
+
+**How to run.**
+
+```sh
+cd testing/mock-server && pnpm exec vitest run src/contract/abort.contract.spec.ts src/core/request-log.spec.ts
+```
+
+**How to repeat it manually.**
+
+1. In `services/conversation-service/src/features/llm-adapters/anthropic.provider.ts`, delete the `signal,` line of the
+   `fetch` call.
+2. Run `pnpm exec vitest run src/contract/abort.contract.spec.ts -t anthropic` in `testing/mock-server`.
+3. Expected: the stop test fails after about **8.4 s** with `promise resolved "undefined" instead of rejecting`: the whole
+   `long` answer was streamed although Stop was pressed. With the line restored it takes about 20 ms. Restore the line.
+
+**Result.** Both formats close the provider connection within a few milliseconds of Stop; the control cases finish.
+
+![Provider connection closed after Stop](evidence/09-provider-connection-closed.png)
+
+**Problems and fixes.** The new spec imports the adapters from conversation-service on purpose (they are the code under
+test), with the same scoped `@nx/enforce-module-boundaries` exception as `llm.contract.spec.ts`. The browser-to-provider check
+(Stop button → `POST /chats/:chatId/stop` → closed upstream connection) is in US6.
