@@ -105,7 +105,7 @@ On the real conversation-service (profile `llm`): `ANTHROPIC_BASE_URL=http://moc
 | `GET /__admin/scenarios` | Every registered scenario with its description |
 | `POST /__admin/seed/<dataset>` | Load a dataset |
 | `GET /__admin/data` | The current records |
-| `GET /__admin/requests[?mock=<name>]` | Requests the mocks received (secrets masked) |
+| `GET /__admin/requests[?mock=<name>]` | Requests the mocks received (secrets masked). Each entry has `status`, `finishedAt` (the whole answer was sent) and `clientClosedAt` (the client left before the answer was complete, e.g. a stopped stream, AICHAT-201) |
 | `POST /__admin/faults`, `GET`, `DELETE` | Set, list and clear faults on routes |
 | `POST /__admin/reset` | Back to the start-up state: dataset, random generator, faults, request log, running answers |
 
