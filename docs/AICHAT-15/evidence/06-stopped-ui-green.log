@@ -1,0 +1,54 @@
+$ cd apps/mfe-chat && NODE_ENV=test PNPM_HOME=/Users/joaovieira/Library/pnpm pnpm exec vitest run src/features/chat-view/components/MessageBubble.test.tsx src/features/chat-view/model/stream-registry.test.ts -t 'stopped|AICHAT-202' --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/apps/mfe-chat
+
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > AC-52: appends streamed tokens incrementally to the assistant message
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > AC-55/AC-59: on done, finalizes the message and invalidates so the next queued message can be reflected
+ ✓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > AICHAT-202: a done event with stopped marks the reply stopped right away, before any refetch 2ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > AICHAT-202: a done event without stopped leaves the reply unstopped 0ms
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > AC-72/AC-74: on a provider error, marks the message failed without throwing and refetches so the queue can proceed
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > AC-55: finalizes a message on done even when no token event was seen first
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > AC-72: marks an already-streaming message failed on a later provider error
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > shows the assistant reply in its thinking state as soon as the server starts it, before any token
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > treats a transport-level error (no data) as a connection error, not a provider failure
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > closeChatStream closes the connection and allows a fresh one to be opened later
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > AC-60/AC-61: two chats stream independently, tokens for one never leak into the other
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > AC-62: supports at least 5 chats streaming simultaneously, each tracked independently
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > is idempotent: calling ensureChatStream twice for the same chat opens only one connection
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > appends streamed reasoning separately from the answer
+ ↓ src/features/chat-view/model/stream-registry.test.ts > stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74) > tracks web fetch progress by fetch id
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > renders the assistant's reply as markdown
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > does not load a markdown image in a reply, so a hidden instruction cannot send data out in an image URL
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > still renders links of a reply as links
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > does not turn markdown in the user's own message into markup
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > marks the row with its role, id and status
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > messages from another member > labels them with the author's email
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > messages from another member > falls back to a generic label when the email is unknown
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > messages from another member > does not label the current user's own messages
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > messages from another member > does not label anyone when the viewer is not known
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > reasoning > shows the reasoning section above an assistant reply that has some
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > reasoning > is open and pulsing while the model thinks before any answer
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > reasoning > is collapsed once the answer streams in
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > reasoning > is hidden when the user turned reasoning off
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > reasoning > is never shown on a user message
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > web fetches > lists the pages the model read for an assistant reply
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > web fetches > shows no list when there are none, or on a user message
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > lists attachments by file name
+ ✓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > stopped reply > labels a reply the user stopped 18ms
+ ✓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > stopped reply > does not label a reply that finished on its own 2ms
+ ✓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > stopped reply > does not label a reply that is still streaming 1ms
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > streaming > announces progress and stops the reply by message id
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > streaming > offers no stop button without a handler
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > streaming > shows hidden typing dots before the first token
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > streaming > shows no typing dots when fetch activity is already visible
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > streaming > shows no progress once the reply is complete
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > failed replies > shows the provider error and retries by message id
+ ↓ src/features/chat-view/components/MessageBubble.test.tsx > MessageBubble > failed replies > shows no error block without a retry handler
+
+ Test Files  2 passed (2)
+      Tests  5 passed | 37 skipped (42)
+   Start at  23:26:00
+   Duration  648ms (environment 44%, import 24%, setup 17%, transform 11%, tests 3%, worker 1%)
+
+
+[exit 0]

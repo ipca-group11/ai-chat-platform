@@ -150,6 +150,28 @@ describe("MessageBubble", () => {
     expect(within(list).getAllByRole("listitem").map((li) => li.textContent)).toEqual(["notes.txt", "scan.pdf"]);
   });
 
+  // AICHAT-202: a reply the user stopped keeps its partial text and says so.
+  describe("stopped reply", () => {
+    it("labels a reply the user stopped", () => {
+      bubble({ content: "Once upon", stopped: true });
+
+      expect(screen.getByText("Stopped")).toBeInTheDocument();
+      expect(screen.getByText("Once upon")).toBeInTheDocument();
+    });
+
+    it("does not label a reply that finished on its own", () => {
+      bubble({ content: "The end.", stopped: false });
+
+      expect(screen.queryByText("Stopped")).not.toBeInTheDocument();
+    });
+
+    it("does not label a reply that is still streaming", () => {
+      bubble({ status: "streaming", content: "Once", stopped: true });
+
+      expect(screen.queryByText("Stopped")).not.toBeInTheDocument();
+    });
+  });
+
   describe("streaming", () => {
     it("announces progress and stops the reply by message id", async () => {
       const onStop = vi.fn();
