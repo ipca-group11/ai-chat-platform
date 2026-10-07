@@ -7,22 +7,16 @@
   "scripts": {
     "e2e": "playwright test --project=chromium",
     "e2e:ui": "playwright test --ui",
-    "visual": "docker run --rm --ipc=host -v \"$(cd .. && pwd)\":/work -w /work/e2e mcr.microsoft.com/playwright:v1.63.0-noble npx playwright test --project=visual --reporter=list",
-    "visual:update": "docker run --rm --ipc=host -v \"$(cd .. && pwd)\":/work -w /work/e2e mcr.microsoft.com/playwright:v1.63.0-noble npx playwright test --project=visual --reporter=list --update-snapshots",
-    "wait-for-stack": "tsx src/fixtures/wait-for-stack-cli.ts",
-    "test": "vitest run --coverage",
+    "wait-for-stack": "tsx src/support/wait-for-stack-cli.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
     "@eslint/js": "^10.0.1",
-    "@platform/test-config": "workspace:*",
     "@playwright/test": "1.63.0",
     "@types/node": "^24.13.6",
-    "@vitest/coverage-v8": "5.0.1",
     "tsx": "^4.19.2",
     "typescript": "6.0.3",
-    "typescript-eslint": "^8.70.1",
-    "vitest": "5.0.1"
+    "typescript-eslint": "^8.70.1"
   }
 }
