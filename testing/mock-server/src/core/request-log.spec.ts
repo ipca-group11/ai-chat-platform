@@ -1,3 +1,5 @@
+import { get } from "node:http";
+import type { AddressInfo } from "node:net";
 import { Router } from "express";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
@@ -19,6 +21,51 @@ const echo = (name: string): MockModule => ({
 });
 
 const makeApp = () => createApp(loadConfig({}), [echo("alpha"), echo("beta")]).app;
+
+/** A mock that streams `chunks` pieces, one every 10 ms, like a slow LLM answer. */
+const slowStream = (chunks: number): MockModule => ({
+  name: "slow",
+  mountPath: "/slow",
+  createRouter: () => {
+    const router = Router();
+    router.get("/stream", (req, res) => {
+      res.writeHead(200, { "content-type": "text/event-stream" });
+      let sent = 0;
+      const timer = setInterval(() => {
+        res.write(`data: ${sent}\n\n`);
+        if (++sent === chunks) {
+          clearInterval(timer);
+          res.end();
+        }
+      }, 10);
+      req.on("close", () => clearInterval(timer));
+    });
+    return router;
+  },
+});
+
+/** Reads `/slow/stream`; with `leaveAfterFirstChunk` the client disconnects as soon as data arrives. */
+async function readStream(port: number, leaveAfterFirstChunk: boolean): Promise<void> {
+  await new Promise<void>((resolve) => {
+    const req = get({ port, path: "/slow/stream" }, (res) => {
+      res.on("data", () => {
+        if (leaveAfterFirstChunk) req.destroy();
+      });
+      res.on("end", resolve);
+      res.on("close", resolve);
+    });
+    req.on("error", () => resolve());
+  });
+}
+
+async function waitFor<T>(read: () => Promise<T>, ok: (value: T) => boolean): Promise<T> {
+  for (let i = 0; i < 100; i++) {
+    const value = await read();
+    if (ok(value)) return value;
+    await new Promise((r) => setTimeout(r, 10));
+  }
+  return read();
+}
 
 describe("request log", () => {
   it("records requests of every mock and filters by mock", async () => {
@@ -101,6 +148,48 @@ describe("request log", () => {
     expect(direct.list().map((e) => e.path)).toEqual(["/m/2", "/m/3"]);
     direct.clear();
     expect(direct.list()).toEqual([]);
+  });
+
+  // AICHAT-201: a stopped stream shows up as a client that left before the answer was complete.
+  describe("finished vs closed by the client (AICHAT-201)", () => {
+    async function withServer(run: (port: number, app: ReturnType<typeof createApp>["app"]) => Promise<void>) {
+      const { app } = createApp(loadConfig({}), [slowStream(50)]);
+      const server = app.listen(0);
+      await new Promise((resolve) => server.once("listening", resolve));
+      try {
+        await run((server.address() as AddressInfo).port, app);
+      } finally {
+        server.closeAllConnections();
+        server.close();
+      }
+    }
+    const lastEntry = async (app: ReturnType<typeof createApp>["app"]) =>
+      (await request(app).get("/__admin/requests?mock=slow")).body.requests.at(-1) as {
+        status: number | null;
+        finishedAt: string | null;
+        clientClosedAt: string | null;
+      };
+
+    it("an answer read to the end has finishedAt and no clientClosedAt (control case)", async () => {
+      await withServer(async (port, app) => {
+        await readStream(port, false);
+        const entry = await waitFor(() => lastEntry(app), (e) => e.finishedAt !== null);
+        expect(entry).toMatchObject({ status: 200, clientClosedAt: null });
+        expect(entry.finishedAt).not.toBeNull();
+      });
+    });
+
+    it("a client that leaves mid-answer is logged with clientClosedAt and no finishedAt", async () => {
+      await withServer(async (port, app) => {
+        const left = Date.now();
+        await readStream(port, true);
+        const entry = await waitFor(() => lastEntry(app), (e) => e.clientClosedAt !== null);
+        expect(entry.finishedAt).toBeNull();
+        expect(entry.clientClosedAt).not.toBeNull();
+        // Logged when the client left, well before the 500 ms the whole answer would take.
+        expect(Date.parse(entry.clientClosedAt as string) - left).toBeLessThan(400);
+      });
+    });
   });
 
   it("maskValue leaves primitives alone", () => {
