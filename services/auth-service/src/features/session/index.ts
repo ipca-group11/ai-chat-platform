@@ -1,4 +1,4 @@
-export { createSessionRouter, sessionRouter } from "./api.js";
+export { createSessionRouter, sessionRouter, type SessionRouterOptions } from "./api.js";
 export {
   verifyCredentials,
   issueTokens,

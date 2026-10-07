@@ -32,6 +32,7 @@ const ROUTE_TESTS: Record<string, string> = {
   "GET /chats/:chatId/stream": "routes.spec.ts",
   "POST /chats/:chatId/messages/:messageId/attachments": "routes.spec.ts",
   "POST /internal/erasures": "erasure.spec.ts",
+  "POST /internal/sessions/:userId/stop": "logout-stop.spec.ts",
 };
 
 const here = dirname(fileURLToPath(import.meta.url));

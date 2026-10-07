@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
-import { HttpError } from "../../shared/error-handler.js";
+import { HttpError } from "./error-handler.js";
 
 /** Guards the internal routes: the caller must send `Authorization: Bearer <token>` with the
  * service token shared through the environment. The comparison takes the same time whatever

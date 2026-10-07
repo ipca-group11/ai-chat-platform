@@ -1,4 +1,5 @@
 export { createMessagesRouter } from "./routes.js";
+export { createInternalSessionsRouter } from "./internal-routes.js";
 export {
   MessagesService,
   createMessagesRepository,

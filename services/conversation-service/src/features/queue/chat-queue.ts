@@ -9,6 +9,9 @@ export interface QueueEntry {
    * assistant reply; `"retry"` reprocesses `messageId` (a previously failed assistant
    * message) in place (AC-73). */
   kind?: "send" | "retry";
+  /** The user who started this reply (whose API key it spends). Logging out stops the
+   * user's running replies (AICHAT-203); replies other members started keep going. */
+  userId?: string;
 }
 
 /**
