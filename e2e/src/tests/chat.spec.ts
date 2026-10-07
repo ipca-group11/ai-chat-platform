@@ -9,8 +9,10 @@ import {
   renameChat,
   selectProvider,
   sendMessage,
+  stopReplyAndExpectCancelled,
   waitForStreamToFinish,
 } from "../fixtures/chat-flows.js";
+import { configureAnthropicKey } from "../fixtures/settings-flows.js";
 import { freshUser, isolationUsers } from "../fixtures/test-users.js";
 
 /** chat stories (docs/BACKLOG.json, pod `chat`). */
@@ -127,16 +129,26 @@ test.describe("chat", () => {
       );
     });
 
+    // AICHAT-204: the step used to pass even when Stop did nothing (it only checked for some text, and a
+    // short reply ends on its own). The chat now uses the mock's long answer so the reply is still
+    // streaming when Stop is pressed, and the step proves the cancellation.
     await test.step("AC-54: stopping mid-stream saves the partial response", async () => {
-      await sendMessage(page, "Write a very long story.");
-      await expect(page.getByRole("status", { name: /generating|streaming/i })).toBeVisible();
-      await page.getByRole("button", { name: /stop/i }).click();
-      await waitForStreamToFinish(page);
+      // The default local model may finish a short answer before Stop is pressed. This step moves the
+      // chat onto the LLM mock's long answer (compose profile `llm`, any key works).
+      const chatId = new URL(page.url()).pathname.split("/").pop() as string;
+      await configureAnthropicKey(page);
+      const patch = await page.request.patch(`/api/chats/${chatId}`, {
+        data: { provider: "anthropic", model: "claude-haiku-4-5@long" },
+      });
+      expect(patch.status()).toBe(200);
+      await page.goto(`/chats/${chatId}`);
 
-      const partial = messagesLog(page).getByTestId("assistant-message").last();
-      await expect(partial).not.toHaveText("");
+      await sendMessage(page, "Write a very long story.");
+      const partial = await stopReplyAndExpectCancelled(page);
+
       await page.reload();
-      await expect(messagesLog(page).getByTestId("assistant-message").last()).not.toHaveText("");
+      await expect(messagesLog(page).getByTestId("assistant-message").last().locator(".typeset")).toHaveText(partial);
+      await expect(messagesLog(page).getByTestId("stopped-indicator")).toBeVisible();
     });
 
     // AC-53 (the full conversation history is sent to the LLM as context) has

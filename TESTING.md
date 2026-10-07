@@ -4,6 +4,19 @@ Prerequisites: Node 24.21+ (`nvm use 24`), `pnpm install`, and Docker running fo
 
 ---
 
+# Stream cancellation (AICHAT-15)
+
+```sh
+# stop contract, abort chain, logout stop, stopped flag (no Docker)
+pnpm exec nx run-many -t test -p conversation-service auth-service mfe-chat test-utils
+# the provider connection closes after Stop, real HTTP against the LLM mock (no Docker)
+cd testing/mock-server && pnpm exec vitest run src/contract/abort.contract.spec.ts src/core/request-log.spec.ts
+# browser: Stop, switching chat, closing the tab, logout (Docker)
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 ANTHROPIC_API_KEY=mock-key-not-a-secret \
+  pnpm exec playwright test --project=chromium src/tests/stream-cancellation.spec.ts src/tests/chat-mock.spec.ts
+```
+
 # Unit testing (AICHAT-17)
 
 ```sh

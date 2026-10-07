@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { registerAndLogin } from "../fixtures/auth-flows.js";
-import { messagesLog, sendMessage, waitForStreamToFinish } from "../fixtures/chat-flows.js";
+import { messagesLog, sendMessage, stopReplyAndExpectCancelled, waitForStreamToFinish } from "../fixtures/chat-flows.js";
+import { waitForLlmRequest } from "../fixtures/llm-mock.js";
 import { configureAnthropicKey } from "../fixtures/settings-flows.js";
 import { freshUser } from "../fixtures/test-users.js";
 
@@ -47,19 +48,23 @@ test.describe("chat flows against the LLM mock", () => {
     await expect(assistantText(page)).toHaveText(answer);
   });
 
+  // AICHAT-204: this test used to pass even when Stop did nothing, because it only checked that some
+  // text was saved and the "long" answer also ends on its own. It now proves the cancellation.
   test("cancel: Stop keeps the part that was already written", async ({ page }) => {
+    const prompt = `Write a very long story ${Date.now()}`;
     await createChatWithScenario(page, "long");
-    await sendMessage(page, "Write a very long story");
-    await expect(page.getByRole("status", { name: "Generating response" })).toBeVisible();
-    await expect(assistantText(page)).not.toHaveText("");
+    await sendMessage(page, prompt);
 
-    await page.getByRole("button", { name: "Stop" }).click();
-    await waitForStreamToFinish(page);
-    const partial = await assistantText(page).innerText();
-    expect(partial.length).toBeGreaterThan(0);
+    const partial = await stopReplyAndExpectCancelled(page);
 
+    // AICHAT-201: conversation-service closed the connection to the provider; the answer was never completed.
+    const upstream = await waitForLlmRequest(page.request, prompt, (r) => r.clientClosedAt !== null);
+    expect(upstream.finishedAt).toBeNull();
+
+    // AICHAT-202: after a reload the partial text is still there and still marked as stopped.
     await page.reload();
-    await expect(assistantText(page)).not.toHaveText("");
+    await expect(assistantText(page)).toHaveText(partial);
+    await expect(messagesLog(page).getByTestId("stopped-indicator")).toBeVisible();
   });
 
   test("cancel: a queued message can be removed before it is answered", async ({ page }) => {

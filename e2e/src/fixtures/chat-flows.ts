@@ -10,6 +10,10 @@ import { expect } from "@playwright/test";
 export async function createChat(page: Page): Promise<string> {
   await page.goto("/chats");
   await page.getByRole("button", { name: /new chat/i }).click();
+  // "New chat" opens a dialog (title, provider, model); Create stays disabled until a title is set.
+  const dialog = page.getByRole("dialog", { name: /new chat/i });
+  await dialog.getByRole("textbox", { name: /chat title/i }).fill("E2E chat");
+  await dialog.getByRole("button", { name: /^create$/i }).click();
   await page.waitForURL(/\/chats\/[^/]+$/);
   const match = /\/chats\/([^/?#]+)/.exec(page.url());
   const chatId = match?.[1];
@@ -67,4 +71,31 @@ export async function attachFile(
   file: { name: string; mimeType: string; buffer: Buffer },
 ): Promise<void> {
   await page.getByLabel(/attach a file/i).setInputFiles(file);
+}
+
+/**
+ * Presses Stop on the reply that is streaming and proves it was cancelled (AICHAT-204), instead of
+ * only checking that some text exists (which also passes when the reply finishes on its own):
+ * - the stop request reaches the server and answers `{ stopped: true }`;
+ * - the reply stops growing and is labelled "Stopped";
+ * Returns the partial text.
+ */
+export async function stopReplyAndExpectCancelled(page: Page): Promise<string> {
+  const reply = messagesLog(page).getByTestId("assistant-message").last();
+  await expect(page.getByRole("status", { name: /generating|streaming/i })).toBeVisible();
+  await expect(reply.locator(".typeset")).not.toHaveText("");
+
+  const stopResponse = page.waitForResponse((r) => r.request().method() === "POST" && /\/chats\/[^/]+\/stop$/.test(new URL(r.url()).pathname));
+  await reply.getByRole("button", { name: "Stop" }).click();
+  const res = await stopResponse;
+  expect(res.status(), "the stop request must reach a real route").toBe(200);
+  expect(await res.json()).toEqual({ stopped: true });
+
+  await waitForStreamToFinish(page);
+  await expect(reply.getByTestId("stopped-indicator")).toBeVisible();
+  const partial = await reply.locator(".typeset").innerText();
+  // A stopped reply no longer grows.
+  await page.waitForTimeout(1_000);
+  await expect(reply.locator(".typeset")).toHaveText(partial);
+  return partial;
 }
