@@ -1,0 +1,22 @@
+$ cd services/conversation-service && PNPM_HOME=/Users/joaovieira/Library/pnpm pnpm exec vitest run src/features/messages/routes.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/features/messages/routes.spec.ts > messages routes > AC-45: requests without a valid access token are rejected with 401 8ms
+ ✓ src/features/messages/routes.spec.ts > messages routes > AC-51: an authenticated user can send a message and see it in the list 8ms
+ ✓ src/features/messages/routes.spec.ts > messages routes > AC-46: user B sending a message to user A's chat receives 403 or 404 1ms
+ ✓ src/features/messages/routes.spec.ts > messages routes > AC-58: a queued message can be edited and canceled via the API 3ms
+ ✓ src/features/messages/routes.spec.ts > messages routes > AC-54: stop reports whether an in-progress stream was stopped 2ms
+ ✓ src/features/messages/routes.spec.ts > messages routes > stop contract (AICHAT-199) > stopping aborts the signal of the reply that is running 3ms
+ ✓ src/features/messages/routes.spec.ts > messages routes > stop contract (AICHAT-199) > stopping an idle chat answers stopped:false instead of an error 1ms
+ ✓ src/features/messages/routes.spec.ts > messages routes > stop contract (AICHAT-199) > a user who is not a member gets 404 and the owner's reply keeps running 1ms
+ ✓ src/features/messages/routes.spec.ts > messages routes > stop contract (AICHAT-199) > an invited member can stop the reply 2ms
+ ✓ src/features/messages/routes.spec.ts > messages routes > AC-73: a failed message can be retried via the API 1ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  23:02:12
+   Duration  202ms (import 47%, transform 27%, tests 19%, worker 6%)
+
+
+[exit 0]

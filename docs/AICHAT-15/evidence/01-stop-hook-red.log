@@ -1,0 +1,39 @@
+$ cd apps/mfe-chat && NODE_ENV=test PNPM_HOME=/Users/joaovieira/Library/pnpm pnpm exec vitest run src/features/chat-view/api/messages.test.ts -t useStopMessage
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/apps/mfe-chat
+
+ ❯ src/features/chat-view/api/messages.test.ts (6 tests | 1 failed | 5 skipped) 62ms
+   ❯ useStopMessage (AC-54) (1)
+     × AC-54: stops a mid-stream response and resyncs history to pick up the saved partial response 60ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 skipped (6)
+   Start at  23:00:38
+   Duration  460ms (environment 50%, setup 17%, tests 15%, transform 12%, import 5%, worker 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/chat-view/api/messages.test.ts > useStopMessage (AC-54) > AC-54: stops a mid-stream response and resyncs history to pick up the saved partial response
+AssertionError: expected [ Array(1) ] to deeply equal [ 'POST /api/chats/chat-1/stop' ]
+
+- Expected
++ Received
+
+  [
+-   "POST /api/chats/chat-1/stop",
++   "POST /api/chats/chat-1/messages/msg-assistant-1/stop",
+  ]
+
+ ❯ src/features/chat-view/api/messages.test.ts:65:75
+     63|
+     64|     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+     65|     expect(requests.map((r) => `${r.method} ${new URL(r.url).pathname}…
+       |                                                                           ^
+     66|   });
+     67| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

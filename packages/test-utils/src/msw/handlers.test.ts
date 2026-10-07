@@ -119,7 +119,6 @@ describe("message handlers", () => {
     const retry = await post("/api/chats/chat_7/messages/msg_3/retry");
     expect(retry.status).toBe(202);
     expect((await json(retry)).message).toMatchObject({ id: "msg_3", status: "queued" });
-    expect(await json(await post("/api/chats/chat_7/messages/msg_3/stop"))).toEqual({ stopped: true });
     expect(await json(await post("/api/chats/chat_7/stop"))).toEqual({ stopped: true });
   });
 
