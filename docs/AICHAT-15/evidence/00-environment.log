@@ -1,0 +1,8 @@
+$ sw_vers -productVersion; node -v; pnpm -v; docker --version; git branch --show-current
+27.0.1
+v26.8.2
+10.4.0
+Docker version 29.7.2, build a7dcaa6
+test/AICHAT-15-stream-cancellation
+
+[exit 0]

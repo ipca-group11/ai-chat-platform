@@ -2,11 +2,11 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { TEST_JWT_SECRET, tokenFor } from "../../test-utils/auth-token.js";
+import { TEST_JWT_SECRET, cookieFor, tokenFor } from "../../test-utils/auth-token.js";
 import { authMiddleware } from "../../shared/auth-middleware.js";
 import { errorHandler, notFoundHandler } from "../../shared/error-handler.js";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
-import { createFakeQueue } from "../../test-utils/fake-queue.js";
+import { createFakeQueue, hangingProcessor } from "../../test-utils/fake-queue.js";
 import { FakeMessagesRepository } from "../../test-utils/fake-messages-repository.js";
 import { ChatsService } from "../chats/index.js";
 import { ChatEventBus } from "../streaming/index.js";
@@ -18,7 +18,8 @@ import { asUser } from "../../test-utils/principal.js";
 function buildApp() {
   const chatsService = new ChatsService(new FakeChatsRepository());
   const messagesRepo = new FakeMessagesRepository();
-  const queueManager = createFakeQueue();
+  const processor = hangingProcessor();
+  const queueManager = createFakeQueue(processor);
   const bus = new ChatEventBus();
   const service = new MessagesService(messagesRepo, chatsService, queueManager, bus);
 
@@ -29,7 +30,14 @@ function buildApp() {
   app.use("/chats", createMessagesRouter(service));
   app.use(notFoundHandler);
   app.use(errorHandler);
-  return { app, chatsService, messagesRepo };
+  return { app, chatsService, messagesRepo, processor };
+}
+
+/** The abort signal the queue handed to the (hanging) processor for its n-th reply. */
+function signalOf(processor: ReturnType<typeof hangingProcessor>, call = 0): AbortSignal {
+  const signal = processor.mock.calls[call]?.[2];
+  if (!signal) throw new Error(`processor call ${call} not made`);
+  return signal;
 }
 
 describe("messages routes", () => {
@@ -109,6 +117,53 @@ describe("messages routes", () => {
     const stopRes = await request(app).post(`/chats/${chat.id}/stop`).set("Cookie", [`access_token=${token}`]);
     expect(stopRes.status).toBe(200);
     expect(stopRes.body).toEqual({ stopped: true });
+  });
+
+  // AICHAT-199: the stop contract the chat UI relies on (`POST /chats/:chatId/stop`).
+  describe("stop contract (AICHAT-199)", () => {
+    it("stopping aborts the signal of the reply that is running", async () => {
+      const { app, chatsService, processor } = buildApp();
+      const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
+      await request(app).post(`/chats/${chat.id}/messages`).set("Cookie", cookieFor("user-1")).send({ content: "hi" });
+      expect(signalOf(processor).aborted).toBe(false);
+
+      await request(app).post(`/chats/${chat.id}/stop`).set("Cookie", cookieFor("user-1")).expect(200, { stopped: true });
+
+      expect(signalOf(processor).aborted).toBe(true);
+    });
+
+    it("stopping an idle chat answers stopped:false instead of an error", async () => {
+      const { app, chatsService } = buildApp();
+      const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
+
+      const res = await request(app).post(`/chats/${chat.id}/stop`).set("Cookie", cookieFor("user-1"));
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ stopped: false });
+    });
+
+    it("a user who is not a member gets 404 and the owner's reply keeps running", async () => {
+      const { app, chatsService, processor } = buildApp();
+      const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
+      await request(app).post(`/chats/${chat.id}/messages`).set("Cookie", cookieFor("user-1")).send({ content: "hi" });
+
+      const res = await request(app).post(`/chats/${chat.id}/stop`).set("Cookie", cookieFor("stranger"));
+
+      expect(res.status).toBe(404);
+      expect(res.body.error.code).toBe("CHAT_NOT_FOUND");
+      expect(signalOf(processor).aborted).toBe(false);
+    });
+
+    it("an invited member can stop the reply", async () => {
+      const { app, chatsService, processor } = buildApp();
+      const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
+      await chatsService.addMember(asUser("user-1"), chat.id, asUser("user-2").email);
+      await request(app).post(`/chats/${chat.id}/messages`).set("Cookie", cookieFor("user-1")).send({ content: "hi" });
+
+      await request(app).post(`/chats/${chat.id}/stop`).set("Cookie", cookieFor("user-2")).expect(200, { stopped: true });
+
+      expect(signalOf(processor).aborted).toBe(true);
+    });
   });
 
   it("AC-73: a failed message can be retried via the API", async () => {
