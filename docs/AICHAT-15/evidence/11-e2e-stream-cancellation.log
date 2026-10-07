@@ -1,0 +1,16 @@
+$ pnpm exec playwright test --project=chromium src/tests/stream-cancellation.spec.ts src/tests/chat-mock.spec.ts src/tests/chat.spec.ts -g 'leaving a chat|chat flows against the LLM mock|US-16' --reporter=list
+
+Running 8 tests using 3 workers
+
+  ✓  2 [chromium] › src/tests/chat-mock.spec.ts:37:3 › chat flows against the LLM mock › send and stream: the answer arrives token by token and is saved (6.6s)
+  ✓  3 [chromium] › src/tests/chat.spec.ts:105:3 › chat › US-16: Send message and streamed response (FR9, FR10, FR12, UC3) (9.7s)
+  ✓  4 [chromium] › src/tests/chat-mock.spec.ts:53:3 › chat flows against the LLM mock › cancel: Stop keeps the part that was already written (6.4s)
+  ✓  1 [chromium] › src/tests/stream-cancellation.spec.ts:47:3 › leaving a chat while the reply is written (AICHAT-203) › switching to another chat keeps the reply running to the end (14.3s)
+  ✓  5 [chromium] › src/tests/chat-mock.spec.ts:70:3 › chat flows against the LLM mock › cancel: a queued message can be removed before it is answered (4.3s)
+  ✓  7 [chromium] › src/tests/chat-mock.spec.ts:82:3 › chat flows against the LLM mock › provider error and retry: the failure is shown and Retry gets an answer (5.5s)
+  ✓  6 [chromium] › src/tests/stream-cancellation.spec.ts:61:3 › leaving a chat while the reply is written (AICHAT-203) › closing the tab keeps the reply running to the end (15.6s)
+  ✓  8 [chromium] › src/tests/stream-cancellation.spec.ts:78:3 › leaving a chat while the reply is written (AICHAT-203) › logging out stops the reply the user started (6.6s)
+
+  8 passed (36.8s)
+
+[exit 0]
