@@ -1,0 +1,35 @@
+$ cd services/conversation-service && pnpm exec vitest run src/features/llm-adapters/abort.spec.ts src/features/messages/processor.spec.ts -t 'AICHAT-200' --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/features/llm-adapters/abort.spec.ts > openai adapter: abort (AICHAT-200) > streams the whole reply when nobody stops it (control case) 4ms
+ ✓ src/features/llm-adapters/abort.spec.ts > openai adapter: abort (AICHAT-200) > hands the caller's abort signal to fetch 0ms
+ ✓ src/features/llm-adapters/abort.spec.ts > openai adapter: abort (AICHAT-200) > an abort in the middle of the reply ends it with an AbortError and no further token 1ms
+ ✓ src/features/llm-adapters/abort.spec.ts > anthropic adapter: abort (AICHAT-200) > streams the whole reply when nobody stops it (control case) 0ms
+ ✓ src/features/llm-adapters/abort.spec.ts > anthropic adapter: abort (AICHAT-200) > hands the caller's abort signal to fetch 0ms
+ ✓ src/features/llm-adapters/abort.spec.ts > anthropic adapter: abort (AICHAT-200) > an abort in the middle of the reply ends it with an AbortError and no further token 0ms
+ ✓ src/features/llm-adapters/abort.spec.ts > ollama adapter: abort (AICHAT-200) > streams the whole reply when nobody stops it (control case) 0ms
+ ✓ src/features/llm-adapters/abort.spec.ts > ollama adapter: abort (AICHAT-200) > hands the caller's abort signal to fetch 0ms
+ ✓ src/features/llm-adapters/abort.spec.ts > ollama adapter: abort (AICHAT-200) > an abort in the middle of the reply ends it with an AbortError and no further token 0ms
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > AC-52/53: streams tokens and sends the full conversation history as context
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > adds the system prompt before the history, and nothing when there is none (AICHAT-26)
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > passes the chat's reasoning toggle to the provider
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > streams and saves the model's reasoning when the chat has reasoning on
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > drops reasoning a model produces while the chat has reasoning off
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > passes the chat's web fetch toggle to the provider
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > streams web fetch progress and saves the finished fetches with the reply
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > doesn't save a fetch that was still running when the reply was stopped
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > AC-55: the completed response is saved so it reappears after reload
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > AC-54: stopping mid-stream saves the partial response
+ ✓ src/features/messages/processor.spec.ts > createMessageProcessor > AICHAT-200: Stop during a real adapter stream saves the partial reply as stopped, never as an error 5ms
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > AC-72/74: a provider error is caught, surfaced, and marks the message failed without throwing
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > AC-50: subsequent messages use the chat's persisted provider and model, even after it changes
+ ↓ src/features/messages/processor.spec.ts > createMessageProcessor > AC-73: a retry entry reprocesses the existing failed assistant message in place
+
+ Test Files  2 passed (2)
+      Tests  10 passed | 13 skipped (23)
+   Start at  23:05:39
+   Duration  163ms (transform 40%, import 39%, worker 13%, tests 7%, setup 1%)
+
+
+[exit 0]
