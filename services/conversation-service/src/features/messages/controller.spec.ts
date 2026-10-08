@@ -70,10 +70,19 @@ describe("messages controller", () => {
     service.editQueued.mockResolvedValue({ id: "m1", content: "new" });
     const res = fakeRes();
 
-    await controller.edit(fakeReq({ params: { chatId: "c1", messageId: "m1" }, body: { content: "new", extra: 1 } }), res);
+    await controller.edit(fakeReq({ params: { chatId: "c1", messageId: "m1" }, body: { content: "new" } }), res);
 
     expect(service.editQueued).toHaveBeenCalledWith(principal, "c1", "m1", "new");
     expect(res.json).toHaveBeenCalledWith({ message: { id: "m1", content: "new" } });
+  });
+
+  it("edit: refuses a body with an unknown field before calling the service (AICHAT-186)", async () => {
+    const { service, controller } = setup();
+
+    await expect(
+      controller.edit(fakeReq({ params: { chatId: "c1", messageId: "m1" }, body: { content: "new", extra: 1 } }), fakeRes()),
+    ).rejects.toThrow(/extra/);
+    expect(service.editQueued).not.toHaveBeenCalled();
   });
 
   it("cancel: answers 204 without a body", async () => {

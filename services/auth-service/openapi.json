@@ -209,7 +209,8 @@
                 "required": [
                   "email",
                   "password"
-                ]
+                ],
+                "additionalProperties": false
               }
             }
           }
@@ -234,7 +235,7 @@
             }
           },
           "400": {
-            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`",
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or `INVALID_JSON` for a body that is not JSON",
             "headers": {
               "X-Correlation-Id": {
                 "description": "Echoes the request's correlation id, or a new one",
@@ -253,6 +254,24 @@
           },
           "409": {
             "description": "An account with this email already exists",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The JSON body is over the 100 kB limit (`PAYLOAD_TOO_LARGE`)",
             "headers": {
               "X-Correlation-Id": {
                 "description": "Echoes the request's correlation id, or a new one",
@@ -318,7 +337,8 @@
                 "required": [
                   "email",
                   "password"
-                ]
+                ],
+                "additionalProperties": false
               }
             }
           }
@@ -348,8 +368,44 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or `INVALID_JSON` for a body that is not JSON",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Missing or invalid credentials, session or refresh token",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The JSON body is over the 100 kB limit (`PAYLOAD_TOO_LARGE`)",
             "headers": {
               "X-Correlation-Id": {
                 "description": "Echoes the request's correlation id, or a new one",
@@ -603,7 +659,8 @@
                 },
                 "required": [
                   "password"
-                ]
+                ],
+                "additionalProperties": false
               }
             }
           }
@@ -627,7 +684,7 @@
             }
           },
           "400": {
-            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`",
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or `INVALID_JSON` for a body that is not JSON",
             "headers": {
               "X-Correlation-Id": {
                 "description": "Echoes the request's correlation id, or a new one",
@@ -664,6 +721,24 @@
           },
           "403": {
             "description": "The request comes from an origin that is not allowed",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The JSON body is over the 100 kB limit (`PAYLOAD_TOO_LARGE`)",
             "headers": {
               "X-Correlation-Id": {
                 "description": "Echoes the request's correlation id, or a new one",

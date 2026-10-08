@@ -40,16 +40,18 @@ describe("unexpected errors", () => {
     expectSafe500(res);
   });
 
-  // Pinned current behaviour (defect, WORKLOG §7): a body that is not valid JSON makes
-  // express.json() raise a 400-class SyntaxError, which the error handler does not know,
-  // so the client gets a 500 instead of a 400. Fixing it needs a new branch in the handler.
-  it("a body that is not valid JSON returns 500 (pinned: should be 400) and still leaks nothing", async () => {
+  // Was pinned as a 500 (defect, AICHAT-23 WORKLOG §7); fixed in AICHAT-186: the error handler
+  // now knows the body parser's 400-class errors.
+  it("a body that is not valid JSON returns 400 INVALID_JSON and leaks nothing", async () => {
     const { app } = buildTestApp();
     const res = await request(app)
       .post("/chats")
       .set("Cookie", cookieFor("user-1"))
       .set("Content-Type", "application/json")
       .send("{not json");
-    expectSafe500(res);
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("INVALID_JSON");
+    expect(res.body.correlationId).toBe(res.headers["x-correlation-id"]);
+    expect(JSON.stringify(res.body)).not.toMatch(/Unexpected token|SyntaxError|at /);
   });
 });

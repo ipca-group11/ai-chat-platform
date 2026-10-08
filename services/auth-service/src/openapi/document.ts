@@ -19,11 +19,12 @@ function named<T extends z.ZodType>(name: string, schema: T): T {
 }
 
 const ERROR_DESCRIPTIONS: Record<number, string> = {
-  400: "Invalid request: `VALIDATION_ERROR` with `fieldErrors`",
+  400: "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or `INVALID_JSON` for a body that is not JSON",
   401: "Missing or invalid credentials, session or refresh token",
   403: "The request comes from an origin that is not allowed",
   409: "An account with this email already exists",
   502: "conversation-service did not erase the account's data; nothing was deleted",
+  413: "The JSON body is over the 100 kB limit (`PAYLOAD_TOO_LARGE`)",
   429: "Too many requests from this client (`RATE_LIMITED`)",
   503: "Account deletion is not configured on this deployment",
 };
@@ -139,8 +140,13 @@ export function routeConfigs(): RouteConfig[] {
     },
   });
 
-  // The app-wide rate limiter runs before every route, so any of them can answer 429.
-  for (const config of routes) Object.assign(config.responses, errors(429));
+  for (const config of routes) {
+    // The body parser refuses a malformed or oversized JSON body before the route runs (AICHAT-186);
+    // on login too, which otherwise answers every bad body with 401.
+    if (config.request?.body) Object.assign(config.responses, errors(400, 413));
+    // The app-wide rate limiter runs before every route, so any of them can answer 429.
+    Object.assign(config.responses, errors(429));
+  }
   return routes;
 }
 

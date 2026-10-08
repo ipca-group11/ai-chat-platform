@@ -28,6 +28,35 @@ export class HttpError extends Error {
   }
 }
 
+/** Zod issues as `fieldErrors`. An unknown field of a strict object is reported under its own
+ * name (Zod puts it on the parent object), so the client knows which field to remove. */
+export function toFieldErrors(err: ZodError): Record<string, string[]> {
+  const fieldErrors: Record<string, string[]> = {};
+  const add = (key: string, message: string) => {
+    fieldErrors[key] = [...(fieldErrors[key] ?? []), message];
+  };
+  for (const issue of err.issues) {
+    const prefix = issue.path.join(".");
+    if (issue.code === "unrecognized_keys") {
+      for (const key of issue.keys) add(prefix ? `${prefix}.${key}` : key, "Unknown field");
+    } else {
+      add(prefix || "_", issue.message);
+    }
+  }
+  return fieldErrors;
+}
+
+/** Errors Express and its body parser raise before a route runs (malformed JSON, a body over the
+ * limit, a path that cannot be decoded). They carry a 4xx `status`; their text is not sent back. */
+function expressClientError(err: unknown): { status: number; code: string; message: string } | undefined {
+  if (typeof err !== "object" || err === null) return undefined;
+  const { status, type } = err as { status?: unknown; type?: unknown };
+  if (typeof status !== "number" || status < 400 || status > 499) return undefined;
+  if (type === "entity.parse.failed") return { status: 400, code: "INVALID_JSON", message: "The request body is not valid JSON" };
+  if (type === "entity.too.large") return { status: 413, code: "PAYLOAD_TOO_LARGE", message: "The request body is too large" };
+  return { status: 400, code: "BAD_REQUEST", message: "The request could not be read" };
+}
+
 export function notFoundMiddleware(req: Request, res: Response): void {
   res
     .status(404)
@@ -53,7 +82,7 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
   }
 
   if (err instanceof ZodError) {
-    const fieldErrors = err.flatten().fieldErrors as Record<string, string[]>;
+    const fieldErrors = toFieldErrors(err);
     res
       .status(400)
       .json(
@@ -62,6 +91,14 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
           correlationId: req.correlationId,
         }),
       );
+    return;
+  }
+
+  const clientError = expressClientError(err);
+  if (clientError) {
+    res
+      .status(clientError.status)
+      .json(http.toErrorResponse(clientError.code, clientError.message, { correlationId: req.correlationId }));
     return;
   }
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { auth } from "../../shared/contracts/index.js";
-import { HttpError } from "../../shared/error-middleware.js";
+import { HttpError, toFieldErrors } from "../../shared/error-middleware.js";
 import type { PrismaClient } from "../../generated/prisma-client/index.js";
 import { prisma as defaultPrisma } from "../../shared/prisma.js";
 import { registerUser } from "./model.js";
@@ -13,8 +13,7 @@ export function createRegisterRouter(prisma: PrismaClient): Router {
     try {
       const parsed = auth.registerRequestSchema.safeParse(req.body);
       if (!parsed.success) {
-        const fieldErrors = parsed.error.flatten().fieldErrors as Record<string, string[]>;
-        throw new HttpError(400, "VALIDATION_ERROR", "Invalid registration details", fieldErrors);
+        throw new HttpError(400, "VALIDATION_ERROR", "Invalid registration details", toFieldErrors(parsed.error));
       }
 
       const user = await registerUser(prisma, parsed.data);

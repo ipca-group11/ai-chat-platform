@@ -1,0 +1,10 @@
+$ pnpm exec nx run-many -t pact:verify -p auth-service conversation-service --skip-nx-cache --outputStyle=static 2>&1 | grep -E 'Tests |passed|failed|Successfully|Failed'
+  a request to retry a failed reply (0s loading, 2ms verification)
+     Given a user owns a chat with a failed reply
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+ NX   Successfully ran target pact:verify for 2 projects and 8 tasks they depend on
+
+[exit 0]

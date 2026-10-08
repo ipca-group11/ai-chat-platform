@@ -1,0 +1,379 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/invalid-requests.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/invalid-requests.spec.ts (40 tests | 19 failed) 111ms
+   ❯ invalid requests are refused with 400 and field errors, never 500 (35)
+     × POST /chats · extra field 5ms
+     × POST /chats · malformed JSON 3ms
+     × POST /chats · body over the 100 kB limit 3ms
+     × GET /chats/:id · bad path param 2ms
+     × PATCH /chats/:id · extra field 2ms
+     × PATCH /chats/:id · bad path param 2ms
+     × DELETE /chats/:id · bad path param 3ms
+     × POST /chats/:id/members · extra field 2ms
+     × DELETE /chats/:id/members/:email · bad path param 2ms
+     × POST /chats/:chatId/messages · extra field 2ms
+     × POST /chats/:chatId/messages · malformed JSON 2ms
+     × GET /chats/:chatId/messages · bad path param 2ms
+     × PATCH /chats/:chatId/messages/:messageId · extra field 2ms
+     × DELETE /chats/:chatId/messages/:messageId · bad path param 2ms
+     × POST /chats/:chatId/messages/:messageId/retry · bad path param 2ms
+     × POST /chats/:chatId/stop · bad path param 2ms
+     × GET /chats/:chatId/stream · bad path param 2ms
+     × POST /internal/erasures · extra field 2ms
+     × POST /internal/sessions/:userId/stop · bad path param 2ms
+
+ Test Files  1 failed (1)
+      Tests  19 failed | 21 passed (40)
+   Start at  19:56:39
+   Duration  341ms (tests 38%, import 31%, transform 28%, worker 3%)
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 19 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /chats · extra field
+AssertionError: {"chat":{"id":"a1c442b5-af5b-4788-9387-53b370f7ca99","title":"T","ownerId":"owner","ownerEmail":"owner@example.com","provider":"openai","model":"gpt-4o","reasoning":false,"webFetch":false,"createdAt":"2026-10-08T18:56:39.337Z","updatedAt":"2026-10-08T18:56:39.337Z"}}: expected 201 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 201
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /chats · malformed JSON
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /chats/:chatId/messages · malformed JSON
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"}}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /chats · body over the 100 kB limit
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"}}: expected 500 to be 413 // Object.is equality
+
+- Expected
++ Received
+
+- 413
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > GET /chats/:id · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"c7fa8ffa-78af-4d98-87c2-0d180c32e307"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > PATCH /chats/:id · extra field
+AssertionError: {"chat":{"id":"b1c21b1a-da93-4de8-9a2e-f48e8abb8d6c","title":"x","ownerId":"owner","ownerEmail":"owner@example.com","provider":"anthropic","model":"claude-haiku-4-5","reasoning":false,"webFetch":false,"createdAt":"2026-10-08T18:56:39.353Z","updatedAt":"2026-10-08T18:56:39.354Z"}}: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > PATCH /chats/:id · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"f6e23316-24da-43b2-9a94-842ad8e66c56"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > DELETE /chats/:id · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"8e5cff04-5534-4dbb-9ced-a50691a02eb6"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /chats/:id/members · extra field
+AssertionError: {"member":{"email":"a@example.com","role":"member","addedAt":"2026-10-08T18:56:39.366Z"}}: expected 201 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 201
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > DELETE /chats/:id/members/:email · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"3c509b5b-46f1-4eab-acce-825c93e01ad8"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /chats/:chatId/messages · extra field
+AssertionError: {"message":{"id":"034398c2-faf3-480c-a805-08eb5ee79575","chatId":"82916bc1-77bb-4b56-964f-04849b176e3f","authorId":"owner","authorEmail":"owner@example.com","role":"user","content":"hi","reasoning":null,"webFetches":[],"status":"queued","error":null,"stopped":false,"attachments":[],"createdAt":"2026-10-08T18:56:39.381Z"}}: expected 201 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 201
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > GET /chats/:chatId/messages · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"e46c6e0f-7e72-4dc2-8dae-afd6bd6f931c"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > PATCH /chats/:chatId/messages/:messageId · extra field
+AssertionError: {"message":{"id":"236b9401-7a35-4af5-afd2-dd472c2124a0","chatId":"28d20a84-52f4-4131-9bf3-363bf80c52ba","authorId":"owner","authorEmail":"owner@example.com","role":"user","content":"x","reasoning":null,"webFetches":[],"status":"queued","error":null,"stopped":false,"attachments":[],"createdAt":"2026-10-08T18:56:39.389Z"}}: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > DELETE /chats/:chatId/messages/:messageId · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"3a6474f7-5f3b-41c8-80fd-f57c0eb44657"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /chats/:chatId/messages/:messageId/retry · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"4bf4f559-bd5b-4ce3-a603-b0d95dfa2c16"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /chats/:chatId/stop · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"f727a7ec-da36-41d0-8ac2-6d531703f9fa"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > GET /chats/:chatId/stream · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"704f175e-3c72-4bc0-bd60-93cf7ed7d545"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /internal/erasures · extra field
+AssertionError: {"erased":{"chats":0,"memberships":0,"messages":0,"files":0}}: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/19]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with 400 and field errors, never 500 > POST /internal/sessions/:userId/stop · bad path param
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"8ce5dbd0-0375-490d-b606-12179eb3e494"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:99:50
+     97|     const res = await send(app, c, { chatId, messageId });
+     98|
+     99|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+    100|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+    101|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/19]⎯
+
+
+[exit 1]
