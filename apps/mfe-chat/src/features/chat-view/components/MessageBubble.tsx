@@ -94,10 +94,11 @@ export function MessageBubble({ message, currentUserId, onStop, onRetry, retryin
         ) : null}
 
         {message.attachments.length > 0 ? (
-          <ul aria-label="Message attachments" className="flex flex-wrap gap-1.5">
+          <ul aria-label="Message attachments" data-testid="message-attachments" className="flex flex-wrap gap-1.5">
             {message.attachments.map((attachment) => (
               <li
                 key={attachment.id}
+                data-testid="message-attachment"
                 className="flex items-center gap-1 rounded-md border border-border bg-muted/50 px-2 py-1 text-xs text-muted-foreground"
               >
                 <Paperclip className="size-3" aria-hidden="true" />

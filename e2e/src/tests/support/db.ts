@@ -35,3 +35,8 @@ export function deleteUser(email: string): void {
 export function countMessages(chatId: string): number {
   return Number(query(`SELECT count(*) FROM conversation."Message" WHERE "chatId" = :'chatId';`, { chatId }));
 }
+
+/** Number of attachments stored for this message (conversation-service schema). */
+export function countAttachments(messageId: string): number {
+  return Number(query(`SELECT count(*) FROM conversation."Attachment" WHERE "messageId" = :'messageId';`, { messageId }));
+}

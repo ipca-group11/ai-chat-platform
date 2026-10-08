@@ -12,26 +12,26 @@ export function AttachmentList({ attachments, onRemove }: AttachmentListProps) {
   if (attachments.length === 0) return null;
 
   return (
-    <ul aria-label="Attachments" className="flex flex-wrap gap-2 px-3 pt-3">
+    <ul aria-label="Attachments" data-testid="attachments" className="flex flex-wrap gap-2 px-3 pt-3">
       {attachments.map((pending) => {
         const rejected = pending.status === "rejected";
         return (
           <li
             key={pending.id}
-            data-testid={`attachment-${pending.id}`}
+            data-testid="attachment"
             className={cn(
               "flex max-w-full items-center gap-2 rounded-md border bg-muted/50 py-1 pl-2 pr-1 text-xs",
               rejected ? "border-destructive/50" : "border-border"
             )}
           >
             <FileText className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
-            <span className="truncate font-medium">{pending.file.name}</span>
+            <span data-testid="attachment-name" className="truncate font-medium">{pending.file.name}</span>
             {rejected ? (
-              <span role="alert" className="text-destructive">
+              <span role="alert" data-testid="attachment-error" className="text-destructive">
                 {pending.error}
               </span>
             ) : (
-              <Badge variant={pending.status === "uploaded" ? "success" : "secondary"} className="px-1.5 py-0 text-[10px]">
+              <Badge data-testid="attachment-status" variant={pending.status === "uploaded" ? "success" : "secondary"} className="px-1.5 py-0 text-[10px]">
                 {pending.status}
               </Badge>
             )}
@@ -42,6 +42,7 @@ export function AttachmentList({ attachments, onRemove }: AttachmentListProps) {
               className="size-6"
               onClick={() => onRemove(pending.id)}
               aria-label={`Remove ${pending.file.name}`}
+              data-testid="remove-attachment"
             >
               <X className="size-3" aria-hidden="true" />
             </Button>

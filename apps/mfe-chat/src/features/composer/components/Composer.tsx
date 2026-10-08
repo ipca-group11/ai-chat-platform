@@ -60,7 +60,7 @@ export function Composer({ chatId, userId, provider, model = "", compact = false
         </div>
       </form>
       {composer.sendError && (
-        <p role="alert" className="text-sm font-medium text-destructive">
+        <p role="alert" data-testid="send-error" className="text-sm font-medium text-destructive">
           {composer.sendError.message}
         </p>
       )}
