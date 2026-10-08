@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { NavBar } from './NavBar';
 import { queryClient } from '../../app/queryClient';
-import { apiFetch } from '../http/apiClient';
+import { logout } from '../../features/auth-guard/api/logout';
 import { SESSION_QUERY_KEY, useSession } from '../../features/auth-guard/api/useSession';
 
 export interface AppShellLayoutProps {
@@ -20,7 +20,7 @@ export function AppShellLayout({ children }: AppShellLayoutProps) {
   const { data: session } = useSession();
 
   const handleLogout = () => {
-    void apiFetch('/auth/logout', { method: 'POST' })
+    void logout()
       .catch(() => {
         // Best-effort: even if the network call fails, clear local session
         // state and send the user back to the login screen.

@@ -4,7 +4,8 @@ import type { AuthMeResponse, Session } from '../model/session';
 
 const SESSION_QUERY_KEY = ['auth', 'me'] as const;
 
-async function fetchSession(): Promise<Session | null> {
+/** `GET /auth/me`: the current user, or `null` when auth-service answers 401. */
+export async function fetchSession(): Promise<Session | null> {
   try {
     const response = await apiFetch<AuthMeResponse | Session>('/auth/me');
     // auth-service returns the user itself ({ id, email }); the shell's type wrapped it in { user }.
