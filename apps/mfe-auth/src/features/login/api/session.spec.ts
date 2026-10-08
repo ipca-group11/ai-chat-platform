@@ -5,7 +5,7 @@ import { fetchSessionWithRefresh } from "./session";
 
 const paths = (requests: Request[]) => requests.map((r) => `${r.method} ${new URL(r.url).pathname}`);
 const user = { id: "1", email: "a@b.com" };
-const unauthorized = () => HttpResponse.json({ error: "Unauthorized" }, { status: 401 });
+const unauthorized = () => HttpResponse.json({ error: { code: "UNAUTHENTICATED", message: "Unauthorized" } }, { status: 401 });
 
 describe("fetchSessionWithRefresh (F4 session contract)", () => {
   it("AC-41: resolves with the current user when /auth/me succeeds", async () => {
@@ -38,7 +38,7 @@ describe("fetchSessionWithRefresh (F4 session contract)", () => {
   });
 
   it("AC-41: a non-401 error from /auth/me is rethrown immediately without attempting a refresh", async () => {
-    server.use(http.get("*/auth/me", () => HttpResponse.json({ error: "Server error" }, { status: 500 })));
+    server.use(http.get("*/auth/me", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "Server error" } }, { status: 500 })));
     const requests = recordRequests();
 
     await expect(fetchSessionWithRefresh()).rejects.toMatchObject({ status: 500 });

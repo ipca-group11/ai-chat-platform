@@ -69,9 +69,15 @@ importers:
       '@module-federation/vite':
         specifier: ^1.22.1
         version: 1.22.1(typescript@6.0.3)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@pact-foundation/pact':
+        specifier: ^17.1.4
+        version: 17.1.4
       '@platform/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@platform/pact-config':
+        specifier: workspace:^
+        version: link:../../packages/pact-config
       '@platform/test-config':
         specifier: workspace:*
         version: link:../../packages/test-config
@@ -154,9 +160,15 @@ importers:
       '@module-federation/vite':
         specifier: ^1.22.1
         version: 1.22.1(typescript@6.0.3)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@pact-foundation/pact':
+        specifier: ^17.1.4
+        version: 17.1.4
       '@platform/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@platform/pact-config':
+        specifier: workspace:^
+        version: link:../../packages/pact-config
       '@platform/test-config':
         specifier: workspace:*
         version: link:../../packages/test-config
@@ -230,9 +242,15 @@ importers:
       '@module-federation/vite':
         specifier: ^1.22.1
         version: 1.22.1(typescript@6.0.3)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@pact-foundation/pact':
+        specifier: ^17.1.4
+        version: 17.1.4
       '@platform/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@platform/pact-config':
+        specifier: workspace:^
+        version: link:../../packages/pact-config
       '@platform/test-config':
         specifier: workspace:*
         version: link:../../packages/test-config
@@ -312,9 +330,15 @@ importers:
       '@module-federation/vite':
         specifier: ^1.22.1
         version: 1.22.1(typescript@6.0.3)(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@pact-foundation/pact':
+        specifier: ^17.1.4
+        version: 17.1.4
       '@platform/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@platform/pact-config':
+        specifier: workspace:^
+        version: link:../../packages/pact-config
       '@platform/test-config':
         specifier: workspace:*
         version: link:../../packages/test-config
@@ -3999,7 +4023,6 @@ packages:
     resolution: {integrity: sha512-3W9bTFcQNJn71cSJVM9RKIiZOy8DO/XLDii8Uv/Pm6WKqDRj7JV3ZfuXIEfyuy5LXpIzAbB/1M4Ukp9GKNa7nA==}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.63.5':
     resolution: {integrity: sha512-VDC7rRJlee/scpki96GZ27Omf6yU87s1YXwVTpjE5841faVlDYYT565rgfmoR1U0sqL7z5ivQSDjcsF6VRXyBA==}
@@ -4296,14 +4319,12 @@ packages:
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@swc/core-linux-x64-musl@1.16.13':
     resolution: {integrity: sha512-iCGxHbh3Cq5vqRvCPlw3XkkDz4RlkPSyQwfFKbOKTMj5tiEuojY/rLmf4BMfI9Z8yPJTf9VB07t3NbKInoC97g==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@swc/core-win32-arm64-msvc@1.16.13':
     resolution: {integrity: sha512-iOabn6cd+hg3cnoKlAC8j3Yufv8nQHBVU5OIDX8dCPA95PjAZ0B0TlDn9sWivk8ezo/cLJux7p9n0B9vRej+1Q==}
@@ -7454,8 +7475,8 @@ packages:
     resolution: {integrity: sha512-b94GiNHQNy6JNTrt5w6zNyffMrNkXZb3KTkCZJb2V1xaEGCk093vkZ2jk3tpaeP33/OiXC+WvK9AxUebnf5nbw==}
     engines: {node: '>= 0.6.3'}
 
-  legacy-javascript@0.0.1:
-    resolution: {integrity: sha512-lPyntS4/aS7jpuvOlitZDFifBCb4W8L/3QU0PLbUTUj+zYah8rfVjYic88yG7ZKTxhS5h9iz7duT8oUXKszLhg==}
+  legacy-javascript@0.0.3:
+    resolution: {integrity: sha512-1r6MT4dVaJyXt4G07Cm2cQ0AUaLJdefiEp4SmIAylA++gnEQ82YvmzE58RkM5EP0fk5hROLCslUPGnwIYdZQVA==}
 
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -13606,7 +13627,7 @@ snapshots:
     dependencies:
       '@pact-foundation/pact-core': 20.2.0
       '@scarf/scarf': 1.4.0
-      axios: 1.18.1
+      axios: 1.20.0(debug@4.4.3)
       body-parser: 2.3.0
       chalk: 4.1.2
       express: 5.2.1
@@ -13630,7 +13651,7 @@ snapshots:
 
   '@paulirish/trace_engine@0.0.53':
     dependencies:
-      legacy-javascript: 0.0.1
+      legacy-javascript: 0.0.3
       third-party-web: 0.30.0
 
   '@phenomnomnominal/tsquery@6.2.0(typescript@6.0.3)':
@@ -15186,16 +15207,6 @@ snapshots:
 
   axe-core@4.13.0: {}
 
-  axios@1.18.1:
-    dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3)
-      form-data: 4.0.6
-      https-proxy-agent: 5.0.1(supports-color@7.2.0)
-      proxy-from-env: 2.1.0
-    transitivePeerDependencies:
-      - debug
-      - supports-color
-
   axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0):
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3(supports-color@7.2.0))
@@ -15215,7 +15226,6 @@ snapshots:
     transitivePeerDependencies:
       - debug
       - supports-color
-    optional: true
 
   b4a@1.9.0: {}
 
@@ -17850,7 +17860,7 @@ snapshots:
     dependencies:
       readable-stream: 2.3.8
 
-  legacy-javascript@0.0.1: {}
+  legacy-javascript@0.0.3: {}
 
   levn@0.4.1:
     dependencies:

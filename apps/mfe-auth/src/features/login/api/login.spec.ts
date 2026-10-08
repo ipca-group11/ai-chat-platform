@@ -19,7 +19,7 @@ describe("loginUser", () => {
   });
 
   it("AC-36: rejects with the server's single generic message on bad credentials", async () => {
-    server.use(http.post("*/auth/login", () => HttpResponse.json({ error: "Invalid credentials" }, { status: 401 })));
+    server.use(http.post("*/auth/login", () => HttpResponse.json({ error: { code: "UNAUTHENTICATED", message: "Invalid credentials" } }, { status: 401 })));
 
     const failure = loginUser({ email: "ana@example.com", password: "wrong" });
     await expect(failure).rejects.toBeInstanceOf(ApiError);
@@ -37,7 +37,7 @@ describe("logoutUser", () => {
   });
 
   it("rejects when the server fails", async () => {
-    server.use(http.post("*/auth/logout", () => HttpResponse.json({ message: "boom" }, { status: 500 })));
+    server.use(http.post("*/auth/logout", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "boom" } }, { status: 500 })));
 
     await expect(logoutUser()).rejects.toMatchObject({ status: 500, message: "boom" });
   });

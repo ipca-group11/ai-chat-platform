@@ -3,6 +3,7 @@ import { coveragePreset, appCoverageThresholds } from "@platform/test-config";
 import { federation } from "@module-federation/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { configDefaults } from "vitest/config";
 
 // Module Federation remote exposure for the auth domain.
 // Per docs/ARCHITECTURE.md §3 and docs/pods/auth/PLAN.md (F1), this remote exposes its
@@ -49,6 +50,8 @@ export default defineConfig({
     env: {
       NODE_ENV: "test",
     },
+    // Pact consumer tests run in their own config (vitest.pact.config.ts), without MSW.
+    exclude: [...configDefaults.exclude, "**/*.pact.spec.ts"],
     setupFiles: ["./src/shared/test/setup.ts", "@platform/test-utils/setup"],
     css: false,
     coverage: coveragePreset({

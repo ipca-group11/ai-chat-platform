@@ -31,7 +31,7 @@ describe("LogoutButton", () => {
   });
 
   it("AC-38: redirects to /login and clears the cache even if the logout request fails", async () => {
-    server.use(http.post("*/auth/logout", () => HttpResponse.json({ error: "Server error" }, { status: 500 })));
+    server.use(http.post("*/auth/logout", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "Server error" } }, { status: 500 })));
     const user = userEvent.setup();
     const { queryClient } = renderWithClient(<LogoutButton />);
     const clearSpy = vi.spyOn(queryClient, "clear");
