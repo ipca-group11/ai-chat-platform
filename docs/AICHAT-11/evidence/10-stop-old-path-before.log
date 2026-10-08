@@ -1,0 +1,13 @@
+$ pnpm exec nx run mfe-chat:pact:consumer --skip-nx-cache 2>&1 | grep -E 'Tests |Successfully'; cd services/conversation-service && pnpm exec vitest run -c vitest.verify.config.ts 2>&1 | grep -vE '^.{0,12}Error.{0,12}: \{' | grep -E 'Failures:|^[0-9]+\) .*stop|stop.*-> |has status code|There were|Tests ' | grep -B1 -A3 'stop' | head -12; echo; pnpm exec vitest run -c vitest.verify.config.ts 2>&1 | grep -E 'Tests '
+      Tests  20 passed (20)
+ NX   Successfully ran target pact:consumer for project mfe-chat
+Failures:
+1) Verifying a pact between mfe-chat and conversation-service Given a user owns a chat with a reply in progress - a request to stop the reply in progress
+    1.2) has status code 200
+There were 1 pact failures
+      has status code 201 (FAILED)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 3 passed (4)
+
+[exit 0]

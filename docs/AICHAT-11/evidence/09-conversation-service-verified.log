@@ -1,0 +1,35 @@
+$ cd services/conversation-service && pnpm exec vitest run -c vitest.verify.config.ts --reporter=verbose 2>&1 | grep -vE '^.{0,12}Error.{0,12}: \{' | grep -E '^Verifying a pact|^  [a-z].*\(|✓|×|Tests ' | sed -E 's/ \([0-9]+s loading.*\)//'
+Verifying a pact between auth-service and conversation-service
+  a request to erase a deleted user's data
+  a request to stop a logged-out user's replies
+Verifying a pact between mfe-chat and conversation-service
+  a request for a chat that does not exist
+  a request for one chat
+  a request for the chat list
+  a request for the members of a chat
+  a request for the messages of a chat
+  a request to cancel a queued message
+  a request to create a chat
+  a request to delete a chat
+  a request to edit a queued message
+  a request to invite a member
+  a request to invite someone who is already a member
+  a request to leave a shared chat
+  a request to remove a member
+  a request to rename a chat
+  a request to retry a failed reply
+  a request to send a message
+  a request to stop the reply in progress
+ ✓ src/contract/provider.verify.spec.ts > conversation-service honours its consumers' pacts > verifies every interaction except the known failures 270ms
+Verifying a pact between mfe-chat and conversation-service
+  a multipart upload of a text file
+ ✓ src/contract/provider.verify.spec.ts > conversation-service honours its consumers' pacts > still fails AICHAT-255: mfe-chat "a multipart upload of a text file" 222ms
+Verifying a pact between mfe-settings and conversation-service
+  a connection test with a rejected key
+ ✓ src/contract/provider.verify.spec.ts > conversation-service honours its consumers' pacts > still fails AICHAT-256: mfe-settings "a connection test with a rejected key" 129ms
+Verifying a pact between mfe-settings and conversation-service
+  a connection test with a valid key
+ ✓ src/contract/provider.verify.spec.ts > conversation-service honours its consumers' pacts > still fails AICHAT-256: mfe-settings "a connection test with a valid key" 224ms
+      Tests  4 passed (4)
+
+[exit 0]

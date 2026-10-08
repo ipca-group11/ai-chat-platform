@@ -326,3 +326,71 @@ Renaming one field in `GET /auth/me` breaks four consumers, and the verifier nam
 **Problems and fixes.** None in the verification itself: every interaction passed on the first run, because the
 consumer side had already been aligned with the real error envelope in US2. The states use the public API rather than
 seeding the fake directly, so they keep working if the storage changes.
+
+### US5 · Provider verification: conversation-service ([AICHAT-181](https://ipca-grupo11.atlassian.net/browse/AICHAT-181))
+
+**What and why.** Same idea as US4 for the service with the most consumers: the Pact `Verifier` replays the 22
+interactions of mfe-chat, mfe-settings and auth-service against the real conversation-service app (`createApp`) wired
+to the in-memory fakes of `src/test-utils/`. It also proves, on the provider side, that the Stop fix of AICHAT-199 is
+right, and keeps the two defects found in US1 visible without blocking every merge.
+
+**Provider states.** Each state builds a fresh `buildTestApp()` and seeds it with the ids the pacts use (`chat-1`,
+`msg-1`) through the fakes' `seed()`. Every request is made as `user-1`.
+
+| State | Setup |
+|---|---|
+| `a user is signed in`, `the chat does not exist` | empty app |
+| `a user owns a chat` / `a user has chats` | chat-1 owned by user-1 |
+| `a user owns a chat with a member` | + member `bob@example.com` |
+| `a user is a member of a chat` | chat-1 owned by `owner-2`, user-1 invited (**member** access) |
+| `a user owns a chat with a message` | + user message msg-1 |
+| `a user owns a chat with a queued message` | a reply is running, msg-1 waits in the queue behind it (edit/cancel only work on queued messages) |
+| `a user owns a chat with a failed reply` | + assistant msg-1 with status `failed` (retry) |
+| `a user owns a chat with a reply in progress` / `a user has a reply in progress` | a reply is submitted to the queue; the fake processor never finishes, so it runs until stopped |
+
+Owner, member and non-member access are all exercised: owner states, the member state (leave), and `the chat does not
+exist`, which is what a non-member gets (404, the service never reveals that a chat exists).
+
+**Credentials.** As in US4 they are not in the pacts. The `requestFilter` sends the test app's service token on
+`/internal/*` and a signed test JWT (`tokenFor("user-1")`) as the `access_token` cookie on every other route.
+
+**Known failures.** `KNOWN_FAILURES` lists the interactions of AICHAT-255 (upload) and AICHAT-256 (two connection
+tests). `splitKnownFailures` (pact-config) writes one copy of the pacts without them, which must verify, and one file
+per known failure, which must **still fail**. When a bug is fixed, its check turns red with "this interaction now passes:
+remove it from KNOWN_FAILURES", so the list cannot go stale.
+
+**Files.**
+- `services/conversation-service/src/contract/provider.verify.spec.ts` (new): verifier, states, known failures.
+- `services/conversation-service/vitest.verify.config.ts` (new), Nx target `pact:verify`; the normal test run excludes `*.verify.spec.ts`.
+
+**How to run.**
+
+```sh
+pnpm exec nx run-many -t pact:consumer
+pnpm exec nx run conversation-service:pact:verify
+```
+
+**How to repeat it manually.**
+
+1. Run the two commands. Expected: 4 tests pass: "verifies every interaction except the known failures" and three
+   "still fails AICHAT-25x" checks.
+2. Bring back the Stop path from before AICHAT-199: in `apps/mfe-chat/src/features/chat-view/api/messages.ts` change
+   `` `/chats/${chatId}/stop` `` to `` `/chats/${chatId}/messages/msg-1/stop` `` and the same path in
+   `messages.pact.spec.ts`. Run both commands again. Expected: the consumer run passes (the client agrees with its own
+   pact), the verifier fails on "a request to stop the reply in progress" with status 404 instead of 200. Restore both
+   files.
+
+**Result.** 19 interactions verify; the 3 known failures fail as expected.
+
+![conversation-service verifies its consumers' pacts](evidence/09-conversation-service-verified.png)
+
+"Before" evidence for the Stop defect: with the old client path, the consumer tests still pass, and only provider
+verification catches it. This is the check that was missing when AICHAT-199 was found:
+
+![The pre-AICHAT-199 Stop path fails provider verification](evidence/10-stop-old-path-before.png)
+
+**Problems and fixes.**
+- The pacts use fixed ids while the fakes generate UUIDs. The fakes already had `seed()`, so the states insert records
+  with the pact ids. (Pact's provider-state injection, `fromProviderState`, would let the provider choose the ids
+  instead; not needed here.)
+- edit/cancel need a message that is **queued**, not just saved: the state starts a reply first so msg-1 waits behind it.
