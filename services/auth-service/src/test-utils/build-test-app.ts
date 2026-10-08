@@ -9,7 +9,7 @@ import { fakePrisma } from "./fake-prisma.js";
  * middleware) backed by the in-memory Prisma fake. No database, no network. */
 export function buildTestApp(
   prisma: PrismaClient = fakePrisma(),
-  options: { logger?: Logger; erasure?: ErasureClient; deletionsPerHour?: number } = {},
+  options: { logger?: Logger; erasure?: ErasureClient; deletionsPerHour?: number; requestsPer15Minutes?: number } = {},
 ): { app: Express; prisma: ReturnType<typeof fakePrisma> } {
-  return { app: createApp({ prisma, logger: options.logger, erasure: options.erasure, deletionsPerHour: options.deletionsPerHour }), prisma: prisma as ReturnType<typeof fakePrisma> };
+  return { app: createApp({ prisma, logger: options.logger, erasure: options.erasure, deletionsPerHour: options.deletionsPerHour, requestsPer15Minutes: options.requestsPer15Minutes }), prisma: prisma as ReturnType<typeof fakePrisma> };
 }

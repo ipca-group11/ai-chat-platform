@@ -254,6 +254,79 @@ project) and the server URL is localhost.
 - The DAST file `testing/zap/openapi.yaml` is replaced in US5, where the compose stack runs and ZAP 2.17 can be checked
   against the generated OpenAPI 3.1 file.
 
+### US3 · Response bodies of every route validated against their schema ([AICHAT-185](https://ipca-grupo11.atlassian.net/browse/AICHAT-185))
+
+**What and why.** US2 describes what each route returns; this story proves the code really returns it. We did not
+write a second list of schemas for the tests: `document.ts` now exposes `routeConfigs()`, the list of routes the spec
+is built from, and the tests read the same list. For every route and status it holds the Zod schema of the body, so
+the spec and the tests cannot disagree.
+
+`test-utils/documented-response.ts` (one per service) checks a real response against that list:
+
+1. **The status must be documented for the route.** A 500, or a 400 on a route that cannot return one, fails with
+   `answered 500, which the spec does not document` and the body.
+2. **The body must match its schema, with no unknown field at any depth.** `schema.parse(body)` must succeed *and*
+   return exactly `body`. `z.object` silently drops keys it does not know, at every level, so any extra field (also
+   inside an array of chats) makes the parsed copy differ from the original. This gives a strict check of the whole
+   tree without changing the schemas.
+3. **Errors use the envelope.** Every 4xx is documented with `ErrorResponse`, has an `X-Correlation-Id` header, and
+   `body.correlationId` equals that header.
+4. **No body where none is documented** (204) and the documented content type (`text/plain` for `/metrics`,
+   `text/event-stream` for the stream; its events are checked in US6).
+
+`integration/response-schemas.spec.ts` (one per service) calls every route through the real app with in-memory fakes:
+the success case and each error status we can provoke (401, 400, 403, 404, 409, 422, and on auth-service 429, 502,
+503). Its last test, `every route's success response was checked against its schema`, fails if a route in the list
+has a success response that no test checked; with the route-inventory check of US2 this means a new route cannot be
+added without a schema and a response test.
+
+**Finding: the rate limiter answered 429 in plain text.** When a client goes over a limit, `express-rate-limit`
+answers by default with `text/html` "Too many requests, please try again later." instead of the error envelope; a
+frontend reading `body.error.message` gets nothing. The app-wide limiter also ran before the correlation id was set,
+so its 429 had no `X-Correlation-Id`. We fixed both: `shared/rate-limit.ts` (`rateLimitedHandler`) answers
+`{ error: { code: "RATE_LIMITED", ... }, correlationId }` for both limiters, and the correlation middleware now runs
+first. The spec documents 429 on every auth-service route. The limit itself comes from the new `RATE_LIMIT_MAX`
+setting (default 300, unchanged; US5 raises it on the CI stack), which also lets the test reach the limit with 1.
+
+**Files.**
+- `services/*/src/openapi/document.ts`: routes moved into `routeConfigs()` (the generated spec is byte-for-byte the same).
+- `services/*/src/test-utils/documented-response.ts` (new): the checker.
+- `services/*/src/integration/response-schemas.spec.ts` (new): 15 tests on conversation-service, 11 on auth-service.
+- `services/auth-service/src/shared/rate-limit.ts` (new), `src/main.ts`, `src/features/account/api.ts`,
+  `src/shared/env.ts`, `.env.example`, `src/test-utils/build-test-app.ts`: 429 envelope and `RATE_LIMIT_MAX`.
+- `services/auth-service/openapi.json`: regenerated with the 429 responses.
+
+**How to run.**
+
+```sh
+cd services/conversation-service && pnpm exec vitest run src/integration/response-schemas.spec.ts --reporter=verbose
+cd services/auth-service && pnpm exec vitest run src/integration/response-schemas.spec.ts --reporter=verbose
+```
+
+**How to repeat it manually.** Three ways to break it (restore the file after each one):
+
+| Change | Expected failure |
+|---|---|
+| In `chats/service.ts`, add `internalNote: "debug",` to the object `toChatDto` returns | `GET /chats 200 body has fields the schema does not describe` |
+| In `chats/controller.ts`, throw `new Error("database is down")` at the start of `get` | `GET /chats/:id answered 500, which the spec does not document` |
+| In `response-schemas.spec.ts`, delete the `check(...)` of the successful `POST /chats/:chatId/stop` | `expected [ 'POST /chats/:chatId/stop 200' ] to deeply equal []` |
+
+**Result.** 26 tests, all routes and 40+ responses checked; the three changes above each fail the suite.
+
+![Extra field in a response](evidence/07-response-extra-field-red.png)
+
+![Undocumented 500](evidence/08-response-undocumented-500-red.png)
+
+![A route whose success response was never checked](evidence/09-response-coverage-red.png)
+
+![Before the fix: the deletion limiter answered 429 as text/html](evidence/10-rate-limit-plain-text-red.png)
+
+![Both suites pass](evidence/11-response-schemas-green.png)
+
+**Problems and fixes.** `tsc` rejected `content["application/json"].schema` because the library types a media entry as
+"schema or `$ref`"; the checker narrows it with `"schema" in jsonMedia`. With `deletionsPerHour: 0` the deletion
+limiter never fires (0 means "no limit" in `express-rate-limit`), so the 429 test uses a limit of 1 and two requests.
+
 ## 4. How to run everything
 
 ```sh

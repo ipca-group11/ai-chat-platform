@@ -83,48 +83,31 @@ const apiKeyHeader = z.object({
 
 export type OpenApiDocument = ReturnType<OpenApiGeneratorV31["generateDocument"]>;
 
-export function buildOpenApiDocument(): OpenApiDocument {
-  const registry = new OpenAPIRegistry();
+named("ErrorResponse", errorResponseSchema);
+named("Chat", chatDtoSchema);
+named("ChatMember", chatMemberDtoSchema);
+named("Message", messageDtoSchema);
+named("Attachment", attachmentDtoSchema);
+named("WebFetch", webFetchDtoSchema);
+const sseEvent = named(
+  "SseEvent",
+  z.discriminatedUnion("type", [
+    sseMessageEventSchema,
+    sseTokenEventSchema,
+    sseReasoningEventSchema,
+    sseWebFetchEventSchema,
+    sseQueuedEventSchema,
+    sseStartedEventSchema,
+    sseDoneEventSchema,
+    sseErrorEventSchema,
+  ]),
+);
 
-  registry.registerComponent("securitySchemes", "cookieAuth", {
-    type: "apiKey",
-    in: "cookie",
-    name: "access_token",
-    description: "Access token (JWT) set by auth-service as an httpOnly cookie",
-  });
-  registry.registerComponent("securitySchemes", "bearerAuth", {
-    type: "http",
-    scheme: "bearer",
-    bearerFormat: "JWT",
-    description: "The same access token in an Authorization header (non-browser clients)",
-  });
-  registry.registerComponent("securitySchemes", "serviceToken", {
-    type: "http",
-    scheme: "bearer",
-    description: "INTERNAL_SERVICE_TOKEN shared with auth-service; only for /internal routes",
-  });
-
-  named("ErrorResponse", errorResponseSchema);
-  named("Chat", chatDtoSchema);
-  named("ChatMember", chatMemberDtoSchema);
-  named("Message", messageDtoSchema);
-  named("Attachment", attachmentDtoSchema);
-  named("WebFetch", webFetchDtoSchema);
-  const sseEvent = named(
-    "SseEvent",
-    z.discriminatedUnion("type", [
-      sseMessageEventSchema,
-      sseTokenEventSchema,
-      sseReasoningEventSchema,
-      sseWebFetchEventSchema,
-      sseQueuedEventSchema,
-      sseStartedEventSchema,
-      sseDoneEventSchema,
-      sseErrorEventSchema,
-    ]),
-  );
-
-  const route = (config: RouteConfig) => registry.registerPath(config);
+/** Every route with its request schemas and, per status, its response schema. The spec is built from
+ * this list and the response validation tests (`response-schemas.spec.ts`) read the same list. */
+export function routeConfigs(): RouteConfig[] {
+  const routes: RouteConfig[] = [];
+  const route = (config: RouteConfig) => routes.push(config);
 
   // --- operations ------------------------------------------------------------------------
   route({
@@ -358,6 +341,32 @@ export function buildOpenApiDocument(): OpenApiDocument {
     request: { params: sessionParamsSchema },
     responses: { 200: json("How many replies were stopped", sessionStopResponseSchema), ...errors(401) },
   });
+
+  return routes;
+}
+
+export function buildOpenApiDocument(): OpenApiDocument {
+  const registry = new OpenAPIRegistry();
+
+  registry.registerComponent("securitySchemes", "cookieAuth", {
+    type: "apiKey",
+    in: "cookie",
+    name: "access_token",
+    description: "Access token (JWT) set by auth-service as an httpOnly cookie",
+  });
+  registry.registerComponent("securitySchemes", "bearerAuth", {
+    type: "http",
+    scheme: "bearer",
+    bearerFormat: "JWT",
+    description: "The same access token in an Authorization header (non-browser clients)",
+  });
+  registry.registerComponent("securitySchemes", "serviceToken", {
+    type: "http",
+    scheme: "bearer",
+    description: "INTERNAL_SERVICE_TOKEN shared with auth-service; only for /internal routes",
+  });
+
+  for (const config of routeConfigs()) registry.registerPath(config);
 
   return new OpenApiGeneratorV31(registry.definitions, { sortComponents: "alphabetically" }).generateDocument({
     openapi: "3.1.0",

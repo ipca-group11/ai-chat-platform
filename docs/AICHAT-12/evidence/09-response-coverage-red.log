@@ -1,0 +1,39 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/response-schemas.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/response-schemas.spec.ts (15 tests | 1 failed) 73ms
+   ❯ coverage of the route table (1)
+     × every route's success response was checked against its schema 1ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 14 passed (15)
+   Start at  19:51:34
+   Duration  305ms (import 36%, transform 32%, tests 28%, worker 4%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/response-schemas.spec.ts > coverage of the route table > every route's success response was checked against its schema
+AssertionError: expected [ 'POST /chats/:chatId/stop 200' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "POST /chats/:chatId/stop 200",
++ ]
+
+ ❯ src/integration/response-schemas.spec.ts:195:34
+    193| describe("coverage of the route table", () => {
+    194|   it("every route's success response was checked against its schema", …
+    195|     expect(uncheckedSuccesses()).toEqual([]);
+       |                                  ^
+    196|   });
+    197| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

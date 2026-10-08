@@ -6,6 +6,7 @@ import { auth } from "../../shared/contracts/index.js";
 import { env } from "../../shared/env.js";
 import type { ErasureClient } from "../../shared/erasure-client.js";
 import { HttpError } from "../../shared/error-middleware.js";
+import { rateLimitedHandler } from "../../shared/rate-limit.js";
 import { clearAuthCookies, requireAuth } from "../session/index.js";
 import { deleteAccount } from "./model.js";
 
@@ -26,6 +27,7 @@ export function createAccountRouter(prisma: PrismaClient, options: AccountRouter
     limit: options.deletionsPerHour ?? 10,
     standardHeaders: true,
     legacyHeaders: false,
+    handler: rateLimitedHandler,
   });
 
   router.delete("/me", limiter, requireAuth, async (req, res, next) => {

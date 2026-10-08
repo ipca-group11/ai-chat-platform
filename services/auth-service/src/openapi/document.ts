@@ -24,6 +24,7 @@ const ERROR_DESCRIPTIONS: Record<number, string> = {
   403: "The request comes from an origin that is not allowed",
   409: "An account with this email already exists",
   502: "conversation-service did not erase the account's data; nothing was deleted",
+  429: "Too many requests from this client (`RATE_LIMITED`)",
   503: "Account deletion is not configured on this deployment",
 };
 
@@ -49,26 +50,14 @@ function errors(...statuses: number[]): Record<number, ResponseConfig> {
 
 export type OpenApiDocument = ReturnType<OpenApiGeneratorV31["generateDocument"]>;
 
-export function buildOpenApiDocument(): OpenApiDocument {
-  const registry = new OpenAPIRegistry();
+named("ErrorResponse", errorResponseSchema);
+named("SessionUser", sessionUserSchema);
 
-  registry.registerComponent("securitySchemes", "cookieAuth", {
-    type: "apiKey",
-    in: "cookie",
-    name: "access_token",
-    description: "Access token (JWT, 15 min) set by login and refresh",
-  });
-  registry.registerComponent("securitySchemes", "refreshCookie", {
-    type: "apiKey",
-    in: "cookie",
-    name: "refresh_token",
-    description: "Refresh token (7 days), only sent to /auth",
-  });
-
-  named("ErrorResponse", errorResponseSchema);
-  named("SessionUser", sessionUserSchema);
-
-  const route = (config: RouteConfig) => registry.registerPath(config);
+/** Every route with its request schemas and, per status, its response schema. The spec is built from
+ * this list and the response validation tests (`response-schemas.spec.ts`) read the same list. */
+export function routeConfigs(): RouteConfig[] {
+  const routes: RouteConfig[] = [];
+  const route = (config: RouteConfig) => routes.push(config);
 
   route({
     operationId: "getHealth",
@@ -149,6 +138,29 @@ export function buildOpenApiDocument(): OpenApiDocument {
       ...errors(400, 401, 403, 502, 503),
     },
   });
+
+  // The app-wide rate limiter runs before every route, so any of them can answer 429.
+  for (const config of routes) Object.assign(config.responses, errors(429));
+  return routes;
+}
+
+export function buildOpenApiDocument(): OpenApiDocument {
+  const registry = new OpenAPIRegistry();
+
+  registry.registerComponent("securitySchemes", "cookieAuth", {
+    type: "apiKey",
+    in: "cookie",
+    name: "access_token",
+    description: "Access token (JWT, 15 min) set by login and refresh",
+  });
+  registry.registerComponent("securitySchemes", "refreshCookie", {
+    type: "apiKey",
+    in: "cookie",
+    name: "refresh_token",
+    description: "Refresh token (7 days), only sent to /auth",
+  });
+
+  for (const config of routeConfigs()) registry.registerPath(config);
 
   return new OpenApiGeneratorV31(registry.definitions, { sortComponents: "alphabetically" }).generateDocument({
     openapi: "3.1.0",
