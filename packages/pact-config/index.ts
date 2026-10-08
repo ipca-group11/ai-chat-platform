@@ -19,3 +19,6 @@ export {
   errorResponseMatcher,
   fieldErrorsMatcher,
 } from "./matchers.js";
+
+export { newConsumerPact, pactDir, removePacts, routeFetchTo, runWithMockServer } from "./consumer.js";
+export type { RouteFetchOptions } from "./consumer.js";
