@@ -54,7 +54,7 @@ describe("useUploadAttachment (AC-66, AC-67, AC-68, AC-71)", () => {
   it("AC-67: surfaces the server's rejection of a file type", async () => {
     server.use(
       http.post("*/chats/:chatId/attachments", () =>
-        HttpResponse.json({ message: "File type not allowed", code: "unsupported_type" }, { status: 415 })
+        HttpResponse.json({ error: { code: "ATTACHMENT_UPLOAD_ERROR", message: "File type not allowed" } }, { status: 400 })
       )
     );
 
@@ -63,13 +63,13 @@ describe("useUploadAttachment (AC-66, AC-67, AC-68, AC-71)", () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error).toBeInstanceOf(ApiError);
-    expect(result.current.error).toMatchObject({ status: 415, message: "File type not allowed", code: "unsupported_type" });
+    expect(result.current.error).toMatchObject({ status: 400, message: "File type not allowed", code: "ATTACHMENT_UPLOAD_ERROR" });
   });
 
   it("AC-71: surfaces the message when the chat's model cannot handle the attachment", async () => {
     server.use(
       http.post("*/chats/:chatId/attachments", () =>
-        HttpResponse.json({ message: "This model does not accept images" }, { status: 422 })
+        HttpResponse.json({ error: { code: "ATTACHMENT_NOT_SUPPORTED", message: "This model does not accept images" } }, { status: 422 })
       )
     );
 

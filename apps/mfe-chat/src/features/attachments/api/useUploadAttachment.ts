@@ -2,6 +2,13 @@ import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "../../../shared/api-client";
 import type { Attachment } from "../../../shared/types";
 
+/** The request itself (multipart, field `file`); the pact test calls it directly. */
+export function uploadAttachment(chatId: string, file: File): Promise<Attachment> {
+  const formData = new FormData();
+  formData.append("file", file);
+  return apiClient.post<Attachment>(`/chats/${chatId}/attachments`, formData);
+}
+
 /**
  * AC-66: uploads a file attached to a message.
  * AC-67/AC-68: the server re-validates type/size even though the client
@@ -12,10 +19,6 @@ import type { Attachment } from "../../../shared/types";
  */
 export function useUploadAttachment(chatId: string) {
   return useMutation({
-    mutationFn: (file: File) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      return apiClient.post<Attachment>(`/chats/${chatId}/attachments`, formData);
-    },
+    mutationFn: (file: File) => uploadAttachment(chatId, file),
   });
 }

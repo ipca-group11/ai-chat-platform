@@ -1,0 +1,29 @@
+$ pnpm exec nx run-many -t pact:consumer -p mfe-chat mfe-settings auth-service --skip-nx-cache 2>&1 | grep -E 'Successfully'; for f in pacts/*-conversation-service.json; do node -e "const d=require('./'+process.argv[1]);console.log(process.argv[1]+': '+d.interactions.length+' interactions');for(const i of d.interactions)console.log('  '+i.request.method.padEnd(6)+' '+i.request.path.padEnd(42)+' -> '+i.response.status+'  ['+(i.providerStates||[]).map(s=>s.name).join(', ')+']')" $f; done
+ NX   Successfully ran target pact:consumer for 3 projects
+pacts/auth-service-conversation-service.json: 2 interactions
+  POST   /internal/erasures                         -> 200  [a user has chats]
+  POST   /internal/sessions/user-1/stop             -> 200  [a user has a reply in progress]
+pacts/mfe-chat-conversation-service.json: 18 interactions
+  POST   /chats/chat-1/attachments                  -> 201  [a user owns a chat]
+  GET    /chats/chat-1                              -> 404  [the chat does not exist]
+  GET    /chats/chat-1                              -> 200  [a user owns a chat]
+  GET    /chats                                     -> 200  [a user owns a chat]
+  GET    /chats/chat-1/members                      -> 200  [a user owns a chat with a member]
+  GET    /chats/chat-1/messages                     -> 200  [a user owns a chat with a message]
+  DELETE /chats/chat-1/messages/msg-1               -> 204  [a user owns a chat with a queued message]
+  POST   /chats                                     -> 201  [a user is signed in]
+  DELETE /chats/chat-1                              -> 204  [a user owns a chat]
+  PATCH  /chats/chat-1/messages/msg-1               -> 200  [a user owns a chat with a queued message]
+  POST   /chats/chat-1/members                      -> 201  [a user owns a chat]
+  POST   /chats/chat-1/members                      -> 409  [a user owns a chat with a member]
+  DELETE /chats/chat-1/membership                   -> 204  [a user is a member of a chat]
+  DELETE /chats/chat-1/members/bob%40example.com    -> 204  [a user owns a chat with a member]
+  PATCH  /chats/chat-1                              -> 200  [a user owns a chat]
+  POST   /chats/chat-1/messages/msg-1/retry         -> 202  [a user owns a chat with a failed reply]
+  POST   /chats/chat-1/messages                     -> 201  [a user owns a chat]
+  POST   /chats/chat-1/stop                         -> 200  [a user owns a chat with a reply in progress]
+pacts/mfe-settings-conversation-service.json: 2 interactions
+  POST   /providers/anthropic/test-connection       -> 200  [the LLM provider rejects the API key]
+  POST   /providers/anthropic/test-connection       -> 200  [the LLM provider accepts the API key]
+
+[exit 0]

@@ -13,6 +13,7 @@ export type { PactConsumerOptions, PactBrokerConfig } from "./pact.config.js";
 export {
   like,
   eachLike,
+  boolean,
   term,
   CORRELATION_HEADER,
   correlationHeaderMatcher,

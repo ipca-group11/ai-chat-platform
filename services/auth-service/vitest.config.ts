@@ -7,7 +7,8 @@ export default defineConfig({
     // bcrypt at the real cost is slow when several projects test at once (nx --parallel).
     testTimeout: 20_000,
     include: ["src/**/*.spec.ts"],
-    exclude: ["src/**/*.db.spec.ts", "node_modules/**"],
+    // Pact consumer tests run in their own config (vitest.pact.config.ts).
+    exclude: ["src/**/*.db.spec.ts", "src/**/*.pact.spec.ts", "node_modules/**"],
     snapshotSerializers: [snapshotSerializerPath],
     setupFiles: ["src/shared/test/setup-env.ts"],
     coverage: coveragePreset({

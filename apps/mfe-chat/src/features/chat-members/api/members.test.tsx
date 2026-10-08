@@ -39,7 +39,7 @@ describe("useChatMembers", () => {
   });
 
   it("exposes the server's refusal as an error", async () => {
-    server.use(http.get("*/chats/:chatId/members", () => HttpResponse.json({ message: "Not a member" }, { status: 403 })));
+    server.use(http.get("*/chats/:chatId/members", () => HttpResponse.json({ error: { code: "FORBIDDEN", message: "Not a member" } }, { status: 403 })));
 
     const { result } = renderHookWithClient(() => useChatMembers("chat-1"));
 
@@ -82,17 +82,20 @@ describe("useAddChatMember", () => {
   it("keeps the cached list and surfaces the error when the server refuses", async () => {
     server.use(
       http.post("*/chats/:chatId/members", () =>
-        HttpResponse.json({ message: "No user with that email", code: "user_not_found" }, { status: 404 })
+        HttpResponse.json(
+          { error: { code: "ALREADY_A_MEMBER", message: "That user is already a member of this chat" } },
+          { status: 409 }
+        )
       )
     );
     const queryClient = createTestQueryClient();
     queryClient.setQueryData(queryKeys.members("chat-1"), [owner]);
     const { result } = renderHookWithClient(() => useAddChatMember("chat-1"), { queryClient });
 
-    result.current.mutate("nobody@example.test");
+    result.current.mutate("bob@example.test");
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(result.current.error).toMatchObject({ status: 404, code: "user_not_found" });
+    expect(result.current.error).toMatchObject({ status: 409, code: "ALREADY_A_MEMBER" });
     expect(queryClient.getQueryData(queryKeys.members("chat-1"))).toEqual([owner]);
   });
 });
@@ -114,7 +117,7 @@ describe("useRemoveChatMember", () => {
 
   it("keeps the member when the server refuses", async () => {
     server.use(
-      http.delete("*/chats/:chatId/members/:email", () => HttpResponse.json({ message: "Owner only" }, { status: 403 }))
+      http.delete("*/chats/:chatId/members/:email", () => HttpResponse.json({ error: { code: "FORBIDDEN", message: "Owner only" } }, { status: 403 }))
     );
     const queryClient = createTestQueryClient();
     queryClient.setQueryData(queryKeys.members("chat-1"), [owner, guest]);
@@ -150,7 +153,7 @@ describe("useLeaveChat", () => {
   });
 
   it("keeps the chat in the list when leaving fails", async () => {
-    server.use(http.delete("*/chats/:chatId/membership", () => HttpResponse.json({ message: "Owners cannot leave" }, { status: 409 })));
+    server.use(http.delete("*/chats/:chatId/membership", () => HttpResponse.json({ error: { code: "CONFLICT", message: "Owners cannot leave" } }, { status: 409 })));
     const queryClient = createTestQueryClient();
     queryClient.setQueryData(queryKeys.chats(), [chat("chat-1")]);
     const { result } = renderHookWithClient(() => useLeaveChat("chat-1"), { queryClient });
