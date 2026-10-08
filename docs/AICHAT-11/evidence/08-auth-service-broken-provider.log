@@ -1,0 +1,15 @@
+$ cd services/auth-service && pnpm exec vitest run -c vitest.verify.config.ts 2>&1 | grep -vE '^.{0,12}Error.{0,12}: \{' | grep -E 'Failures:|^[0-9]+\) |missing the following keys|There were|Tests ' | head -14
+Failures:
+1) Verifying a pact between mfe-auth and auth-service Given a user is logged in - a request for the current user
+           $ -> Actual map is missing the following keys: id
+2) Verifying a pact between mfe-chat and auth-service Given a user is logged in - a request for the current user from the chat
+           $ -> Actual map is missing the following keys: id
+3) Verifying a pact between mfe-settings and auth-service Given a user is logged in - a request for the current user from settings
+           $ -> Actual map is missing the following keys: id
+4) Verifying a pact between shell and auth-service Given a user is logged in - a session check from the shell
+           $ -> Actual map is missing the following keys: id
+There were 4 pact failures
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed (1)
+
+[exit 0]

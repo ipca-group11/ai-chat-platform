@@ -266,3 +266,63 @@ codes (`ALREADY_A_MEMBER`, `CHAT_NOT_FOUND`, `ATTACHMENT_UPLOAD_ERROR`).
   fixed key so the header is part of the contract.
 - mfe-settings' `extractErrorMessage` has the same flat-shape reading. It is left as is: the route does not exist yet
   (AICHAT-256), so there is no error contract to follow; noted on that bug.
+
+### US4 · Provider verification: auth-service ([AICHAT-180](https://ipca-grupo11.atlassian.net/browse/AICHAT-180))
+
+**What and why.** The consumer tests only prove that each client agrees with its pact. This story closes the loop: the
+Pact `Verifier` reads every `*-auth-service.json`, replays each request against the **real** auth-service app and compares
+the real response with what the consumer declared (status, headers, body with its matchers). A change in auth-service
+that would break any frontend now fails here, and the failure names the consumer that would break.
+
+**How the verifier works.**
+
+1. `pactFilesFor("auth-service")` collects the four pact files and fails if there are none (an empty verification
+   would pass without checking anything).
+2. One HTTP server on a random port forwards every request to "the current app". The app is `createApp()` with the
+   in-memory Prisma fake (`buildTestApp`): no database, no Docker.
+3. Before each interaction the Verifier calls the **state handler** for its `given(...)`. Each handler builds a fresh
+   app and prepares it through the public API, the way a user would:
+
+   | Provider state | Setup | Cookie sent |
+   |---|---|---|
+   | `no user is logged in`, `no user exists with the email` | fresh app | none |
+   | `a user exists` (`email`, `password`) | `POST /auth/register` | none |
+   | `a user is logged in` (`email`) | register + `POST /auth/login` | `access_token` and `refresh_token` |
+   | `a user has a valid refresh token` (`email`) | register + login | `refresh_token` |
+
+4. The cookies are not in the pacts (the browser adds them). A `requestFilter`, which runs on every replayed request,
+   adds the cookie the state chose.
+5. `verifyProvider()` rejects if any interaction does not match, so the Vitest test fails.
+
+**Files.**
+- `services/auth-service/src/contract/provider.verify.spec.ts` (new): the verifier and its state handlers.
+- `services/auth-service/vitest.verify.config.ts` (new), Nx target `pact:verify`; the normal test run excludes `*.verify.spec.ts`.
+- `packages/pact-config/provider.ts` (new): `pactFilesFor` and `splitKnownFailures` (used by US5), with unit tests.
+
+**How to run.**
+
+```sh
+pnpm exec nx run-many -t pact:consumer          # writes pacts/ (US2, US3)
+pnpm exec nx run auth-service:pact:verify
+```
+
+**How to repeat it manually.**
+
+1. Run the two commands. Expected: "Verifying a pact between mfe-auth and auth-service" (and shell, mfe-settings,
+   mfe-chat); every interaction shows `has status code … (OK)` and `has a matching body (OK)`.
+2. Break the provider: in `services/auth-service/src/features/session/api.ts`, in the `GET /me` handler, rename `id`
+   to `userId` in the JSON. Run `pnpm exec nx run auth-service:pact:verify`. Expected: "There were 4 pact failures",
+   one per consumer that reads `/auth/me`, each "Actual map is missing the following keys: id". Restore the line.
+3. Delete `pacts/` and run the verifier: it fails with "no pact files for auth-service … run the consumer tests first".
+
+**Result.** All 17 interactions of the 4 consumers verify against the real app.
+
+![auth-service verifies every consumer pact](evidence/07-auth-service-verified.png)
+
+Renaming one field in `GET /auth/me` breaks four consumers, and the verifier names each of them:
+
+![A provider change that breaks four consumers](evidence/08-auth-service-broken-provider.png)
+
+**Problems and fixes.** None in the verification itself: every interaction passed on the first run, because the
+consumer side had already been aligned with the real error envelope in US2. The states use the public API rather than
+seeding the fake directly, so they keep working if the storage changes.
