@@ -1,0 +1,298 @@
+$ cd services/conversation-service && pnpm exec vitest run src/openapi/openapi.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/openapi/openapi.spec.ts (6 tests | 1 failed) 11ms
+   ❯ conversation-service OpenAPI spec (6)
+     × the committed openapi.json matches the schemas (run `pnpm openapi:generate` after a change) 4ms
+
+  Snapshots  1 failed
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  19:46:18
+   Duration  288ms (import 49%, transform 41%, worker 5%, tests 5%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/openapi/openapi.spec.ts > conversation-service OpenAPI spec > the committed openapi.json matches the schemas (run `pnpm openapi:generate` after a change)
+Error: Snapshot `conversation-service OpenAPI spec > the committed openapi.json matches the schemas (run `pnpm openapi:generate` after a change) 1` mismatched
+
+- Expected
++ Received
+
+@@ -477,14 +477,16 @@
+      "parameters": {}
+    },
+    "paths": {
+      "/health": {
+        "get": {
++         "operationId": "getHealth",
+          "tags": [
+            "operations"
+          ],
+          "summary": "Liveness check",
++         "security": [],
+          "responses": {
+            "200": {
+              "description": "The service is up",
+              "headers": {
+                "X-Correlation-Id": {
+@@ -516,14 +518,16 @@
+          }
+        }
+      },
+      "/metrics": {
+        "get": {
++         "operationId": "getMetrics",
+          "tags": [
+            "operations"
+          ],
+          "summary": "Prometheus metrics",
++         "security": [],
+          "responses": {
+            "200": {
+              "description": "Prometheus text format",
+              "content": {
+                "text/plain": {
+@@ -536,10 +540,11 @@
+          }
+        }
+      },
+      "/chats": {
+        "get": {
++         "operationId": "listChats",
+          "tags": [
+            "chats"
+          ],
+          "summary": "Chats the caller owns or is a member of",
+          "security": [
+@@ -599,10 +604,11 @@
+              }
+            }
+          }
+        },
+        "post": {
++         "operationId": "createChat",
+          "tags": [
+            "chats"
+          ],
+          "summary": "Create a chat",
+          "security": [
+@@ -720,10 +726,11 @@
+          }
+        }
+      },
+      "/chats/{id}": {
+        "get": {
++         "operationId": "getChat",
+          "tags": [
+            "chats"
+          ],
+          "summary": "One chat",
+          "security": [
+@@ -809,10 +816,11 @@
+              }
+            }
+          }
+        },
+        "patch": {
++         "operationId": "updateChat",
+          "tags": [
+            "chats"
+          ],
+          "summary": "Rename or change the model of a chat (owner only)",
+          "security": [
+@@ -952,10 +960,11 @@
+              }
+            }
+          }
+        },
+        "delete": {
++         "operationId": "deleteChat",
+          "tags": [
+            "chats"
+          ],
+          "summary": "Delete a chat (owner only)",
+          "security": [
+@@ -1028,10 +1037,11 @@
+          }
+        }
+      },
+      "/chats/{id}/members": {
+        "get": {
++         "operationId": "listMembers",
+          "tags": [
+            "chats"
+          ],
+          "summary": "Members of a chat",
+          "security": [
+@@ -1120,10 +1130,11 @@
+              }
+            }
+          }
+        },
+        "post": {
++         "operationId": "addMember",
+          "tags": [
+            "chats"
+          ],
+          "summary": "Invite a member by email (owner only)",
+          "security": [
+@@ -1266,10 +1277,11 @@
+          }
+        }
+      },
+      "/chats/{id}/members/{email}": {
+        "delete": {
++         "operationId": "removeMember",
+          "tags": [
+            "chats"
+          ],
+          "summary": "Remove a member (owner), or remove yourself",
+          "security": [
+@@ -1369,10 +1381,11 @@
+          }
+        }
+      },
+      "/chats/{id}/membership": {
+        "delete": {
++         "operationId": "leaveChat",
+          "tags": [
+            "chats"
+          ],
+          "summary": "Leave a chat shared with you",
+          "security": [
+@@ -1445,10 +1458,11 @@
+          }
+        }
+      },
+      "/chats/{chatId}/messages": {
+        "get": {
++         "operationId": "listMessages",
+          "tags": [
+            "messages"
+          ],
+          "summary": "Message history of a chat",
+          "security": [
+@@ -1537,10 +1551,11 @@
+              }
+            }
+          }
+        },
+        "post": {
++         "operationId": "sendMessage",
+          "tags": [
+            "messages"
+          ],
+          "summary": "Send a message; the reply is queued and streamed",
+          "security": [
+@@ -1685,10 +1700,11 @@
+          }
+        }
+      },
+      "/chats/{chatId}/messages/{messageId}": {
+        "patch": {
++         "operationId": "editQueuedMessage",
+          "tags": [
+            "messages"
+          ],
+          "summary": "Edit a message that is still queued",
+          "security": [
+@@ -1839,10 +1855,11 @@
+              }
+            }
+          }
+        },
+        "delete": {
++         "operationId": "cancelQueuedMessage",
+          "tags": [
+            "messages"
+          ],
+          "summary": "Cancel a message that is still queued",
+          "security": [
+@@ -1942,10 +1959,11 @@
+          }
+        }
+      },
+      "/chats/{chatId}/messages/{messageId}/retry": {
+        "post": {
++         "operationId": "retryReply",
+          "tags": [
+            "messages"
+          ],
+          "summary": "Retry a failed reply",
+          "security": [
+@@ -2070,10 +2088,11 @@
+          }
+        }
+      },
+      "/chats/{chatId}/stop": {
+        "post": {
++         "operationId": "stopReply",
+          "tags": [
+            "messages"
+          ],
+          "summary": "Stop the reply being written; the partial text is kept",
+          "security": [
+@@ -2161,10 +2180,11 @@
+          }
+        }
+      },
+      "/chats/{chatId}/stream": {
+        "get": {
++         "operationId": "streamChat",
+          "tags": [
+            "streaming"
+          ],
+          "summary": "Server-sent events of a chat (never ends on its own)",
+          "description": "Each event is `event: <type>` followed by `data: <JSON>`; the JSON matches `SseEvent`.",
+@@ -2245,10 +2265,11 @@
+          }
+        }
+      },
+      "/chats/{chatId}/messages/{messageId}/attachments": {
+        "post": {
++         "operationId": "uploadAttachment",
+          "tags": [
+            "attachments"
+          ],
+          "summary": "Upload a file for a message (.txt, .pdf, .png, .jpeg; 10 MB by default)",
+          "security": [
+@@ -2400,10 +2421,11 @@
+          }
+        }
+      },
+      "/internal/erasures": {
+        "post": {
++         "operationId": "eraseUser",
+          "tags": [
+            "internal"
+          ],
+          "summary": "Erase everything a deleted account owns (called by auth-service)",
+          "security": [
+@@ -2527,10 +2549,11 @@
+          }
+        }
+      },
+      "/internal/sessions/{userId}/stop": {
+        "post": {
++         "operationId": "stopUserReplies",
+          "tags": [
+            "internal"
+          ],
+          "summary": "Stop every reply a user started (called by auth-service on logout)",
+          "security": [
+
+ ❯ src/openapi/openapi.spec.ts:38:5
+     36| describe("conversation-service OpenAPI spec", () => {
+     37|   it("the committed openapi.json matches the schemas (run `pnpm openap…
+     38|     await expect(`${JSON.stringify(doc, null, 2)}\n`).toMatchFileSnaps…
+       |     ^
+     39|   });
+     40|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

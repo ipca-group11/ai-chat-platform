@@ -14,11 +14,13 @@
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "test:stop-abort": "vitest run src/integration/stop-abort.spec.ts",
+    "openapi:generate": "vitest run src/openapi/openapi.spec.ts -u",
     "test-db": "vitest run --config vitest.db.config.ts",
     "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@app/shared-types": "workspace:*",
+    "@asteasolutions/zod-to-openapi": "9.1.0",
     "@prisma/client": "6.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

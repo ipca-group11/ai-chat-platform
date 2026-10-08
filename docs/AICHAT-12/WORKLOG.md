@@ -31,6 +31,8 @@ Decisions:
 |---|---|
 | OpenAPI generator | `@asteasolutions/zod-to-openapi` 9.1.0 (peer `zod ^4`), `OpenApiGeneratorV31` → OpenAPI 3.1 |
 | Rate limit in CI | New env var `RATE_LIMIT_MAX` on auth-service (default 300, production unchanged); the CI stack raises it so Schemathesis is not throttled. A seeded test user's cookie is passed to Schemathesis |
+| Unknown fields in a request body (asked after US1) | Rejected with 400: request body schemas become strict (`z.strictObject`), and the spec says `additionalProperties: false` |
+| `POST /auth/login` with an invalid body (asked after US1) | Stays 401 `INVALID_CREDENTIALS` (AC-36: never say which field was wrong); documented as the one exception to "400 with field errors" |
 
 Blockers: none.
 
@@ -172,6 +174,85 @@ cd services/conversation-service && pnpm exec vitest run src/shared/contracts/sh
 comparison into a Vitest test inside conversation-service, which already depends on `@app/shared-types`, so it runs
 in CI with no extra tool. auth-service does not depend on shared-types, so its three request schemas were compared once
 (identical) and are not guarded.
+
+### US2 · Generate an OpenAPI spec for both services from the Zod schemas ([AICHAT-184](https://ipca-grupo11.atlassian.net/browse/AICHAT-184))
+
+**What and why.** Schemathesis (US5) and ZAP need an OpenAPI file, and a spec written by hand goes stale the day a route
+changes. We generate the spec from the **same Zod schemas the routes use to parse requests**, so the spec cannot
+describe a body the code does not accept. Each service has a `src/openapi/document.ts` that registers its routes with
+`@asteasolutions/zod-to-openapi` and builds an OpenAPI 3.1 document; the result is committed as
+`services/<service>/openapi.json` (auth-service 8 operations, conversation-service 21).
+
+The spec covers, for each route:
+
+- the path parameters, the JSON body (or the multipart `file` for attachments) and the optional `X-Llm-Api-Key` header;
+- the success response, with the response schemas US1 found missing (`src/shared/contracts/responses.ts`: `{ chat }`,
+  `{ messages }`, `{ stopped }`, `{ erased }`, auth's `{ id, email }`, …), the `X-Correlation-Id` header and, for
+  login/refresh/logout/delete, `Set-Cookie`;
+- **only the error statuses the route can really return** (taken from the `HttpError`s in the code), each with the
+  shared `ErrorResponse` envelope. A **500 is never documented**: it is always a bug, so Schemathesis and the US3 tests
+  must treat it as a failure, not as an expected answer;
+- the security of each route: `cookieAuth` (`access_token` cookie) or `bearerAuth` on the chat routes, `refreshCookie`
+  on refresh/logout, `serviceToken` on `/internal/*`, and an explicit `security: []` on the public routes.
+
+`openapi.spec.ts` (one per service) checks four things:
+
+| Test | What breaks it |
+|---|---|
+| the committed `openapi.json` matches the schemas | a schema or route changed and nobody ran `pnpm openapi:generate` |
+| every route the app registers is documented, and nothing else | a new route without a spec entry, or a removed route still documented (compared with `listRoutes(app)` from US1) |
+| the security of every route | a chat route documented as public, or an internal route with the user cookie |
+| every 4xx/5xx is `ErrorResponse`, and no 500 is documented | an error response with another body |
+
+The stale check uses Vitest's `toMatchFileSnapshot("../../openapi.json")`: the file is a snapshot. In CI a mismatch
+fails; locally `pnpm openapi:generate` (the same test with `-u`) rewrites it.
+
+**Files.**
+- `services/*/src/openapi/document.ts` (new): the registry of every route; `services/*/src/openapi/openapi.spec.ts` (new): the four checks.
+- `services/*/openapi.json` (new, generated): the specs.
+- `services/*/src/shared/contracts/responses.ts` (new): response body schemas.
+- `services/conversation-service/src/features/messages/internal-routes.ts`: `sessionParamsSchema` exported, so the spec uses the route's own schema.
+- `services/*/package.json`: `@asteasolutions/zod-to-openapi` 9.1.0 and the `openapi:generate` script.
+
+**How to run.**
+
+```sh
+cd services/conversation-service && pnpm exec vitest run src/openapi/openapi.spec.ts --reporter=verbose
+cd services/conversation-service && pnpm openapi:generate      # after changing a schema or a route
+pnpm dlx --package=@redocly/cli@2.50.0 redocly lint services/conversation-service/openapi.json --extends=recommended
+```
+
+**How to repeat it manually.**
+
+1. In `services/conversation-service/src/shared/contracts/chat.ts`, add a field to `chatDtoSchema`, e.g. `pinned: z.boolean(),`.
+2. Run `pnpm exec vitest run src/openapi/openapi.spec.ts` in that folder.
+3. Expected output: `the committed openapi.json matches the schemas` fails and the diff shows the new `pinned`
+   property. Run `pnpm openapi:generate` and the test passes; `git diff openapi.json` shows the change. Remove the field
+   and regenerate again.
+
+**Result.** Both specs are generated, pass the four checks and are valid OpenAPI 3.1 for Redocly's `recommended`
+rules (0 errors). The warnings left are expected: `/health` and `/metrics` have no 4xx, there is no licence (private
+project) and the server URL is localhost.
+
+![Stale spec detected: the committed file lacks the new operationIds](evidence/04-openapi-stale-red.png)
+
+![Spec tests pass for both services](evidence/05-openapi-green.png)
+
+![Both specs are valid OpenAPI 3.1](evidence/06-openapi-lint.png)
+
+**Problems and fixes.**
+- `registry.register("Chat", chatDtoSchema)` failed with `zodSchema.openapi is not a function` even after
+  `extendZodWithOpenApi(z)`. In Zod 4.6 a schema does not inherit from `ZodType.prototype`: each instance gets a copy of
+  the methods when it is created, and the contract schemas are created at import time, before the extension runs. We
+  record the name on the existing instance instead, through the library's exported `zodToOpenAPIRegistry`
+  (`named("Chat", chatDtoSchema)` in `document.ts`). It needs no import order and leaves the contract files untouched.
+- The first Redocly run gave 2 errors: `/health` and `/metrics` had no `security`, which reads as "forgot to protect".
+  They are public on purpose, so they now say `security: []`. We also added an `operationId` to every route
+  (Schemathesis names its findings by it).
+- `tsc` refused the inferred return type (TS2883, it comes from `openapi3-ts`, not a direct dependency); the function
+  is now annotated with `ReturnType<OpenApiGeneratorV31["generateDocument"]>`.
+- The DAST file `testing/zap/openapi.yaml` is replaced in US5, where the compose stack runs and ZAP 2.17 can be checked
+  against the generated OpenAPI 3.1 file.
 
 ## 4. How to run everything
 

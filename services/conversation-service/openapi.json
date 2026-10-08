@@ -1,0 +1,2626 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "conversation-service",
+    "version": "1.0.0",
+    "description": "Chats, messages, attachments and the reply stream. Generated from the Zod schemas; do not edit by hand."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4002",
+      "description": "Local service (the shell proxies it under /api)"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "access_token",
+        "description": "Access token (JWT) set by auth-service as an httpOnly cookie"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "The same access token in an Authorization header (non-browser clients)"
+      },
+      "serviceToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "INTERNAL_SERVICE_TOKEN shared with auth-service; only for /internal routes"
+      }
+    },
+    "schemas": {
+      "Attachment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "messageId": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "text",
+              "pdf",
+              "image"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "messageId",
+          "filename",
+          "mimeType",
+          "size",
+          "kind",
+          "createdAt"
+        ]
+      },
+      "Chat": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "ownerEmail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "ollama",
+              "openai",
+              "anthropic"
+            ]
+          },
+          "model": {
+            "type": "string"
+          },
+          "reasoning": {
+            "type": "boolean"
+          },
+          "webFetch": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "ownerId",
+          "ownerEmail",
+          "provider",
+          "model",
+          "reasoning",
+          "webFetch",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ChatMember": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "member"
+            ]
+          },
+          "addedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "role",
+          "addedAt"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "fieldErrors": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          },
+          "correlationId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chatId": {
+            "type": "string"
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "authorEmail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant",
+              "system"
+            ]
+          },
+          "content": {
+            "type": "string"
+          },
+          "reasoning": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "webFetches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WebFetch"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Attachment"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "queued",
+              "streaming",
+              "failed"
+            ]
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stopped": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "chatId",
+          "authorId",
+          "authorEmail",
+          "role",
+          "content",
+          "reasoning",
+          "webFetches",
+          "attachments",
+          "status",
+          "stopped",
+          "createdAt"
+        ]
+      },
+      "SseEvent": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "message"
+                ]
+              },
+              "message": {
+                "$ref": "#/components/schemas/Message"
+              }
+            },
+            "required": [
+              "type",
+              "message"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "token"
+                ]
+              },
+              "messageId": {
+                "type": "string"
+              },
+              "token": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "messageId",
+              "token"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "reasoning"
+                ]
+              },
+              "messageId": {
+                "type": "string"
+              },
+              "token": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "messageId",
+              "token"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "web_fetch"
+                ]
+              },
+              "messageId": {
+                "type": "string"
+              },
+              "fetch": {
+                "$ref": "#/components/schemas/WebFetch"
+              }
+            },
+            "required": [
+              "type",
+              "messageId",
+              "fetch"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "queued"
+                ]
+              },
+              "messageId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "messageId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "started"
+                ]
+              },
+              "messageId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "messageId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "done"
+                ]
+              },
+              "messageId": {
+                "type": "string"
+              },
+              "stopped": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "type",
+              "messageId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "error"
+                ]
+              },
+              "messageId": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "type",
+              "messageId",
+              "message",
+              "retryable"
+            ]
+          }
+        ]
+      },
+      "WebFetch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "fetching",
+              "done",
+              "error"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "status"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "tags": [
+          "operations"
+        ],
+        "summary": "Liveness check",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "The service is up",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "operationId": "getMetrics",
+        "tags": [
+          "operations"
+        ],
+        "summary": "Prometheus metrics",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Prometheus text format",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats": {
+      "get": {
+        "operationId": "listChats",
+        "tags": [
+          "chats"
+        ],
+        "summary": "Chats the caller owns or is a member of",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The chats",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "chats": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Chat"
+                      }
+                    }
+                  },
+                  "required": [
+                    "chats"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createChat",
+        "tags": [
+          "chats"
+        ],
+        "summary": "Create a chat",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "ollama",
+                      "openai",
+                      "anthropic"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "reasoning": {
+                    "type": "boolean"
+                  },
+                  "webFetch": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "title",
+                  "provider",
+                  "model"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new chat",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "chat": {
+                      "$ref": "#/components/schemas/Chat"
+                    }
+                  },
+                  "required": [
+                    "chat"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or a specific code",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{id}": {
+      "get": {
+        "operationId": "getChat",
+        "tags": [
+          "chats"
+        ],
+        "summary": "One chat",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The chat",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "chat": {
+                      "$ref": "#/components/schemas/Chat"
+                    }
+                  },
+                  "required": [
+                    "chat"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateChat",
+        "tags": [
+          "chats"
+        ],
+        "summary": "Rename or change the model of a chat (owner only)",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "ollama",
+                      "openai",
+                      "anthropic"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "reasoning": {
+                    "type": "boolean"
+                  },
+                  "webFetch": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated chat",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "chat": {
+                      "$ref": "#/components/schemas/Chat"
+                    }
+                  },
+                  "required": [
+                    "chat"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or a specific code",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteChat",
+        "tags": [
+          "chats"
+        ],
+        "summary": "Delete a chat (owner only)",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{id}/members": {
+      "get": {
+        "operationId": "listMembers",
+        "tags": [
+          "chats"
+        ],
+        "summary": "Members of a chat",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The members, owner first",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ChatMember"
+                      }
+                    }
+                  },
+                  "required": [
+                    "members"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "addMember",
+        "tags": [
+          "chats"
+        ],
+        "summary": "Invite a member by email (owner only)",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The new member",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "member": {
+                      "$ref": "#/components/schemas/ChatMember"
+                    }
+                  },
+                  "required": [
+                    "member"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or a specific code",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The resource is in a state that does not allow the change",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{id}/members/{email}": {
+      "delete": {
+        "operationId": "removeMember",
+        "tags": [
+          "chats"
+        ],
+        "summary": "Remove a member (owner), or remove yourself",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "email",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this member",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{id}/membership": {
+      "delete": {
+        "operationId": "leaveChat",
+        "tags": [
+          "chats"
+        ],
+        "summary": "Leave a chat shared with you",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Left the chat",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{chatId}/messages": {
+      "get": {
+        "operationId": "listMessages",
+        "tags": [
+          "messages"
+        ],
+        "summary": "Message history of a chat",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "chatId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The messages, oldest first",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Message"
+                      }
+                    }
+                  },
+                  "required": [
+                    "messages"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "sendMessage",
+        "tags": [
+          "messages"
+        ],
+        "summary": "Send a message; the reply is queued and streamed",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "chatId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Provider API key for this request only; never stored"
+            },
+            "required": false,
+            "description": "Provider API key for this request only; never stored",
+            "name": "x-llm-api-key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32000
+                  },
+                  "attachmentIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 10,
+                    "default": []
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The user message",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "$ref": "#/components/schemas/Message"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or a specific code",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "patch": {
+        "operationId": "editQueuedMessage",
+        "tags": [
+          "messages"
+        ],
+        "summary": "Edit a message that is still queued",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "chatId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "messageId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32000
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The edited message",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "$ref": "#/components/schemas/Message"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or a specific code",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The resource is in a state that does not allow the change",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "cancelQueuedMessage",
+        "tags": [
+          "messages"
+        ],
+        "summary": "Cancel a message that is still queued",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "chatId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "messageId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Canceled",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The resource is in a state that does not allow the change",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{chatId}/messages/{messageId}/retry": {
+      "post": {
+        "operationId": "retryReply",
+        "tags": [
+          "messages"
+        ],
+        "summary": "Retry a failed reply",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "chatId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "messageId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Provider API key for this request only; never stored"
+            },
+            "required": false,
+            "description": "Provider API key for this request only; never stored",
+            "name": "x-llm-api-key",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "The reply, queued again",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "$ref": "#/components/schemas/Message"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The resource is in a state that does not allow the change",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{chatId}/stop": {
+      "post": {
+        "operationId": "stopReply",
+        "tags": [
+          "messages"
+        ],
+        "summary": "Stop the reply being written; the partial text is kept",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "chatId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Whether a reply was running",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stopped": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "stopped"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{chatId}/stream": {
+      "get": {
+        "operationId": "streamChat",
+        "tags": [
+          "streaming"
+        ],
+        "summary": "Server-sent events of a chat (never ends on its own)",
+        "description": "Each event is `event: <type>` followed by `data: <JSON>`; the JSON matches `SseEvent`.",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "chatId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event stream",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/SseEvent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{chatId}/messages/{messageId}/attachments": {
+      "post": {
+        "operationId": "uploadAttachment",
+        "tags": [
+          "attachments"
+        ],
+        "summary": "Upload a file for a message (.txt, .pdf, .png, .jpeg; 10 MB by default)",
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "chatId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "messageId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The stored attachment",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "attachment": {
+                      "$ref": "#/components/schemas/Attachment"
+                    }
+                  },
+                  "required": [
+                    "attachment"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or a specific code",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found, or not visible to the caller",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The chat's model cannot take this attachment",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/erasures": {
+      "post": {
+        "operationId": "eraseUser",
+        "tags": [
+          "internal"
+        ],
+        "summary": "Erase everything a deleted account owns (called by auth-service)",
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "email": {
+                    "type": "string",
+                    "maxLength": 320,
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "What was deleted",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "erased": {
+                      "type": "object",
+                      "properties": {
+                        "chats": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "memberships": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "messages": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "files": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "chats",
+                        "memberships",
+                        "messages",
+                        "files"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "erased"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or a specific code",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/sessions/{userId}/stop": {
+      "post": {
+        "operationId": "stopUserReplies",
+        "tags": [
+          "internal"
+        ],
+        "summary": "Stop every reply a user started (called by auth-service on logout)",
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "How many replies were stopped",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stopped": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "stopped"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}
