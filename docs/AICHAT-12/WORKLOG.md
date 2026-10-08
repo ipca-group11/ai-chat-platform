@@ -427,6 +427,91 @@ by AICHAT-20 (it is the odd one out; its fix is the ticket proposed in `SSE-DRIF
 **Problems and fixes.** In mfe-chat's jsdom environment `import.meta.url` is not a `file:` URL, so the test reads the
 spec relative to the working directory (`apps/mfe-chat`, where the Nx target runs it).
 
+### US5 · Schemathesis run against the OpenAPI spec in CI ([AICHAT-187](https://ipca-grupo11.atlassian.net/browse/AICHAT-187))
+
+**What and why.** Our tests only send the inputs we thought of. Schemathesis reads the spec and generates hundreds of
+requests per route (valid ones, invalid ones, odd strings, odd headers, sequences that follow the links between
+routes) and checks every answer. We run the pinned `schemathesis/schemathesis:4.28.0` image against the real compose
+stack (`pnpm mock:up`: real services and Postgres, mock LLM), one run per service with its own `openapi.json`. The
+services are published on `localhost:4001`/`4002`, the same URLs as the specs' `servers`.
+
+- **Checks:** `not_a_server_error` (no 5xx), `status_code_conformance` (only documented statuses),
+  `response_schema_conformance` (bodies match the spec).
+- **Signed in:** `scripts/schemathesis/session.ts` reuses the DAST helper (`signInSeededUser`): it registers a throw-away
+  user, seeds three chats and prints its access-token cookie; `run.sh` masks it in the CI log and sends it on every request.
+- **Left out on purpose:** `deleteAccount` (would delete the signed-in user mid-run), `eraseUser` (deletes data,
+  service token only; covered by the integration tests) and `streamChat` (server-sent events never end).
+- **Rate limit:** `compose.yaml` passes `RATE_LIMIT_MAX` (default 300) to auth-service; the workflow sets 100 000 so the
+  ~1 200 requests are not answered 429 halfway.
+- **CI:** `.github/workflows/api-schema.yml`, job `schemathesis`, on every pull request and on pushes to the integration
+  branch and `main`. A failed check fails the job; the JUnit reports (`schemathesis-results/*.xml`) are uploaded even
+  then; the stack is always torn down. Branch protection is not available on this repository (HTTP 403), so, as for
+  DAST, the team rule in the workflow header is: do not merge while `api-schema / schemathesis` is red.
+  `e2e/src/ci/schemathesis-workflow.spec.ts` checks these properties.
+
+**Finding (first run): a malformed upload answered 500.** Schemathesis sent a multipart body whose part had no headers;
+busboy (the parser inside multer) throws a plain `Error("Malformed part header")`, which the error handler did not know.
+We reproduced it in-process first (a new row in `invalid-requests.spec.ts`, red), then fixed it in
+`attachments/routes.ts`: any error raised while the multipart body is read becomes `400 ATTACHMENT_UPLOAD_ERROR`
+(multer's own errors keep their handling). After rebuilding the service image the whole run is green.
+
+**Triage of the warnings** (reported, not failures):
+
+| Warning | Why it is expected |
+|---|---|
+| auth-service: "schema validation mismatch" on register/login | login answers 401 to any bad body on purpose (AC-36); register rejects most generated emails/passwords |
+| auth-service/conversation-service: "authentication failed" on refresh / `POST /internal/sessions/{userId}/stop` | refresh needs the refresh cookie and the internal route the service token; only the access token is sent. Both answer documented 401s |
+| conversation-service: "missing test data" (404) on message edit/cancel/leave | generated ids rarely exist; the success paths are covered by the US3 suite |
+
+**ZAP API scan now uses the generated specs.** `scripts/dast/zap-spec.ts` joins the two service specs as the browser
+sees them through the shell (`/auth/...`, `/api/chats/...`), leaving out `DELETE /auth/me`, `/internal/*`, the stream,
+`/health` and `/metrics`, and writes `testing/zap/openapi.json`; `scripts/dast/zap-spec.test.ts` fails when it is stale.
+The hand-written `testing/zap/openapi.yaml` is deleted, `testing/zap/run.sh` and `dast.yml` point to the JSON file and
+`e2e/src/ci/dast-workflow.spec.ts` reads it (still green: the same 21 operations).
+
+**Files.**
+- `testing/schemathesis/run.sh`, `scripts/schemathesis/session.ts` (new): the runner and the session.
+- `.github/workflows/api-schema.yml`, `e2e/src/ci/schemathesis-workflow.spec.ts` (new): the job and its checks.
+- `compose.yaml`: `RATE_LIMIT_MAX`. `.gitignore`: `schemathesis-results/`.
+- `services/conversation-service/src/features/attachments/routes.ts`: malformed multipart → 400; new row in `invalid-requests.spec.ts`.
+- `scripts/dast/zap-spec.ts`, `scripts/dast/zap-spec.test.ts`, `testing/zap/openapi.json` (new); `testing/zap/openapi.yaml` (deleted);
+  `testing/zap/run.sh`, `.github/workflows/dast.yml`, `e2e/src/ci/dast-workflow.spec.ts`.
+
+**How to run.**
+
+```sh
+RATE_LIMIT_MAX=100000 pnpm mock:up
+bash testing/schemathesis/run.sh            # Linux / CI
+# Docker Desktop on macOS: the container reaches the host through host.docker.internal
+ST_DOCKER_ARGS= ST_AUTH_URL=http://host.docker.internal:4001 ST_CONVERSATION_URL=http://host.docker.internal:4002 \
+  bash testing/schemathesis/run.sh
+node scripts/dast/zap-spec.ts               # after a service spec changes
+```
+
+**How to repeat it manually.** Remove `readFile(...)` around `upload.single("file")` in `attachments/routes.ts`,
+rebuild the service (`docker compose --profile llm up -d --build --no-deps conversation-service` with
+`COMPOSE_FILE=compose.yaml:compose.mock.yaml`) and run the script: the run fails with `Server error` on
+`POST /chats/{chatId}/messages/{messageId}/attachments` and prints a `curl` command that reproduces it.
+
+**Result.** auth-service 224 and conversation-service 1 010 generated cases, all checks pass; JUnit reports written.
+
+![First run: the malformed upload answered 500](evidence/21-schemathesis-first-run-red.png)
+
+![The same request reproduced in-process before the fix](evidence/19-multipart-500-red.png)
+
+![Schemathesis green on both services](evidence/20-schemathesis-green.png)
+
+**Problems and fixes.**
+- `run.sh` failed on macOS's bash 3.2 with `docker_args[@]: unbound variable` when the array is empty (`set -u`); it
+  now uses `${docker_args[@]+"${docker_args[@]}"}`.
+- `pnpm mock:up` exited 1 locally although every service was healthy: `docker compose up --wait` counts the one-shot
+  `ollama-pull` container (exit 0) as a failure. It comes from the Ollama restore, not from this epic; the job's
+  bounded health poll is what decides. Reported to the team.
+- Not verified locally: that ZAP 2.17 imports the OpenAPI 3.1 file. The weekly `api-scan` job (or a manual
+  `workflow_dispatch`) is the first run; if ZAP refuses 3.1, `zap-spec.ts` can emit 3.0 with the library's
+  `OpenApiGeneratorV3`.
+- `gitleaks` is not installed on the development machine; CI runs it on the pull request.
+
 ## 4. How to run everything
 
 ```sh

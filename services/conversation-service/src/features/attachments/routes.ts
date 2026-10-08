@@ -1,6 +1,7 @@
-import { Router } from "express";
-import multer from "multer";
+import { Router, type RequestHandler } from "express";
+import multer, { MulterError } from "multer";
 import { asyncHandler } from "../../shared/async-handler.js";
+import { HttpError } from "../../shared/error-handler.js";
 import { createAttachmentsController } from "./controller.js";
 import type { AttachmentsService } from "./service.js";
 
@@ -14,7 +15,22 @@ export function createAttachmentsRouter(service: AttachmentsService, maxBytesCei
   const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: maxBytesCeiling } });
   const router = Router();
 
-  router.post("/:chatId/messages/:messageId/attachments", upload.single("file"), asyncHandler(controller.upload));
+  router.post("/:chatId/messages/:messageId/attachments", readFile(upload.single("file")), asyncHandler(controller.upload));
 
   return router;
+}
+
+/** A multipart body the parser cannot read (a part without headers, a cut-off form) is the client's
+ * mistake: answer 400, not 500. Found by Schemathesis (AICHAT-187). Multer's own errors (size
+ * ceiling, unexpected field) keep their specific handling in the error handler. */
+function readFile(parse: RequestHandler): RequestHandler {
+  return (req, res, next) => {
+    parse(req, res, (err?: unknown) => {
+      if (err === undefined || err === null || err instanceof MulterError) {
+        next(err);
+        return;
+      }
+      next(new HttpError(400, "ATTACHMENT_UPLOAD_ERROR", "The upload could not be read"));
+    });
+  };
 }

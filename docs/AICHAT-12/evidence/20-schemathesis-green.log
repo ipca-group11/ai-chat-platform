@@ -1,0 +1,17 @@
+$ ST_DOCKER_ARGS= ST_AUTH_URL=http://host.docker.internal:4001 ST_CONVERSATION_URL=http://host.docker.internal:4002 bash testing/schemathesis/run.sh 2>&1 | grep -E 'Operations:|generated|passed in|failures|warnings in|Server error|Undocumented|JUNIT'
+     Operations:       7 selected / 8 total                                     
+Schema validation mismatch: 2 operations mostly rejected generated data due to validation errors, indicating schema constraints don't match API validation
+API Operations:
+  ⚠️ Schema validation mismatch: 2 operations mostly rejected generated data
+  224 generated, 224 passed
+  - JUNIT: /results/auth-service.xml
+============================= 2 warnings in 3.89s ==============================
+     Operations:       19 selected / 21 total                                   
+Schema validation mismatch: 4 operations mostly rejected generated data due to validation errors, indicating schema constraints don't match API validation
+API Operations:
+  ⚠️ Schema validation mismatch: 4 operations mostly rejected generated data
+  1010 generated, 1010 passed
+  - JUNIT: /results/conversation-service.xml
+============================= 3 warnings in 7.39s ==============================
+
+[exit 0]

@@ -4,8 +4,8 @@
 # baseline  zap-baseline.py with the AJAX spider, signed in as a seeded user. Rules: testing/zap/rules.tsv.
 #           A rule set to FAIL (High risk) fails the job (FAIL_ACTION=true); Medium only warns.
 #
-# api-scan  zap-api-scan.py, an active scan of the REST API from testing/zap/openapi.yaml (a small spec written from the
-#           Express routes; the AICHAT-12 spec replaces it). Runs weekly (Monday 04:00 UTC) and on demand, never on a pull
+# api-scan  zap-api-scan.py, an active scan of the REST API from testing/zap/openapi.json (built by
+#           scripts/dast/zap-spec.ts from the generated service specs, AICHAT-184/187). Runs weekly (Monday 04:00 UTC) and on demand, never on a pull
 #           request: an active scan sends attack payloads and creates data, so it only ever targets this throw-away stack.
 #
 # Required check: the job is named "dast / baseline". Branch protection is not available on this private

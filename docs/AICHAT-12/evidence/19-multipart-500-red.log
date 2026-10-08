@@ -1,0 +1,41 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/invalid-requests.spec.ts -t multipart
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/invalid-requests.spec.ts (41 tests | 1 failed | 40 skipped) 27ms
+   ❯ attachment upload: type and size are checked before anything is stored (6)
+     × 400 ATTACHMENT_UPLOAD_ERROR for a multipart body that cannot be parsed 27ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 40 skipped (41)
+   Start at  20:56:02
+   Duration  436ms (import 54%, transform 35%, tests 7%, worker 3%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > attachment upload: type and size are checked before anything is stored > 400 ATTACHMENT_UPLOAD_ERROR for a multipart body that cannot be parsed
+AssertionError: expected [ 500, 'INTERNAL_ERROR' ] to deeply equal [ 400, 'ATTACHMENT_UPLOAD_ERROR' ]
+
+- Expected
++ Received
+
+  [
+-   400,
+-   "ATTACHMENT_UPLOAD_ERROR",
++   500,
++   "INTERNAL_ERROR",
+  ]
+
+ ❯ src/integration/invalid-requests.spec.ts:148:47
+    146|       .set("Content-Type", `multipart/form-data; boundary=${boundary}`)
+    147|       .send(`--${boundary}\r\nNone--${boundary}--\r\n`);
+    148|     expect([res.status, res.body.error.code]).toEqual([400, "ATTACHMEN…
+       |                                               ^
+    149|     expectDocumentedResponse("POST /chats/:chatId/messages/:messageId/…
+    150|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

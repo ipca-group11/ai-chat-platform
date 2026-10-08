@@ -2,7 +2,7 @@
 # Runs one OWASP ZAP scan in Docker against the compose stack (pnpm mock:up) and judges the result.
 #
 #   bash testing/zap/run.sh baseline    passive scan + AJAX spider of the shell (zap-baseline.py), the PR gate
-#   bash testing/zap/run.sh api         active scan of the REST API from testing/zap/openapi.yaml (zap-api-scan.py), weekly
+#   bash testing/zap/run.sh api         active scan of the REST API from testing/zap/openapi.json (zap-api-scan.py), weekly
 #
 # The reports go to $ZAP_RESULTS (default zap-results): <mode>.html, <mode>.json, <mode>.md, plus the log.
 # Exit code: 1 when a rule set to FAIL in testing/zap/rules.tsv matched (a High alert) and FAIL_ACTION is not
@@ -41,7 +41,7 @@ docker_args=(${ZAP_DOCKER_ARGS:---network host})
 mkdir -p "$results"
 chmod 777 "$results" # the zap user of the image writes the reports
 cp "$rules" "$results/rules.tsv"
-cp testing/zap/openapi.yaml "$results/openapi.yaml" 2> /dev/null || true
+cp testing/zap/openapi.json "$results/openapi.json" 2> /dev/null || true
 cp testing/zap/hooks.py "$results/hooks.py"
 
 zap_args=(-c rules.tsv -r "$name.html" -J "$name.json" -w "$name.md")
@@ -60,7 +60,7 @@ if [ "$mode" = "baseline" ]; then
   if [ "$auth" = "1" ]; then docker_args+=(-e "ZAP_SEED_PATHS=${ZAP_EXPECT:-/chats,/settings,/api/chats}"); fi
   cmd=(zap-baseline.py -t "$target" -j -m "${ZAP_MINUTES:-3}" -I --hook /zap/wrk/hooks.py "${zap_args[@]}")
 else
-  cmd=(zap-api-scan.py -t /zap/wrk/openapi.yaml -f openapi -O "$base" -T "${ZAP_MINUTES:-10}" -I "${zap_args[@]}")
+  cmd=(zap-api-scan.py -t /zap/wrk/openapi.json -f openapi -O "$base" -T "${ZAP_MINUTES:-10}" -I "${zap_args[@]}")
 fi
 
 status=0
