@@ -31,9 +31,11 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@pact-foundation/pact": "^17.1.4",
     "@platform/eslint-config": "workspace:*",
-    "@platform/test-config": "workspace:*",
+    "@platform/pact-config": "workspace:^",
     "@platform/pii-detector": "workspace:*",
+    "@platform/test-config": "workspace:*",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",

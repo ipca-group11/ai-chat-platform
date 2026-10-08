@@ -858,9 +858,15 @@ importers:
         specifier: ^4.6.5
         version: 4.6.5
     devDependencies:
+      '@pact-foundation/pact':
+        specifier: ^17.1.4
+        version: 17.1.4
       '@platform/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@platform/pact-config':
+        specifier: workspace:^
+        version: link:../../packages/pact-config
       '@platform/pii-detector':
         specifier: workspace:*
         version: link:../../packages/pii-detector

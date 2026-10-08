@@ -1,0 +1,13 @@
+$ cd apps/mfe-chat && pnpm exec vitest run -c vitest.pact.config.ts src/features/chat-list 2>&1 | grep -v WARN | grep -E '✓|×|Expected|Received|code|message|Tests ' | head -20
+     × GET /chats/:id of a chat the user cannot see is a 404 with the server's message 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/features/chat-list/api/chats.pact.spec.ts > mfe-chat -> conversation-service: chats > GET /chats/:id of a chat the user cannot see is a 404 with the server's message
+- Expected
++ Received
+-   "code": "CHAT_NOT_FOUND",
+-   "message": "A human-readable error message.",
++   "code": undefined,
+     57|       code: "CHAT_NOT_FOUND",
+      Tests  1 failed | 5 passed (6)
+
+[exit 0]

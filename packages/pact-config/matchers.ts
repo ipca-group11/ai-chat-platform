@@ -5,7 +5,7 @@ import { MatchersV3 } from "@pact-foundation/pact";
  * package instead of reaching into `@pact-foundation/pact` directly — keeps the matcher
  * API surface every pod uses in one documented place.
  */
-export const { like, eachLike } = MatchersV3;
+export const { like, eachLike, boolean } = MatchersV3;
 
 /**
  * V2-style `term(matcher, example)` naming kept for readability at call sites (a regex the

@@ -18,6 +18,7 @@ export default defineConfig({
     include: ["src/**/*.pact.spec.ts"],
     globalSetup: ["./vitest.pact.setup.ts"],
     fileParallelism: false,
-    env: { NODE_ENV: "test" },
+    // Built with /api in Docker (Dockerfile ARG), like the shell proxy path.
+    env: { NODE_ENV: "test", VITE_CONVERSATION_SERVICE_URL: "/api" },
   },
 });

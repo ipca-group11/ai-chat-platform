@@ -55,7 +55,7 @@ describe("ChatList (AC-42, AC-47)", () => {
   });
 
   it("shows an error state when the chats request fails", async () => {
-    server.use(http.get("*/chats", () => HttpResponse.json({ message: "boom" }, { status: 500 })));
+    server.use(http.get("*/chats", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "boom" } }, { status: 500 })));
 
     renderWithClient(<ChatList onOpenChat={vi.fn()} />);
 

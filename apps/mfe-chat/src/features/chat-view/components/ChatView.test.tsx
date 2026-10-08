@@ -97,8 +97,8 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
 
   it("AC-46: shows a clear not-found state instead of any chat data on a 403/404", async () => {
     server.use(
-      http.get("*/chats/:chatId", () => HttpResponse.json({ message: "Forbidden" }, { status: 403 })),
-      http.get("*/chats/:chatId/messages", () => HttpResponse.json({ message: "Forbidden" }, { status: 403 }))
+      http.get("*/chats/:chatId", () => HttpResponse.json({ error: { code: "FORBIDDEN", message: "Forbidden" } }, { status: 403 })),
+      http.get("*/chats/:chatId/messages", () => HttpResponse.json({ error: { code: "FORBIDDEN", message: "Forbidden" } }, { status: 403 }))
     );
 
     renderWithClient(<ChatView chatId="chat-owned-by-another-user" userId="user-1" />);
@@ -238,7 +238,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
 
     it("a server error on the chat shows 'Could not load this chat', not the not-found text", async () => {
       server.use(
-        http.get("*/chats/:chatId", () => HttpResponse.json({ message: "Boom" }, { status: 500 })),
+        http.get("*/chats/:chatId", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "Boom" } }, { status: 500 })),
         http.get("*/chats/:chatId/messages", () => HttpResponse.json({ messages: [] }))
       );
       renderWithClient(<ChatView chatId="chat-1" userId="user-1" />, { queryClient: clientWithoutRetryDelay() });
@@ -252,7 +252,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
 
     it("the error state still offers the close button of a split pane", async () => {
       const onClose = vi.fn();
-      server.use(http.get("*/chats/:chatId", () => HttpResponse.json({ message: "Boom" }, { status: 500 })));
+      server.use(http.get("*/chats/:chatId", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "Boom" } }, { status: 500 })));
       renderWithClient(<ChatView chatId="chat-1" userId="user-1" onClose={onClose} />, {
         queryClient: clientWithoutRetryDelay(),
       });
@@ -264,7 +264,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
 
     it("keeps the chat usable and shows 'Could not load messages.' when only the history fails", async () => {
       serveChat(chat);
-      server.use(http.get("*/chats/:chatId/messages", () => HttpResponse.json({ message: "Boom" }, { status: 500 })));
+      server.use(http.get("*/chats/:chatId/messages", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "Boom" } }, { status: 500 })));
       renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
       expect(await screen.findByRole("alert")).toHaveTextContent("Could not load messages.");
@@ -465,7 +465,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
 
     it("a failed update leaves the toggle as it was and usable again", async () => {
       serveChat(reasoningChat);
-      server.use(http.patch("*/chats/:chatId", () => HttpResponse.json({ message: "Boom" }, { status: 500 })));
+      server.use(http.patch("*/chats/:chatId", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "Boom" } }, { status: 500 })));
       const requests = recordRequests();
       renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
