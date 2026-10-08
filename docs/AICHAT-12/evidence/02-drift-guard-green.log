@@ -1,0 +1,21 @@
+$ cd services/conversation-service && pnpm exec vitest run src/shared/contracts/shared-types-drift.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > ChatDto matches the recorded drift 1ms
+ ✓ src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > MessageDto matches the recorded drift 0ms
+ ✓ src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > AttachmentDto matches the recorded drift 0ms
+ ✓ src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > ChatMemberDto matches the recorded drift 0ms
+ ✓ src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > create chat body matches the recorded drift 0ms
+ ✓ src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > update chat body matches the recorded drift 0ms
+ ✓ src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > add member body matches the recorded drift 0ms
+ ✓ src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > send message body matches the recorded drift 0ms
+ ✓ src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > edit message body matches the recorded drift 0ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  19:37:44
+   Duration  119ms (transform 40%, import 38%, worker 16%, tests 5%, setup 1%)
+
+
+[exit 0]

@@ -1,0 +1,27 @@
+$ (cd services/auth-service && pnpm exec vitest run src/integration/route-inventory.spec.ts --reporter=verbose) && (cd services/conversation-service && pnpm exec vitest run src/integration/route-inventory.spec.ts --reporter=verbose)
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/auth-service
+
+ ✓ src/integration/route-inventory.spec.ts > route inventory > every registered route has an entry in ROUTE_TESTS 1ms
+ ✓ src/integration/route-inventory.spec.ts > route inventory > ROUTE_TESTS has no entry for a route that no longer exists 0ms
+ ✓ src/integration/route-inventory.spec.ts > route inventory > each entry points to a spec with a test titled after the route 0ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  19:37:45
+   Duration  653ms (transform 74%, import 24%, worker 2%)
+
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/integration/route-inventory.spec.ts > route inventory > every registered route has an entry in ROUTE_TESTS 1ms
+ ✓ src/integration/route-inventory.spec.ts > route inventory > ROUTE_TESTS has no entry for a route that no longer exists 0ms
+ ✓ src/integration/route-inventory.spec.ts > route inventory > each entry points to a spec with a test titled after the route 1ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  19:37:47
+   Duration  248ms (import 53%, transform 41%, worker 5%, tests 1%)
+
+
+[exit 0]

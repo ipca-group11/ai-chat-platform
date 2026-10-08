@@ -1,0 +1,44 @@
+$ cd services/conversation-service && pnpm exec vitest run src/shared/contracts/shared-types-drift.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/shared/contracts/shared-types-drift.spec.ts (9 tests | 1 failed) 6ms
+   ❯ drift between the service contracts and packages/shared-types (9)
+     × MessageDto matches the recorded drift 3ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  19:37:32
+   Duration  116ms (transform 38%, import 37%, worker 15%, tests 9%, setup 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/shared/contracts/shared-types-drift.spec.ts > drift between the service contracts and packages/shared-types > MessageDto matches the recorded drift
+AssertionError: expected [ …(10) ] to deeply equal [ …(11) ]
+
+- Expected
++ Received
+
+@@ -6,8 +6,7 @@
+    "createdAt: definition differs",
+    "error: only in service",
+    "reasoning: required differs",
+    "role: definition differs",
+    "status: definition differs",
+-   "stopped: only in service",
+    "webFetches: required differs",
+  ]
+
+ ❯ src/shared/contracts/shared-types-drift.spec.ts:56:47
+     54|     ["edit message body", editMessageSchema, shared.editQueuedMessageR…
+     55|   ] as const)("%s matches the recorded drift", (name, service, sharedS…
+     56|     expect(fieldDrift(service, sharedSchema)).toEqual(KNOWN_DRIFT[name…
+       |                                               ^
+     57|   });
+     58| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]
