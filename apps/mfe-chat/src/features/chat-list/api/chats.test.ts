@@ -9,8 +9,8 @@ const chatA: Chat = {
   id: "chat-1",
   title: "First chat",
   ownerId: "user-1",
-  provider: "anthropic",
-  model: "claude-3-5-haiku-latest",
+  provider: "ollama",
+  model: "llama3.2:1b",
   createdAt: "2026-01-01T00:00:00.000Z",
   updatedAt: "2026-01-01T00:00:00.000Z",
 };
@@ -75,13 +75,13 @@ describe("useCreateChat (AC-42, AC-48, AC-49)", () => {
 
     const { result } = renderHookWithClient(() => useCreateChat());
 
-    result.current.mutate({ title: "First chat", provider: "anthropic", model: "claude-3-5-haiku-latest" });
+    result.current.mutate({ title: "First chat", provider: "ollama", model: "llama3.2:1b" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(await requests[0]!.json()).toEqual({
       title: "First chat",
-      provider: "anthropic",
-      model: "claude-3-5-haiku-latest",
+      provider: "ollama",
+      model: "llama3.2:1b",
     });
   });
 });

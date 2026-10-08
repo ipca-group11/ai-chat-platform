@@ -23,6 +23,7 @@ describe("test-config README testability expectations (AC-94)", () => {
 
   it("AC-94: documents that conversation-service must mock every LLM provider adapter", () => {
     expect(readme).toMatch(/mocks the LLM\/HTTP calls/i);
+    expect(readme).toMatch(/Ollama/);
     expect(readme).toMatch(/OpenAI/);
     expect(readme).toMatch(/Anthropic/);
     expect(readme).toMatch(/no live\s+network calls/i);

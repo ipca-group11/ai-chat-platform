@@ -47,12 +47,16 @@ export function useSendMessage() {
   });
 }
 
-/** AC-54: stop a response mid-stream; the partial response is saved server-side and re-synced here. */
+/**
+ * AC-54: stop a response mid-stream; the partial response is saved server-side and re-synced here.
+ * conversation-service stops whatever reply is active in the chat (`POST /chats/:chatId/stop`), so
+ * `messageId` only identifies the bubble the user clicked; it is not part of the request.
+ */
 export function useStopMessage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ chatId, messageId }: { chatId: string; messageId: string }) =>
-      apiClient.post<void>(`/chats/${chatId}/messages/${messageId}/stop`),
+    mutationFn: ({ chatId }: { chatId: string; messageId: string }) =>
+      apiClient.post<{ stopped: boolean }>(`/chats/${chatId}/stop`),
     onSuccess: (_data, { chatId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.messages(chatId) });
     },

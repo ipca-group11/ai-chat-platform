@@ -15,7 +15,7 @@ vi.mock("@playwright/test", () => ({
 const flows = await import("./chat-flows.js");
 
 describe("chat flows", () => {
-  it("createChat opens the list, clicks New chat and returns the id from the URL", async () => {
+  it("createChat opens the list, fills the New chat dialog and returns the id from the URL", async () => {
     const { page, calls, state } = createFakePage();
     state.url = "http://localhost:4173/chats/abc-123";
 
@@ -25,6 +25,8 @@ describe("chat flows", () => {
     expect(calls).toEqual([
       'goto("/chats")',
       'getByRole("button", {"name":"/new chat/i"}).click()',
+      'getByRole("dialog", {"name":"/new chat/i"}).getByRole("textbox", {"name":"/chat title/i"}).fill("E2E chat")',
+      'getByRole("dialog", {"name":"/new chat/i"}).getByRole("button", {"name":"/^create$/i"}).click()',
       String.raw`waitForURL("/\\/chats\\/[^/]+$/")`,
     ]);
   });

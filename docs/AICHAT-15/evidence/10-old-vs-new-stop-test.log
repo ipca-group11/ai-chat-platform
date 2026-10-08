@@ -1,0 +1,51 @@
+$ pnpm exec playwright test --project=chromium src/tests/zz-sanity-broken-stop.spec.ts --reporter=line
+
+Running 2 tests using 1 worker
+
+[1/2] [chromium] › src/tests/zz-sanity-broken-stop.spec.ts:17:1 › OLD assertions with a broken Stop
+[2/2] [chromium] › src/tests/zz-sanity-broken-stop.spec.ts:25:1 › NEW helper with a broken Stop
+  1) [chromium] › src/tests/zz-sanity-broken-stop.spec.ts:25:1 › NEW helper with a broken Stop ─────
+
+    Error: the stop request must reach a real route
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+       at ../fixtures/chat-flows.ts:91
+
+      89 |   await reply.getByRole("button", { name: "Stop" }).click();
+      90 |   const res = await stopResponse;
+    > 91 |   expect(res.status(), "the stop request must reach a real route").toBe(200);
+         |                                                                    ^
+      92 |   expect(await res.json()).toEqual({ stopped: true });
+      93 |
+      94 |   await waitForStreamToFinish(page);
+        at stopReplyAndExpectCancelled (/Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/e2e/src/fixtures/chat-flows.ts:91:68)
+        at /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/e2e/src/tests/zz-sanity-broken-stop.spec.ts:27:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/zz-sanity-broken-stop-NEW-helper-with-a-broken-Stop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/zz-sanity-broken-stop-NEW-helper-with-a-broken-Stop-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/zz-sanity-broken-stop-NEW-helper-with-a-broken-Stop-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/zz-sanity-broken-stop-NEW-helper-with-a-broken-Stop-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/zz-sanity-broken-stop-NEW-helper-with-a-broken-Stop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [chromium] › src/tests/zz-sanity-broken-stop.spec.ts:25:1 › NEW helper with a broken Stop ──────
+  1 passed (19.0s)
+
+[exit 1]

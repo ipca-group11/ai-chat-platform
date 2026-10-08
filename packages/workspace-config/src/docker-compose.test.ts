@@ -4,7 +4,7 @@ import { readRepoFile } from "./repo.ts";
 
 const compose = parse(readRepoFile("docker-compose.yml"));
 
-describe("AC-5: a single `docker compose up` starts every app, service, and Postgres", () => {
+describe("AC-5: a single `docker compose up` starts every app, service, Postgres, and Ollama", () => {
   it.each([
     "shell",
     "mfe-auth",
@@ -13,6 +13,7 @@ describe("AC-5: a single `docker compose up` starts every app, service, and Post
     "auth-service",
     "conversation-service",
     "postgres",
+    "ollama",
   ])("AC-5: docker-compose.yml defines a `%s` service", (service) => {
     expect(compose.services).toHaveProperty(service);
   });
@@ -30,12 +31,9 @@ describe("AC-5: a single `docker compose up` starts every app, service, and Post
     }
   });
 
-  it("AC-5: postgres has a healthcheck so dependents wait until it's ready", () => {
+  it("AC-5: postgres and ollama have healthchecks so dependents wait until they're ready", () => {
     expect(compose.services.postgres.healthcheck).toBeDefined();
-  });
-
-  it("does not run a local LLM (hosted providers only)", () => {
-    expect(compose.services).not.toHaveProperty("ollama");
+    expect(compose.services.ollama.healthcheck).toBeDefined();
   });
 });
 

@@ -6,7 +6,7 @@ import { z } from "zod";
  * can switch to `import { chat } from "@shared-types"` once the package lands.
  */
 
-export const providerSchema = z.enum(["openai", "anthropic"]);
+export const providerSchema = z.enum(["ollama", "openai", "anthropic"]);
 export type Provider = z.infer<typeof providerSchema>;
 
 export const messageRoleSchema = z.enum(["user", "assistant", "system"]);
@@ -57,6 +57,8 @@ export const messageDtoSchema = z.object({
   attachments: z.array(attachmentDtoSchema),
   status: messageStatusSchema,
   error: z.string().nullable().optional(),
+  /** The user stopped the reply before it finished; `content` holds the partial text (AICHAT-202). */
+  stopped: z.boolean(),
   createdAt: z.string(),
 });
 export type MessageDto = z.infer<typeof messageDtoSchema>;

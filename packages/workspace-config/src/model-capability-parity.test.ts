@@ -4,6 +4,7 @@ import { supportsAttachmentKind } from "@parity/mfe-chat/features/attachments/mo
 import { supportsReasoning, supportsWebFetch } from "@parity/mfe-chat/shared/model-capabilities";
 import * as chatTypes from "@parity/mfe-chat/shared/types";
 import { AnthropicProvider } from "@parity/conversation-service/features/llm-adapters/anthropic.provider";
+import { OllamaProvider } from "@parity/conversation-service/features/llm-adapters/ollama.provider";
 import { OpenAiProvider } from "@parity/conversation-service/features/llm-adapters/openai.provider";
 
 // Capability parity between the chat UI (apps/mfe-chat) and the server
@@ -17,7 +18,11 @@ interface ServerCapabilities {
   supportsVision(model: string): boolean;
 }
 
-const backend: Record<Provider, ServerCapabilities> = { anthropic: new AnthropicProvider(), openai: new OpenAiProvider() };
+const backend: Record<Provider, ServerCapabilities> = {
+  anthropic: new AnthropicProvider(),
+  openai: new OpenAiProvider(),
+  ollama: new OllamaProvider({ baseUrl: "http://localhost:11434" }),
+};
 
 /** Ids outside the catalogue, in other letter cases: the two sides must still agree. */
 const EXTRA_MODELS: Record<Provider, string[]> = {
@@ -32,6 +37,7 @@ const EXTRA_MODELS: Record<Provider, string[]> = {
     "",
   ],
   openai: ["GPT-4O", "gpt-4-vision-preview", "gpt-5", "o1", "o3-mini", "gpt-3.5-turbo", "gpt-4", ""],
+  ollama: ["Qwen3:8B", "llava:7b", "gpt-oss:20b", "mistral:7b", ""],
 };
 
 const cases = PROVIDERS.flatMap((provider) =>

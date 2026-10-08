@@ -13,6 +13,8 @@ const envSchema = z.object({
   // Base URLs of the LLM providers. Tests and the mock server point them elsewhere (AICHAT-43).
   ANTHROPIC_BASE_URL: z.string().url().default("https://api.anthropic.com"),
   OPENAI_BASE_URL: z.string().url().default("https://api.openai.com"),
+  // Local Ollama server (no API key).
+  OLLAMA_BASE_URL: z.string().url().default("http://localhost:11434"),
   // Optional system prompt added at the start of every conversation. Unset in production (no system prompt today);
   // the red-team test stack sets it to a prompt that holds a canary (AICHAT-26, compose.redteam.yaml).
   SYSTEM_PROMPT: z.string().min(1).optional(),

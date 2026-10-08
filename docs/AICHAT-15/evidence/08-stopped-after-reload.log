@@ -1,0 +1,27 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/stopped-reply.spec.ts src/shared/contracts/chat.spec.ts -t 'AICHAT-202|stopped' --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ↓ src/shared/contracts/chat.spec.ts > enums > accepts only the agreed values
+ ↓ src/shared/contracts/chat.spec.ts > enums > accepts only the agreed values
+ ↓ src/shared/contracts/chat.spec.ts > enums > accepts only the agreed values
+ ↓ src/shared/contracts/chat.spec.ts > DTO schemas > accepts a message with every optional part empty and keeps error optional
+ ✓ src/shared/contracts/chat.spec.ts > DTO schemas > AICHAT-202: requires a boolean stopped flag on a message 1ms
+ ↓ src/shared/contracts/chat.spec.ts > DTO schemas > rejects a message with an unknown role or a missing author
+ ↓ src/shared/contracts/chat.spec.ts > DTO schemas > requires boolean reasoning and webFetch flags on a chat
+ ↓ src/shared/contracts/chat.spec.ts > DTO schemas > accepts a member with a null email (legacy owner) and rejects unknown roles
+ ↓ src/shared/contracts/chat.spec.ts > DTO schemas > limits web fetch status and keeps title and errorCode optional
+ ↓ src/shared/contracts/chat.spec.ts > SSE event schemas > discriminates on the literal type
+ ✓ src/shared/contracts/chat.spec.ts > SSE event schemas > allows done with or without stopped 0ms
+ ↓ src/shared/contracts/chat.spec.ts > SSE event schemas > requires retryable on error events
+ ↓ src/shared/contracts/chat.spec.ts > SSE event schemas > nests full DTOs in message and web_fetch events
+ ✓ src/integration/stopped-reply.spec.ts > stopped reply (AICHAT-202) > a reply stopped mid-stream is read back with stopped: true and its partial text 21ms
+ ✓ src/integration/stopped-reply.spec.ts > stopped reply (AICHAT-202) > a reply that finishes on its own is read back with stopped: false 4ms
+
+ Test Files  2 passed (2)
+      Tests  4 passed | 11 skipped (15)
+   Start at  23:27:43
+   Duration  254ms (import 45%, transform 35%, tests 11%, worker 8%)
+
+
+[exit 0]

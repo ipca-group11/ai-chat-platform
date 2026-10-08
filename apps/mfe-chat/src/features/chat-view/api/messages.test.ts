@@ -52,17 +52,17 @@ describe("useSendMessage (AC-51, AC-60)", () => {
 });
 
 describe("useStopMessage (AC-54)", () => {
+  // The handler mirrors conversation-service's real route (`POST /chats/:chatId/stop`, messages/routes.ts).
+  // It used to mirror the client's own wrong path, which kept this test green while Stop hit a 404 (AICHAT-199).
   it("AC-54: stops a mid-stream response and resyncs history to pick up the saved partial response", async () => {
-    server.use(http.post("*/chats/:chatId/messages/:messageId/stop", () => new HttpResponse(null, { status: 204 })));
+    server.use(http.post("*/chats/:chatId/stop", () => HttpResponse.json({ stopped: true })));
     const requests = recordRequests();
 
     const { result } = renderHookWithClient(() => useStopMessage());
     result.current.mutate({ chatId: "chat-1", messageId: "msg-assistant-1" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(requests.map((r) => `${r.method} ${new URL(r.url).pathname}`)).toContain(
-      "POST /api/chats/chat-1/messages/msg-assistant-1/stop"
-    );
+    expect(requests.map((r) => `${r.method} ${new URL(r.url).pathname}`)).toEqual(["POST /api/chats/chat-1/stop"]);
   });
 });
 

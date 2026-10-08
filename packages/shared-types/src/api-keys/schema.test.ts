@@ -16,16 +16,16 @@ describe("providerSchema", () => {
     expect(providerSchema.parse("anthropic")).toBe("anthropic");
   });
 
-  it("rejects ollama (no longer supported)", () => {
-    expect(() => providerSchema.parse("ollama")).toThrow();
+  it("AC-77: accepts ollama as a valid provider", () => {
+    expect(providerSchema.parse("ollama")).toBe("ollama");
   });
 
   it("AC-76: rejects an unknown provider", () => {
     expect(() => providerSchema.parse("cohere")).toThrow();
   });
 
-  it("lists exactly the two supported providers", () => {
-    expect(PROVIDERS).toEqual(["openai", "anthropic"]);
+  it("lists exactly the three supported providers", () => {
+    expect(PROVIDERS).toEqual(["openai", "anthropic", "ollama"]);
   });
 });
 
@@ -36,8 +36,9 @@ describe("providerRequiresApiKey", () => {
     expect(PROVIDERS_REQUIRING_KEY).toEqual(["openai", "anthropic"]);
   });
 
-  it("AC-77: no supported provider is keyless", () => {
-    expect(PROVIDERS_WITHOUT_KEY).toEqual([]);
+  it("AC-77: ollama does not require a key", () => {
+    expect(providerRequiresApiKey("ollama")).toBe(false);
+    expect(PROVIDERS_WITHOUT_KEY).toEqual(["ollama"]);
   });
 });
 

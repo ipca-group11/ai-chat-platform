@@ -35,6 +35,11 @@ export interface LoggedRequest {
   headers: Record<string, string | string[] | undefined>;
   body: unknown;
   status: number | null;
+  /** When the whole answer was sent; null while it is still streaming or if the client left. */
+  finishedAt: string | null;
+  /** When the client closed the connection before the answer was complete (a stopped stream,
+   * AICHAT-201); null when the answer finished. */
+  clientClosedAt: string | null;
 }
 
 export interface RequestLog {
@@ -89,11 +94,18 @@ export function createRequestLog(capacity = 1000): RequestLog {
           headers: maskHeaders(req.headers),
           body: maskValue(req.body as unknown),
           status: null,
+          finishedAt: null,
+          clientClosedAt: null,
         };
         entries.push(entry);
         if (entries.length > capacity) entries = entries.slice(-capacity);
         res.on("finish", () => {
           entry.status = res.statusCode;
+          entry.finishedAt = new Date().toISOString();
+        });
+        // `close` also follows a normal finish; only a close before it means the client left.
+        res.on("close", () => {
+          if (!res.writableFinished) entry.clientClosedAt = new Date().toISOString();
         });
         next();
       });

@@ -81,7 +81,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
     };
     serveChat(chat, [streamingMessage, failedMessage]);
     server.use(
-      http.post("*/chats/:chatId/messages/:messageId/stop", () => HttpResponse.json({ stopped: true })),
+      http.post("*/chats/:chatId/stop", () => HttpResponse.json({ stopped: true })),
       http.post("*/chats/:chatId/messages/:messageId/retry", () => HttpResponse.json({ message }, { status: 202 }))
     );
     const requests = recordRequests();
@@ -89,7 +89,7 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
     renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
 
     await userEvent.click(await screen.findByText("Stop"));
-    await waitFor(() => expect(calls(requests)).toContain("POST /api/chats/chat-1/messages/msg-2/stop"));
+    await waitFor(() => expect(calls(requests)).toContain("POST /api/chats/chat-1/stop"));
 
     await userEvent.click(screen.getByText("Retry"));
     await waitFor(() => expect(calls(requests)).toContain("POST /api/chats/chat-1/messages/msg-3/retry"));

@@ -1,0 +1,12 @@
+$ cd apps/mfe-chat && NODE_ENV=test PNPM_HOME=/Users/joaovieira/Library/pnpm pnpm exec vitest run src/features/chat-view/api/messages.test.ts src/features/chat-view/components/ChatView.test.tsx
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/apps/mfe-chat
+
+
+ Test Files  2 passed (2)
+      Tests  33 passed (33)
+   Start at  23:01:32
+   Duration  1.90s (tests 51%, environment 19%, import 15%, transform 8%, setup 6%)
+
+
+[exit 0]

@@ -10,19 +10,19 @@ vi.mock("../../shared/prisma", async () => {
   return { prisma: buildFakePrisma() };
 });
 
-const { sessionRouter } = await import("./api");
+const { sessionRouter, createSessionRouter } = await import("./api");
 const { errorMiddleware } = await import("../../shared/error-middleware");
 const { correlationIdMiddleware } = await import("../../shared/correlation-id");
 const { prisma } = (await import("../../shared/prisma")) as unknown as {
   prisma: ReturnType<typeof fakePrisma>;
 };
 
-function buildApp() {
+function buildApp(router = sessionRouter) {
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
   app.use(correlationIdMiddleware);
-  app.use("/auth", sessionRouter);
+  app.use("/auth", router);
   app.use(errorMiddleware);
   return app;
 }
@@ -199,6 +199,62 @@ describe("session routes", () => {
     it("GET /auth/me is 401 with a garbage access token cookie", async () => {
       const res = await request(buildApp()).get("/auth/me").set("Cookie", "access_token=garbage");
       expect(res.status).toBe(401);
+    });
+  });
+
+  // AICHAT-203: logout stops the replies the user started (they spend the user's API key).
+  describe("POST /auth/logout stops the user's running replies (AICHAT-203)", () => {
+    async function loginCookies(email: string) {
+      const user = await makeUser(email, "password1");
+      prisma.__addUser(user);
+      const loginRes = await request(buildApp()).post("/auth/login").send({ email, password: "password1" });
+      const setCookie = loginRes.headers["set-cookie"] as unknown as string[];
+      return { user, refreshCookie: extractCookie(setCookie, "refresh_token") as string };
+    }
+
+    it("asks conversation-service to stop the replies of the user whose session ended", async () => {
+      const { user, refreshCookie } = await loginCookies("stop@example.com");
+      const replies = { stopUserReplies: vi.fn(async () => 1) };
+
+      const res = await request(buildApp(createSessionRouter(prisma as never, { replies }))).post("/auth/logout").set("Cookie", refreshCookie);
+
+      expect(res.status).toBe(204);
+      expect(replies.stopUserReplies).toHaveBeenCalledExactlyOnceWith(user.id);
+    });
+
+    it("still logs out (204, cookies cleared) when conversation-service fails, and reports the failure", async () => {
+      const { user, refreshCookie } = await loginCookies("down@example.com");
+      const failure = new Error("ECONNREFUSED");
+      const replies = { stopUserReplies: vi.fn(() => Promise.reject(failure)) };
+      const onReplyStopError = vi.fn();
+
+      const res = await request(buildApp(createSessionRouter(prisma as never, { replies, onReplyStopError })))
+        .post("/auth/logout")
+        .set("Cookie", refreshCookie);
+
+      expect(res.status).toBe(204);
+      const cleared = res.headers["set-cookie"] as unknown as string[];
+      expect(cleared.some((c) => c.startsWith("refresh_token=;"))).toBe(true);
+      expect(onReplyStopError).toHaveBeenCalledWith(failure, user.id);
+    });
+
+    it("does not act again when an already revoked refresh token is replayed", async () => {
+      const { refreshCookie } = await loginCookies("replay@example.com");
+      const replies = { stopUserReplies: vi.fn(async () => 0) };
+      const app = buildApp(createSessionRouter(prisma as never, { replies }));
+
+      await request(app).post("/auth/logout").set("Cookie", refreshCookie).expect(204);
+      await request(app).post("/auth/logout").set("Cookie", refreshCookie).expect(204);
+
+      expect(replies.stopUserReplies).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not call conversation-service when there is no session to end", async () => {
+      const replies = { stopUserReplies: vi.fn(async () => 0) };
+
+      await request(buildApp(createSessionRouter(prisma as never, { replies }))).post("/auth/logout").expect(204);
+
+      expect(replies.stopUserReplies).not.toHaveBeenCalled();
     });
   });
 });

@@ -20,6 +20,7 @@ datasource db {
 }
 
 enum ChatProvider {
+  ollama
   openai
   anthropic
 }
@@ -97,6 +98,9 @@ model Message {
   webFetches  Json?
   status      MessageStatus @default(sent)
   error       String?
+  /// True when the user stopped the reply before it finished (AICHAT-202); the partial
+  /// text is kept in `content`. Additive column, existing rows read as false.
+  stopped     Boolean       @default(false)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   attachments Attachment[]

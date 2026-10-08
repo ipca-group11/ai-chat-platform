@@ -9,6 +9,7 @@ import {
   renameChat,
   selectProvider,
   sendMessage,
+  stopReplyAndExpectCancelled,
   waitForStreamToFinish,
 } from "../fixtures/chat-flows.js";
 import { configureAnthropicKey } from "../fixtures/settings-flows.js";
@@ -19,7 +20,6 @@ import { freshUser, isolationUsers } from "../fixtures/test-users.js";
 test.describe("chat", () => {
   test("US-13: Chat CRUD and history persistence (FR4, FR8)", async ({ page }) => {
     await registerAndLogin(page, freshUser("chat-crud"));
-    await configureAnthropicKey(page);
 
     const chatId = await test.step("AC-42: a user can create, list, and open chats", async () => {
       const id = await createChat(page);
@@ -56,7 +56,6 @@ test.describe("chat", () => {
     const contextA = await browser.newContext();
     const pageA = await contextA.newPage();
     await registerAndLogin(pageA, userA);
-    await configureAnthropicKey(pageA);
     const chatId = await createChat(pageA);
     await sendMessage(pageA, "This belongs to user A only.");
     await waitForStreamToFinish(pageA);
@@ -87,26 +86,24 @@ test.describe("chat", () => {
 
   test("US-15: Provider and model selection per chat (FR6)", async ({ page }) => {
     await registerAndLogin(page, freshUser("chat-provider"));
-    await configureAnthropicKey(page);
     await createChat(page);
 
     await test.step("AC-48: the user chooses a provider/model when creating/editing a chat", async () => {
-      await selectProvider(page, "Anthropic");
+      await selectProvider(page, "Ollama");
     });
 
     await test.step("AC-49/AC-50: the selection is persisted and reused for subsequent messages", async () => {
-      await sendMessage(page, "Hello with Anthropic");
+      await sendMessage(page, "Hello with Ollama");
       await waitForStreamToFinish(page);
       await page.reload();
       await expect(page.getByRole("combobox", { name: /provider|model/i })).toHaveValue(
-        /anthropic/i,
+        /ollama/i,
       );
     });
   });
 
   test("US-16: Send message and streamed response (FR9, FR10, FR12, UC3)", async ({ page }) => {
     await registerAndLogin(page, freshUser("chat-send"));
-    await configureAnthropicKey(page);
     await createChat(page);
 
     await test.step("AC-51: a sent message is persisted immediately and shown", async () => {
@@ -132,16 +129,26 @@ test.describe("chat", () => {
       );
     });
 
+    // AICHAT-204: the step used to pass even when Stop did nothing (it only checked for some text, and a
+    // short reply ends on its own). The chat now uses the mock's long answer so the reply is still
+    // streaming when Stop is pressed, and the step proves the cancellation.
     await test.step("AC-54: stopping mid-stream saves the partial response", async () => {
-      await sendMessage(page, "Write a very long story.");
-      await expect(page.getByRole("status", { name: /generating|streaming/i })).toBeVisible();
-      await page.getByRole("button", { name: /stop/i }).click();
-      await waitForStreamToFinish(page);
+      // The default local model may finish a short answer before Stop is pressed. This step moves the
+      // chat onto the LLM mock's long answer (compose profile `llm`, any key works).
+      const chatId = new URL(page.url()).pathname.split("/").pop() as string;
+      await configureAnthropicKey(page);
+      const patch = await page.request.patch(`/api/chats/${chatId}`, {
+        data: { provider: "anthropic", model: "claude-haiku-4-5@long" },
+      });
+      expect(patch.status()).toBe(200);
+      await page.goto(`/chats/${chatId}`);
 
-      const partial = messagesLog(page).getByTestId("assistant-message").last();
-      await expect(partial).not.toHaveText("");
+      await sendMessage(page, "Write a very long story.");
+      const partial = await stopReplyAndExpectCancelled(page);
+
       await page.reload();
-      await expect(messagesLog(page).getByTestId("assistant-message").last()).not.toHaveText("");
+      await expect(messagesLog(page).getByTestId("assistant-message").last().locator(".typeset")).toHaveText(partial);
+      await expect(messagesLog(page).getByTestId("stopped-indicator")).toBeVisible();
     });
 
     // AC-53 (the full conversation history is sent to the LLM as context) has
@@ -152,7 +159,6 @@ test.describe("chat", () => {
 
   test("US-17: Message queue (FR11, UC4)", async ({ page }) => {
     await registerAndLogin(page, freshUser("chat-queue"));
-    await configureAnthropicKey(page);
     await createChat(page);
 
     await test.step("AC-56/AC-57: messages sent while streaming are queued and shown as queued", async () => {
@@ -187,7 +193,6 @@ test.describe("chat", () => {
   test("US-18: Parallel chat sessions (FR7, UC6)", async ({ page }) => {
     test.slow();
     await registerAndLogin(page, freshUser("chat-parallel"));
-    await configureAnthropicKey(page);
 
     const chatIds: string[] = [];
     await test.step("AC-60: several chats can generate responses at the same time", async () => {
@@ -212,20 +217,19 @@ test.describe("chat", () => {
     });
   });
 
-  test("US-19: LLM provider adapter layer (FR6, OpenAI/Anthropic)", async ({ page }) => {
+  test("US-19: LLM provider adapter layer (FR6, Ollama/OpenAI/Anthropic)", async ({ page }) => {
     await registerAndLogin(page, freshUser("chat-adapter"));
-    await configureAnthropicKey(page);
     await createChat(page);
 
-    await test.step("AC-63/AC-64: the composer offers both providers, backed by a common adapter interface", async () => {
+    await test.step("AC-63/AC-64: the composer offers all three providers, backed by a common adapter interface", async () => {
       const combobox = page.getByRole("combobox", { name: /provider|model/i });
-      for (const provider of ["OpenAI", "Anthropic"]) {
+      for (const provider of ["Ollama", "OpenAI", "Anthropic"]) {
         await expect(combobox.locator(`option:has-text("${provider}")`)).toHaveCount(1);
       }
     });
 
-    await test.step("AC-64: selecting Anthropic (key configured) and sending a message succeeds end-to-end", async () => {
-      await selectProvider(page, "Anthropic");
+    await test.step("AC-64: selecting Ollama (no key required) and sending a message succeeds end-to-end", async () => {
+      await selectProvider(page, "Ollama");
       await sendMessage(page, "Hello via the adapter layer");
       await waitForStreamToFinish(page);
       await expect(messagesLog(page).getByTestId("assistant-message").last()).not.toHaveText("");
@@ -272,7 +276,6 @@ test.describe("chat", () => {
 
   test("US-21: Attachments passed to the LLM (FR16)", async ({ page }) => {
     await registerAndLogin(page, freshUser("chat-attach-llm"));
-    await configureAnthropicKey(page);
     await createChat(page);
 
     await test.step("AC-69: text attachment content is extracted and used as context by the LLM", async () => {
@@ -300,7 +303,6 @@ test.describe("chat", () => {
 
   test("US-22: Provider error handling and retry (Reliability NFR)", async ({ page }) => {
     await registerAndLogin(page, freshUser("chat-error"));
-    await configureAnthropicKey(page);
     await createChat(page);
 
     await test.step("AC-72/AC-73: a provider error is surfaced without crashing, and the message can be retried", async () => {

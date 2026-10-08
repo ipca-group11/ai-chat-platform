@@ -44,6 +44,16 @@ export class QueueManager {
     return this.getQueue(chatId).stopActive();
   }
 
+  /** Stops every running reply that `userId` started, in any chat (AICHAT-203: logout).
+   * Replies started by other members of a shared chat keep running. Returns how many stopped. */
+  stopForUser(userId: string): number {
+    let stopped = 0;
+    for (const queue of this.queues.values()) {
+      if (queue.activeEntry?.userId === userId && queue.stopActive()) stopped += 1;
+    }
+    return stopped;
+  }
+
   editQueued(chatId: string, messageId: string, content: string): boolean {
     return this.getQueue(chatId).editQueued(messageId, content);
   }

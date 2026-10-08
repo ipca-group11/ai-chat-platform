@@ -99,7 +99,6 @@ export const messageHandlers = [
       { status: 202 },
     ),
   ),
-  http.post("*/chats/:chatId/messages/:messageId/stop", () => HttpResponse.json({ stopped: true })),
   http.post("*/chats/:chatId/stop", () => HttpResponse.json({ stopped: true })),
   http.post("*/chats/:chatId/attachments", () =>
     HttpResponse.json({ attachment: toAttachmentDto(attachment) }, { status: 201 }),
