@@ -1,12 +1,11 @@
-$ pnpm exec nx run mfe-chat:pact:consumer --skip-nx-cache 2>&1 | grep -E 'Tests |Successfully'; cd services/conversation-service && pnpm exec vitest run -c vitest.verify.config.ts 2>&1 | grep -vE '^.{0,12}Error.{0,12}: \{' | grep -E 'Failures:|^[0-9]+\) .*stop|stop.*-> |has status code|There were|Tests ' | grep -B1 -A3 'stop' | head -12; echo; pnpm exec vitest run -c vitest.verify.config.ts 2>&1 | grep -E 'Tests '
-      Tests  20 passed (20)
+$ echo '# consumer side, client calls POST /chats/:id/messages/:messageId/stop (before AICHAT-199):'; pnpm exec nx run mfe-chat:pact:consumer --skip-nx-cache 2>&1 | grep -E 'Successfully|failed'; echo; echo '# provider side:'; cd services/conversation-service && pnpm exec vitest run -c vitest.verify.config.ts 2>&1 | grep -A2 -E '^[0-9]+\) .*stop the reply' ; pnpm exec vitest run -c vitest.verify.config.ts 2>&1 | grep -E '× |Tests ' | sed -E 's/ [0-9]+ms$//'
+# consumer side, client calls POST /chats/:id/messages/:messageId/stop (before AICHAT-199):
  NX   Successfully ran target pact:consumer for project mfe-chat
-Failures:
-1) Verifying a pact between mfe-chat and conversation-service Given a user owns a chat with a reply in progress - a request to stop the reply in progress
-    1.2) has status code 200
-There were 1 pact failures
-      has status code 201 (FAILED)
 
+# provider side:
+1) Verifying a pact between mfe-chat and conversation-service Given a user owns a chat with a reply in progress - a request to stop the reply in progress
+    1.1) has a matching body
+           $ -> Actual map is missing the following keys: stopped
 ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
       Tests  1 failed | 3 passed (4)
 

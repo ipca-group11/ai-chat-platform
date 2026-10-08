@@ -1,0 +1,17 @@
+$ rm -rf pacts && pnpm exec nx run-many -t pact:consumer --skip-nx-cache 2>&1 | grep -E 'Successfully|failed' && ls pacts && pnpm exec nx run auth-service:pact:verify --skip-nx-cache 2>&1 | grep -E 'Tests |Successfully|failed' && pnpm exec nx run conversation-service:pact:verify --skip-nx-cache 2>&1 | grep -E 'Tests |Successfully|failed'
+ NX   Successfully ran target pact:consumer for 5 projects
+auth-service-conversation-service.json
+mfe-auth-auth-service.json
+mfe-chat-auth-service.json
+mfe-chat-conversation-service.json
+mfe-settings-auth-service.json
+mfe-settings-conversation-service.json
+shell-auth-service.json
+      Tests  1 passed (1)
+ NX   Successfully ran target pact:verify for project auth-service and 8 tasks it depends on
+  a request to retry a failed reply (0s loading, 1ms verification)
+     Given a user owns a chat with a failed reply
+      Tests  4 passed (4)
+ NX   Successfully ran target pact:verify for project conversation-service and 6 tasks it depends on
+
+[exit 0]
