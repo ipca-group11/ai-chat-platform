@@ -108,3 +108,84 @@ only package depending on `@pact-foundation/pact`, and no pact file exists.
 
 **Problems and fixes.** `consumerName()` in `pact-config` always adds the `mfe-` prefix, which is wrong for the shell and
 for auth-service as a consumer. Those two pacts pass their names directly.
+
+### US2 · Consumer pacts: mfe-auth, shell and mfe-settings to auth-service ([AICHAT-178](https://ipca-grupo11.atlassian.net/browse/AICHAT-178))
+
+**What and why.** Each frontend that calls auth-service now writes down, in a pact file, exactly which requests it sends
+and which parts of the responses it relies on. The tests call the real client functions (`features/*/api/*.ts`,
+`shared/auth.ts`); only the network underneath is the Pact mock server, which answers declared requests and rejects any
+other. mfe-chat's `GET /auth/me` (pair 4 of US1) is included because its provider is auth-service.
+
+**How a consumer test works.**
+
+1. `newConsumerPact("mfe-auth", "auth-service")` creates the Pact for one pair; the file is `pacts/mfe-auth-auth-service.json`
+   at the repository root, whichever app runs the test (`pactDir()`).
+2. Each test declares one interaction: provider state (`given`), description, the exact request, and the response
+   with **matchers**: `like("user-1")` means "any string", so the provider is not tied to the example values.
+3. `runWithMockServer(pact, () => fetchMe())` starts the mock server, points the global `fetch` at it (the clients use
+   relative URLs, as in the browser) and runs the real function.
+4. The test asserts what the client does with the answer (returns the user, throws `ApiError` 401 with the server's
+   message, `fetchSession` returns `null` on 401).
+5. Pact checks that every declared request arrived exactly as declared, and only then writes the interaction.
+
+Cookies are not part of the contract: the browser adds them, and auth-service's verifier adds valid ones for each
+provider state (US4). The correlation id is required in both directions (`correlationHeaderMatcher()`), error bodies use
+`errorResponseMatcher()` / `fieldErrorsMatcher()`.
+
+**Files.**
+- `packages/pact-config/consumer.ts` (new): `pactDir`, `newConsumerPact`, `removePacts`, `routeFetchTo`, `runWithMockServer`; unit tests in `consumer.spec.ts`.
+- `apps/{mfe-auth,shell,mfe-settings,mfe-chat}/vitest.pact.config.ts` + `vitest.pact.setup.ts` (new): Node environment, no MSW, one file at a time, old pact files removed at start.
+- `apps/*/vite.config.ts`: the normal test run excludes `*.pact.spec.ts`.
+- `apps/*/project.json`: new Nx target `pact:consumer`.
+- `apps/mfe-auth/src/features/{login,register}/api/*.pact.spec.ts` (new): 10 interactions.
+- `apps/shell/src/features/auth-guard/api/auth.pact.spec.ts` (new), `logout.ts` (new, logout moved out of `AppShellLayout`), `useSession.ts` (`fetchSession` exported).
+- `apps/mfe-settings/src/features/api-keys/api/auth.pact.spec.ts`, `apps/mfe-chat/src/shared/auth.pact.spec.ts` (new).
+- `apps/mfe-auth/src/shared/api-client.ts`: reads the real error envelope (defect below); 16 MSW doubles in mfe-auth's specs now answer with that envelope.
+- `.gitignore`: `pacts/` (generated, shared as a CI artifact).
+
+**How to run.**
+
+```sh
+pnpm exec nx run-many -t pact:consumer -p mfe-auth shell mfe-settings mfe-chat
+ls pacts/   # mfe-auth-auth-service.json, shell-auth-service.json, mfe-settings-…, mfe-chat-…
+```
+
+**How to repeat it manually.**
+
+1. Run the command above; expected: every test passes and four `*-auth-service.json` files appear in `pacts/`.
+2. Open `pacts/mfe-auth-auth-service.json`: each interaction has `providerStates`, `request`, `response` and
+   `matchingRules` (`"match": "type"` for every `like`).
+3. Break the client: change `"/auth/login"` to `"/auth/signin"` in `apps/mfe-auth/src/features/login/api/login.ts` and
+   run `pnpm exec nx run mfe-auth:pact:consumer`. Expected: the two login tests fail with "request was not expected" /
+   "expected but not received". Restore the line.
+
+**Result.** 17 interactions in 4 pact files, using 4 provider states that auth-service has to support:
+`a user exists` (`email`, `password`), `a user is logged in` (`email`), `a user has a valid refresh token` (`email`),
+`no user exists with the email` (`email`), `no user is logged in`.
+
+![Four consumer pacts for auth-service](evidence/04-auth-consumer-pacts.png)
+
+A broken path fails the consumer test:
+
+![Changing the login path fails the pact test](evidence/03-mfe-auth-broken-path.png)
+
+**Defect found: the server's error message never reached the user.** auth-service answers every error with
+`{ "error": { "code": "INVALID_CREDENTIALS", "message": "Invalid email or password" } }`. mfe-auth's `extractErrorMessage`
+only read `error` when it was a **string** or a top-level `message`, shapes the server never sends, so the forms showed the
+HTTP status text ("Unauthorized", or "Request failed" over HTTP/2 where there is no status text). The 16 MSW doubles in
+mfe-auth's tests had been written with those same wrong shapes, so every test passed. The pact test, whose mock answers
+with the shared error envelope, failed first:
+
+![Before the fix: the 401 message is the status text](evidence/02-mfe-auth-error-message-red.png)
+
+The client now reads `error.message`, and the doubles use the real envelope. The shell and mfe-chat do not show the
+server's message (they use their own text), so they were not affected.
+
+**Problems and fixes.**
+- Pact writes an interaction only when the test callback **resolves**. Clients that throw on a 401 made Pact drop every
+  error interaction silently (the first run wrote 5 of 10). `runWithMockServer` now captures the client's outcome inside
+  the callback and replays it afterwards; a unit test covers it.
+- Vitest loads `vitest.*.config.ts` with plain Node, which cannot resolve pact-config's `.js` imports of `.ts` sources.
+  The cleanup moved to a `globalSetup` file, which Vitest transforms.
+- `PACT_LOG_LEVEL` allows `fatal`, which `PactV3` does not accept; `newConsumerPact` maps it to `error`.
+- `consumerName()` forces the `mfe-` prefix; `newConsumerPact` takes the names as given (`shell`, `auth-service`).
