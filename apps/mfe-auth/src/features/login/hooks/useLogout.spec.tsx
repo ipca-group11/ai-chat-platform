@@ -29,7 +29,7 @@ describe("useLogout", () => {
   });
 
   it("still clears the cache and redirects when the server fails (500), and reports the error", async () => {
-    server.use(http.post("*/auth/logout", () => HttpResponse.json({ error: "Server error" }, { status: 500 })));
+    server.use(http.post("*/auth/logout", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "Server error" } }, { status: 500 })));
     const { result, queryClient } = renderHookWithClient(() => useLogout());
     queryClient.setQueryData(["chats"], [{ id: "c1" }]);
 
@@ -42,7 +42,7 @@ describe("useLogout", () => {
   });
 
   it("still redirects when the logout request is rejected as unauthorized (401: session already expired)", async () => {
-    server.use(http.post("*/auth/logout", () => HttpResponse.json({ error: "Unauthorized" }, { status: 401 })));
+    server.use(http.post("*/auth/logout", () => HttpResponse.json({ error: { code: "UNAUTHENTICATED", message: "Unauthorized" } }, { status: 401 })));
     const { result } = renderHookWithClient(() => useLogout());
 
     result.current.mutate();

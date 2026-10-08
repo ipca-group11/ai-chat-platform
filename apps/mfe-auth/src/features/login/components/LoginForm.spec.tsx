@@ -19,7 +19,7 @@ describe("LoginForm", () => {
   const rejectLogin = () =>
     server.use(
       http.post("*/auth/login", () =>
-        HttpResponse.json({ error: "Invalid email or password" }, { status: 401 }),
+        HttpResponse.json({ error: { code: "UNAUTHENTICATED", message: "Invalid email or password" } }, { status: 401 }),
       ),
     );
 

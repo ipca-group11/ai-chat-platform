@@ -18,7 +18,7 @@ describe("useRegister", () => {
   it("surfaces a validation error returned by the server (400) with its message", async () => {
     server.use(
       http.post("*/auth/register", () =>
-        HttpResponse.json({ message: "Password must contain at least one number" }, { status: 400 }),
+        HttpResponse.json({ error: { code: "VALIDATION_ERROR", message: "Password must contain at least one number" } }, { status: 400 }),
       ),
     );
     const { result } = renderHookWithClient(() => useRegister());
@@ -30,7 +30,7 @@ describe("useRegister", () => {
   });
 
   it("surfaces a duplicate email (409) as an error", async () => {
-    server.use(http.post("*/auth/register", () => HttpResponse.json({ error: "Email already registered" }, { status: 409 })));
+    server.use(http.post("*/auth/register", () => HttpResponse.json({ error: { code: "EMAIL_TAKEN", message: "Email already registered" } }, { status: 409 })));
     const { result } = renderHookWithClient(() => useRegister());
 
     result.current.mutate({ email: "taken@example.com", password: "s3cretpass" });
@@ -40,7 +40,7 @@ describe("useRegister", () => {
   });
 
   it("surfaces a server error (500) as an error", async () => {
-    server.use(http.post("*/auth/register", () => HttpResponse.json({ error: "Unexpected" }, { status: 500 })));
+    server.use(http.post("*/auth/register", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "Unexpected" } }, { status: 500 })));
     const { result } = renderHookWithClient(() => useRegister());
 
     result.current.mutate({ email: "new@example.com", password: "s3cretpass" });

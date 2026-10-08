@@ -1,0 +1,15 @@
+$ cd apps/mfe-auth && pnpm exec vitest run -c vitest.pact.config.ts src/features/login/api/login.pact.spec.ts 2>&1 | grep -v WARN | grep -E 'Mock server|Expected|Received|request|×|Tests|path|Request' | head -20
+     × POST /auth/login with valid credentials returns the user 13ms
+     × POST /auth/login with a wrong password is a 401 whose message reaches the form 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+  Mock server failed with the following mismatches:
+	0) The following request was not expected: 
+	1) The following request was expected but not received: 
+- Expected
++ Received
++   Mock server failed with the following mismatches:
++ 	0) The following request was not expected: 
++ 	1) The following request was expected but not received: 
+      Tests  2 failed | 1 passed (3)
+
+[exit 0]

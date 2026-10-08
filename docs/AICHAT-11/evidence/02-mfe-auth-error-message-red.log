@@ -1,0 +1,35 @@
+$ cd apps/mfe-auth && pnpm exec vitest run -c vitest.pact.config.ts 2>&1 | grep -v WARN | head -32
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/apps/mfe-auth
+
+ ❯ src/features/login/api/session.pact.spec.ts (4 tests | 1 failed) 21ms
+   ❯ mfe-auth -> auth-service: session (4)
+     × GET /auth/me without a session is a 401 with the error envelope 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/login/api/session.pact.spec.ts > mfe-auth -> auth-service: session > GET /auth/me without a session is a 401 with the error envelope
+AssertionError: expected ApiError: Unauthorized { status: 401 } to match object { status: 401, …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "message": "A human-readable error message.",
++ ApiError {
+    "status": 401,
+  }
+
+ ❯ src/features/login/api/session.pact.spec.ts:46:26
+     44|
+     45|     // 401 is what makes fetchSessionWithRefresh try one refresh; the …
+     46|     await expect(failure).rejects.toMatchObject({ status: 401, message…
+       |                          ^
+     47|   });
+     48|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 0]

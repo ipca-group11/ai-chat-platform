@@ -69,14 +69,13 @@ export async function apiFetch<T = unknown>(
   return JSON.parse(text) as T;
 }
 
+// auth-service answers every error with `{ error: { code, message, fieldErrors? } }`
+// (`http.toErrorResponse`); the message is shown to the user as is. Pinned by the pact tests.
 async function extractErrorMessage(response: Response): Promise<string> {
   try {
     const data = await response.clone().json();
-    if (data && typeof data.error === "string") {
-      return data.error;
-    }
-    if (data && typeof data.message === "string") {
-      return data.message;
+    if (data && typeof data.error?.message === "string") {
+      return data.error.message;
     }
     // auth-service's error envelope: `{ error: { code, message, fieldErrors } }`.
     if (data && typeof data.error?.message === "string") {

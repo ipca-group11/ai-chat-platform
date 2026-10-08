@@ -23,7 +23,9 @@
   },
   "devDependencies": {
     "@module-federation/vite": "^1.22.1",
+    "@pact-foundation/pact": "^17.1.4",
     "@platform/eslint-config": "workspace:*",
+    "@platform/pact-config": "workspace:^",
     "@platform/test-config": "workspace:*",
     "@platform/test-utils": "workspace:*",
     "@testing-library/jest-dom": "^7.0.1",

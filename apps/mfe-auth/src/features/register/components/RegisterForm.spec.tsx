@@ -53,7 +53,7 @@ describe("RegisterForm", () => {
   it("AC-31: displays the server's duplicate-email error and does not navigate away", async () => {
     server.use(
       http.post("*/auth/register", () =>
-        HttpResponse.json({ error: "Email already registered" }, { status: 409 }),
+        HttpResponse.json({ error: { code: "EMAIL_TAKEN", message: "Email already registered" } }, { status: 409 }),
       ),
     );
     const user = userEvent.setup();

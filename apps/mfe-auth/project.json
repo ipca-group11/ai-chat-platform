@@ -16,6 +16,10 @@
       "executor": "nx:run-commands",
       "options": { "command": "vitest run --coverage", "cwd": "apps/mfe-auth" }
     },
+    "pact:consumer": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run -c vitest.pact.config.ts", "cwd": "apps/mfe-auth" }
+    },
     "build": {
       "executor": "nx:run-commands",
       "options": { "command": "vite build", "cwd": "apps/mfe-auth" }
