@@ -1,0 +1,25 @@
+$ pnpm exec nx run-many -t pact:consumer -p mfe-auth shell mfe-settings mfe-chat --skip-nx-cache 2>&1 | grep -E 'Tests |Successfully'; for f in pacts/*-auth-service.json; do node -e "const d=require('./'+process.argv[1]);console.log(process.argv[1]+': '+d.interactions.length+' interactions');for(const i of d.interactions)console.log('  '+i.request.method+' '+i.request.path+' -> '+i.response.status+'  ['+(i.providerStates||[]).map(s=>s.name).join(', ')+']')" $f; done
+ NX   Successfully ran target pact:consumer for 4 projects
+pacts/mfe-auth-auth-service.json: 10 interactions
+  POST /auth/login -> 401  [a user exists]
+  POST /auth/login -> 200  [a user exists]
+  POST /auth/logout -> 204  [a user is logged in]
+  POST /auth/refresh -> 204  [a user has a valid refresh token]
+  POST /auth/refresh -> 401  [no user is logged in]
+  POST /auth/register -> 201  [no user exists with the email]
+  POST /auth/register -> 400  [no user exists with the email]
+  POST /auth/register -> 409  [a user exists]
+  GET /auth/me -> 200  [a user is logged in]
+  GET /auth/me -> 401  [no user is logged in]
+pacts/mfe-chat-auth-service.json: 2 interactions
+  GET /auth/me -> 200  [a user is logged in]
+  GET /auth/me -> 401  [no user is logged in]
+pacts/mfe-settings-auth-service.json: 2 interactions
+  GET /auth/me -> 200  [a user is logged in]
+  GET /auth/me -> 401  [no user is logged in]
+pacts/shell-auth-service.json: 3 interactions
+  POST /auth/logout -> 204  [a user is logged in]
+  GET /auth/me -> 200  [a user is logged in]
+  GET /auth/me -> 401  [no user is logged in]
+
+[exit 0]
