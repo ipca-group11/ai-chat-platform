@@ -10,9 +10,9 @@ title: "AICHAT-11 · Consumer-driven contract testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | João Vieira |
 | Branch | `test/AICHAT-11-contract-testing` (built on `test/AICHAT-15-stream-cancellation`, which has the Stop fix) |
-| Started / finished | 2026-10-08 / … |
-| Pull requests | … |
-| Status | In Progress |
+| Started / finished | 2026-10-08 / 2026-10-08 |
+| Pull requests | not opened yet (commits are local; pushed by the owner) |
+| Status | Review |
 
 ## 1. DoR review
 
@@ -141,7 +141,7 @@ provider state (US4). The correlation id is required in both directions (`correl
 - `apps/shell/src/features/auth-guard/api/auth.pact.spec.ts` (new), `logout.ts` (new, logout moved out of `AppShellLayout`), `useSession.ts` (`fetchSession` exported).
 - `apps/mfe-settings/src/features/api-keys/api/auth.pact.spec.ts`, `apps/mfe-chat/src/shared/auth.pact.spec.ts` (new).
 - `apps/mfe-auth/src/shared/api-client.ts`: reads the real error envelope (defect below); 16 MSW doubles in mfe-auth's specs now answer with that envelope.
-- `.gitignore`: `pacts/` (generated, shared as a CI artifact).
+- `.gitignore`: `pacts/` (written by the consumer tests, shared as a CI artifact).
 
 **How to run.**
 
@@ -377,8 +377,8 @@ pnpm exec nx run conversation-service:pact:verify
 2. Bring back the Stop path from before AICHAT-199: in `apps/mfe-chat/src/features/chat-view/api/messages.ts` change
    `` `/chats/${chatId}/stop` `` to `` `/chats/${chatId}/messages/msg-1/stop` `` and the same path in
    `messages.pact.spec.ts`. Run both commands again. Expected: the consumer run passes (the client agrees with its own
-   pact), the verifier fails on "a request to stop the reply in progress" with status 404 instead of 200. Restore both
-   files.
+   pact), the verifier fails on "a request to stop the reply in progress": the old path is answered with 404 and the
+   error envelope, so the expected `stopped` is missing. Restore both files.
 
 **Result.** 19 interactions verify; the 3 known failures fail as expected.
 
@@ -394,3 +394,120 @@ verification catches it. This is the check that was missing when AICHAT-199 was 
   with the pact ids. (Pact's provider-state injection, `fromProviderState`, would let the provider choose the ids
   instead; not needed here.)
 - edit/cancel need a message that is **queued**, not just saved: the state starts a reply first so msg-1 waits behind it.
+
+### US6 · Contract tests in CI with a merge gate ([AICHAT-182](https://ipca-grupo11.atlassian.net/browse/AICHAT-182))
+
+**What and why.** The contracts only protect `main` if they run on every pull request and a failure blocks the merge.
+Two jobs were added to `.github/workflows/ci.yml`, which already runs on every pull request:
+
+| Job | What it does |
+|---|---|
+| `contracts-consumer` | `nx run-many -t pact:consumer --skip-nx-cache` for the five consumers, then uploads `pacts/` as the artifact `pacts` (`if-no-files-found: error`) |
+| `contracts-provider` (matrix: auth-service, conversation-service) | `needs: contracts-consumer`; downloads the artifact of **the same run** and runs `nx run <provider>:pact:verify --skip-nx-cache` |
+
+Choices:
+- **All consumers and both providers on every pull request**, not `nx affected`. A contract links two projects that the
+  Nx graph does not connect (mfe-chat does not import conversation-service), so "affected" could skip the side that
+  breaks. The whole set takes about a minute.
+- **`--skip-nx-cache`**: a cache hit replays the log but does not write the pact files the next job needs.
+- **No Pact Broker** (US1): the pacts never leave the run, so there are no secrets to manage.
+- The jobs are plain steps without `continue-on-error`, so a mismatch fails the workflow. Marking them as **required
+  checks** is a branch-protection setting of the GitHub repository; it has to be enabled by a repository admin for
+  `contracts (consumer pacts)`, `contracts (verify auth-service)` and `contracts (verify conversation-service)`.
+
+**Guards.**
+- `e2e/src/ci/contracts-workflow.spec.ts` (new) checks the wiring: consumer job uploads, provider job needs it,
+  downloads the same artifact, verifies both services, no broker, no `continue-on-error`. Written first: 3 of 5 failed
+  before the jobs existed.
+- `packages/workspace-config/src/ci.test.ts` pins the list of CI jobs; it failed as intended when the jobs were added
+  and now lists them.
+- The unit-test guard (`source-files.test.ts`) flagged the shell's new `logout.ts`; it now has `logout.test.ts`.
+
+**Files.**
+- `.github/workflows/ci.yml`: jobs `contracts-consumer`, `contracts-provider`.
+- `e2e/src/ci/contracts-workflow.spec.ts` (new), `packages/workspace-config/src/ci.test.ts`.
+- `apps/shell/src/features/auth-guard/api/logout.test.ts` (new).
+- `packages/pact-config/README.md`: how the pieces fit, how to run, how to add a contract, how to read a failure.
+- `TESTING.md`: section "Contract tests (AICHAT-11)".
+
+**How to run (the CI sequence, locally).**
+
+```sh
+rm -rf pacts
+pnpm exec nx run-many -t pact:consumer --skip-nx-cache
+pnpm exec nx run auth-service:pact:verify --skip-nx-cache
+pnpm exec nx run conversation-service:pact:verify --skip-nx-cache
+```
+
+**How to repeat it manually.**
+
+1. Run the four commands. Expected: 7 files in `pacts/`, then both verifications pass.
+2. Skip the first two commands after `rm -rf pacts`: the verifier fails with "no pact files … run the consumer tests
+   first", which is what the provider job would do if the artifact were missing.
+3. `cd e2e && pnpm exec vitest run src/ci/contracts-workflow.spec.ts`: 5 tests pass.
+
+**Result.** The local CI sequence runs end to end:
+
+![Consumers, artifact folder and both verifications, in CI order](evidence/11-ci-sequence-local.png)
+
+The failing side of the gate is shown by the provider evidence of US4 (a changed response breaks four consumers) and US5
+(the pre-AICHAT-199 Stop path).
+
+**Problems and fixes.** None in the workflow. Locally, `testing/mock-server/src/faults/faults.spec.ts` fails one test on
+Node 26 and passes on Node 22 (and in CI, which uses Node 24); it is unrelated to this epic, which does not change the
+mock server.
+
+## 4. How to run everything
+
+```sh
+# unit and component tests of every project touched (pact specs excluded from these runs)
+pnpm exec nx run-many -t lint typecheck test -p pact-config mfe-auth shell mfe-settings mfe-chat auth-service conversation-service workspace-config
+# consumer pacts, then provider verification (the CI order)
+pnpm exec nx run-many -t pact:consumer --skip-nx-cache
+pnpm exec nx run-many -t pact:verify --skip-nx-cache
+# the CI wiring guard
+cd e2e && pnpm exec vitest run src/ci/contracts-workflow.spec.ts
+```
+
+## 5. Results
+
+| Metric | Before | After |
+|---|---|---|
+| Consumer/provider pairs with a pact | 0 of 7 | 7 of 7 |
+| Pact interactions | 0 | 39 (17 auth-service, 22 conversation-service) |
+| Interactions verified against the real provider | 0 | 36 pass, 3 known failures that must keep failing (AICHAT-255, AICHAT-256) |
+| Contract jobs in CI | none | `contracts-consumer` → `contracts-provider` (2 services), every pull request |
+| Defects found | — | 4: error message lost in mfe-auth (fixed), error code and message lost in mfe-chat (fixed), attachment upload route (AICHAT-255), test-connection route (AICHAT-256) |
+| Test doubles that answered with shapes the server never sends | not known | 35 corrected (16 mfe-auth, 19 mfe-chat) |
+
+## 6. DoD check
+
+| DoD item | Met | Evidence |
+|---|---|---|
+| Tests run in CI and pass on `main` | Partly: jobs added and green locally in CI order; passing on `main` after the pull request is merged | [11-ci-sequence-local](evidence/11-ci-sequence-local.png) |
+| Failure blocks the merge | ✅ the jobs fail the workflow on any mismatch; making them required checks is a repository setting (see US6) | [08](evidence/08-auth-service-broken-provider.png), [10](evidence/10-stop-old-path-before.png) |
+| Run instructions added to the project README or `docs/` | ✅ | `packages/pact-config/README.md`, `TESTING.md` |
+| Every MFE → service REST call has a pact | ✅ every call of the 4 MFEs (plus the service-to-service calls); SSE out of scope | [04](evidence/04-auth-consumer-pacts.png), [06](evidence/06-conversation-consumer-pacts.png) |
+| Provider verification runs in CI | ✅ `contracts-provider` | [07](evidence/07-auth-service-verified.png), [09](evidence/09-conversation-service-verified.png) |
+
+## 7. Notes for the report
+
+- **What was found.** Contract testing found four defects in an application whose unit, component and E2E tests were
+  all green: two calls to routes that do not exist (attachment upload, test connection) and two clients that discarded
+  the server's error message. Together with the Stop bug of AICHAT-15, every one of them had the same cause: the
+  frontend test doubles were written from the client's point of view, so they agreed with the client instead of the
+  server.
+- **What was fixed / waived.** The two error-envelope defects were fixed in the clients and 35 doubles were corrected.
+  The two missing routes are product work, raised as AICHAT-255 and AICHAT-256 and kept visible as known failures that
+  must keep failing until fixed.
+- **Proof that the checks bite.** Renaming one field of `GET /auth/me` fails verification for four consumers by name;
+  the pre-AICHAT-199 Stop path passes the consumer side and fails provider verification with 404, which is the check
+  that was missing when that bug shipped.
+- **Lessons learned.**
+  - A test double only proves something if it behaves like the real component; a pact is a double the provider must
+    confirm.
+  - Pact writes an interaction only when the test callback resolves; clients that throw on error statuses need the
+    outcome captured inside (`runWithMockServer`).
+  - Requests hidden inside React hooks are hard to contract-test; plain request functions called by the hooks are easier
+    to test and to read.
+  - A contract links projects the build graph does not, so contract jobs should not be limited to "affected" projects.

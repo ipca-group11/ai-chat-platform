@@ -87,8 +87,8 @@ describe("AC-13: CI fails the build if any project reports a lint or typecheck e
     expect(nxStep["continue-on-error"]).toBeFalsy();
   });
 
-  it("AC-13: `affected` checks the code, `test-db` runs the database tests (AICHAT-116) and `source-sbom` only produces the source SBOM (AICHAT-108)", () => {
-    expect(Object.keys(ci.jobs)).toEqual(["affected", "test-db", "source-sbom"]);
+  it("AC-13: `affected` checks the code, `test-db` runs the database tests (AICHAT-116), `contracts-*` run the Pact tests (AICHAT-182) and `source-sbom` only produces the source SBOM (AICHAT-108)", () => {
+    expect(Object.keys(ci.jobs)).toEqual(["affected", "test-db", "contracts-consumer", "contracts-provider", "source-sbom"]);
   });
 });
 

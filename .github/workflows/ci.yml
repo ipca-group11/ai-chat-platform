@@ -123,6 +123,72 @@ jobs:
       - name: nx test-db
         run: pnpm exec nx run-many -t test-db -p auth-service,conversation-service --parallel=1
 
+  # Consumer-driven contract tests (AICHAT-11). The consumers (mfe-auth, shell, mfe-settings,
+  # mfe-chat, auth-service) write pacts/*.json from their real API client code; the providers
+  # verify those same files in the next job. All of them run on every pull request, not only the
+  # affected ones: a change on either side can break a pair that the Nx graph does not link, and
+  # the whole set takes about a minute. No Pact Broker: the pacts are an artifact of this run.
+  contracts-consumer:
+    name: contracts (consumer pacts)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # --skip-nx-cache: a cache hit would replay the log without writing the pact files.
+      - name: nx pact:consumer
+        run: pnpm exec nx run-many -t pact:consumer --skip-nx-cache
+
+      - name: Upload the pacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pacts
+          path: pacts/
+          if-no-files-found: error
+          retention-days: 7
+
+  # Provider verification (AICHAT-180, AICHAT-181): each service replays every pact written
+  # for it against its real app with in-memory fakes. Known defects are listed in the
+  # verifier and must keep failing until fixed (AICHAT-255, AICHAT-256).
+  contracts-provider:
+    name: contracts (verify ${{ matrix.provider }})
+    needs: contracts-consumer
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [auth-service, conversation-service]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download the pacts of this run
+        uses: actions/download-artifact@v4
+        with:
+          name: pacts
+          path: pacts
+
+      - name: nx pact:verify
+        run: pnpm exec nx run ${{ matrix.provider }}:pact:verify --skip-nx-cache
+
   # Source SBOM of the pnpm workspace (AICHAT-108): lists the npm packages the lockfile
   # resolves, for SCA on every pull request. Independent of the Nx job.
   source-sbom:
