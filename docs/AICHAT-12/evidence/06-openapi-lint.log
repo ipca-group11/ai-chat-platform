@@ -1,0 +1,21 @@
+$ cd services && for s in auth-service conversation-service; do pnpm dlx --package=@redocly/cli@2.50.0 redocly lint $s/openapi.json --extends=recommended --format=summary 2>&1 | grep -vE 'Progress|store|Packages|dependencies|^\+|^$'; done
+validating auth-service/openapi.json...
+warning operation-4xx-response: 3
+warning info-license: 1
+warning no-server-example.com: 1
+auth-service/openapi.json: validated in 9ms
+Woohoo! Your API description is valid. 🎉
+You have 5 warnings.
+
+Done in 217ms using pnpm v12.4.1
+validating conversation-service/openapi.json...
+warning operation-4xx-response: 2
+warning info-license: 1
+warning no-server-example.com: 1
+conversation-service/openapi.json: validated in 18ms
+Woohoo! Your API description is valid. 🎉
+You have 4 warnings.
+
+Done in 137ms using pnpm v12.4.1
+
+[exit 0]

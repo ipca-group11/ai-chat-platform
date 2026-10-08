@@ -1,0 +1,33 @@
+$ (cd services/auth-service && pnpm exec vitest run src/openapi/openapi.spec.ts --reporter=verbose) && (cd services/conversation-service && pnpm exec vitest run src/openapi/openapi.spec.ts --reporter=verbose)
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/auth-service
+
+ ✓ src/openapi/openapi.spec.ts > auth-service OpenAPI spec > the committed openapi.json matches the schemas (run `pnpm openapi:generate` after a change) 1ms
+ ✓ src/openapi/openapi.spec.ts > auth-service OpenAPI spec > is OpenAPI 3.1 0ms
+ ✓ src/openapi/openapi.spec.ts > auth-service OpenAPI spec > documents every route the app registers, and no route that does not exist 3ms
+ ✓ src/openapi/openapi.spec.ts > auth-service OpenAPI spec > declares the cookie that each route reads 0ms
+ ✓ src/openapi/openapi.spec.ts > auth-service OpenAPI spec > describes every error response with the shared error envelope 0ms
+ ✓ src/openapi/openapi.spec.ts > auth-service OpenAPI spec > never documents a 500: a server error is always a bug, never an expected answer 0ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  19:48:08
+   Duration  206ms (import 58%, transform 31%, worker 7%, tests 4%)
+
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/openapi/openapi.spec.ts > conversation-service OpenAPI spec > the committed openapi.json matches the schemas (run `pnpm openapi:generate` after a change) 1ms
+ ✓ src/openapi/openapi.spec.ts > conversation-service OpenAPI spec > is OpenAPI 3.1 0ms
+ ✓ src/openapi/openapi.spec.ts > conversation-service OpenAPI spec > documents every route the app registers, and no route that does not exist 4ms
+ ✓ src/openapi/openapi.spec.ts > conversation-service OpenAPI spec > protects every chat route with the access-token cookie and every internal route with the service token 0ms
+ ✓ src/openapi/openapi.spec.ts > conversation-service OpenAPI spec > describes every error response with the shared error envelope 0ms
+ ✓ src/openapi/openapi.spec.ts > conversation-service OpenAPI spec > never documents a 500: a server error is always a bug, never an expected answer 1ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  19:48:09
+   Duration  244ms (import 50%, transform 41%, worker 5%, tests 4%)
+
+
+[exit 0]

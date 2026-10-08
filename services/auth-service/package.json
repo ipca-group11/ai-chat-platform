@@ -13,10 +13,12 @@
     "lint": "eslint src --max-warnings=0",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
+    "openapi:generate": "vitest run src/openapi/openapi.spec.ts -u",
     "test-db": "vitest run --config vitest.db.config.ts",
     "prisma:generate": "prisma generate"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "9.1.0",
     "@prisma/client": "6.1.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",

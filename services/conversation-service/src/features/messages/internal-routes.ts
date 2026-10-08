@@ -4,7 +4,7 @@ import { asyncHandler } from "../../shared/async-handler.js";
 import { requireServiceToken } from "../../shared/service-token.js";
 import type { MessagesService } from "./service.js";
 
-const paramsSchema = z.object({ userId: z.string().min(1) });
+export const sessionParamsSchema = z.object({ userId: z.string().min(1) });
 
 /** Mounted at `/internal`, before the user authentication. auth-service calls it with the
  * service token when the user logs out (AICHAT-203): every reply the user started stops, and
@@ -16,7 +16,7 @@ export function createInternalSessionsRouter(service: MessagesService, serviceTo
   router.post(
     "/sessions/:userId/stop",
     asyncHandler(async (req, res) => {
-      const { userId } = paramsSchema.parse(req.params);
+      const { userId } = sessionParamsSchema.parse(req.params);
       res.status(200).json(service.stopAllForUser(userId));
     }),
   );
