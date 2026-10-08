@@ -65,10 +65,10 @@ export function ChatView({ chatId, userId, onBack, onClose, compact = false }: C
           <Alert variant="destructive">
             <CircleAlert />
             <AlertTitle>
-              <h1>{notFound ? "Chat not found" : "Could not load this chat"}</h1>
+              <h1 data-testid="chat-error-heading">{notFound ? "Chat not found" : "Could not load this chat"}</h1>
             </AlertTitle>
             <AlertDescription>
-              <p>
+              <p data-testid="chat-error-text">
                 {notFound
                   ? "Chat not found. It may have been deleted, or you no longer have access to it."
                   : "Something went wrong while loading this chat. Please try again."}
@@ -110,7 +110,7 @@ export function ChatView({ chatId, userId, onBack, onClose, compact = false }: C
             <ArrowLeft aria-hidden="true" />
           </Button>
         ) : null}
-        <h1 className="min-w-0 truncate text-base font-semibold tracking-tight">{chat.title}</h1>
+        <h1 data-testid="chat-heading" className="min-w-0 truncate text-base font-semibold tracking-tight">{chat.title}</h1>
         {/* In a narrow split pane the badge truncates and the share button drops its label,
             so the title keeps its room. */}
         <Badge

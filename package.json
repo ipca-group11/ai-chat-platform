@@ -20,6 +20,7 @@
     "typecheck:scripts": "tsc -p tsconfig.scripts.json",
     "test:scripts": "node --test \"scripts/**/*.test.ts\"",
     "test": "nx run-many -t test",
+    "e2e": "nx run e2e:e2e",
     "build": "nx run-many -t build",
     "affected:lint": "nx affected -t lint",
     "affected:typecheck": "nx affected -t typecheck",

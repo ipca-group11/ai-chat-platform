@@ -18,6 +18,8 @@ const envSchema = z.object({
   CONVERSATION_SERVICE_URL: z.string().url().optional(),
   // How often the retention job runs, in minutes; 0 turns it off.
   RETENTION_INTERVAL_MINUTES: z.coerce.number().int().min(0).default(360),
+  // Requests one client may send in 15 minutes; 0 turns the limit off (end-to-end runs).
+  RATE_LIMIT_MAX: z.coerce.number().int().min(0).default(300),
   COOKIE_SECURE: z
     .string()
     .default("true")
@@ -38,6 +40,8 @@ export type Env = {
   CONVERSATION_SERVICE_URL?: string;
   /** Minutes between retention runs; 0 = off. */
   RETENTION_INTERVAL_MINUTES: number;
+  /** Requests per client and 15 minutes; 0 = no limit. */
+  RATE_LIMIT_MAX: number;
   COOKIE_SECURE: boolean;
   LOG_LEVEL: string;
 };
@@ -55,6 +59,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     INTERNAL_SERVICE_TOKEN: parsed.INTERNAL_SERVICE_TOKEN,
     CONVERSATION_SERVICE_URL: parsed.CONVERSATION_SERVICE_URL,
     RETENTION_INTERVAL_MINUTES: parsed.RETENTION_INTERVAL_MINUTES,
+    RATE_LIMIT_MAX: parsed.RATE_LIMIT_MAX,
     COOKIE_SECURE: parsed.COOKIE_SECURE,
     LOG_LEVEL: parsed.LOG_LEVEL,
   };

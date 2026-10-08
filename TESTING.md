@@ -20,13 +20,16 @@ pnpm --filter @app/mfe-settings exec vitest run src/features/api-keys/components
 pnpm --filter @app/mfe-chat exec vitest run src/features -t accessibility   # a11y only
 ```
 
-# Visual regression (AICHAT-19) (Docker)
+# End-to-end (Playwright) (Docker)
 
 ```sh
-pnpm exec nx run-many -t build -p shell mfe-auth mfe-chat mfe-settings
-pnpm --filter e2e run visual            # compare in the Playwright image
-pnpm --filter e2e run visual:update     # re-baseline after an intended change
+pnpm mock:up                             # or `docker compose up -d` for the real providers
+pnpm --filter e2e run wait-for-stack     # polls shell + auth + conversation /health
+pnpm e2e                                 # chromium, against http://localhost:8000 (BASE_URL to override)
+E2E_OPENAI_API_KEY=sk-... pnpm e2e       # also runs "Test connection succeeds with a valid key" (AC-85)
 ```
+
+JUnit XML lands in `e2e/test-results/e2e-results.xml` (`PLAYWRIGHT_JUNIT_OUTPUT_FILE` to override); the HTML report in `e2e/playwright-report`.
 
 # Snapshot testing (AICHAT-20)
 

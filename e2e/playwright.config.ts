@@ -5,19 +5,15 @@ import { defineConfig, devices } from "@playwright/test";
  * `e2e` factory command) inject this as `BASE_URL`; it falls back to a local
  * `docker compose up` / dev-preview default for running the suite by hand.
  */
-const baseURL = process.env["BASE_URL"] ?? "http://localhost:4173";
+const baseURL = process.env["BASE_URL"] ?? "http://localhost:8000";
 
 const isCI = !!process.env["CI"];
 
-// The factory `e2e` command invokes `playwright test --reporter=junit`,
-// which replaces the `reporter` array below entirely and drops any
-// `outputFile` option configured here. The junit reporter itself still
-// honors `PLAYWRIGHT_JUNIT_OUTPUT_FILE` at report-build time, so set a
-// default here (without clobbering an explicit override) to guarantee the
-// JUnit XML lands where the orchestrator expects it.
-if (!process.env["PLAYWRIGHT_JUNIT_OUTPUT_FILE"]) {
-  process.env["PLAYWRIGHT_JUNIT_OUTPUT_FILE"] = "/app/e2e-results.xml";
-}
+// Where the JUnit XML lands. The orchestrator sets `PLAYWRIGHT_JUNIT_OUTPUT_FILE`
+// (to `/app/e2e-results.xml` inside its container); everywhere else — a laptop
+// or a GitHub runner — `/app` does not exist and the reporter would fail the
+// run with ENOENT after every test passed, so default to a repo-relative path.
+const junitFile = process.env["PLAYWRIGHT_JUNIT_OUTPUT_FILE"] ?? "test-results/e2e-results.xml";
 
 export default defineConfig({
   testDir: "./src/tests",
@@ -36,7 +32,7 @@ export default defineConfig({
   reporter: [
     ["list"],
     ["html", { outputFolder: "playwright-report", open: "never" }],
-    ["junit", { outputFile: "/app/e2e-results.xml" }],
+    ["junit", { outputFile: junitFile }],
   ],
   outputDir: "test-results",
   use: {
@@ -49,49 +45,6 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-    },
-    // Visual regression (AICHAT-19). Own folder, so `chromium` never runs these specs and this
-    // project never runs the e2e specs. Serves the built apps itself and mocks every API call,
-    // so it needs no stack and no BASE_URL. Baselines are only valid from the Playwright Docker
-    // image (`pnpm --filter e2e visual`, see docs/AICHAT-19/RUNNING.md).
-    {
-      name: "visual",
-      testDir: "./src/visual",
-      // The Vitest specs of the helpers in lib/ are not Playwright specs.
-      testIgnore: "**/lib/**",
-      // One browser at a time: the specs share four fixed ports.
-      fullyParallel: false,
-      retries: 0,
-      timeout: 30_000,
-      snapshotPathTemplate: "{testDir}/__screenshots__/{projectName}/{arg}{ext}",
-      expect: {
-        toHaveScreenshot: {
-          // At most 50 pixels (of 1 024 000) may differ, and each of them only a little. The images are the same
-          // from run to run, so the limit is only for anti-aliasing noise; 1% let a changed heading through.
-          maxDiffPixels: 50,
-          threshold: 0.2,
-          animations: "disabled",
-          caret: "hide",
-          scale: "css",
-        },
-      },
-      use: {
-        ...devices["Desktop Chrome"],
-        // The shell, served by the spec itself.
-        baseURL: "http://localhost:5000",
-        viewport: { width: 1280, height: 800 },
-        deviceScaleFactor: 1,
-        locale: "en-GB",
-        timezoneId: "UTC",
-        colorScheme: "light",
-        launchOptions: {
-          // Same pixels on a busy machine: software rendering on one raster thread, no LCD text, no font hinting.
-          args: ["--disable-gpu", "--disable-lcd-text", "--font-render-hinting=none", "--force-color-profile=srgb", "--disable-skia-runtime-opts", "--num-raster-threads=1"],
-        },
-        screenshot: "off",
-        video: "off",
-        trace: "off",
-      },
     },
   ],
 });

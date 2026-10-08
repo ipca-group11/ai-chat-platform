@@ -1,4 +1,4 @@
-/bmad-spec # Project: Multi-Session AI Chat Platform
+# Project: Multi-Session AI Chat Platform
 
 ## 1. Overview
 Build an end-to-end web application that lets authenticated users chat with Large Language

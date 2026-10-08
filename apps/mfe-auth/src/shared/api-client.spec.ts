@@ -43,6 +43,22 @@ describe("apiFetch", () => {
     );
   });
 
+  it("reads the message from auth-service's nested error envelope", async () => {
+    server.use(
+      http.post("*/auth/register", () =>
+        HttpResponse.json(
+          { error: { code: "EMAIL_TAKEN", message: "An account with this email already exists" } },
+          { status: 409 },
+        ),
+      ),
+    );
+
+    await expect(apiFetch("/auth/register", { method: "POST", body: {} })).rejects.toMatchObject({
+      status: 409,
+      message: "An account with this email already exists",
+    });
+  });
+
   it("resolves with parsed JSON on success", async () => {
     server.use(http.get("*/auth/me", () => HttpResponse.json({ id: "1", email: "a@b.com" })));
 

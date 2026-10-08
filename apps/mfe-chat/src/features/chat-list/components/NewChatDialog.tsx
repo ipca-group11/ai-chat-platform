@@ -33,7 +33,7 @@ export function NewChatDialog({ open, onClose, onCreate, submitting }: NewChatDi
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent aria-label="New chat">
+      <DialogContent aria-label="New chat" data-testid="new-chat-dialog">
         <DialogHeader>
           <DialogTitle>New chat</DialogTitle>
           <DialogDescription>Give it a title and pick the model that will answer.</DialogDescription>
@@ -57,6 +57,7 @@ export function NewChatDialog({ open, onClose, onCreate, submitting }: NewChatDi
             <Input
               id="new-chat-title"
               aria-label="Chat title"
+              data-testid="chat-title"
               placeholder="e.g. Trip planning"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -100,10 +101,10 @@ export function NewChatDialog({ open, onClose, onCreate, submitting }: NewChatDi
             </label>
           ) : null}
           <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" data-testid="cancel-new-chat" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" loading={submitting} disabled={!title.trim()}>
+            <Button type="submit" data-testid="create-chat" loading={submitting} disabled={!title.trim()}>
               Create
             </Button>
           </DialogFooter>

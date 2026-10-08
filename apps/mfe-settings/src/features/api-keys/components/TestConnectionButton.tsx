@@ -29,6 +29,7 @@ export function TestConnectionButton({ provider, apiKey, providerLabel }: TestCo
         variant="outline"
         size="sm"
         className="w-full"
+        data-testid="test-connection"
         disabled={disabled}
         onClick={() => mutation.mutate()}
       >
@@ -36,19 +37,19 @@ export function TestConnectionButton({ provider, apiKey, providerLabel }: TestCo
       </Button>
 
       {mutation.isSuccess && mutation.data.success ? (
-        <Alert variant="success" role="status">
+        <Alert variant="success" role="status" data-testid="test-connection-success">
           <AlertDescription className="text-success">Connection successful.</AlertDescription>
         </Alert>
       ) : null}
 
       {mutation.isSuccess && !mutation.data.success ? (
-        <Alert variant="destructive">
+        <Alert variant="destructive" data-testid="test-connection-error">
           <AlertDescription>{mutation.data.message ?? "Connection failed."}</AlertDescription>
         </Alert>
       ) : null}
 
       {mutation.isError ? (
-        <Alert variant="destructive">
+        <Alert variant="destructive" data-testid="test-connection-error">
           <AlertDescription>Unable to test the connection. Please try again.</AlertDescription>
         </Alert>
       ) : null}

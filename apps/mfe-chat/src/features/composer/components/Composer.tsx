@@ -34,6 +34,7 @@ export function Composer({ chatId, userId, provider, model = "", compact = false
         <div className={cn(compact && "flex items-end")}>
           <Textarea
             aria-label="Message"
+            data-testid="message-input"
             placeholder={compact ? "Send a message…" : "Send a message…  (Shift+Enter for a new line)"}
             rows={compact ? 1 : 2}
             className={cn(
@@ -51,7 +52,7 @@ export function Composer({ chatId, userId, provider, model = "", compact = false
           />
           <div className={cn("flex items-center gap-2 px-2", compact ? "shrink-0 py-1" : "justify-between pb-2")}>
             <AttachmentPicker onSelect={(files) => composer.attachments.addFiles(files)} />
-            <Button type="submit" size="sm" disabled={!composer.canSend} loading={composer.isSending}>
+            <Button type="submit" size="sm" data-testid="send-message" disabled={!composer.canSend} loading={composer.isSending}>
               Send
               {composer.isSending ? null : <SendHorizontal aria-hidden="true" />}
             </Button>
@@ -59,7 +60,7 @@ export function Composer({ chatId, userId, provider, model = "", compact = false
         </div>
       </form>
       {composer.sendError && (
-        <p role="alert" className="text-sm font-medium text-destructive">
+        <p role="alert" data-testid="send-error" className="text-sm font-medium text-destructive">
           {composer.sendError.message}
         </p>
       )}

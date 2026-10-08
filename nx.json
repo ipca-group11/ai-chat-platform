@@ -2,7 +2,10 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "defaultBase": "main",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "sharedGlobals": [
       "{workspaceRoot}/tsconfig.base.json",
       "{workspaceRoot}/.nvmrc"
@@ -19,9 +22,16 @@
   },
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"],
-      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
       "cache": true
     },
     "lint": {
@@ -32,7 +42,9 @@
       "cache": true
     },
     "typecheck": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "inputs": [
         "default",
         "{workspaceRoot}/tsconfig.base.json",
@@ -41,9 +53,16 @@
       "cache": true
     },
     "test": {
-      "dependsOn": ["^build"],
-      "inputs": ["default", "{workspaceRoot}/vitest.workspace.ts"],
-      "outputs": ["{projectRoot}/coverage"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/vitest.workspace.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/coverage"
+      ],
       "cache": true
     },
     "size": {
@@ -63,5 +82,6 @@
     "version": {
       "conventionalCommits": true
     }
-  }
+  },
+  "analytics": false
 }

@@ -7,14 +7,6 @@ export const PROVIDER_LABELS: Record<Provider, string> = {
   ollama: "Ollama",
 };
 
-/**
- * Copy shown for providers that never require an API key (AC-77): explains *why*
- * there's no input, rather than just hiding one.
- */
-export const PROVIDER_NO_KEY_DESCRIPTIONS: Partial<Record<Provider, string>> = {
-  ollama: "Ollama runs locally — no API key is required to use it.",
-};
-
 export function providerLabel(provider: Provider): string {
   return PROVIDER_LABELS[provider];
 }

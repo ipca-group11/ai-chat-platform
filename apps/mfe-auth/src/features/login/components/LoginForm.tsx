@@ -51,6 +51,7 @@ export function LoginForm() {
       <form aria-label="Login form" className="grid gap-4" noValidate onSubmit={handleSubmit}>
         <FormField label="Email">
           <Input
+            data-testid="email"
             autoComplete="email"
             name="email"
             onChange={(event) => setEmail(event.target.value)}
@@ -62,6 +63,7 @@ export function LoginForm() {
 
         <FormField label="Password">
           <Input
+            data-testid="password"
             autoComplete="current-password"
             name="password"
             onChange={(event) => setPassword(event.target.value)}
@@ -72,12 +74,12 @@ export function LoginForm() {
 
         {/* AC-36: exactly one generic message, shown as-is, never per-field. */}
         {errorMessage ? (
-          <Alert variant="destructive">
+          <Alert variant="destructive" data-testid="login-error">
             <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>
         ) : null}
 
-        <Button className="w-full" loading={isPending} type="submit">
+        <Button className="w-full" data-testid="sign-in" loading={isPending} type="submit">
           {isPending ? "Signing in…" : "Sign in"}
         </Button>
       </form>

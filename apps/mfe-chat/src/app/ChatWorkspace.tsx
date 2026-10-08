@@ -174,7 +174,7 @@ export function ChatWorkspace({ chatId }: { chatId?: string }) {
             <span className="flex size-12 items-center justify-center rounded-full bg-muted">
               <MessageSquare className="size-5 text-muted-foreground" aria-hidden="true" />
             </span>
-            <h2 className="text-lg font-semibold tracking-tight">Select a chat</h2>
+            <h2 data-testid="select-chat-heading" className="text-lg font-semibold tracking-tight">Select a chat</h2>
             <p className="max-w-sm text-sm text-muted-foreground">
               Pick a conversation from the list, or start a new one to begin chatting.
             </p>

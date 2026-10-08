@@ -25,6 +25,7 @@ export function AttachmentPicker({ onSelect, disabled }: AttachmentPickerProps) 
         ref={inputRef}
         type="file"
         aria-label="Attach a file"
+        data-testid="attach-input"
         className="sr-only"
         tabIndex={-1}
         multiple
@@ -36,6 +37,7 @@ export function AttachmentPicker({ onSelect, disabled }: AttachmentPickerProps) 
         type="button"
         variant="ghost"
         size="sm"
+        data-testid="attach"
         className="text-muted-foreground"
         disabled={disabled}
         onClick={() => inputRef.current?.click()}

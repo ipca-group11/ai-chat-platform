@@ -36,7 +36,7 @@ export function ChatListItem({
 
   if (renaming) {
     return (
-      <li>
+      <li data-testid={`chat-item-${chat.id}`}>
         <form
           className="flex items-center gap-1 rounded-md bg-background p-1"
           onSubmit={(e) => {
@@ -47,15 +47,16 @@ export function ChatListItem({
         >
           <Input
             aria-label={`Rename ${chat.title}`}
+            data-testid="rename-title"
             autoFocus
             className="h-8"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <Button type="submit" size="sm" className="h-8">
+          <Button type="submit" size="sm" className="h-8" data-testid="save-rename">
             Save
           </Button>
-          <Button type="button" size="sm" variant="ghost" className="h-8" onClick={() => setRenaming(false)}>
+          <Button type="button" size="sm" variant="ghost" className="h-8" data-testid="cancel-rename" onClick={() => setRenaming(false)}>
             Cancel
           </Button>
         </form>
@@ -65,6 +66,7 @@ export function ChatListItem({
 
   return (
     <li
+      data-testid={`chat-item-${chat.id}`}
       aria-current={active ? "true" : undefined}
       className={cn(
         "group relative flex items-center gap-0.5 rounded-md pr-1 transition-colors hover:bg-accent",
@@ -76,15 +78,16 @@ export function ChatListItem({
         type="button"
         variant="ghost"
         className="h-auto min-w-0 flex-1 flex-col items-start gap-0.5 px-3 py-2 text-left hover:bg-transparent"
+        data-testid="open-chat"
         onClick={() => onOpen(chat.id)}
       >
         <span className="flex w-full items-center gap-1.5">
-          <span className="truncate text-sm font-medium">{chat.title}</span>
+          <span data-testid="chat-item-title" className="truncate text-sm font-medium">{chat.title}</span>
           {shared ? (
             <Users className="size-3.5 shrink-0 text-muted-foreground" aria-label="Shared with you" />
           ) : null}
         </span>
-        <span className="w-full truncate text-xs font-normal text-muted-foreground">
+        <span data-testid="chat-item-model" className="w-full truncate text-xs font-normal text-muted-foreground">
           {shared && chat.ownerEmail ? `${chat.ownerEmail} · ` : null}
           {chat.provider} · {chat.model}
         </span>
@@ -132,6 +135,7 @@ export function ChatListItem({
               variant="ghost"
               size="icon"
               className="size-8 shrink-0 text-muted-foreground"
+              data-testid="rename-chat"
               onClick={() => setRenaming(true)}
               aria-label={`Rename ${chat.title}`}
             >
@@ -142,6 +146,7 @@ export function ChatListItem({
               variant="ghost"
               size="icon"
               className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
+              data-testid="delete-chat"
               onClick={() => onDelete(chat.id)}
               aria-label={`Delete ${chat.title}`}
             >
