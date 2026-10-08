@@ -159,12 +159,12 @@ describe("apiClient responses", () => {
 
 describe("apiClient errors", () => {
   it("throws an ApiError with the status, message and code from the JSON body", async () => {
-    server.use(http.get("*/chats/x", () => HttpResponse.json({ message: "Chat not found", code: "chat_not_found" }, { status: 404 })));
+    server.use(http.get("*/chats/x", () => HttpResponse.json({ error: { code: "CHAT_NOT_FOUND", message: "Chat not found" } }, { status: 404 })));
 
     const error = await apiClient.get("/chats/x").catch((e: unknown) => e);
 
     expect(error).toBeInstanceOf(ApiError);
-    expect(error).toMatchObject({ name: "ApiError", status: 404, message: "Chat not found", code: "chat_not_found" });
+    expect(error).toMatchObject({ name: "ApiError", status: 404, message: "Chat not found", code: "CHAT_NOT_FOUND" });
   });
 
   it("falls back to the status text when the error body has no message", async () => {
@@ -189,7 +189,7 @@ describe("apiClient errors", () => {
 
   it("does not retry a failed request", async () => {
     const requests = recordRequests();
-    server.use(http.get("*/flaky", () => HttpResponse.json({ message: "Try later" }, { status: 503 })));
+    server.use(http.get("*/flaky", () => HttpResponse.json({ error: { code: "SERVICE_UNAVAILABLE", message: "Try later" } }, { status: 503 })));
 
     await expect(apiClient.get("/flaky")).rejects.toMatchObject({ status: 503 });
 

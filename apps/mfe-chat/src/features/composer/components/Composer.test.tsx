@@ -53,7 +53,7 @@ describe("Composer (AC-51, AC-66)", () => {
   });
 
   it("shows the send error when the message fails to send", async () => {
-    server.use(http.post("*/chats/:chatId/messages", () => HttpResponse.json({ message: "Server error" }, { status: 500 })));
+    server.use(http.post("*/chats/:chatId/messages", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR", message: "Server error" } }, { status: 500 })));
 
     renderWithClient(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />);
 

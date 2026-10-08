@@ -189,3 +189,80 @@ server's message (they use their own text), so they were not affected.
   The cleanup moved to a `globalSetup` file, which Vitest transforms.
 - `PACT_LOG_LEVEL` allows `fatal`, which `PactV3` does not accept; `newConsumerPact` maps it to `error`.
 - `consumerName()` forces the `mfe-` prefix; `newConsumerPact` takes the names as given (`shell`, `auth-service`).
+
+### US3 · Consumer pacts: mfe-chat to conversation-service ([AICHAT-179](https://ipca-grupo11.atlassian.net/browse/AICHAT-179))
+
+**What and why.** Every conversation-service call of mfe-chat now has a pact: chats (list, create, get, rename, delete),
+members (list, invite, remove, leave), messages (list, send, edit, cancel, retry, stop) and the attachment upload. The
+two other consumers of conversation-service found in US1 are in this story too, because the same provider verifies them
+(US5): mfe-settings (test connection) and auth-service (the two internal routes).
+
+**Changes needed to drive the real client code.**
+- mfe-chat's requests lived inside React Query hooks, which need a DOM to run, and under jsdom Node's `fetch` sends a
+  `FormData` as the text `[object FormData]`, so the upload could not be tested there. Each request is now a plain
+  exported function (`fetchChats`, `createChat`, `stopReply`, `uploadAttachment`, …) that its hook calls; the hooks behave
+  as before (385 unit tests unchanged and green). The pact tests call the functions in plain Node.
+- The shell's `/api` proxy removes the prefix, so the tests route `/api/chats/…` to the mock server as `/chats/…`
+  (`runWithMockServer(…, { stripPrefix: "/api" })`). mfe-settings is built with `VITE_CONVERSATION_SERVICE_URL=/api`,
+  and its pact config sets the same value.
+- Bodies contain only the fields mfe-chat reads (`shared/types.ts`), in `src/test/pact.ts`. Pact accepts extra fields
+  in a response, so conversation-service can add fields without breaking this contract, but not remove or rename these.
+
+**Notable interactions.**
+
+| Interaction | What the contract pins |
+|---|---|
+| `POST /chats/:id/messages` | The `X-Llm-Api-Key` header must be present (any value, `term(".+")`): the browser holds the key, the server only borrows it |
+| `POST /chats/:id/stop` | The **fixed** Stop route from AICHAT-199 and `{ stopped: boolean }` |
+| `POST /chats/:id/attachments` | Multipart, part `file`, `text/plain`, from the fixture `src/test/fixtures/notes.txt`. The boundary is random, so Pact matches `Content-Type` with a regex and the part by content type. No such route on the provider: AICHAT-255 |
+| `POST /providers/:provider/test-connection` | 200 with `{ success: true }` or `{ success: false, message }` (shape taken from the mock server, the only implementation). No such route: AICHAT-256 |
+| `POST /internal/erasures` | Service token matched by form (`Bearer .+`), never by value. The client only reads the status, so the pact requires no body |
+| `POST /internal/sessions/:userId/stop` | `{ stopped: <number> }`, the count the logout code reads |
+
+**Files.**
+- `apps/mfe-chat/src/features/{chat-list,chat-members,chat-view,attachments}/api/*.pact.spec.ts` (new), `src/test/pact.ts` (shared matchers), `src/test/fixtures/notes.txt`.
+- `apps/mfe-chat/src/features/*/api/*.ts`: request functions extracted from the hooks.
+- `apps/mfe-chat/src/shared/api-client.ts`: reads the real error envelope (defect below); 19 MSW doubles corrected.
+- `apps/mfe-settings/src/features/api-keys/api/testConnection.pact.spec.ts` (new).
+- `services/auth-service/src/shared/internal-clients.pact.spec.ts`, `vitest.pact.config.ts`, `vitest.pact.setup.ts` (new); `pact:consumer` target.
+- `packages/pact-config`: `boolean` matcher re-exported.
+
+**How to run.**
+
+```sh
+pnpm exec nx run-many -t pact:consumer -p mfe-chat mfe-settings auth-service
+```
+
+**How to repeat it manually.**
+
+1. Run the command above. Expected: all tests pass; `pacts/mfe-chat-conversation-service.json` (18 interactions),
+   `mfe-settings-conversation-service.json` (2), `auth-service-conversation-service.json` (2).
+2. Open the mfe-chat pact and find "a multipart upload of a text file": the body is the multipart text, and
+   `matchingRules` holds the boundary regex and `"match": "contentType"` for the part `file`.
+3. Change `stopReply` in `apps/mfe-chat/src/features/chat-view/api/messages.ts` back to the old path
+   (`/chats/${chatId}/messages/x/stop`) and run `pnpm exec nx run mfe-chat:pact:consumer`: the consumer test still passes,
+   because the consumer side only checks that the client and the pact agree. The failure appears when the provider
+   verifies the pact (US5, "before" evidence). Restore the line.
+
+**Result.** 22 interactions in 3 pact files. Together with US2, every pair of US1 has a pact.
+
+![Consumer pacts for conversation-service](evidence/06-conversation-consumer-pacts.png)
+
+**Defect found: same error-envelope bug in mfe-chat.** conversation-service sends `{ error: { code, message } }`;
+mfe-chat's client read `message` and `code` from the top level, so `ApiError` carried the status text and no code. The
+pact for `GET /chats/:id` → 404 failed first:
+
+![Before the fix: ApiError has no code and the status text](evidence/05-mfe-chat-error-envelope-red.png)
+
+Visible effect before the fix: the members dialog never showed the server's reason (for example "That user is already a
+member of this chat"), and the attachment error of AC-71 showed "Unprocessable Entity" instead of the server's sentence.
+The client now reads `error.message` and `error.code`. 19 doubles in mfe-chat's tests used the flat shape, and three used
+codes the server never sends (`user_not_found`, `chat_not_found`, `unsupported_type`); they now use the envelope and real
+codes (`ALREADY_A_MEMBER`, `CHAT_NOT_FOUND`, `ATTACHMENT_UPLOAD_ERROR`).
+
+**Problems and fixes.**
+- The jsdom `FormData` problem above, solved by testing the request functions in Node.
+- Sending and retrying read the API key from `sessionStorage`, which plain Node does not have; the test stubs it with a
+  fixed key so the header is part of the contract.
+- mfe-settings' `extractErrorMessage` has the same flat-shape reading. It is left as is: the route does not exist yet
+  (AICHAT-256), so there is no error contract to follow; noted on that bug.
