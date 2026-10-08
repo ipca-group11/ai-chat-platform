@@ -1,0 +1,8 @@
+$ sw_vers -productVersion; node -v; pnpm -v; docker --version; node -e "console.log('pact', require('./packages/pact-config/node_modules/@pact-foundation/pact/package.json').version)"
+27.0.1
+v26.8.2
+10.4.0
+Docker version 29.7.2, build a7dcaa6
+pact 17.1.4
+
+[exit 0]
