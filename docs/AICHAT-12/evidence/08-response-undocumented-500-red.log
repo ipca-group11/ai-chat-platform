@@ -1,0 +1,56 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/response-schemas.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/response-schemas.spec.ts (15 tests | 2 failed) 71ms
+   ❯ chats (3)
+     × GET, PATCH and DELETE /chats/:id · 200/204, 400 and 404 3ms
+   ❯ coverage of the route table (1)
+     × every route's success response was checked against its schema 1ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 13 passed (15)
+   Start at  19:51:33
+   Duration  304ms (import 36%, transform 32%, tests 28%, worker 4%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/response-schemas.spec.ts > chats > GET, PATCH and DELETE /chats/:id · 200/204, 400 and 404
+AssertionError: GET /chats/:id answered 500, which the spec does not document: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"5e86c1e4-063e-4fcd-9d33-a481cc725c4e"}: expected undefined to be defined
+ ❯ expectDocumentedResponse src/test-utils/documented-response.ts:43:134
+     41|     expect(config, `${route} is not in the OpenAPI spec`).toBeDefined(…
+     42|     const documented = (config?.responses as Record<string, ResponseCo…
+     43|     expect(documented, `${route} answered ${res.status}, which the spe…
+       |                                                                                                                                      ^
+     44|     if (!documented) return;
+     45|
+ ❯ src/integration/response-schemas.spec.ts:73:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/integration/response-schemas.spec.ts > coverage of the route table > every route's success response was checked against its schema
+AssertionError: expected [ 'GET /chats/:id 200', …(2) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "GET /chats/:id 200",
++   "PATCH /chats/:id 200",
++   "DELETE /chats/:id 204",
++ ]
+
+ ❯ src/integration/response-schemas.spec.ts:196:34
+    194| describe("coverage of the route table", () => {
+    195|   it("every route's success response was checked against its schema", …
+    196|     expect(uncheckedSuccesses()).toEqual([]);
+       |                                  ^
+    197|   });
+    198| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+[exit 1]

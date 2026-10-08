@@ -26,6 +26,7 @@ import { httpMetricsMiddleware } from "./shared/http-metrics.js";
 import { serializeError } from "./shared/pii-scrub.js";
 import { logger as defaultLogger, serializeRequest, serializeResponse, type Logger } from "./shared/logger.js";
 import { prisma as defaultPrisma } from "./shared/prisma.js";
+import { rateLimitedHandler } from "./shared/rate-limit.js";
 
 collectDefaultMetrics({ register: metricsRegister, prefix: "auth_service_" });
 
@@ -43,6 +44,8 @@ export interface AppDeps {
   replies?: ReplyStopClient;
   /** Account deletions per client and hour (default 10). */
   deletionsPerHour?: number;
+  /** Requests per client every 15 minutes over all routes (default `RATE_LIMIT_MAX`). */
+  requestsPer15Minutes?: number;
 }
 
 function defaultErasureClient(): ErasureClient | undefined {
@@ -69,19 +72,22 @@ export function createApp(deps: AppDeps = {}): Express {
       credentials: true,
     }),
   );
-  if (env.RATE_LIMIT_MAX > 0) {
+  // Before the rate limiter, so a 429 also carries the correlation id.
+  app.use(correlationIdMiddleware);
+  const requestsPer15Minutes = deps.requestsPer15Minutes ?? env.RATE_LIMIT_MAX;
+  if (requestsPer15Minutes > 0) {
     app.use(
       rateLimit({
         windowMs: 15 * 60 * 1000,
-        limit: env.RATE_LIMIT_MAX,
+        limit: requestsPer15Minutes,
         standardHeaders: true,
         legacyHeaders: false,
+        handler: rateLimitedHandler,
       }),
     );
   }
   app.use(express.json());
   app.use(cookieParser());
-  app.use(correlationIdMiddleware);
   app.use(
     pinoHttp({
       logger,

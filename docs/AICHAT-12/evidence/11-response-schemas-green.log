@@ -1,0 +1,47 @@
+$ (cd services/auth-service && pnpm exec vitest run src/integration/response-schemas.spec.ts --reporter=verbose) && (cd services/conversation-service && pnpm exec vitest run src/integration/response-schemas.spec.ts --reporter=verbose)
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/auth-service
+
+ ✓ src/integration/response-schemas.spec.ts > operations > GET /health and GET /metrics 17ms
+ ✓ src/integration/response-schemas.spec.ts > operations > any route · 429 with the error envelope once the client is over the limit 2ms
+ ✓ src/integration/response-schemas.spec.ts > register and login > POST /auth/register · 201, 400 and 409 194ms
+ ✓ src/integration/response-schemas.spec.ts > register and login > POST /auth/login · 200, and 401 for wrong credentials or an invalid body 568ms
+ ✓ src/integration/response-schemas.spec.ts > session > POST /auth/refresh · 204 and 401 378ms
+ ✓ src/integration/response-schemas.spec.ts > session > POST /auth/logout · 204 with and without a session 383ms
+ ✓ src/integration/response-schemas.spec.ts > session > GET /auth/me · 200 and 401 387ms
+ ✓ src/integration/response-schemas.spec.ts > account deletion > DELETE /auth/me · 204, 400, 401 and 403 760ms
+ ✓ src/integration/response-schemas.spec.ts > account deletion > DELETE /auth/me · 502 when conversation-service fails, 503 when deletion is not configured 947ms
+ ✓ src/integration/response-schemas.spec.ts > account deletion > DELETE /auth/me · 429 from the deletion limiter, with the error envelope 564ms
+ ✓ src/integration/response-schemas.spec.ts > coverage of the route table > every route's success response was checked against its schema 0ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  19:54:17
+   Duration  4.40s (tests 97%, import 2%, transform 1%)
+
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/integration/response-schemas.spec.ts > operations > GET /health and GET /metrics 13ms
+ ✓ src/integration/response-schemas.spec.ts > chats > GET /chats · 200 and 401 8ms
+ ✓ src/integration/response-schemas.spec.ts > chats > POST /chats · 201 and 400 3ms
+ ✓ src/integration/response-schemas.spec.ts > chats > GET, PATCH and DELETE /chats/:id · 200/204, 400 and 404 6ms
+ ✓ src/integration/response-schemas.spec.ts > members > GET and POST /chats/:id/members · 200/201, 400, 404 and 409 5ms
+ ✓ src/integration/response-schemas.spec.ts > members > DELETE /chats/:id/members/:email and DELETE /chats/:id/membership · 204, 403 and 404 6ms
+ ✓ src/integration/response-schemas.spec.ts > messages > GET and POST /chats/:chatId/messages · 200/201, 400 and 404 6ms
+ ✓ src/integration/response-schemas.spec.ts > messages > PATCH and DELETE /chats/:chatId/messages/:messageId · 200/204, 400, 404 and 409 5ms
+ ✓ src/integration/response-schemas.spec.ts > messages > POST /chats/:chatId/messages/:messageId/retry · 202, 404 and 409 2ms
+ ✓ src/integration/response-schemas.spec.ts > messages > POST /chats/:chatId/stop · 200 and 404 3ms
+ ✓ src/integration/response-schemas.spec.ts > streaming > GET /chats/:chatId/stream · 200 event stream, 401 and 404 8ms
+ ✓ src/integration/response-schemas.spec.ts > attachments > POST /chats/:chatId/messages/:messageId/attachments · 201, 400, 404 and 422 6ms
+ ✓ src/integration/response-schemas.spec.ts > internal routes (service token) > POST /internal/erasures · 200, 400 and 401 2ms
+ ✓ src/integration/response-schemas.spec.ts > internal routes (service token) > POST /internal/sessions/:userId/stop · 200 and 401 1ms
+ ✓ src/integration/response-schemas.spec.ts > coverage of the route table > every route's success response was checked against its schema 0ms
+
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  19:54:23
+   Duration  312ms (import 36%, transform 31%, tests 29%, worker 4%)
+
+
+[exit 0]

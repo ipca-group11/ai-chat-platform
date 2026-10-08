@@ -1,0 +1,38 @@
+$ cd services/auth-service && pnpm exec vitest run src/integration/response-schemas.spec.ts -t 429
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/auth-service
+
+ ❯ src/integration/response-schemas.spec.ts (11 tests | 1 failed | 9 skipped) 585ms
+   ❯ account deletion (3)
+     × DELETE /auth/me · 429 from the deletion limiter, with the error envelope 570ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed | 9 skipped (11)
+   Start at  19:53:30
+   Duration  781ms (tests 80%, import 12%, transform 7%, worker 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/response-schemas.spec.ts > account deletion > DELETE /auth/me · 429 from the deletion limiter, with the error envelope
+AssertionError: DELETE /auth/me 429 content type text/html; charset=utf-8: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ expectDocumentedResponse src/test-utils/documented-response.ts:51:120
+     49|       expect(res.text ?? "", `${route} ${res.status} must have no body…
+     50|     } else {
+     51|       expect(media.some((type) => contentType.startsWith(type)), `${ro…
+       |                                                                                                                        ^
+     52|     }
+     53|
+ ❯ src/integration/response-schemas.spec.ts:105:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

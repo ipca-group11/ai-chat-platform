@@ -1,0 +1,135 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/response-schemas.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/response-schemas.spec.ts (15 tests | 4 failed) 74ms
+   ❯ chats (3)
+     × GET /chats · 200 and 401 9ms
+     × POST /chats · 201 and 400 2ms
+     × GET, PATCH and DELETE /chats/:id · 200/204, 400 and 404 2ms
+   ❯ coverage of the route table (1)
+     × every route's success response was checked against its schema 0ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 11 passed (15)
+   Start at  19:51:31
+   Duration  308ms (import 36%, transform 32%, tests 29%, worker 4%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/response-schemas.spec.ts > chats > GET /chats · 200 and 401
+AssertionError: GET /chats 200 body has fields the schema does not describe: expected { chats: [ { …(10) } ] } to deeply equal { chats: [ { …(11) } ] }
+
+- Expected
++ Received
+
+@@ -1,11 +1,10 @@
+  {
+    "chats": [
+      {
+        "createdAt": "2026-10-08T18:51:31.855Z",
+        "id": "81107792-62c0-4236-bb20-1e9077ba76c9",
+-       "internalNote": "debug",
+        "model": "claude-haiku-4-5",
+        "ownerEmail": "owner@example.com",
+        "ownerId": "owner",
+        "provider": "anthropic",
+        "reasoning": false,
+
+ ❯ expectDocumentedResponse src/test-utils/documented-response.ts:58:98
+     56|       const parsed = jsonSchema.safeParse(res.body);
+     57|       expect(parsed.success, `${route} ${res.status} body does not mat…
+     58|       expect(parsed.data, `${route} ${res.status} body has fields the …
+       |                                                                                                  ^
+     59|     }
+     60|
+ ❯ src/integration/response-schemas.spec.ts:60:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/integration/response-schemas.spec.ts > chats > POST /chats · 201 and 400
+AssertionError: POST /chats 201 body has fields the schema does not describe: expected { chat: { …(10) } } to deeply equal { chat: { …(11) } }
+
+- Expected
++ Received
+
+@@ -1,10 +1,9 @@
+  {
+    "chat": {
+      "createdAt": "2026-10-08T18:51:31.861Z",
+      "id": "45082b95-57d6-403a-b0fd-ccfbcf385696",
+-     "internalNote": "debug",
+      "model": "gpt-4o",
+      "ownerEmail": "owner@example.com",
+      "ownerId": "owner",
+      "provider": "openai",
+      "reasoning": true,
+
+ ❯ expectDocumentedResponse src/test-utils/documented-response.ts:58:98
+     56|       const parsed = jsonSchema.safeParse(res.body);
+     57|       expect(parsed.success, `${route} ${res.status} body does not mat…
+     58|       expect(parsed.data, `${route} ${res.status} body has fields the …
+       |                                                                                                  ^
+     59|     }
+     60|
+ ❯ src/integration/response-schemas.spec.ts:66:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/integration/response-schemas.spec.ts > chats > GET, PATCH and DELETE /chats/:id · 200/204, 400 and 404
+AssertionError: GET /chats/:id 200 body has fields the schema does not describe: expected { chat: { …(10) } } to deeply equal { chat: { …(11) } }
+
+- Expected
++ Received
+
+@@ -1,10 +1,9 @@
+  {
+    "chat": {
+      "createdAt": "2026-10-08T18:51:31.863Z",
+      "id": "66672579-4f4f-43b0-9db1-0d36b46f7cc8",
+-     "internalNote": "debug",
+      "model": "claude-haiku-4-5",
+      "ownerEmail": "owner@example.com",
+      "ownerId": "owner",
+      "provider": "anthropic",
+      "reasoning": false,
+
+ ❯ expectDocumentedResponse src/test-utils/documented-response.ts:58:98
+     56|       const parsed = jsonSchema.safeParse(res.body);
+     57|       expect(parsed.success, `${route} ${res.status} body does not mat…
+     58|       expect(parsed.data, `${route} ${res.status} body has fields the …
+       |                                                                                                  ^
+     59|     }
+     60|
+ ❯ src/integration/response-schemas.spec.ts:73:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/integration/response-schemas.spec.ts > coverage of the route table > every route's success response was checked against its schema
+AssertionError: expected [ 'GET /chats 200', …(4) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "GET /chats 200",
++   "POST /chats 201",
++   "GET /chats/:id 200",
++   "PATCH /chats/:id 200",
++   "DELETE /chats/:id 204",
++ ]
+
+ ❯ src/integration/response-schemas.spec.ts:196:34
+    194| describe("coverage of the route table", () => {
+    195|   it("every route's success response was checked against its schema", …
+    196|     expect(uncheckedSuccesses()).toEqual([]);
+       |                                  ^
+    197|   });
+    198| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+[exit 1]

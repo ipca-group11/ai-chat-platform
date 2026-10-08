@@ -119,6 +119,24 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many requests from this client (`RATE_LIMITED`)",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -138,6 +156,24 @@
               "text/plain": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests from this client (`RATE_LIMITED`)",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -232,6 +268,24 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many requests from this client (`RATE_LIMITED`)",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -311,6 +365,24 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many requests from this client (`RATE_LIMITED`)",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -362,6 +434,24 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many requests from this client (`RATE_LIMITED`)",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -393,6 +483,24 @@
                 "description": "Expires both auth cookies",
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests from this client (`RATE_LIMITED`)",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -433,6 +541,24 @@
           },
           "401": {
             "description": "Missing or invalid credentials, session or refresh token",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests from this client (`RATE_LIMITED`)",
             "headers": {
               "X-Correlation-Id": {
                 "description": "Echoes the request's correlation id, or a new one",
@@ -538,6 +664,24 @@
           },
           "403": {
             "description": "The request comes from an origin that is not allowed",
+            "headers": {
+              "X-Correlation-Id": {
+                "description": "Echoes the request's correlation id, or a new one",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests from this client (`RATE_LIMITED`)",
             "headers": {
               "X-Correlation-Id": {
                 "description": "Echoes the request's correlation id, or a new one",
