@@ -18,6 +18,23 @@ Details, known failures and how to add a pact: `packages/pact-config/README.md`.
 
 ---
 
+# API schema validation (AICHAT-12)
+
+```sh
+# specs, response schemas, invalid requests, stream events (no Docker)
+pnpm exec nx run-many -t test -p auth-service conversation-service mfe-chat
+# after changing a schema or a route: regenerate the committed specs, then the ZAP spec
+pnpm --filter @app/auth-service openapi:generate && pnpm --filter @app/conversation-service openapi:generate
+node scripts/dast/zap-spec.ts
+# Schemathesis against the running stack (Docker); on macOS add the ST_DOCKER_ARGS / ST_*_URL variables of the work log
+RATE_LIMIT_MAX=100000 pnpm mock:up
+bash testing/schemathesis/run.sh
+```
+
+Details: `docs/AICHAT-12/WORKLOG.md`.
+
+---
+
 # Stream cancellation (AICHAT-15)
 
 ```sh
