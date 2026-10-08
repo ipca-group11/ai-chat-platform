@@ -10,9 +10,9 @@ title: "AICHAT-12 · API schema validation testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | João Vieira |
 | Branch | `test/AICHAT-12-api-schema-validation` (built on `test/AICHAT-11-contract-testing`) |
-| Started / finished | 2026-10-08 / … |
+| Started / finished | 2026-10-08 / 2026-10-08 |
 | Pull requests | not opened yet (commits are local; pushed by the owner) |
-| Status | In Progress |
+| Status | Review |
 
 ## 1. DoR review
 
@@ -515,17 +515,47 @@ rebuild the service (`docker compose --profile llm up -d --build --no-deps conve
 ## 4. How to run everything
 
 ```sh
-# filled in at the end of the epic
+# no Docker: drift guard, spec checks, response schemas, invalid requests, stream events, client/server events
+pnpm exec nx run-many -t test -p auth-service conversation-service mfe-chat
+pnpm exec nx run-many -t pact:verify -p auth-service conversation-service --skip-nx-cache   # strict bodies vs the frontends
+node --test scripts/dast/zap-spec.test.ts
+cd e2e && pnpm exec vitest run src/ci/schemathesis-workflow.spec.ts src/ci/dast-workflow.spec.ts
+# Docker: Schemathesis against the stack
+RATE_LIMIT_MAX=100000 pnpm mock:up && bash testing/schemathesis/run.sh; pnpm mock:down
 ```
 
 ## 5. Results
 
 | Metric | Before | After |
 |---|---|---|
+| Routes with a documented request and response schema | 0 of 29 (no spec in the repo) | 29 of 29, in two generated OpenAPI 3.1 files |
+| Routes whose responses are checked against a schema in tests | 0 | 29 (26 tests, 40+ responses) |
+| Negative request cases | scattered | 57 table rows (41 conversation-service, 16 auth-service) |
+| Stream event types parsed from the wire | 0 of 8 | 8 of 8; mfe-chat compared with the server's events |
+| Generated requests per CI run (Schemathesis) | 0 | about 1 230 (224 auth-service, 1 010 conversation-service) |
+| Ways a client could get a 500 for its own bad input | 5 found | 0 known |
 
 ## 6. DoD check
 
 | DoD item | Met | Evidence |
 |---|---|---|
+| Tests run in CI and pass on `main` | Partly: they run in CI (unit/integration in `ci.yml`, Schemathesis in `api-schema.yml`) and pass on this branch; `main` after the merge | [green suites](evidence/11-response-schemas-green.png), [Schemathesis](evidence/20-schemathesis-green.png) |
+| Failure blocks the merge | ✅ the jobs fail on any failed check; "required check" is a team rule (branch protection unavailable, HTTP 403), as for DAST | `.github/workflows/api-schema.yml` header, `e2e/src/ci/schemathesis-workflow.spec.ts` |
+| Run instructions added to the project README or `docs/` | ✅ | `TESTING.md` (AICHAT-12 section), section 4 above |
+| Request and response of every route validated against the schemas | ✅ | US3, US4, US6 |
+| Schemathesis run against the OpenAPI spec | ✅ | [first run](evidence/21-schemathesis-first-run-red.png), [green](evidence/20-schemathesis-green.png) |
 
 ## 7. Notes for the report
+
+- **What was found.** No API spec existed; no response had a schema; auth's only response schema described a shape no
+  route returns. Five ways to get a 500 with a bad request: malformed JSON, an oversized body, an undecodable path
+  parameter, a malformed multipart upload (found by Schemathesis), and a rate-limit 429 sent as `text/html`. Unknown
+  fields in request bodies were silently accepted. `packages/shared-types` holds chat DTOs that no longer match the API.
+- **What was fixed.** All of the above: 400/413/429 with the error envelope and the correlation id, strict request
+  bodies (the frontends' pacts still verify), and the generated specs replace the hand-written ZAP file.
+- **What was recorded, not fixed.** The shared-types drift (pinned by tests; aligning it is the platform team's
+  follow-up). ZAP's acceptance of OpenAPI 3.1 is confirmed on the first scheduled run. `pnpm mock:up` exits 1 because
+  of the one-shot `ollama-pull` container (reported).
+- **Lessons learned.** A test that passes the first time proves nothing until it has been seen failing: every check in
+  this epic was broken on purpose once. Tests that read the same route table as the spec cannot disagree with it.
+  Fuzzing found in seconds the one input none of our 57 hand-written negative cases tried.
