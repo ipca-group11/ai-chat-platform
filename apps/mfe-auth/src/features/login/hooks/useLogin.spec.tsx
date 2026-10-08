@@ -16,7 +16,7 @@ describe("useLogin", () => {
   });
 
   it("surfaces a validation error returned by the server (400) with its message", async () => {
-    server.use(http.post("*/auth/login", () => HttpResponse.json({ message: "Email is required" }, { status: 400 })));
+    server.use(http.post("*/auth/login", () => HttpResponse.json({ error: { code: "VALIDATION_ERROR", message: "Email is required" } }, { status: 400 })));
     const { result } = renderHookWithClient(() => useLogin());
 
     result.current.mutate({ email: "", password: "pw" });
@@ -26,7 +26,7 @@ describe("useLogin", () => {
   });
 
   it("surfaces wrong credentials (401) as an error", async () => {
-    server.use(http.post("*/auth/login", () => HttpResponse.json({ error: "Invalid credentials" }, { status: 401 })));
+    server.use(http.post("*/auth/login", () => HttpResponse.json({ error: { code: "UNAUTHENTICATED", message: "Invalid credentials" } }, { status: 401 })));
     const { result } = renderHookWithClient(() => useLogin());
 
     result.current.mutate({ email: "ana@example.com", password: "wrong" });

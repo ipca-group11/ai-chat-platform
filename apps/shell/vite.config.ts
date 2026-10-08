@@ -78,6 +78,8 @@ export default defineConfig({
     },
     setupFiles: ['./src/test-setup.ts', '@platform/test-utils/setup'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    // Pact consumer tests run in their own config (vitest.pact.config.ts), without MSW.
+    exclude: ['src/**/*.pact.spec.ts'],
     // Cold-cache transform of module-federation.config.ts (and its
     // @module-federation/vite import) can exceed the 5s default, especially
     // in sandboxed/CI environments without a warm Vite cache; give tests

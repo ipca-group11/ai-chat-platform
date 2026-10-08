@@ -37,6 +37,21 @@
         "cwd": "services/auth-service"
       }
     },
+    "pact:consumer": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run -c vitest.pact.config.ts",
+        "cwd": "services/auth-service"
+      }
+    },
+    "pact:verify": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["prisma-generate", "^build"],
+      "options": {
+        "command": "vitest run -c vitest.verify.config.ts",
+        "cwd": "services/auth-service"
+      }
+    },
     "test-db": {
       "executor": "nx:run-commands",
       "dependsOn": ["prisma-generate", "^build"],

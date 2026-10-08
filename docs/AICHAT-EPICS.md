@@ -63,6 +63,7 @@ All stories were created in Jira on 2026-10-03 as children of their epic, assign
 | AICHAT-26 | Done (merged into the integration branch) | [WORKLOG](AICHAT-26/WORKLOG.md) | #25 |
 | AICHAT-33 | Done (merged into the integration branch) | [WORKLOG](AICHAT-33/WORKLOG.md) | #26 |
 | AICHAT-29 | In Progress (DoR recorded on its branch; testing not started) | — | — |
+| AICHAT-11 | Review (committed on `test/AICHAT-11-contract-testing`, not pushed yet) | [WORKLOG](AICHAT-11/WORKLOG.md) | — |
 
 ## Suggested order
 

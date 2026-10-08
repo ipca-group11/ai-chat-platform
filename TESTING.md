@@ -4,6 +4,20 @@ Prerequisites: Node 24.21+ (`nvm use 24`), `pnpm install`, and Docker running fo
 
 ---
 
+# Contract tests (AICHAT-11)
+
+```sh
+# consumers write pacts/*.json from their real API client code (no Docker)
+pnpm exec nx run-many -t pact:consumer
+# providers replay those pacts against their real app with in-memory fakes (no Docker)
+pnpm exec nx run auth-service:pact:verify
+pnpm exec nx run conversation-service:pact:verify
+```
+
+Details, known failures and how to add a pact: `packages/pact-config/README.md`.
+
+---
+
 # Stream cancellation (AICHAT-15)
 
 ```sh

@@ -70,9 +70,11 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     let message = res.statusText;
     let code: string | undefined;
     try {
-      const payload = (await res.json()) as { message?: string; code?: string };
-      message = payload.message ?? message;
-      code = payload.code;
+      // conversation-service answers every error with `{ error: { code, message } }`
+      // (`toErrorResponse`); pinned by the pact tests.
+      const payload = (await res.json()) as { error?: { message?: string; code?: string } };
+      message = payload.error?.message ?? message;
+      code = payload.error?.code;
     } catch {
       // no JSON body, fall back to statusText
     }

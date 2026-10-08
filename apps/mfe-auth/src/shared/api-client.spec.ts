@@ -31,7 +31,7 @@ describe("apiFetch", () => {
 
   it("throws an ApiError with the server's message on a non-2xx response", async () => {
     server.use(
-      http.post("*/auth/login", () => HttpResponse.json({ error: "Invalid email or password" }, { status: 401 })),
+      http.post("*/auth/login", () => HttpResponse.json({ error: { code: "UNAUTHENTICATED", message: "Invalid email or password" } }, { status: 401 })),
     );
 
     await expect(apiFetch("/auth/login", { method: "POST", body: {} })).rejects.toMatchObject({

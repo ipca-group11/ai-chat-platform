@@ -3,11 +3,19 @@ import { apiClient, type ApiError } from "../../../shared/api-client";
 import { queryKeys } from "../../../shared/query-keys";
 import type { Chat, ChatMember } from "../../../shared/types";
 
+// Requests to conversation-service, one function per route; the hooks below add caching.
+// The pact tests (`members.pact.spec.ts`) call these directly.
+export const fetchChatMembers = (chatId: string) => apiClient.get<ChatMember[]>(`/chats/${chatId}/members`);
+export const addChatMember = (chatId: string, email: string) => apiClient.post<ChatMember>(`/chats/${chatId}/members`, { email });
+export const removeChatMember = (chatId: string, email: string) =>
+  apiClient.delete<void>(`/chats/${chatId}/members/${encodeURIComponent(email)}`);
+export const leaveChat = (chatId: string) => apiClient.delete<void>(`/chats/${chatId}/membership`);
+
 /** Owner first, then invited members. Visible to every member of the chat. */
 export function useChatMembers(chatId: string, enabled = true): UseQueryResult<ChatMember[], ApiError> {
   return useQuery({
     queryKey: queryKeys.members(chatId),
-    queryFn: () => apiClient.get<ChatMember[]>(`/chats/${chatId}/members`),
+    queryFn: () => fetchChatMembers(chatId),
     enabled,
   });
 }
@@ -16,7 +24,7 @@ export function useChatMembers(chatId: string, enabled = true): UseQueryResult<C
 export function useAddChatMember(chatId: string) {
   const queryClient = useQueryClient();
   return useMutation<ChatMember, ApiError, string>({
-    mutationFn: (email) => apiClient.post<ChatMember>(`/chats/${chatId}/members`, { email }),
+    mutationFn: (email) => addChatMember(chatId, email),
     onSuccess: (member) => {
       queryClient.setQueryData<ChatMember[]>(queryKeys.members(chatId), (existing) =>
         existing ? [...existing, member] : existing
@@ -29,7 +37,7 @@ export function useAddChatMember(chatId: string) {
 export function useRemoveChatMember(chatId: string) {
   const queryClient = useQueryClient();
   return useMutation<void, ApiError, string>({
-    mutationFn: (email) => apiClient.delete<void>(`/chats/${chatId}/members/${encodeURIComponent(email)}`),
+    mutationFn: (email) => removeChatMember(chatId, email),
     onSuccess: (_data, email) => {
       queryClient.setQueryData<ChatMember[]>(queryKeys.members(chatId), (existing) =>
         existing?.filter((m) => m.email !== email)
@@ -42,7 +50,7 @@ export function useRemoveChatMember(chatId: string) {
 export function useLeaveChat(chatId: string) {
   const queryClient = useQueryClient();
   return useMutation<void, ApiError, void>({
-    mutationFn: () => apiClient.delete<void>(`/chats/${chatId}/membership`),
+    mutationFn: () => leaveChat(chatId),
     onSuccess: () => {
       queryClient.setQueryData<Chat[]>(queryKeys.chats(), (existing) => existing?.filter((c) => c.id !== chatId));
       queryClient.removeQueries({ queryKey: queryKeys.chat(chatId) });

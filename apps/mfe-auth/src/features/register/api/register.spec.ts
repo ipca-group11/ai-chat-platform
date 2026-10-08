@@ -17,7 +17,7 @@ describe("registerUser", () => {
   });
 
   it("rejects with the server's message when the email is already taken", async () => {
-    server.use(http.post("*/auth/register", () => HttpResponse.json({ error: "Email already registered" }, { status: 409 })));
+    server.use(http.post("*/auth/register", () => HttpResponse.json({ error: { code: "EMAIL_TAKEN", message: "Email already registered" } }, { status: 409 })));
 
     await expect(registerUser({ email: "taken@example.com", password: "s3cretpass" })).rejects.toMatchObject({
       status: 409,

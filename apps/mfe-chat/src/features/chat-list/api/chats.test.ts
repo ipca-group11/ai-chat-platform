@@ -46,7 +46,7 @@ describe("useChat (AC-43, AC-46)", () => {
   });
 
   it("AC-46: surfaces a 403 without retrying so the UI can show a clear not-found/error state", async () => {
-    server.use(http.get("*/chats/:chatId", () => HttpResponse.json({ message: "Forbidden" }, { status: 403 })));
+    server.use(http.get("*/chats/:chatId", () => HttpResponse.json({ error: { code: "FORBIDDEN", message: "Forbidden" } }, { status: 403 })));
     const requests = recordRequests();
 
     const { result } = renderHookWithClient(() => useChat("chat-owned-by-another-user"));
@@ -57,7 +57,7 @@ describe("useChat (AC-43, AC-46)", () => {
   });
 
   it("AC-46: surfaces a 404 without retrying", async () => {
-    server.use(http.get("*/chats/:chatId", () => HttpResponse.json({ message: "Not found" }, { status: 404 })));
+    server.use(http.get("*/chats/:chatId", () => HttpResponse.json({ error: { code: "NOT_FOUND", message: "Not found" } }, { status: 404 })));
     const requests = recordRequests();
 
     const { result } = renderHookWithClient(() => useChat("missing-chat"));

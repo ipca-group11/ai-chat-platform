@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { federation } from "@module-federation/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { configDefaults } from "vitest/config";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -64,6 +65,8 @@ export default defineConfig({
     env: {
       NODE_ENV: "test",
     },
+    // Pact consumer tests run in their own config (vitest.pact.config.ts), without MSW.
+    exclude: [...configDefaults.exclude, "**/*.pact.spec.ts"],
     setupFiles: ["./src/shared/test/setup.ts", "@platform/test-utils/setup"],
     css: false,
     coverage: coveragePreset({

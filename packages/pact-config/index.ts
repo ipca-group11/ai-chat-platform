@@ -13,9 +13,16 @@ export type { PactConsumerOptions, PactBrokerConfig } from "./pact.config.js";
 export {
   like,
   eachLike,
+  boolean,
   term,
   CORRELATION_HEADER,
   correlationHeaderMatcher,
   errorResponseMatcher,
   fieldErrorsMatcher,
 } from "./matchers.js";
+
+export { newConsumerPact, pactDir, removePacts, routeFetchTo, runWithMockServer } from "./consumer.js";
+export type { RouteFetchOptions } from "./consumer.js";
+
+export { pactFilesFor, splitKnownFailures } from "./provider.js";
+export type { KnownFailure, SplitPacts } from "./provider.js";

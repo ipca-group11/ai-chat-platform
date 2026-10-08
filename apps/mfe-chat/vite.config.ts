@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { coveragePreset, appCoverageThresholds } from "@platform/test-config";
 import { defineConfig } from "vite";
+import { configDefaults } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { federation } from "@module-federation/vite";
 import path from "node:path";
@@ -53,6 +54,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
+    // Pact consumer tests run in their own config (vitest.pact.config.ts), without MSW.
+    exclude: [...configDefaults.exclude, "**/*.pact.spec.ts"],
     setupFiles: ["./src/test/setup.ts", "@platform/test-utils/setup"],
     css: false,
     testTimeout: 15000,

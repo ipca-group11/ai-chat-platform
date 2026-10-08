@@ -14,7 +14,7 @@ import { ensureChatStream } from "../model/stream-registry";
 export function useMessages(chatId: string | undefined): UseQueryResult<Message[], ApiError> {
   return useQuery({
     queryKey: queryKeys.messages(chatId ?? ""),
-    queryFn: () => apiClient.get<Message[]>(`/chats/${chatId}/messages`),
+    queryFn: () => fetchMessages(chatId ?? ""),
     enabled: Boolean(chatId),
   });
 }
@@ -27,16 +27,24 @@ export interface SendMessageInput {
   provider: Provider;
 }
 
+// Requests to conversation-service, one function per route; the hooks add caching and
+// open the chat's stream. The pact tests (`messages.pact.spec.ts`) call these directly.
+export const fetchMessages = (chatId: string) => apiClient.get<Message[]>(`/chats/${chatId}/messages`);
+export const sendMessage = ({ chatId, content, attachmentIds, userId, provider }: SendMessageInput) =>
+  apiClient.post<Message>(`/chats/${chatId}/messages`, { content, attachmentIds }, { llmKey: { userId, provider } });
+export const stopReply = (chatId: string) => apiClient.post<{ stopped: boolean }>(`/chats/${chatId}/stop`);
+export const retryMessage = ({ chatId, messageId, userId, provider }: RetryMessageInput) =>
+  apiClient.post<Message>(`/chats/${chatId}/messages/${messageId}/retry`, undefined, { llmKey: { userId, provider } });
+export const editQueuedMessage = ({ chatId, messageId, content }: { chatId: string; messageId: string; content: string }) =>
+  apiClient.patch<Message>(`/chats/${chatId}/messages/${messageId}`, { content });
+export const cancelQueuedMessage = ({ chatId, messageId }: { chatId: string; messageId: string }) =>
+  apiClient.delete<void>(`/chats/${chatId}/messages/${messageId}`);
+
 /** AC-51: persisted immediately and shown; also (re)opens this chat's stream (AC-60/AC-61). */
 export function useSendMessage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ chatId, content, attachmentIds, userId, provider }: SendMessageInput) =>
-      apiClient.post<Message>(
-        `/chats/${chatId}/messages`,
-        { content, attachmentIds },
-        { llmKey: { userId, provider } }
-      ),
+    mutationFn: sendMessage,
     onSuccess: (message, { chatId }) => {
       // The stream's `message` event may have added it already.
       queryClient.setQueryData<Message[]>(queryKeys.messages(chatId), (existing = []) =>
@@ -55,8 +63,7 @@ export function useSendMessage() {
 export function useStopMessage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ chatId }: { chatId: string; messageId: string }) =>
-      apiClient.post<{ stopped: boolean }>(`/chats/${chatId}/stop`),
+    mutationFn: ({ chatId }: { chatId: string; messageId: string }) => stopReply(chatId),
     onSuccess: (_data, { chatId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.messages(chatId) });
     },
@@ -75,8 +82,7 @@ export interface RetryMessageInput {
 export function useRetryMessage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ chatId, messageId, userId, provider }: RetryMessageInput) =>
-      apiClient.post<Message>(`/chats/${chatId}/messages/${messageId}/retry`, undefined, { llmKey: { userId, provider } }),
+    mutationFn: retryMessage,
     onSuccess: (message, { chatId }) => {
       queryClient.setQueryData<Message[]>(queryKeys.messages(chatId), (existing = []) =>
         existing.map((m) => (m.id === message.id ? message : m))
@@ -90,8 +96,7 @@ export function useRetryMessage() {
 export function useEditQueuedMessage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ chatId, messageId, content }: { chatId: string; messageId: string; content: string }) =>
-      apiClient.patch<Message>(`/chats/${chatId}/messages/${messageId}`, { content }),
+    mutationFn: editQueuedMessage,
     onSuccess: (message, { chatId }) => {
       queryClient.setQueryData<Message[]>(queryKeys.messages(chatId), (existing = []) =>
         existing.map((m) => (m.id === message.id ? message : m))
@@ -104,8 +109,7 @@ export function useEditQueuedMessage() {
 export function useCancelQueuedMessage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ chatId, messageId }: { chatId: string; messageId: string }) =>
-      apiClient.delete<void>(`/chats/${chatId}/messages/${messageId}`),
+    mutationFn: cancelQueuedMessage,
     onSuccess: (_data, { chatId, messageId }) => {
       queryClient.setQueryData<Message[]>(queryKeys.messages(chatId), (existing = []) =>
         existing.filter((m) => m.id !== messageId)

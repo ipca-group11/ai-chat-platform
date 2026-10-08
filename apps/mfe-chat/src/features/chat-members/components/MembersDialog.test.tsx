@@ -54,7 +54,7 @@ describe("MembersDialog", () => {
     server.use(
       http.post("*/chats/:chatId/members", () =>
         HttpResponse.json(
-          { code: "ALREADY_A_MEMBER", message: "That user is already a member of this chat" },
+          { error: { code: "ALREADY_A_MEMBER", message: "That user is already a member of this chat" } },
           { status: 409 }
         )
       )
