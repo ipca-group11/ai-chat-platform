@@ -79,15 +79,13 @@ describe("POST /auth/login with a malformed body", () => {
     expect(res.body.error.code).toBe("INVALID_CREDENTIALS");
   });
 
-  // Pinned current behaviour (defect, WORKLOG §7): a body that is not valid JSON is
-  // rejected by express.json() with a 400-class SyntaxError, but the error middleware only
-  // knows HttpError and ZodError, so the client gets a 500 INTERNAL_ERROR instead of a 400.
-  // Fixing it needs a new branch in the error middleware, not a one-line change.
-  it("500 INTERNAL_ERROR for a body that is not valid JSON (pinned: should be 400)", async () => {
+  // Was pinned as a 500 (defect, AICHAT-23 WORKLOG §7); fixed in AICHAT-186: the error middleware
+  // now knows the body parser's 400-class errors.
+  it("400 INVALID_JSON for a body that is not valid JSON", async () => {
     const { app } = buildTestApp();
     const res = await request(app).post("/auth/login").set("Content-Type", "application/json").send("{not json");
-    expect(res.status).toBe(500);
-    expect(res.body.error.code).toBe("INTERNAL_ERROR");
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("INVALID_JSON");
     expect(JSON.stringify(res.body)).not.toMatch(/Unexpected token|SyntaxError|at /);
   });
 });

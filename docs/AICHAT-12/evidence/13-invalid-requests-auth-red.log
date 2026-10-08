@@ -1,0 +1,157 @@
+$ cd services/auth-service && pnpm exec vitest run src/integration/invalid-requests.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/auth-service
+
+ ❯ src/integration/invalid-requests.spec.ts (16 tests | 7 failed) 6601ms
+   ❯ invalid requests are refused with the error envelope, never 500 (16)
+     × POST /auth/register · extra field 564ms
+     × POST /auth/register · malformed JSON 376ms
+     × POST /auth/register · body over the 100 kB limit 376ms
+     × POST /auth/login · extra field (401 on purpose, AC-36) 562ms
+     × POST /auth/login · malformed JSON (refused before the route) 378ms
+     × DELETE /auth/me · extra field 563ms
+     × DELETE /auth/me · malformed JSON 376ms
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 9 passed (16)
+   Start at  19:57:40
+   Duration  6.80s (tests 98%, import 1%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with the error envelope, never 500 > POST /auth/register · extra field
+AssertionError: {"id":"user-2","email":"new@example.com"}: expected 201 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 201
+
+ ❯ src/integration/invalid-requests.spec.ts:59:50
+     57|     const res = await req.send(c.body);
+     58|
+     59|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+     60|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+     61|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with the error envelope, never 500 > POST /auth/register · malformed JSON
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"Internal server error"},"correlationId":"bbee2e84-6625-45b5-b10f-be0fd3443ca3"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:59:50
+     57|     const res = await req.send(c.body);
+     58|
+     59|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+     60|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+     61|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with the error envelope, never 500 > POST /auth/register · body over the 100 kB limit
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"Internal server error"},"correlationId":"262e839f-738a-4ed6-aa8d-e94d41666d3c"}: expected 500 to be 413 // Object.is equality
+
+- Expected
++ Received
+
+- 413
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:59:50
+     57|     const res = await req.send(c.body);
+     58|
+     59|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+     60|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+     61|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with the error envelope, never 500 > POST /auth/login · extra field (401 on purpose, AC-36)
+AssertionError: {"id":"user-1","email":"ana@example.com"}: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ src/integration/invalid-requests.spec.ts:59:50
+     57|     const res = await req.send(c.body);
+     58|
+     59|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+     60|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+     61|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with the error envelope, never 500 > POST /auth/login · malformed JSON (refused before the route)
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"Internal server error"},"correlationId":"edae346c-72b3-4998-910f-af1822c7dacb"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:59:50
+     57|     const res = await req.send(c.body);
+     58|
+     59|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+     60|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+     61|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with the error envelope, never 500 > DELETE /auth/me · extra field
+AssertionError: {}: expected 204 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 204
+
+ ❯ src/integration/invalid-requests.spec.ts:59:50
+     57|     const res = await req.send(c.body);
+     58|
+     59|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+     60|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+     61|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  src/integration/invalid-requests.spec.ts > invalid requests are refused with the error envelope, never 500 > DELETE /auth/me · malformed JSON
+AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"Internal server error"},"correlationId":"adca4414-bcdf-4ee2-9036-915aa85b35f0"}: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ src/integration/invalid-requests.spec.ts:59:50
+     57|     const res = await req.send(c.body);
+     58|
+     59|     expect(res.status, JSON.stringify(res.body)).toBe(c.status ?? 400);
+       |                                                  ^
+     60|     expect(res.body.error.code).toBe(c.code ?? "VALIDATION_ERROR");
+     61|     if (c.field) expect(Object.keys(res.body.error.fieldErrors ?? {}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+[exit 1]

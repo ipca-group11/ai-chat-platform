@@ -32,20 +32,21 @@ export function isValidPassword(value: string): boolean {
 }
 
 // --- DTOs --------------------------------------------------------------------------
-export const registerRequestSchema = z.object({
+// Request bodies are strict: an unknown field is refused (AICHAT-186).
+export const registerRequestSchema = z.strictObject({
   email: z.string().trim().toLowerCase().email(),
   password: passwordSchema,
 });
 export type RegisterRequest = z.infer<typeof registerRequestSchema>;
 
-export const loginRequestSchema = z.object({
+export const loginRequestSchema = z.strictObject({
   email: z.string().trim().toLowerCase().email(),
   password: z.string().min(1),
 });
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
 
 /** `DELETE /auth/me`: the password is asked again before the account is erased. */
-export const deleteAccountRequestSchema = z.object({
+export const deleteAccountRequestSchema = z.strictObject({
   password: z.string().min(1).max(1024),
 });
 export type DeleteAccountRequest = z.infer<typeof deleteAccountRequestSchema>;

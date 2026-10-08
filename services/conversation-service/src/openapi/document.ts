@@ -51,11 +51,12 @@ function named<T extends z.ZodType>(name: string, schema: T): T {
 }
 
 const ERROR_DESCRIPTIONS: Record<number, string> = {
-  400: "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, or a specific code",
+  400: "Invalid request: `VALIDATION_ERROR` with `fieldErrors`, `INVALID_JSON`, `BAD_REQUEST` (a path that cannot be decoded) or a specific code",
   401: "Missing or invalid credentials",
   403: "Not allowed for this member",
   404: "Not found, or not visible to the caller",
   409: "The resource is in a state that does not allow the change",
+  413: "The JSON body is over the 100 kB limit (`PAYLOAD_TOO_LARGE`)",
   422: "The chat's model cannot take this attachment",
 };
 
@@ -342,6 +343,12 @@ export function routeConfigs(): RouteConfig[] {
     responses: { 200: json("How many replies were stopped", sessionStopResponseSchema), ...errors(401) },
   });
 
+  // Express refuses a path it cannot decode, and the body parser a malformed or oversized JSON body,
+  // before any route code runs (AICHAT-186).
+  for (const config of routes) {
+    if (config.request?.params || config.request?.body) Object.assign(config.responses, errors(400));
+    if (config.request?.body?.content["application/json"]) Object.assign(config.responses, errors(413));
+  }
   return routes;
 }
 

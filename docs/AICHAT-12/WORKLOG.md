@@ -327,6 +327,48 @@ cd services/auth-service && pnpm exec vitest run src/integration/response-schema
 "schema or `$ref`"; the checker narrows it with `"schema" in jsonMedia`. With `deletionsPerHour: 0` the deletion
 limiter never fires (0 means "no limit" in `express-rate-limit`), so the 429 test uses a limit of 1 and two requests.
 
+### US4 · Invalid requests rejected with 400 and field errors ([AICHAT-186](https://ipca-grupo11.atlassian.net/browse/AICHAT-186))
+
+**What and why.** Bad input must be refused with the error envelope and never reach the services as a 500. We wrote
+the negative table first (`src/integration/invalid-requests.spec.ts`, 40 rows on conversation-service, 16 on
+auth-service: missing field, wrong type, value not allowed, too long, extra field, malformed JSON, body over 100 kB,
+undecodable path parameter, upload type/size) and ran it before changing any code.
+
+**Findings (red before the fix).** 19 rows failed on conversation-service and 7 on auth-service:
+
+| Request | Before | After |
+|---|---|---|
+| Malformed JSON body | 500 (conversation-service also without `correlationId`) | 400 `INVALID_JSON` |
+| Body over the 100 kB limit | 500 | 413 `PAYLOAD_TOO_LARGE` |
+| Path parameter that cannot be decoded (`%E0%A4%A`) | 500 | 400 `BAD_REQUEST` |
+| Unknown field in a body | accepted, silently dropped | 400, `fieldErrors: { <field>: ["Unknown field"] }` (login: 401, AC-36) |
+
+**Fixes.** Request body schemas are `z.strictObject` (spec: `additionalProperties: false`). Both error handlers map
+the 4xx errors Express and its body parser raise before a route runs, and `toFieldErrors` reports an unknown key under
+its own name (Zod puts it on the parent object). conversation-service sets the correlation id before parsing the body.
+The spec documents 400 on routes with parameters or a body and 413 on JSON-body routes. Two AICHAT-23 tests had pinned
+the malformed-JSON 500 ("pinned: should be 400"); they now assert the 400. All consumer pacts still verify against the
+strict services, so no frontend sends an unknown field.
+
+**How to run.**
+
+```sh
+cd services/conversation-service && pnpm exec vitest run src/integration/invalid-requests.spec.ts --reporter=verbose
+cd services/auth-service && pnpm exec vitest run src/integration/invalid-requests.spec.ts --reporter=verbose
+pnpm exec nx run-many -t pact:verify -p auth-service conversation-service --skip-nx-cache
+```
+
+**How to repeat it manually.** Revert `z.strictObject` to `z.object` in `features/chats/schema.ts`: the "extra field"
+rows fail with status 201.
+
+**Result.**
+
+![conversation-service before the fix: 19 failures](evidence/12-invalid-requests-conversation-red.png)
+
+![auth-service before the fix: 7 failures](evidence/13-invalid-requests-auth-red.png)
+
+![Consumer pacts still verify](evidence/15-pact-verify-strict.png)
+
 ## 4. How to run everything
 
 ```sh

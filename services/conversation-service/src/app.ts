@@ -47,9 +47,10 @@ export function createApp(
 
   app.use(helmet());
   app.use(cors({ origin: env.CORS_ORIGIN.split(",").map((o) => o.trim()), credentials: true }));
+  // First, so that errors raised while the body is parsed also carry the correlation id.
+  app.use(correlationMiddleware(logger));
   app.use(express.json());
   app.use(cookieParser());
-  app.use(correlationMiddleware(logger));
 
   const { metricsMiddleware, metricsHandler, activeStreams } = createMetrics();
   app.use(metricsMiddleware);
