@@ -10,14 +10,7 @@ import {
   chatDtoSchema,
   chatMemberDtoSchema,
   messageDtoSchema,
-  sseDoneEventSchema,
-  sseErrorEventSchema,
-  sseMessageEventSchema,
-  sseQueuedEventSchema,
-  sseReasoningEventSchema,
-  sseStartedEventSchema,
-  sseTokenEventSchema,
-  sseWebFetchEventSchema,
+  sseEventSchema,
   webFetchDtoSchema,
 } from "../shared/contracts/chat.js";
 import { CORRELATION_HEADER, errorResponseSchema, LLM_API_KEY_HEADER } from "../shared/contracts/http.js";
@@ -90,19 +83,7 @@ named("ChatMember", chatMemberDtoSchema);
 named("Message", messageDtoSchema);
 named("Attachment", attachmentDtoSchema);
 named("WebFetch", webFetchDtoSchema);
-const sseEvent = named(
-  "SseEvent",
-  z.discriminatedUnion("type", [
-    sseMessageEventSchema,
-    sseTokenEventSchema,
-    sseReasoningEventSchema,
-    sseWebFetchEventSchema,
-    sseQueuedEventSchema,
-    sseStartedEventSchema,
-    sseDoneEventSchema,
-    sseErrorEventSchema,
-  ]),
-);
+const sseEvent = named("SseEvent", sseEventSchema);
 
 /** Every route with its request schemas and, per status, its response schema. The spec is built from
  * this list and the response validation tests (`response-schemas.spec.ts`) read the same list. */

@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { chat } from "@app/shared-types";
 import { describe, expect, it } from "vitest";
 import type { SSEEvent } from "./types";
@@ -94,5 +96,69 @@ describe("SSE event drift between mfe-chat and shared-types", () => {
         "onlyInSharedTypes": [],
       }
     `);
+  });
+});
+
+/**
+ * AICHAT-188: mfe-chat's `SSEEvent` against what conversation-service really sends. The server
+ * side is read from its generated OpenAPI spec (`SseEvent`, built from the same `sseEventSchema`
+ * its stream test parses every event with), so no service code is imported here. Unlike the
+ * shared-types comparison above, these two must agree exactly: a difference fails the build.
+ */
+type OptionalFieldsOf<K extends EventType> = {
+  [F in FieldsOf<K>]-?: object extends Pick<Extract<SSEEvent, { type: K }>, F> ? F : never;
+}[FieldsOf<K>];
+
+/** Optional fields of every mfe-chat event; the type check keeps the list exact. */
+const mfeChatOptionalFields = {
+  message: [],
+  queued: [],
+  started: [],
+  token: [],
+  reasoning: [],
+  web_fetch: [],
+  done: ["stopped"],
+  error: [],
+} as const satisfies { [K in EventType]: readonly OptionalFieldsOf<K>[] };
+type UnlistedOptional = {
+  [K in EventType]: Exclude<OptionalFieldsOf<K>, (typeof mfeChatOptionalFields)[K][number]>;
+}[EventType];
+const everyOptionalFieldIsListed: [UnlistedOptional] extends [never] ? true : never = true;
+
+interface ServerEventSchema {
+  properties: { type: { enum: string[] } } & Record<string, unknown>;
+  required: string[];
+}
+
+function serverEvents(): Record<string, { fields: string[]; required: string[] }> {
+  const spec = JSON.parse(
+    // Tests run from apps/mfe-chat (the jsdom environment gives no file: URL for this module).
+    readFileSync(resolve(process.cwd(), "../../services/conversation-service/openapi.json"), "utf-8"),
+  ) as { components: { schemas: { SseEvent: { oneOf: ServerEventSchema[] } } } };
+  return Object.fromEntries(
+    spec.components.schemas.SseEvent.oneOf.map((event) => [
+      event.properties.type.enum[0],
+      { fields: Object.keys(event.properties).sort(), required: [...event.required].sort() },
+    ]),
+  );
+}
+
+function mfeChatEvents(): Record<string, { fields: string[]; required: string[] }> {
+  return Object.fromEntries(
+    (Object.keys(mfeChatFields) as EventType[]).map((type) => {
+      const optional: readonly string[] = mfeChatOptionalFields[type];
+      const fields = [...mfeChatFields[type]].sort();
+      return [type, { fields, required: fields.filter((field) => !optional.includes(field)) }];
+    }),
+  );
+}
+
+describe("SSE events: mfe-chat against conversation-service (AICHAT-188)", () => {
+  it("lists every optional field of the mfe-chat events", () => {
+    expect(everyOptionalFieldIsListed).toBe(true);
+  });
+
+  it("handles exactly the events the server sends, with the same fields and the same required fields", () => {
+    expect(mfeChatEvents()).toEqual(serverEvents());
   });
 });

@@ -1,0 +1,27 @@
+$ (cd services/conversation-service && pnpm exec vitest run src/integration/sse-events.spec.ts --reporter=verbose) && (cd apps/mfe-chat && pnpm exec vitest run src/shared/sse-drift.test.ts --reporter=verbose)
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/integration/sse-events.spec.ts > stream events on the wire (AICHAT-188) > every event type the app writes parses with sseEventSchema, unchanged 24ms
+ ✓ src/integration/sse-events.spec.ts > stream events on the wire (AICHAT-188) > the schema refuses events the client could not handle 0ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  20:44:13
+   Duration  250ms (import 44%, transform 38%, tests 13%, worker 5%)
+
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/apps/mfe-chat
+
+ ✓ src/shared/sse-drift.test.ts > SSE event drift between mfe-chat and shared-types > lists every field of the mfe-chat events 0ms
+ ✓ src/shared/sse-drift.test.ts > SSE event drift between mfe-chat and shared-types > pins today's drift: event names and fields that differ 2ms
+ ✓ src/shared/sse-drift.test.ts > SSE events: mfe-chat against conversation-service (AICHAT-188) > lists every optional field of the mfe-chat events 0ms
+ ✓ src/shared/sse-drift.test.ts > SSE events: mfe-chat against conversation-service (AICHAT-188) > handles exactly the events the server sends, with the same fields and the same required fields 1ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  20:44:14
+   Duration  388ms (environment 59%, setup 19%, transform 14%, import 6%, tests 1%, worker 1%)
+
+
+[exit 0]

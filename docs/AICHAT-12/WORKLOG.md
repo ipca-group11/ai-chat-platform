@@ -369,6 +369,64 @@ rows fail with status 201.
 
 ![Consumer pacts still verify](evidence/15-pact-verify-strict.png)
 
+### US6 · SSE events validated against the shared event schema ([AICHAT-188](https://ipca-grupo11.atlassian.net/browse/AICHAT-188))
+
+**What and why.** The stream (`GET /chats/:chatId/stream`) is not JSON request/response, so US3 only checked its status
+and content type. The events have three definitions: the one conversation-service sends, mfe-chat's `SSEEvent`, and
+shared-types. AICHAT-20 already pins the drift between mfe-chat and shared-types (`apps/mfe-chat/src/shared/sse-drift.test.ts`,
+`docs/AICHAT-20/SSE-DRIFT.md`); nothing compared the client with what the **server really sends**. We extended that
+work instead of writing a second guard.
+
+1. **One runtime schema for the stream.** `sseEventSchema` (`shared/contracts/chat.ts`) is a discriminated union of the
+   eight events on `type`. A compile-time check (`sseEventTypeMatchesSchema`) keeps the existing `SseEvent` type and the
+   schema identical, and the OpenAPI spec now publishes this same schema as `SseEvent`.
+2. **Server: every event, from the real code, on the wire.** `integration/sse-events.spec.ts` runs the real app, queue
+   and processor; only the LLM is scripted. Reply 1 streams reasoning, a web fetch (`fetching` then `done`) and text and
+   waits, so message 2 is `queued`; reply 2 fails (`error` with `retryable`); reply 3 is stopped (`done` with
+   `stopped: true`). Every published event goes through `writeSseEvent`, the function the stream route uses, and each
+   frame is parsed back: it must be `event: <type>\ndata: <JSON>\n\n`, the event line must equal the JSON's `type`, the
+   JSON must parse with `sseEventSchema` without an unknown field, and all eight types must appear.
+3. **Client: mfe-chat against the server.** `sse-drift.test.ts` gains a block that reads `SseEvent` from the committed
+   `services/conversation-service/openapi.json` (no service code is imported into the frontend) and compares, per
+   event, the field names and the required fields with mfe-chat's `SSEEvent`. The field lists are checked against the
+   TypeScript type at compile time (the AICHAT-20 technique, extended to optional fields). This comparison must be exact.
+   `apps/mfe-chat/project.json` declares the spec as a test input and conversation-service as an implicit dependency, so
+   Nx re-runs the test (cache and `affected`) when the server's events change.
+
+**Files.**
+- `services/conversation-service/src/shared/contracts/chat.ts`: `sseEventSchema` and the type check.
+- `services/conversation-service/src/openapi/document.ts`: uses `sseEventSchema` (the spec is unchanged).
+- `services/conversation-service/src/integration/sse-events.spec.ts` (new).
+- `apps/mfe-chat/src/shared/sse-drift.test.ts`, `apps/mfe-chat/project.json`.
+- `docs/AICHAT-20/SSE-DRIFT.md`: a section pointing to this extension.
+
+**How to run.**
+
+```sh
+cd services/conversation-service && pnpm exec vitest run src/integration/sse-events.spec.ts --reporter=verbose
+cd apps/mfe-chat && pnpm exec vitest run src/shared/sse-drift.test.ts --reporter=verbose
+```
+
+**How to repeat it manually.**
+
+1. Server: in `features/messages/processor.ts`, add `...{ elapsedMs: 42 }` to the object of the `done` event. The stream
+   test fails with `done has a field the schema does not describe`.
+2. Client: in `shared/contracts/chat.ts`, add `elapsedMs: z.number().optional(),` to `sseDoneEventSchema` and run
+   `pnpm openapi:generate`. The server tests still pass (the field is optional), but the mfe-chat test fails: the
+   server can now send a field the client does not know. Restore both files and regenerate.
+
+**Result.** Both checks pass today: the server sends exactly what mfe-chat handles. The shared-types drift stays pinned
+by AICHAT-20 (it is the odd one out; its fix is the ticket proposed in `SSE-DRIFT.md`).
+
+![Server: an undeclared field on the done event](evidence/16-sse-extra-field-red.png)
+
+![Client: the server's done event gained a field mfe-chat does not know](evidence/17-sse-client-drift-red.png)
+
+![Both checks pass](evidence/18-sse-green.png)
+
+**Problems and fixes.** In mfe-chat's jsdom environment `import.meta.url` is not a `file:` URL, so the test reads the
+spec relative to the working directory (`apps/mfe-chat`, where the Nx target runs it).
+
 ## 4. How to run everything
 
 ```sh

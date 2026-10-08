@@ -1,0 +1,40 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/sse-events.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/sse-events.spec.ts (2 tests | 1 failed) 24ms
+   ❯ stream events on the wire (AICHAT-188) (2)
+     × every event type the app writes parses with sseEventSchema, unchanged 24ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  20:42:31
+   Duration  241ms (import 44%, transform 38%, tests 13%, worker 5%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/sse-events.spec.ts > stream events on the wire (AICHAT-188) > every event type the app writes parses with sseEventSchema, unchanged
+AssertionError: done has a field the schema does not describe: expected { type: 'done', …(1) } to deeply equal { type: 'done', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "elapsedMs": 42,
+    "messageId": "63ff1b07-c618-4aea-bf05-07984936dea6",
+    "type": "done",
+  }
+
+ ❯ src/integration/sse-events.spec.ts:97:80
+     95|       const result = sseEventSchema.safeParse(data);
+     96|       expect(result.success, `${event} does not match sseEventSchema: …
+     97|       expect(result.data, `${event} has a field the schema does not de…
+       |                                                                                ^
+     98|     }
+     99|     expect(new Set(parsed.map(({ event }) => event))).toEqual(new Set(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+[exit 1]

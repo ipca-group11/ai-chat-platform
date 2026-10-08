@@ -88,6 +88,15 @@ Run it with:
 pnpm --dir apps/mfe-chat exec vitest run src/shared/sse-drift.test.ts
 ```
 
+### Extended by AICHAT-12 (AICHAT-188)
+
+The same test file now also compares mfe-chat's `SSEEvent` with what conversation-service **sends**: the event names,
+their fields and which fields are required, read from the generated `services/conversation-service/openapi.json`
+(`SseEvent`). That comparison must be exact, so a server change that mfe-chat does not handle fails the build. On the
+server, `src/integration/sse-events.spec.ts` produces all eight events with the real processor and parses each frame
+`writeSseEvent` writes with `sseEventSchema`. The shared-types comparison above is unchanged. See
+`docs/AICHAT-12/WORKLOG.md`, US6.
+
 ## Proposed ticket for the chat owner
 
 **Title.** Align mfe-chat stream event types with `@platform/shared-types`.

@@ -157,3 +157,20 @@ export type SseEvent =
   | SseStartedEvent
   | SseDoneEvent
   | SseErrorEvent;
+
+/** Every event of the stream, chosen by `type` (AICHAT-188). The stream tests parse each event
+ * written to the wire with it, and the OpenAPI spec publishes it as `SseEvent`. */
+export const sseEventSchema = z.discriminatedUnion("type", [
+  sseMessageEventSchema,
+  sseTokenEventSchema,
+  sseReasoningEventSchema,
+  sseWebFetchEventSchema,
+  sseQueuedEventSchema,
+  sseStartedEventSchema,
+  sseDoneEventSchema,
+  sseErrorEventSchema,
+]);
+
+// Compile-time check: the `SseEvent` type and the schema describe the same events.
+type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never;
+export const sseEventTypeMatchesSchema: Same<SseEvent, z.infer<typeof sseEventSchema>> = true;

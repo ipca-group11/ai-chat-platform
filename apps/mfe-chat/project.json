@@ -4,6 +4,7 @@
   "sourceRoot": "apps/mfe-chat/src",
   "projectType": "application",
   "tags": ["scope:chat", "type:app"],
+  "implicitDependencies": ["conversation-service"],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",
@@ -18,7 +19,8 @@
       "options": {
         "command": "cross-env NODE_ENV=test vitest run --coverage",
         "cwd": "apps/mfe-chat"
-      }
+      },
+      "inputs": ["default", "{workspaceRoot}/vitest.workspace.ts", "{workspaceRoot}/services/conversation-service/openapi.json"]
     },
     "pact:consumer": {
       "executor": "nx:run-commands",
