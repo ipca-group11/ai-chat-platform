@@ -1,0 +1,32 @@
+[
+  {
+    "name": "mfe-auth remoteEntry.js",
+    "passed": true,
+    "size": 6224,
+    "sizeLimit": 7000
+  },
+  {
+    "name": "mfe-auth route chunks",
+    "passed": true,
+    "size": 24745,
+    "sizeLimit": 28000
+  },
+  {
+    "name": "mfe-auth federation glue",
+    "passed": true,
+    "size": 116944,
+    "sizeLimit": 129000
+  },
+  {
+    "name": "mfe-auth shared-library copies",
+    "passed": true,
+    "size": 123697,
+    "sizeLimit": 137000
+  },
+  {
+    "name": "mfe-auth all emitted JS",
+    "passed": true,
+    "size": 271610,
+    "sizeLimit": 299000
+  }
+]

@@ -1,0 +1,137 @@
+[
+  {
+    "url": "http://localhost:8000/login",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-login-2026_10_08_18_35_23.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-login-2026_10_08_18_35_23.report.json",
+    "summary": {
+      "performance": 0.93
+    }
+  },
+  {
+    "url": "http://localhost:8000/login",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-login-2026_10_08_18_35_36.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-login-2026_10_08_18_35_36.report.json",
+    "summary": {
+      "performance": 0.95
+    }
+  },
+  {
+    "url": "http://localhost:8000/register",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-register-2026_10_08_18_36_02.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-register-2026_10_08_18_36_02.report.json",
+    "summary": {
+      "performance": 0.94
+    }
+  },
+  {
+    "url": "http://localhost:8000/register",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-register-2026_10_08_18_36_15.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-register-2026_10_08_18_36_15.report.json",
+    "summary": {
+      "performance": 0.96
+    }
+  },
+  {
+    "url": "http://localhost:8000/chats",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats-2026_10_08_18_36_44.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats-2026_10_08_18_36_44.report.json",
+    "summary": {
+      "performance": 0.95
+    }
+  },
+  {
+    "url": "http://localhost:8000/chats",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats-2026_10_08_18_37_00.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats-2026_10_08_18_37_00.report.json",
+    "summary": {
+      "performance": 0.89
+    }
+  },
+  {
+    "url": "http://localhost:8000/chats/cmuzvlq530000ld01ylvucw7s",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats_cmuzvlq530000ld01ylvucw7s-2026_10_08_18_37_14.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats_cmuzvlq530000ld01ylvucw7s-2026_10_08_18_37_14.report.json",
+    "summary": {
+      "performance": 0.83
+    }
+  },
+  {
+    "url": "http://localhost:8000/chats/cmuzvlq530000ld01ylvucw7s",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats_cmuzvlq530000ld01ylvucw7s-2026_10_08_18_37_50.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats_cmuzvlq530000ld01ylvucw7s-2026_10_08_18_37_50.report.json",
+    "summary": {
+      "performance": 0.95
+    }
+  },
+  {
+    "url": "http://localhost:8000/settings",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-settings-2026_10_08_18_38_04.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-settings-2026_10_08_18_38_04.report.json",
+    "summary": {
+      "performance": 0.93
+    }
+  },
+  {
+    "url": "http://localhost:8000/settings",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-settings-2026_10_08_18_38_33.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-settings-2026_10_08_18_38_33.report.json",
+    "summary": {
+      "performance": 0.94
+    }
+  },
+  {
+    "url": "http://localhost:8000/login",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-login-2026_10_08_18_35_07.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-login-2026_10_08_18_35_07.report.json",
+    "summary": {
+      "performance": 0.94
+    }
+  },
+  {
+    "url": "http://localhost:8000/register",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-register-2026_10_08_18_35_49.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-register-2026_10_08_18_35_49.report.json",
+    "summary": {
+      "performance": 0.95
+    }
+  },
+  {
+    "url": "http://localhost:8000/chats",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats-2026_10_08_18_36_29.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats-2026_10_08_18_36_29.report.json",
+    "summary": {
+      "performance": 0.94
+    }
+  },
+  {
+    "url": "http://localhost:8000/chats/cmuzvlq530000ld01ylvucw7s",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats_cmuzvlq530000ld01ylvucw7s-2026_10_08_18_37_34.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-chats_cmuzvlq530000ld01ylvucw7s-2026_10_08_18_37_34.report.json",
+    "summary": {
+      "performance": 0.91
+    }
+  },
+  {
+    "url": "http://localhost:8000/settings",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-settings-2026_10_08_18_38_19.report.html",
+    "jsonPath": "/Users/truezone/Projects/ai-chat-platform/lighthouse-results/lhci/localhost-settings-2026_10_08_18_38_19.report.json",
+    "summary": {
+      "performance": 0.94
+    }
+  }
+]

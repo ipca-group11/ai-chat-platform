@@ -1,0 +1,42 @@
+# Weekly full test run to catch drift that `nx affected` misses on PRs.
+# Threshold: `nx run-many -t test` exits 0 (0 failing tests, 0 coverage threshold breaches,
+# since vitest coverage thresholds are enforced inside each project's own test target).
+# Any non-zero exit fails this job.
+name: weekly
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch: {}
+
+concurrency:
+  group: weekly-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  full-test:
+    name: weekly / nx run-many -t test
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Script tests
+        run: pnpm test:scripts
+
+      # No Nx cache and no affected filter: every project's tests run from scratch.
+      - name: Full test run (fails on any test failure or coverage threshold breach)
+        run: pnpm nx run-many -t test --skip-nx-cache

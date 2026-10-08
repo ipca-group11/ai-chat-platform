@@ -88,7 +88,19 @@ export class AnthropicProvider implements LlmProvider {
       const response = await this.post({ ...request, messages }, context.apiKey, options.signal);
       const turn = yield* streamTurn(response);
       replyBlocks.push(...turn.blocks);
-      if (turn.stopReason !== "pause_turn" || continuation >= MAX_PAUSE_CONTINUATIONS) return;
+      if (turn.stopReason !== "pause_turn" || continuation >= MAX_PAUSE_CONTINUATIONS) {
+        // A stream that ends without any answer text would be saved as an empty "sent" reply.
+        const blocks = replyBlocks.filter(Boolean);
+        if (turn.stopReason && !blocks.some((b) => (b.type === "text" && b.text) || b.type === "server_tool_use")) {
+          const seen = blocks.map((b) => b.type).join(", ") || "none";
+          throw new ProviderError(
+            "anthropic",
+            `Anthropic returned no answer text (stop_reason: ${turn.stopReason}, content: ${seen})`,
+            { retryable: true },
+          );
+        }
+        return;
+      }
     }
   }
 

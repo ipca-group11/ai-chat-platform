@@ -1,4 +1,4 @@
-import { parseEnv } from "../../shared/env.js";
+import { parseProviderEnv } from "../../shared/env.js";
 import type { Provider } from "../../shared/contracts/chat.js";
 import { AnthropicProvider } from "./anthropic.provider.js";
 import { OllamaProvider } from "./ollama.provider.js";
@@ -17,7 +17,7 @@ export interface ProviderRegistry {
 export function createProviderRegistry(source: NodeJS.ProcessEnv = process.env): ProviderRegistry {
   // `ANTHROPIC_BASE_URL` / `OPENAI_BASE_URL` override the real API hosts (AICHAT-43);
   // `OLLAMA_BASE_URL` points at a local Ollama server.
-  const env = parseEnv(source);
+  const env = parseProviderEnv(source);
   const providers: Record<Provider, LlmProvider> = {
     ollama: new OllamaProvider({ baseUrl: env.OLLAMA_BASE_URL }),
     openai: new OpenAiProvider({ baseUrl: env.OPENAI_BASE_URL }),

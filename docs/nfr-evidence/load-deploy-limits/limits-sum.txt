@@ -1,0 +1,13 @@
+mfe-chat: mem=64m cpus=0.05
+loki: mem=512m cpus=0.2
+postgres: mem=512m cpus=0.4
+alloy: mem=256m cpus=0.15
+shell: mem=256m cpus=0.15
+mfe-auth: mem=64m cpus=0.05
+mfe-settings: mem=64m cpus=0.05
+grafana: mem=384m cpus=0.2
+prometheus: mem=512m cpus=0.2
+auth-service: mem=256m cpus=0.2
+caddy: mem=64m cpus=0.1
+conversation-service: mem=384m cpus=0.2
+services=12 missing=0 sum_mem=3328MB sum_cpus=1.95

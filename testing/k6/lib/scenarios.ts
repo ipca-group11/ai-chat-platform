@@ -1,3 +1,4 @@
+import { mixedScenarios, mixedThresholds, MIXED_DURATION, MIXED_STREAMS_PER_SECOND, MIXED_USERS } from "../scenarios/mixed.ts";
 /**
  * Scenario definitions of the load test (AICHAT-24). Pure TypeScript with no k6 imports, so
  * Vitest can check them; `load.ts` hands the result to k6 as `options`.
@@ -7,8 +8,8 @@
  * the first level whose threshold fails is the saturation point.
  */
 
-export type ScenarioName = "seed" | "smoke" | "users_ramp" | "streams_ramp" | "soak";
-export const SCENARIO_NAMES: readonly ScenarioName[] = ["seed", "smoke", "users_ramp", "streams_ramp", "soak"];
+export type ScenarioName = "seed" | "smoke" | "users_ramp" | "streams_ramp" | "soak" | "mixed";
+export const SCENARIO_NAMES: readonly ScenarioName[] = ["seed", "smoke", "users_ramp", "streams_ramp", "soak", "mixed"];
 
 export type Env = Record<string, string | undefined>;
 
@@ -23,6 +24,10 @@ export interface Settings {
   /** Arrival rate of the soak run, new streams per second. */
   soakRate: number;
   soakDuration: string;
+  /** Mixed scenario: browsing users, new streams per second and length, all at once. */
+  mixedUsers: number;
+  mixedStreams: number;
+  mixedDuration: string;
   /** Upper bound on the virtual users of the arrival-rate scenarios. */
   maxVus: number;
   /** Accounts the seed scenario registers (one per virtual user of the later runs). */
@@ -30,6 +35,12 @@ export interface Settings {
   /** Per-level thresholds, in ms. */
   restP95Ms: number;
   ttftP95Ms: number;
+  /** SPEC s6: first token within this many ms of the provider emitting it (p95). */
+  specTtftMs: number;
+  /** Latency the LLM mock adds before its first token (compose.mock.yaml MOCK_TTFT_MS), subtracted from the measure. */
+  mockTtftMs: number;
+  /** Concurrent streams of the smoke run. */
+  smokeStreams: number;
 }
 
 const numbers = (text: string | undefined, fallback: number[]): number[] => {
@@ -59,10 +70,16 @@ export function readSettings(env: Env): Settings {
     rampSeconds: number(env["RAMP_SECONDS"], 10),
     soakRate: number(env["SOAK_RATE"], 20),
     soakDuration: env["SOAK_DURATION"] || "30m",
+    mixedUsers: number(env["MIXED_USERS"], MIXED_USERS),
+    mixedStreams: number(env["MIXED_STREAMS"], MIXED_STREAMS_PER_SECOND),
+    mixedDuration: env["MIXED_DURATION"] || MIXED_DURATION,
     maxVus: number(env["MAX_VUS"], 600),
     seedUsers: number(env["SEED_USERS"], 40),
     restP95Ms: number(env["REST_P95_MS"], 1000),
     ttftP95Ms: number(env["TTFT_P95_MS"], 1500),
+    specTtftMs: number(env["SPEC_TTFT_MS"], 1000),
+    mockTtftMs: number(env["MOCK_TTFT_MS"], 200),
+    smokeStreams: Math.round(number(env["SMOKE_STREAMS"], 5)),
   };
 }
 
@@ -103,7 +120,13 @@ export function buildScenarios(settings: Settings): Record<string, object> {
       };
     case "smoke":
       return {
-        smoke: { executor: "per-vu-iterations", vus: 1, iterations: 1, maxDuration: "1m", exec: "smoke" },
+        smoke: {
+          executor: "per-vu-iterations",
+          vus: settings.smokeStreams,
+          iterations: 1,
+          maxDuration: "1m",
+          exec: "smoke",
+        },
       };
     case "users_ramp":
       return {
@@ -128,6 +151,8 @@ export function buildScenarios(settings: Settings): Record<string, object> {
           exec: "stream",
         },
       };
+    case "mixed":
+      return mixedScenarios(settings);
     case "soak":
       return {
         soak: {
@@ -152,7 +177,11 @@ type Thresholds = Record<string, string[]>;
  */
 export function buildThresholds(settings: Settings): Thresholds {
   const rest = `p(95)<${settings.restP95Ms}`;
-  const ttft = `p(95)<${settings.ttftP95Ms}`;
+  // Smoke checks SPEC s6: p95 TTFT under specTtftMs with the mock's own latency subtracted. Every
+  // sample contains the same mockTtftMs, so the p95 limit is shifted by it.
+  const ttft =
+    settings.scenario === "smoke" ? `p(95)<${settings.specTtftMs + settings.mockTtftMs}` : `p(95)<${settings.ttftP95Ms}`;
+  if (settings.scenario === "mixed") return mixedThresholds(settings);
   const thresholds: Thresholds = {
     "http_req_duration{kind:rest}": [rest],
     "http_req_failed{kind:rest}": ["rate<0.01"],

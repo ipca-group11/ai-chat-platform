@@ -1,0 +1,32 @@
+[
+  {
+    "name": "shell remoteEntry.js",
+    "passed": true,
+    "size": 6147,
+    "sizeLimit": 7000
+  },
+  {
+    "name": "shell own chunks",
+    "passed": true,
+    "size": 51541,
+    "sizeLimit": 57000
+  },
+  {
+    "name": "shell federation glue",
+    "passed": true,
+    "size": 117602,
+    "sizeLimit": 130000
+  },
+  {
+    "name": "shell shared-library copies",
+    "passed": true,
+    "size": 121355,
+    "sizeLimit": 134000
+  },
+  {
+    "name": "shell all emitted JS",
+    "passed": true,
+    "size": 296645,
+    "sizeLimit": 327000
+  }
+]

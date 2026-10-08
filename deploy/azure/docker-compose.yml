@@ -27,6 +27,8 @@ services:
   postgres:
     <<: *app
     image: postgres:16-alpine
+    mem_limit: 512m
+    cpus: 0.4
     environment:
       POSTGRES_USER: llmchat
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
@@ -42,6 +44,8 @@ services:
   auth-service:
     <<: *app
     image: ${IMAGE_PREFIX:?}/auth-service:${IMAGE_TAG:-latest}
+    mem_limit: 256m
+    cpus: 0.2
     depends_on:
       postgres:
         condition: service_healthy
@@ -63,6 +67,8 @@ services:
   conversation-service:
     <<: *app
     image: ${IMAGE_PREFIX}/conversation-service:${IMAGE_TAG:-latest}
+    mem_limit: 384m
+    cpus: 0.2
     depends_on:
       postgres:
         condition: service_healthy
@@ -84,6 +90,8 @@ services:
   mfe-auth:
     <<: *app
     image: ${IMAGE_PREFIX}/mfe-auth:${IMAGE_TAG:-latest}
+    mem_limit: 64m
+    cpus: 0.05
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/ || exit 1"]
       interval: 10s
@@ -93,6 +101,8 @@ services:
   mfe-chat:
     <<: *app
     image: ${IMAGE_PREFIX}/mfe-chat:${IMAGE_TAG:-latest}
+    mem_limit: 64m
+    cpus: 0.05
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3002/ || exit 1"]
       interval: 10s
@@ -102,6 +112,8 @@ services:
   mfe-settings:
     <<: *app
     image: ${IMAGE_PREFIX}/mfe-settings:${IMAGE_TAG:-latest}
+    mem_limit: 64m
+    cpus: 0.05
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3003/ || exit 1"]
       interval: 10s
@@ -111,6 +123,8 @@ services:
   shell:
     <<: *app
     image: ${IMAGE_PREFIX}/shell:${IMAGE_TAG:-latest}
+    mem_limit: 256m
+    cpus: 0.15
     depends_on:
       auth-service:
         condition: service_healthy
@@ -129,6 +143,8 @@ services:
   caddy:
     <<: *app
     image: caddy:2-alpine
+    mem_limit: 64m
+    cpus: 0.1
     environment:
       DOMAIN: ${DOMAIN}
     ports:
@@ -145,6 +161,8 @@ services:
   prometheus:
     <<: *app
     image: ${IMAGE_PREFIX}/prometheus:${IMAGE_TAG:-latest}
+    mem_limit: 512m
+    cpus: 0.2
     ports:
       - "127.0.0.1:9090:9090"
     depends_on: [auth-service, conversation-service]
@@ -152,6 +170,8 @@ services:
   grafana:
     <<: *app
     image: ${IMAGE_PREFIX}/grafana:${IMAGE_TAG:-latest}
+    mem_limit: 384m
+    cpus: 0.2
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?}
@@ -172,10 +192,14 @@ services:
   loki:
     <<: *app
     image: ${IMAGE_PREFIX}/loki:${IMAGE_TAG:-latest}
+    mem_limit: 512m
+    cpus: 0.2
     volumes:
       - loki-data:/loki
 
   alloy:
     <<: *app
     image: ${IMAGE_PREFIX}/alloy:${IMAGE_TAG:-latest}
+    mem_limit: 256m
+    cpus: 0.15
     depends_on: [loki]

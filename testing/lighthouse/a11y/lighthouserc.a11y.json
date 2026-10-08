@@ -1,0 +1,31 @@
+{
+  "ci": {
+    "collect": {
+      "url": [
+        "http://localhost:8000/login",
+        "http://localhost:8000/register",
+        "http://localhost:8000/chats",
+        "http://localhost:8000/chats/{CHAT_ID}",
+        "http://localhost:8000/settings"
+      ],
+      "numberOfRuns": 1,
+      "settings": {
+        "preset": "desktop",
+        "onlyCategories": ["accessibility"],
+        "chromeFlags": "--headless=new --no-sandbox"
+      }
+    },
+    "assert": {
+      "assertMatrix": [
+        {
+          "matchingUrlPattern": "^http://[^/]+/(login|register|chats|chats/[^/]+|settings)$",
+          "aggregationMethod": "median",
+          "assertions": {
+            "categories:accessibility": ["error", { "minScore": 0.95 }]
+          }
+        }
+      ]
+    },
+    "upload": { "target": "filesystem", "outputDir": "lighthouse-results-a11y/lhci" }
+  }
+}
