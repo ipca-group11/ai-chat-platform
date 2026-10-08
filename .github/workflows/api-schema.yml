@@ -1,0 +1,87 @@
+# API schema fuzzing with Schemathesis (AICHAT-187). Starts the compose stack with the LLM mock (same steps as
+# dast.yml) and runs the pinned schemathesis/schemathesis image against auth-service and conversation-service with
+# their generated OpenAPI specs (services/*/openapi.json, AICHAT-184), through testing/schemathesis/run.sh.
+#
+# Checks: not_a_server_error, status_code_conformance, response_schema_conformance. Any failure fails the job.
+# The JUnit reports are kept as an artifact. The stack is a throw-away one; production is never targeted.
+#
+# Required check: the job is named "api-schema / schemathesis". Branch protection is not available on this private
+# free-plan repository (HTTP 403), so the team rule is: do not merge while "api-schema / schemathesis" is red.
+name: api-schema
+
+on:
+  pull_request:
+  push:
+    branches: [integration/testing-epics, main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: api-schema-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Pinned: a newer Schemathesis generates other inputs and may report new findings, so bump it on purpose.
+  ST_IMAGE: schemathesis/schemathesis:4.28.0
+  # Schemathesis sends about 1 200 requests; the default limit (300 per 15 minutes) would answer 429 halfway.
+  AUTH_RATE_LIMIT_MAX: "100000"
+  # The LLM mock accepts any key; this value is a placeholder, not a secret.
+  ANTHROPIC_API_KEY: mock-key-not-a-secret
+
+jobs:
+  schemathesis:
+    name: schemathesis
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ST_RESULTS: schemathesis-results
+    steps:
+      # Building every app image fills the runner's ~14 GB free disk; drop preinstalled SDKs this job never uses.
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost && df -h /
+
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      # The session helper (scripts/schemathesis/session.ts) runs on Node's built-in TypeScript support.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Start docker compose stack (profile llm)
+        run: pnpm mock:up
+
+      # Bounded poll of the three entry points; fails after about five minutes instead of hanging.
+      - name: Wait for the stack to become healthy
+        run: |
+          for url in http://localhost:8000/ http://localhost:4001/health http://localhost:4002/health; do
+            ok=0
+            for _ in $(seq 1 60); do
+              if curl -fsS -o /dev/null "$url"; then ok=1; break; fi
+              sleep 5
+            done
+            [ "$ok" = "1" ] || { echo "not healthy: $url"; exit 1; }
+          done
+
+      - name: Pull the Schemathesis image
+        run: docker pull "$ST_IMAGE"
+
+      # Signs in the seeded user, fuzzes both services and exits 1 on any failed check.
+      - name: Schemathesis against both services
+        run: bash testing/schemathesis/run.sh
+
+      - name: Upload JUnit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: schemathesis-junit
+          path: schemathesis-results/*.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Tear down docker compose stack
+        if: always()
+        run: pnpm mock:down

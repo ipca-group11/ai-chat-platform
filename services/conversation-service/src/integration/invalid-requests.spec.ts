@@ -133,6 +133,22 @@ describe("attachment upload: type and size are checked before anything is stored
     expect([res.status, res.body.error.code]).toEqual([400, "ATTACHMENT_UPLOAD_ERROR"]);
   });
 
+  // Found by Schemathesis (AICHAT-187): a multipart part without headers made the parser throw a plain
+  // Error ("Malformed part header"), which became a 500.
+  it("400 ATTACHMENT_UPLOAD_ERROR for a multipart body that cannot be parsed", async () => {
+    const t = buildTestApp();
+    const chatId = await createChatVia(t.app, "owner");
+    const message = await t.messagesRepo.create({ chatId, ownerId: "owner", authorEmail: "owner@example.com", role: "user", content: "hi", status: "sent" });
+    const boundary = "7c5156fb04a2177cf9e322ad31ebde44";
+    const res = await request(t.app)
+      .post(`/chats/${chatId}/messages/${message.id}/attachments`)
+      .set("Cookie", owner)
+      .set("Content-Type", `multipart/form-data; boundary=${boundary}`)
+      .send(`--${boundary}\r\nNone--${boundary}--\r\n`);
+    expect([res.status, res.body.error.code]).toEqual([400, "ATTACHMENT_UPLOAD_ERROR"]);
+    expectDocumentedResponse("POST /chats/:chatId/messages/:messageId/attachments", res);
+  });
+
   it("400 ATTACHMENT_REQUIRED without a file", async () => {
     const res = await upload({});
     expect([res.status, res.body.error.code]).toEqual([400, "ATTACHMENT_REQUIRED"]);

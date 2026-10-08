@@ -1,0 +1,47 @@
+$ cat docs/AICHAT-12/evidence/schemathesis-first-run-failure.txt
+=================================== FAILURES ===================================
+____________ POST /chats/{chatId}/messages/{messageId}/attachments _____________
+1. Test Case ID: DE2r6d
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 201, 400, 401, 404, 422
+
+[500] Internal Server Error:
+
+    `{"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred"},"correlationId":"3dc07429-ecec-4003-ab71-6183e55732cf"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H '7w53mY: \7F"iYstv(o2B>Q' -H '+p;' -H '&G1Y8.YpxCy: buE>?WICK-' -H 'Authorization: [Filtered]' -H 'Content-Type: multipart/form-data; boundary=7c5156fb04a2177cf9e322ad31ebde44' -d $'--7c5156fb04a2177cf9e322ad31ebde44\r\nNone--7c5156fb04a2177cf9e322ad31ebde44--\r\n' http://host.docker.internal:4002/chats/cmuzyhusb0008o5019uv14hn9/messages/cmuzyhvt2003fo5018v3tn681/attachments
+    
+    ⚠️  Request body contains non-printable characters. Actual value: b'--7c5156fb04a2177cf9e322ad31ebde44\r\nNone--7c5156fb04a2177cf9e322ad31ebde44--\r\n'
+    
+    st replay DE2r6d
+  ❌ Stateful
+
+Failures:
+  ❌ Server error: 1
+  ❌ Undocumented HTTP status code: 1
+
+Warnings:
+  ⚠️ Missing authentication: 1 operation returned only 401/403 responses
+  ⚠️ Missing valid test data: 3 operations repeatedly returned 404 responses
+  ⚠️ Schema validation mismatch: 3 operations mostly rejected generated data
+
+Schema Coverage report: ./schema-coverage.html
+
+Test cases:
+  984 generated, 1 found 2 unique failures
+
+Reports:
+  - JUNIT: /results/conversation-service.xml
+
+Seed: 1
+
+======================= 2 failures, 3 warnings in 6.94s ========================
+
+[exit 0]
