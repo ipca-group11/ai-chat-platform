@@ -23,3 +23,6 @@ export {
 
 export { newConsumerPact, pactDir, removePacts, routeFetchTo, runWithMockServer } from "./consumer.js";
 export type { RouteFetchOptions } from "./consumer.js";
+
+export { pactFilesFor, splitKnownFailures } from "./provider.js";
+export type { KnownFailure, SplitPacts } from "./provider.js";

@@ -1,0 +1,59 @@
+$ cd services/auth-service && pnpm exec vitest run -c vitest.verify.config.ts 2>&1 | grep -E '^Verifying|^  [a-z]|Given|has status code|Tests ' | sed -E 's/ \([0-9]+s loading.*\)//'
+Verifying a pact between mfe-auth and auth-service
+  a login with a wrong password
+     Given a user exists
+      has status code 401 (OK)
+  a login with valid credentials
+     Given a user exists
+      has status code 200 (OK)
+  a logout request
+     Given a user is logged in
+      has status code 204 (OK)
+  a refresh request
+     Given a user has a valid refresh token
+      has status code 204 (OK)
+  a refresh request without a valid refresh token
+     Given no user is logged in
+      has status code 401 (OK)
+  a registration with a new email
+     Given no user exists with the email
+      has status code 201 (OK)
+  a registration with a password that is too short
+     Given no user exists with the email
+      has status code 400 (OK)
+  a registration with an email that is already taken
+     Given a user exists
+      has status code 409 (OK)
+  a request for the current user
+     Given a user is logged in
+      has status code 200 (OK)
+  a request for the current user without a session
+     Given no user is logged in
+      has status code 401 (OK)
+Verifying a pact between mfe-chat and auth-service
+  a request for the current user from the chat
+     Given a user is logged in
+      has status code 200 (OK)
+  a request for the current user from the chat without a session
+     Given no user is logged in
+      has status code 401 (OK)
+Verifying a pact between mfe-settings and auth-service
+  a request for the current user from settings
+     Given a user is logged in
+      has status code 200 (OK)
+  a request for the current user from settings without a session
+     Given no user is logged in
+      has status code 401 (OK)
+Verifying a pact between shell and auth-service
+  a logout from the shell
+     Given a user is logged in
+      has status code 204 (OK)
+  a session check from the shell
+     Given a user is logged in
+      has status code 200 (OK)
+  a session check from the shell without a session
+     Given no user is logged in
+      has status code 401 (OK)
+      Tests  1 passed (1)
+
+[exit 0]
