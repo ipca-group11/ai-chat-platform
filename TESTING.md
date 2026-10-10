@@ -35,6 +35,23 @@ Details: `docs/AICHAT-12/WORKLOG.md`.
 
 ---
 
+# SSE reconnection (AICHAT-9)
+
+```sh
+# client recovery (refetch on reconnect, Reconnecting…) and server disconnect/heartbeat (no Docker)
+pnpm exec nx run-many -t test -p mfe-chat test-utils conversation-service
+# browser: network drop mid-stream, drop over the end of the reply, server-side outage, long drop (Docker)
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium \
+  src/tests/sse-reconnection.spec.ts src/tests/support/drop-proxy.spec.ts
+# an idle stream through the proxies: heartbeats every 15 s, exit 1 if cut (Docker, or --base https://<VM>)
+node scripts/sse/idle-stream.ts --minutes 0.75
+```
+
+Details: `docs/AICHAT-9/WORKLOG.md`.
+
+---
+
 # Stream cancellation (AICHAT-15)
 
 ```sh
