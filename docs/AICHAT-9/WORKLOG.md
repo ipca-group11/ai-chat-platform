@@ -11,7 +11,7 @@ title: "AICHAT-9 · SSE reconnection testing: work log"
 | Owner | João Vieira |
 | Branch | `test/AICHAT-9-sse-reconnection` (built on `test/AICHAT-12-api-schema-validation`, PR #33 not merged yet) |
 | Started / finished | 2026-10-10 / 2026-10-10 (US5 VM run pending) |
-| Pull requests | not opened yet (commits are local; pushed by the owner) |
+| Pull requests | #34 (base `test/AICHAT-12-api-schema-validation`, #33) |
 | Status | Review (US5: VM run pending) |
 
 ## 1. DoR review
