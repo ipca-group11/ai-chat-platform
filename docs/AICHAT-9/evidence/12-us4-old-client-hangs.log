@@ -1,0 +1,11 @@
+$ cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/zz-old.spec.ts -g 'server-side' --reporter=list 2>&1 | grep -E '✓|✘|passed|failed|Error:|Expected|Received|Timeout' | head -10
+  ✘  1 [chromium] › src/tests/zz-old.spec.ts:116:3 › old client, no indicator checks › a server-side outage that spans the end of the reply (browser stays online) does not leave it streaming (28.0s)
+    Error: the reply must not stay streaming
+    expect(locator).toHaveCount(expected) failed
+    Expected: 0
+    Received: 1
+    Timeout:  15000ms
+    test-results/zz-old-old-client-no-indic-673ed-does-not-leave-it-streaming-chromium/test-failed-1.png
+  1 failed
+
+[exit 0]

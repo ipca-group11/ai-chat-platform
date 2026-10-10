@@ -220,3 +220,113 @@ cd services/conversation-service && pnpm exec vitest run src/features/streaming 
   received "one " before cutting it, and passed three runs in a row.
 - Fake timers are limited to `setInterval`/`clearInterval`, so the HTTP server and socket (which use `setTimeout` and
   `setImmediate` internally) keep working with real time.
+
+### US4 · E2E: network drop mid-stream never hangs the UI ([AICHAT-170](https://ipca-grupo11.atlassian.net/browse/AICHAT-170))
+
+**What and why.** The unit and integration tests of US2 and US3 check each side alone. This story drops the network in a
+real browser, against the whole stack (`pnpm mock:up`: real services and database, the LLM mock of AICHAT-144 with its
+`long` scenario so the reply is still streaming when the test acts), and checks what the user sees.
+
+**How a drop is simulated.** We first used only `context.setOffline(true)`, as the story says. The first run showed it is
+not enough: in the "drop over done" test the reply **finished on screen while the browser was offline**. Chromium's offline
+emulation only fails **new** requests; a response that is already open (the SSE stream) keeps flowing. A real network loss
+does both things, so the tests do both:
+
+| Piece | Role |
+|---|---|
+| `context.setOffline(true)` | the browser's reconnects fail (`ERR_INTERNET_DISCONNECTED`) |
+| `e2e/src/tests/support/drop-proxy.ts` (new) | a TCP proxy in the test process, between the browser and the app. `cutConnections()` destroys every open socket (the stream drops); `setDown(true)` is a server-side outage: open sockets are cut and new ones are refused while the browser stays online |
+
+The whole spec runs through the proxy (`test.use({ baseURL })`), because cookies and the key in `sessionStorage` belong to
+the origin. Each Playwright worker gets its own port (`8100 + TEST_PARALLEL_INDEX`).
+
+**Tests** (`e2e/src/tests/sse-reconnection.spec.ts`).
+
+| Test | Checks |
+|---|---|
+| a drop in the middle of a reply | "Reconnecting…" is shown; after the network is back the reply ends, and the text on screen equals the text after a reload (what was saved) |
+| a drop that spans the end of the reply | offline until the LLM mock's log says the provider finished (`finishedAt`), so `done` is published while the browser is away; meanwhile the reply is still "Generating…"; after the drop it is not, and it equals the saved text |
+| a server-side outage that spans the end (browser stays online) | the same, with the outage on the server side. The browser fires no `online` event, so React Query's own `refetchOnReconnect` does not run: only the stream's reconnect and refetch (US2) can end the reply |
+| a long drop | "Reconnecting…" stays visible for 6 s (longer than the browser's retry and the client's 3 s reopen), and goes away once the network is back |
+
+The third test was added after we noticed that, in the first two, the browser's `online` event also makes React Query
+refetch the messages by itself (the shell's `QueryClient` keeps `refetchOnReconnect` on). Those two prove the user-visible
+result; the third one proves the fix.
+
+**Files.**
+- `e2e/src/tests/sse-reconnection.spec.ts` (new): the 4 tests above.
+- `e2e/src/tests/support/drop-proxy.ts` and `drop-proxy.spec.ts` (new): the proxy and its own test (passes traffic, cuts an
+  open stream, refuses connections while down). Playwright runs both, so they are part of the `e2e.yml` gate.
+- `services/conversation-service/src/features/streaming/routes.ts`: the stream starts with a `: connected` comment (see
+  Problems); `routes.spec.ts` and `integration/routes.spec.ts` adapted, plus one new test.
+- `e2e/src/tests/stream-cancellation.spec.ts`: helper fix (see Problems).
+
+**How to run.**
+
+```sh
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/sse-reconnection.spec.ts src/tests/support/drop-proxy.spec.ts
+```
+
+`e2e.yml` runs the whole Playwright suite against the same stack (`pnpm exec nx run e2e:e2e`), so the new spec is part of
+the merge gate without workflow changes.
+
+**How to repeat it manually.**
+
+1. `pnpm mock:up`, open http://localhost:8000, sign up, save any Anthropic key in Settings.
+2. In the browser console create a chat with the long scenario:
+   `await fetch("/api/chats", { method: "POST", headers: { "content-type": "application/json" }, credentials: "include", body: JSON.stringify({ title: "Drop", provider: "anthropic", model: "claude-haiku-4-5@long" }) })`,
+   reload and open it.
+3. Send a message. While it streams, stop the shell container for ~10 s (`docker stop llm-chat-shell-1`, then
+   `docker start llm-chat-shell-1`): "Reconnecting…" appears, and once the shell is back the reply shows its full saved text
+   and the Stop button is gone.
+4. In DevTools → Network → "Offline" alone, the reply keeps streaming: the same limitation the tests work around.
+
+**Result.**
+
+| Run | Result |
+|---|---|
+| New spec, each test repeated (`--repeat-each=2`) | 8 passed ([log](evidence/07-us4-e2e-green.log)) |
+| Old client (mfe-chat from before US2, server unchanged), server-side outage over `done` | fails: `the reply must not stay streaming — Expected: 0, Received: 1` |
+| Refetch blocked with `page.route` after the drop | fails: the reply stays "Generating…" |
+
+Whole Playwright suite, configured like `e2e.yml` (`AUTH_RATE_LIMIT_MAX=0`): **73 passed, 1 skipped, 9 failed**. The 9
+failures are all in `attach-file.spec.ts`: the upload gets a 404 because mfe-chat posts to `POST /chats/:id/attachments`,
+which conversation-service does not have (it only has `/chats/:id/messages/:messageId/attachments`). This is the known
+defect **AICHAT-255**, found by the consumer pacts of AICHAT-11, and it fails the same way without this epic's changes
+(neither the upload code nor that spec changed here).
+
+![Whole suite](evidence/14-us4-full-suite.png)
+
+![E2E green](evidence/07-us4-e2e-green.png)
+
+![Reconnecting… during the drop](evidence/10-us4-reconnecting.png)
+
+![The reply recovered after the drop](evidence/11-us4-recovered.png)
+
+![The old client hangs after a server-side outage](evidence/12-us4-old-client-hangs.png)
+
+![Old client: the reply stuck on Generating… after the outage](evidence/13-us4-old-client-stuck.png)
+
+![Refetch blocked: the reply stays Generating…](evidence/09-us4-mutation-reply-stuck.png)
+
+**Problems and fixes.**
+- **Offline emulation does not drop an open stream** (above): solved with the drop proxy.
+- **An idle stream did not open behind the shell's proxy (app defect, fixed).** The long-drop test stayed on "Reconnecting…"
+  after the network came back. We recorded every `/stream` request with timestamps: the reconnect reached the app but no
+  byte came back. `curl` against an idle chat measured the first byte at 0.003 s directly on conversation-service (4002)
+  and **nothing within 4 s** through the shell (8000): the shell's `/api` proxy passes the headers on only with the first
+  body bytes, and `EventSource` fires `open` only on the headers. During a reply the first token unblocks it; after a drop
+  that outlived the reply nothing is sent until the 15 s heartbeat. Production uses the same shell proxy behind Caddy. The
+  stream now starts with a `: connected` comment; first byte through the shell: 0.009 s. Commit
+  `fix(conversation-service): open an idle chat stream at once behind a proxy`.
+- **Fixed port shared by parallel workers.** With `--repeat-each`, two workers opened the proxy on 8100 (`EADDRINUSE`).
+  Each worker now uses `8100 + TEST_PARALLEL_INDEX`.
+- **Rate limit during repeated local runs.** After many sign-ups the auth-service answered "Too many requests" and sign-in
+  failed before any drop. Restarting it resets the in-memory limiter (`docker restart llm-chat-auth-service-1`); CI raises
+  the limit (`RATE_LIMIT_MAX`, AICHAT-12).
+- **AICHAT-15 test broken on `main` (fixed).** "closing the tab keeps the reply running" timed out in its second tab: since
+  `905e13f` (settings page, 2026-10-05) a provider that already has a key shows **Update key** (`update-key`) instead of
+  **Save key**. The helper now clicks whichever is shown. Commit `fix(e2e): save the key in a new tab when one was saved before`.
+- `docker compose --wait` (used by `pnpm mock:up`) exits 1 locally because the one-shot `ollama-pull` container exits; all
+  other services are healthy. Not related to this epic.
