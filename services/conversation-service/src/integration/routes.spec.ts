@@ -232,8 +232,12 @@ describe("streaming route", () => {
             // The route subscribes in the same tick it sends the headers, so publishing
             // once they arrive cannot miss the event.
             t.bus.publish(chatId, { type: "token", messageId: "m1", token: "hi" });
+            // The stream starts with a ": connected" comment; read until the event's frame arrives.
+            let received = "";
             res.on("data", (chunk: Buffer) => {
-              resolve(chunk.toString("utf-8"));
+              received += chunk.toString("utf-8");
+              if (!received.includes("event: ")) return;
+              resolve(received);
               req.destroy();
             });
             res.on("error", reject);

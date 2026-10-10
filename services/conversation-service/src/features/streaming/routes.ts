@@ -31,6 +31,10 @@ export function createStreamingRouter(
       await chatsService.getAccessible(principalFrom(req), chatId);
 
       initSseResponse(res);
+      // AICHAT-170: a proxy may hold the headers until the first body bytes (the shell's `/api`
+      // proxy does), and EventSource fires `open` only on the headers. Without this an idle stream,
+      // such as a reconnect after the reply ended, would wait for the first heartbeat to open.
+      writeSseComment(res, "connected");
       const unsubscribe = bus.subscribe(chatId, (event) => writeSseEvent(res, event));
       openStreams?.inc();
       const heartbeat = setInterval(() => writeSseComment(res, "ping"), HEARTBEAT_INTERVAL_MS);
