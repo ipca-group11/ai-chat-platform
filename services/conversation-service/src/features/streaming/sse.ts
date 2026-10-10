@@ -26,6 +26,11 @@ export class ChatEventBus {
     this.getEmitter(chatId).emit("event", event);
   }
 
+  /** How many connections listen to the chat (AICHAT-169: a closed stream must not stay subscribed). */
+  subscriberCount(chatId: string): number {
+    return this.emitters.get(chatId)?.listenerCount("event") ?? 0;
+  }
+
   /** Returns an unsubscribe function. */
   subscribe(chatId: string, listener: (event: SseEvent) => void): () => void {
     const emitter = this.getEmitter(chatId);
@@ -45,4 +50,9 @@ export function initSseResponse(res: Response): void {
 
 export function writeSseEvent(res: Response, event: SseEvent): void {
   res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
+}
+
+/** A comment line (`: text`): EventSource ignores it, but bytes keep flowing (AICHAT-169 heartbeat). */
+export function writeSseComment(res: Response, text: string): void {
+  res.write(`: ${text}\n\n`);
 }

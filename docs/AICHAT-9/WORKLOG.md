@@ -157,3 +157,66 @@ mfe-settings and shell pass.
   the client's `unwrapEnvelope` accepts both, so the test passed either way. The fake now returns the real envelope.
 - `api/messages.ts` imports the registry, so the registry calls `apiClient.get` itself instead of importing
   `fetchMessages` back (no import cycle).
+
+### US3 · conversation-service: stream disconnect and resubscribe tests ([AICHAT-169](https://ipca-grupo11.atlassian.net/browse/AICHAT-169))
+
+**What and why.** The client recovery of US2 relies on three things the server must do when a connection drops: free the
+connection, **keep generating** the reply and save it, and serve later events to a new connection. We also added the
+heartbeat agreed in US1. The existing `routes.spec.ts` already checked that the `active_streams` counter goes down on
+disconnect; the rest was untested.
+
+| Change | Where |
+|---|---|
+| `ChatEventBus.subscriberCount(chatId)`: how many connections listen to a chat (so "unsubscribed" can be observed) | `features/streaming/sse.ts` |
+| `writeSseComment(res, text)`: writes `: text\n\n`, a line `EventSource` ignores | same file |
+| Heartbeat: `setInterval(… ": ping" …, HEARTBEAT_INTERVAL_MS)` (15 s) per open stream, `clearInterval` on `close` | `features/streaming/routes.ts` |
+
+**Files.**
+- `src/features/streaming/sse.spec.ts`: subscriber count, comment frame (2 new tests).
+- `src/features/streaming/routes.spec.ts`: close unsubscribes; heartbeat every 15 s and not before; heartbeat stops on
+  disconnect; events and heartbeats in one stream keep valid frames (4 new tests, fake `setInterval` only, real socket).
+- `src/integration/stream-reconnect.spec.ts` (new): real app, queue and processor on a real port, LLM scripted with
+  "gates" so the test decides when each token is produced (3 tests).
+
+| Test | What it proves |
+|---|---|
+| a dropped connection is unsubscribed and no longer counted | read from the bus and from `GET /metrics` (`active_streams 0`), like Prometheus |
+| the reply keeps being generated with no client and is saved complete | the client is cut after "one "; "two " and "three" are produced with nobody connected; `GET /messages` returns `one two three`, `sent`. This is what US2's refetch reads |
+| a new connection receives later events, none from before | the second connection gets `three` and `done` only: no replay, as agreed |
+
+The two integration tests about generation and "no replay" describe behaviour that already existed (they failed before
+only because `subscriberCount` did not exist yet): they are characterization tests that lock it in. The heartbeat is new
+behaviour and went from red to green.
+
+**How to run.**
+
+```sh
+cd services/conversation-service && pnpm exec vitest run src/features/streaming src/integration/stream-reconnect.spec.ts --reporter=verbose
+```
+
+**How to repeat it manually.**
+
+1. Run the command above: 20 tests pass (9 of them new).
+2. In `routes.ts` delete `clearInterval(heartbeat);`: only "stops the heartbeat when the client disconnects" fails
+   (`vi.getTimerCount()` is 1, a timer leak that would write into a closed socket forever).
+3. Delete `unsubscribe();` in the `close` handler: 4 tests fail, including the `active_streams` one.
+4. Remove the `setInterval` line: the 3 heartbeat tests fail. Restore everything and check `git diff`.
+5. By hand, with the stack running (`pnpm mock:up`), sign in, copy the `access_token` cookie and run
+   `curl -N -H "Cookie: access_token=…" http://localhost:8000/api/chats/<chatId>/stream`: a `: ping` line appears every 15 s.
+
+**Result.**
+
+![US3 before: 9 tests fail](evidence/04-us3-before-red.png)
+
+![US3 after: 9 new tests pass](evidence/05-us3-after-green.png)
+
+![Without clearInterval, the timer leak is caught](evidence/06-us3-mutation-timer-leak.png)
+
+`nx run-many -t lint typecheck test -p conversation-service`: 652 tests pass, coverage thresholds met.
+
+**Problems and fixes.**
+- The "no replay" test failed once: it dropped the first connection right after the `token` event was published on the
+  in-process bus, before the bytes had reached the client over the socket. The test now waits until the client has
+  received "one " before cutting it, and passed three runs in a row.
+- Fake timers are limited to `setInterval`/`clearInterval`, so the HTTP server and socket (which use `setTimeout` and
+  `setImmediate` internally) keep working with real time.
