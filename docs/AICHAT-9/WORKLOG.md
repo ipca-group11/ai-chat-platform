@@ -10,9 +10,9 @@ title: "AICHAT-9 · SSE reconnection testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | João Vieira |
 | Branch | `test/AICHAT-9-sse-reconnection` (built on `test/AICHAT-12-api-schema-validation`, PR #33 not merged yet) |
-| Started / finished | 2026-10-10 / … |
+| Started / finished | 2026-10-10 / 2026-10-10 (US5 VM run pending) |
 | Pull requests | not opened yet (commits are local; pushed by the owner) |
-| Status | In Progress |
+| Status | Review (US5: VM run pending) |
 
 ## 1. DoR review
 
@@ -373,3 +373,60 @@ VM: **pending**. The VM runs what is deployed from `main`, which does not have t
 
 **Problems and fixes.** Deploys run on GitHub Actions, which are not starting jobs at the moment (account billing,
 "recent account payments have failed or your spending limit needs to be increased"), so the "after" run waits for that.
+
+## 4. How to run everything
+
+```sh
+# unit and integration (no Docker)
+pnpm exec nx run-many -t lint typecheck test -p mfe-chat test-utils conversation-service
+# browser (Docker)
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/sse-reconnection.spec.ts src/tests/support/drop-proxy.spec.ts
+# idle stream through the proxies (local, or --base https://<VM> --minutes 6)
+node scripts/sse/idle-stream.ts --minutes 0.75
+```
+
+Also in `TESTING.md` (section "SSE reconnection").
+
+## 5. Results
+
+| Metric | Before | After |
+|---|---|---|
+| Reply whose `done` is lost during a drop | stays "Generating…" with a Stop button until a reload | ends with the saved text (unit, integration and E2E) |
+| Indicator while the stream is down | none | "Reconnecting…" (`role="status"`, no axe violations) |
+| Browser gives up reconnecting (`CLOSED`) | stream never comes back | new stream after 3 s |
+| Idle stream through the shell's proxy: first byte | none within 4 s (headers held) | 0.009 s (`: connected`) |
+| Longest silence on an idle stream | unbounded | 15 s (`: ping`) |
+| Heartbeat timer after the client leaves | — | cleared (`vi.getTimerCount() === 0`) |
+| New tests | — | 4 (fake EventSource) + 2 (`sse.ts`) + 9 (registry) + 1 (ChatView) + 2 (bus/frames) + 5 (stream route) + 3 (integration) + 4 (E2E) + 3 (proxy) = 33 |
+| Mutations of the new code killed | — | 8 of 8 (3 registry, 3 stream route, 1 E2E refetch, 1 proxy) |
+
+## 6. DoD check
+
+| DoD item | Met | Evidence |
+|---|---|---|
+| Tests run in CI and pass on `main` | Partly | They run in the existing jobs (`nx affected … test` in `ci.yml`; the whole Playwright suite in `e2e.yml`) and pass locally. No CI job has started since 2026-10-08 (GitHub account billing), and the branch is not merged yet |
+| Failure blocks the merge | ✅ | Same jobs as the other tests; no new workflow needed. Shown locally: [old client fails](evidence/12-us4-old-client-hangs.png), [no refetch fails](evidence/03-us2-mutation-no-refetch.png) |
+| Run instructions added | ✅ | `TESTING.md`, §4 above |
+| Network drop mid-stream tested | ✅ | [E2E](evidence/07-us4-e2e-green.png), [integration](evidence/05-us3-after-green.png) |
+| The UI resumes or shows the error and never hangs | ✅ | [Reconnecting…](evidence/10-us4-reconnecting.png), [recovered](evidence/11-us4-recovered.png) |
+
+## 7. Notes for the report
+
+- **What was found.** (1) A reply whose `done` event was sent while the connection was down stayed "Generating…" forever:
+  the client ignored transport errors. (2) Behind the shell's `/api` proxy an idle stream sent no bytes at all, so the
+  browser never saw it open: any reconnect after the reply had ended stayed silent until something was published.
+  (3) The AICHAT-203 E2E "closing the tab" had been broken on `main` since the settings page changed its button. (4) Two
+  repository guards in `workspace-config` (unit-test guard and coverage-project list) fail on the base branch; the SAST
+  gate reports one ERROR in an E2E helper (`e2e/src/tests/support/auth.ts:6`); the upload E2E tests fail on the known
+  defect AICHAT-255. None of these come from this epic; they went unnoticed because no CI job has run since 2026-10-08.
+- **What was fixed.** (1) and (2) in the app (refetch on reconnect, "Reconnecting…", reopen after `CLOSED`, heartbeat,
+  first comment); (3) in the test helper.
+- **Lessons learned.**
+  - `context.setOffline(true)` does not drop an open response in Chromium; a real drop needs the open connection cut too.
+  - When the browser comes back online, React Query refetches by itself (`refetchOnReconnect`). A test that only uses the
+    browser's offline mode can pass without the fix; the server-side outage test cannot.
+  - A proxy can hold response headers until the first body bytes; SSE servers should write something at once.
+  - A test that passes before the code exists is not always useless (characterization tests, negative tests), but
+    `expect(undefined).toBe(undefined)` is: constants are pinned to their real values.
+  - A fake server must answer exactly like the real one (the `{ messages }` envelope), or the test proves less than it seems.
