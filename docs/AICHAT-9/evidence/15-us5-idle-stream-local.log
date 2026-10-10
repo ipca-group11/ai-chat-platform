@@ -1,0 +1,13 @@
+$ node scripts/sse/idle-stream.ts --minutes 0.75
+target http://localhost:8000, holding an idle stream for 0.75 min
+registered throwaway account sse-idle-1791650749817@example.com
+   0.4s  HTTP 200 text/event-stream
+   0.4s  : connected
+  15.4s  : ping
+  30.4s  : ping
+  45.4s  run finished, closing the stream
+
+open for 45 s, 2 heartbeats, longest silence 15.0 s
+RESULT: the idle stream stayed open for the whole 0.75 min
+
+[exit 0]
