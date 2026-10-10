@@ -13,8 +13,14 @@ export interface StreamHandlers {
   onWebFetch?: (event: Extract<SSEEvent, { type: "web_fetch" }>) => void;
   onDone: (event: Extract<SSEEvent, { type: "done" }>) => void;
   onError: (event: Extract<SSEEvent, { type: "error" }>) => void;
-  /** Native transport-level error (connection dropped), distinct from a provider `error` event. */
-  onConnectionError?: (event: Event) => void;
+  /**
+   * Native transport-level error (connection dropped), distinct from a provider `error` event.
+   * `willReconnect` is false when the browser gave up (`readyState` CLOSED, e.g. the reconnect got
+   * an HTTP error): only then does the caller have to open a new stream itself.
+   */
+  onConnectionError?: (event: Event, info: { willReconnect: boolean }) => void;
+  /** The connection is open: the first connect and every reconnect after a drop (AICHAT-168). */
+  onOpen?: () => void;
 }
 
 export interface ChatStream {
@@ -36,6 +42,7 @@ export function subscribeToChatStream(chatId: string, handlers: StreamHandlers):
     withCredentials: true,
   });
 
+  source.addEventListener("open", () => handlers.onOpen?.());
   source.addEventListener("message", (evt) => handlers.onMessage?.(parse<"message">(evt)));
   source.addEventListener("started", (evt) => handlers.onStarted?.(parse<"started">(evt)));
   source.addEventListener("token", (evt) => handlers.onToken(parse<"token">(evt)));
@@ -49,7 +56,7 @@ export function subscribeToChatStream(chatId: string, handlers: StreamHandlers):
     if (evt instanceof MessageEvent && typeof evt.data === "string" && evt.data) {
       handlers.onError(parse<"error">(evt));
     } else {
-      handlers.onConnectionError?.(evt);
+      handlers.onConnectionError?.(evt, { willReconnect: source.readyState !== EventSource.CLOSED });
     }
   });
 

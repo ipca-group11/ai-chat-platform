@@ -94,5 +94,43 @@ describe("FakeEventSource", () => {
     source.close();
 
     expect(FakeEventSource.last.closed).toBe(true);
+    expect(source.readyState).toBe(EventSource.CLOSED);
+  });
+
+  it("has the browser's readyState constants, so comparisons never pass on undefined", () => {
+    expect([EventSource.CONNECTING, EventSource.OPEN, EventSource.CLOSED]).toEqual([0, 1, 2]);
+  });
+
+  it("follows the browser's readyState: connecting, open, connecting again after a drop", () => {
+    const source = new EventSource("/stream");
+    expect(source.readyState).toBe(EventSource.CONNECTING);
+
+    FakeEventSource.last.emitOpen();
+    expect(source.readyState).toBe(EventSource.OPEN);
+
+    FakeEventSource.last.emitTransportError();
+    expect(source.readyState).toBe(EventSource.CONNECTING);
+  });
+
+  it("emits open to onopen and to the open listeners", () => {
+    const listener = vi.fn();
+    const source = new EventSource("/stream");
+    source.onopen = vi.fn();
+    source.addEventListener("open", listener);
+
+    FakeEventSource.last.emitOpen();
+
+    expect(source.onopen).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  it("a final transport error leaves the connection CLOSED, as when the browser stops retrying", () => {
+    const source = new EventSource("/stream");
+    let stateSeenByListener: number | undefined;
+    source.addEventListener("error", () => (stateSeenByListener = source.readyState));
+
+    FakeEventSource.last.emitTransportError({ final: true });
+
+    expect(stateSeenByListener).toBe(EventSource.CLOSED);
   });
 });

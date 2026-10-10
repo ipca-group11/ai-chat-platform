@@ -10,8 +10,15 @@ type Listener = (event: Event) => void;
  *   const FakeSource = installFakeEventSource();
  *   openStream("chat-1");
  *   FakeSource.last.emit("token", { messageId: "m1", token: "Hi" });
+ *
+ * `readyState` follows the browser: CONNECTING until `emitOpen()`, back to CONNECTING after a
+ * transport error (the browser retries by itself) and CLOSED after `close()` or a final error.
  */
 export class FakeEventSource {
+  static readonly CONNECTING = 0;
+  static readonly OPEN = 1;
+  static readonly CLOSED = 2;
+
   static instances: FakeEventSource[] = [];
 
   /** The most recently opened connection. Throws when none was opened. */
@@ -27,7 +34,9 @@ export class FakeEventSource {
 
   readonly url: string;
   readonly withCredentials: boolean;
+  readyState: number = FakeEventSource.CONNECTING;
   closed = false;
+  onopen: ((event: Event) => void) | null = null;
   onerror: ((event: Event) => void) | null = null;
   private listeners: Record<string, Listener[]> = {};
 
@@ -47,6 +56,15 @@ export class FakeEventSource {
 
   close(): void {
     this.closed = true;
+    this.readyState = FakeEventSource.CLOSED;
+  }
+
+  /** The connection is (re)established: the first connect, or the browser's reconnect after a drop. */
+  emitOpen(): void {
+    this.readyState = FakeEventSource.OPEN;
+    const event = new Event("open");
+    this.onopen?.(event);
+    this.dispatch("open", event);
   }
 
   /** Delivers a named server event. `data` is sent as JSON unless it is already a string. */
@@ -55,8 +73,13 @@ export class FakeEventSource {
     this.dispatch(type, new MessageEvent(type, { data: payload }));
   }
 
-  /** Delivers a transport-level error: an `error` event that carries no data. */
-  emitTransportError(): void {
+  /**
+   * Delivers a transport-level error: an `error` event that carries no data. By default the browser
+   * keeps retrying (CONNECTING); `final: true` is the case where it gives up (CLOSED), for example
+   * when the server answers the reconnect with an HTTP error.
+   */
+  emitTransportError({ final = false }: { final?: boolean } = {}): void {
+    this.readyState = final ? FakeEventSource.CLOSED : FakeEventSource.CONNECTING;
     const event = new Event("error");
     this.onerror?.(event);
     this.dispatch("error", event);

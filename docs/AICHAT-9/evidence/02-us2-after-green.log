@@ -1,0 +1,16 @@
+$ cd apps/mfe-chat && pnpm exec vitest run src/shared/sse.test.ts src/features/chat-view/model/stream-registry.test.ts src/features/chat-view/components/ChatView.test.tsx -t AICHAT-168 --reporter=verbose 2>&1 | grep -E '✓|×|Tests '
+ ✓ src/shared/sse.test.ts > subscribeToChatStream > AICHAT-168: reports every open, the first connect and each reconnect, through onOpen 1ms
+ ✓ src/shared/sse.test.ts > subscribeToChatStream > AICHAT-168: says whether the browser will reconnect by itself or has given up 0ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect) > shows the chat as reconnecting from the drop until the stream is open again 10ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect) > does not refetch on the first open, only on an open that follows a drop 75ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect) > a reply that finished during the drop is no longer streaming after the reconnect (the 'done' event was lost) 54ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect) > a reply still being generated keeps the text already shown, because the server saves the text only at the end 54ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect) > messages that arrived during the drop (another member's, the next queued one) appear after the reconnect 52ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect) > a failed refetch keeps what is shown and does not throw; the next done refetches again 24ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect) > when the browser gives up (CLOSED), opens a new stream after a delay, and that open recovers like a reconnect 55ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect) > closing the chat's stream cancels a pending reconnect 0ms
+ ✓ src/features/chat-view/model/stream-registry.test.ts > AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect) > a drop in one chat does not mark the other chats as reconnecting 0ms
+ ✓ src/features/chat-view/components/ChatView.test.tsx > ChatView (AC-46, AC-51..AC-55) > AICHAT-168: connection drop > shows Reconnecting… while the stream is down, then the reply as saved once it is back 109ms
+      Tests  12 passed | 52 skipped (64)
+
+[exit 0]

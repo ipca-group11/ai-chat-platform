@@ -1,0 +1,5 @@
+$ cd apps/mfe-chat && F=src/features/chat-view/model/stream-registry.ts && cp $F /tmp/r.ts && sed -i '' 's/      void resyncMessages(chatId, queryClient);//' $F && git diff --unified=0 $F | grep '^-.*resync'; pnpm exec vitest run src/features/chat-view/model/stream-registry.test.ts -t AICHAT-168 2>&1 | grep -E '^ +×|Tests '; cp /tmp/r.ts $F
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  5 failed | 4 passed | 15 skipped (24)
+
+[exit 0]

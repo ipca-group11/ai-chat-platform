@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle, Badge, Button, Skeleton, cn } from "@app/ui";
-import { ArrowLeft, Brain, CircleAlert, Eye, EyeOff, Globe, Users, X } from "lucide-react";
+import { ArrowLeft, Brain, CircleAlert, Eye, EyeOff, Globe, Users, WifiOff, X } from "lucide-react";
 import { MembersDialog } from "../../chat-members";
 import { useChat, useUpdateChat } from "../../chat-list";
 import { Composer } from "../../composer";
 import { MessageQueue } from "../../message-queue";
 import { supportsReasoning, supportsWebFetch } from "../../../shared/model-capabilities";
 import { useMessages, useRetryMessage, useStopMessage } from "../api/messages";
-import { useMessageStream } from "../hooks/useMessageStream";
+import { useChatReconnecting, useMessageStream } from "../hooks/useMessageStream";
 import { useShowReasoning } from "../model/show-reasoning";
 import { MessageList } from "./MessageList";
 
@@ -39,6 +39,7 @@ export function ChatView({ chatId, userId, onBack, onClose, compact = false }: C
   const [showReasoning, setShowReasoning] = useShowReasoning();
 
   useMessageStream(chatId);
+  const reconnecting = useChatReconnecting(chatId);
 
   const closeButton = onClose ? (
     <Button type="button" variant="ghost" size="icon" className="size-8 shrink-0" onClick={onClose} aria-label="Close pane" data-pane-close="">
@@ -205,6 +206,18 @@ export function ChatView({ chatId, userId, onBack, onClose, compact = false }: C
 
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
         <div className={cn("mx-auto w-full max-w-3xl px-4", compact ? "py-3" : "py-6")}>
+          {/* AICHAT-168: the stream dropped; the reply is refetched as soon as it is back. */}
+          {reconnecting && (
+            <div
+              role="status"
+              aria-label="Reconnecting"
+              data-testid="chat-reconnecting"
+              className="mb-4 flex items-center gap-2 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground"
+            >
+              <WifiOff aria-hidden="true" className="size-4" />
+              Reconnecting…
+            </div>
+          )}
           {messagesQuery.isError && (
             <Alert variant="destructive" className="mb-4">
               <AlertDescription>Could not load messages.</AlertDescription>
