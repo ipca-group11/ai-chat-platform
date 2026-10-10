@@ -19,7 +19,8 @@ async function configureAnthropicKey(page: Page): Promise<void> {
   await page.goto("/settings");
   const card = page.getByTestId("provider-card-anthropic");
   await card.getByTestId("api-key").fill(anthropicKey);
-  await card.getByTestId("save-key").click();
+  // A new tab of a user who saved the key before shows "Update key" instead of "Save key".
+  await card.getByTestId("save-key").or(card.getByTestId("update-key")).click();
   await expect(card.getByTestId("masked-key")).toHaveText(`••••${anthropicKey.slice(-4)}`);
 }
 
