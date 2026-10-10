@@ -330,3 +330,46 @@ defect **AICHAT-255**, found by the consumer pacts of AICHAT-11, and it fails th
   **Save key**. The helper now clicks whichever is shown. Commit `fix(e2e): save the key in a new tab when one was saved before`.
 - `docker compose --wait` (used by `pnpm mock:up`) exits 1 locally because the one-shot `ollama-pull` container exits; all
   other services are healthy. Not related to this epic.
+
+### US5 · Idle stream survives the reverse proxy (Caddy) on the VM ([AICHAT-171](https://ipca-grupo11.atlassian.net/browse/AICHAT-171))
+
+**What and why.** On the VM a chat stream passes through Caddy (`deploy/azure/Caddyfile`), the shell's `/api` proxy and the
+Azure network. Caddy has no timeout configured for it, but Azure closes TCP flows idle for ~4 min, and the shell's proxy
+holds the headers until the first body bytes (US4). A stream that stays silent (a slow model, a long queue, a reply that
+already ended) must not be cut, or must recover. The heartbeat of US3 (`: ping` every 15 s) and the first `: connected`
+comment of US4 keep bytes flowing; this story checks that on the real path.
+
+**Files.**
+- `scripts/sse/idle-stream.ts` (new): signs in (`SSE_EMAIL`/`SSE_PASSWORD`, or a throwaway account), creates a chat, opens
+  its stream with nothing being generated and prints every line with the time since it opened; at the end it deletes the
+  chat and prints the number of heartbeats, the longest silence and `RESULT: … stayed open` (exit 0) or `… was CUT` (exit 1).
+
+**How to run.**
+
+```sh
+# local stack (pnpm mock:up), 45 s
+node scripts/sse/idle-stream.ts --minutes 0.75
+# the VM, longer than the Azure idle timeout
+node scripts/sse/idle-stream.ts --base https://ai-chat-jpc.swedencentral.cloudapp.azure.com --minutes 6
+```
+
+**How to repeat it manually.** Sign in on the site, copy the `access_token` cookie, open a chat and run
+`curl -N -H "Cookie: access_token=<token>" https://<domain>/api/chats/<chatId>/stream`: `: connected` appears at once and
+`: ping` every 15 s, with nothing else while the chat is idle.
+
+**Result.**
+
+Local stack, through the shell's proxy: `: connected` after 0.4 s, a heartbeat every 15 s, longest silence 15.0 s, stream
+open for the whole run.
+
+![Idle stream on the local stack](evidence/15-us5-idle-stream-local.png)
+
+VM: **pending**. The VM runs what is deployed from `main`, which does not have the heartbeat yet, so the run is done twice:
+
+| Run | Expected | Result |
+|---|---|---|
+| Before (current `main` on the VM) | no bytes after the headers; the stream is cut around 4 min (Azure idle timeout) or kept by Caddy | … |
+| After (this branch merged and deployed) | `: connected`, a `: ping` every 15 s, open for the whole 6 min | … |
+
+**Problems and fixes.** Deploys run on GitHub Actions, which are not starting jobs at the moment (account billing,
+"recent account payments have failed or your spending limit needs to be increased"), so the "after" run waits for that.
