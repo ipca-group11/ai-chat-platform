@@ -1,0 +1,12 @@
+$ cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/sse-reconnection.spec.ts --repeat-each=2 --reporter=list 2>&1 | grep -E '✓|✘|passed|failed'
+  ✓  2 [chromium] › src/tests/sse-reconnection.spec.ts:81:3 › SSE reconnection (AICHAT-170) › a drop in the middle of a reply shows Reconnecting…, and the reply ends as it was saved (13.8s)
+  ✓  1 [chromium] › src/tests/sse-reconnection.spec.ts:81:3 › SSE reconnection (AICHAT-170) › a drop in the middle of a reply shows Reconnecting…, and the reply ends as it was saved (13.8s)
+  ✓  4 [chromium] › src/tests/sse-reconnection.spec.ts:97:3 › SSE reconnection (AICHAT-170) › a drop that spans the end of the reply does not leave it streaming (13.5s)
+  ✓  3 [chromium] › src/tests/sse-reconnection.spec.ts:97:3 › SSE reconnection (AICHAT-170) › a drop that spans the end of the reply does not leave it streaming (13.5s)
+  ✓  6 [chromium] › src/tests/sse-reconnection.spec.ts:116:3 › SSE reconnection (AICHAT-170) › a server-side outage that spans the end of the reply (browser stays online) does not leave it streaming (13.5s)
+  ✓  5 [chromium] › src/tests/sse-reconnection.spec.ts:116:3 › SSE reconnection (AICHAT-170) › a server-side outage that spans the end of the reply (browser stays online) does not leave it streaming (13.5s)
+  ✓  8 [chromium] › src/tests/sse-reconnection.spec.ts:133:3 › SSE reconnection (AICHAT-170) › a long drop keeps Reconnecting… visible until the connection is back (12.9s)
+  ✓  7 [chromium] › src/tests/sse-reconnection.spec.ts:133:3 › SSE reconnection (AICHAT-170) › a long drop keeps Reconnecting… visible until the connection is back (12.9s)
+  8 passed (54.2s)
+
+[exit 0]

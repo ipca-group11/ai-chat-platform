@@ -1,0 +1,15 @@
+$ cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium   # whole suite, AUTH_RATE_LIMIT_MAX=0 as in e2e.yml
+  ✘   2 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): notes.txt
+  ✘  31 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): report.pdf
+  ✘  42 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): diagram.png
+  ✘  54 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): photo.jpg
+  ✘  59 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): photo.jpeg
+  ✘  63 [chromium] › src/tests/attach-file.spec.ts:213:3 › Attach a file to a message › Several files are attached at once (AC-66)
+  ✘  68 [chromium] › src/tests/attach-file.spec.ts:222:3 › Attach a file to a message › A staged file is removed before sending
+  ✘  70 [chromium] › src/tests/attach-file.spec.ts:228:3 › Attach a file to a message › The response takes the attached file into account (AC-69)
+  ✘  78 [chromium] › src/tests/attach-file.spec.ts:275:3 › Attach a file to a message › A file of exactly 10 MB is accepted (AC-68)
+  9 failed
+  1 skipped
+  73 passed (2.6m)
+
+[exit 1]

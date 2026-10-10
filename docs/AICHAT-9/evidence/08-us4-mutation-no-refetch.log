@@ -1,0 +1,10 @@
+$ cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/zz-mutation.spec.ts -g 'spans the end' --reporter=list 2>&1 | grep -E '✓|✘|passed|failed|Error:|Expected|Received|Timeout' | head -12
+  ✘  1 [chromium] › src/tests/zz-mutation.spec.ts:97:3 › MUTATION no refetch (AICHAT-170) › a drop that spans the end of the reply does not leave it streaming (27.8s)
+    Error: expect(locator).toHaveCount(expected) failed
+    Expected: 0
+    Received: 1
+    Timeout:  15000ms
+    test-results/zz-mutation-MUTATION-no-re-faa29-does-not-leave-it-streaming-chromium/test-failed-1.png
+  1 failed
+
+[exit 0]
