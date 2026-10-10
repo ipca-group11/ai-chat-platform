@@ -86,3 +86,74 @@ wires `onConnectionError`, `onOpen` and the "Reconnecting…" state. conversatio
 owner of both apps for this epic is João Vieira.
 
 **Result.** Decision recorded here and in the Jira epic comment (2026-10-10). US2–US5 test against it.
+
+### US2 · mfe-chat: unit tests for connection drop and reconnect handling ([AICHAT-168](https://ipca-grupo11.atlassian.net/browse/AICHAT-168))
+
+**What and why.** The routing of errors in `shared/sse.ts` (a transport error goes to `onConnectionError`, a server
+`event: error` with data goes to `onError`) was already tested by AICHAT-17 (`sse.test.ts`), so this story adds the
+**recovery** agreed in US1. Before, `stream-registry.ts` ignored a drop: if `done` was published during the gap the reply
+stayed `streaming`, with the Stop button, until the page was reloaded.
+
+We wrote the tests first and watched them fail (10 failures: missing functions and no refetch), then wrote the code:
+
+| Piece | Change |
+|---|---|
+| `FakeEventSource` (shared, AICHAT-17) | Follows the browser's `readyState` (`CONNECTING` → `OPEN` → `CONNECTING` after a drop, `CLOSED` after `close()`), has the real constants (0/1/2), `emitOpen()` and `emitTransportError({ final: true })` for "the browser gave up" |
+| `shared/sse.ts` | New `onOpen` handler; `onConnectionError` also receives `{ willReconnect }` (`false` when the source is `CLOSED`) |
+| `model/stream-registry.ts` | A drop marks the chat as reconnecting. The `open` that follows a drop refetches `GET /chats/:id/messages` and merges it: the server list wins, except for a reply the server still reports as `streaming` (its text is saved only at the end), which keeps the text already shown. If the browser gave up, a new stream is opened after `RECONNECT_DELAY_MS` (3 s); closing the chat cancels it |
+| `hooks/useMessageStream.ts`, `components/ChatView.tsx` | `useChatReconnecting(chatId)` (`useSyncExternalStore` over the registry) and a "Reconnecting…" status (`role="status"`) above the messages |
+
+**Files.**
+- `packages/test-utils/src/fake-event-source.ts` and `.test.ts`: `readyState`, `emitOpen`, final error (4 new tests).
+- `apps/mfe-chat/src/shared/sse.ts` and `sse.test.ts`: `onOpen`, `willReconnect` (2 new tests).
+- `apps/mfe-chat/src/features/chat-view/model/stream-registry.ts` and `.test.ts`: recovery (9 new tests).
+- `apps/mfe-chat/src/features/chat-view/hooks/useMessageStream.ts`, `components/ChatView.tsx` and `ChatView.test.tsx`
+  (1 new test, with an axe scan while reconnecting).
+
+| Test | What it proves |
+|---|---|
+| reconnecting from the drop until the stream is open again | the indicator is driven by the transport events |
+| no refetch on the first open, only after a drop | a normal page load does not fetch twice |
+| a reply that finished during the drop is no longer streaming | **the hang this epic is about**: the lost `done` is recovered from the server |
+| a reply still being generated keeps the text already shown | the merge rule of US1 (known limitation) |
+| messages that arrived during the drop appear | a member's message or the next queued reply is not lost |
+| a failed refetch keeps what is shown and does not throw | the next `done` refetches again |
+| the browser gives up → new stream after 3 s, and its open recovers | the `CLOSED` case (fake timers) |
+| closing the chat cancels a pending reconnect | no stream comes back for a closed chat |
+| a drop in one chat does not mark the others | streams are independent (AC-60/61) |
+| ChatView: Reconnecting… then the saved reply, no Stop button | the user-visible result, with no axe violations |
+
+**How to run.**
+
+```sh
+cd apps/mfe-chat && pnpm exec vitest run src/shared/sse.test.ts src/features/chat-view -t AICHAT-168 --reporter=verbose
+```
+
+**How to repeat it manually.**
+
+1. Run the command above: 12 tests pass.
+2. Delete the line `void resyncMessages(chatId, queryClient);` in `stream-registry.ts` and run it again: 5 tests fail
+   (the reply stays `streaming`). Restore the line.
+3. In `mergeAfterReconnect`, make the server always win (`if (true || !local …`): only "keeps the text already shown"
+   fails. Restore it.
+4. Replace `if (activeStreams.get(chatId) === entry) entry.stream = connect(…)` with `if (false) …`: only "the browser
+   gives up" fails. Restore it and check `git diff`.
+
+**Result.** Before (red) and after (green), and the first mutation:
+
+![US2 before the change: 10 tests fail](evidence/01-us2-before-red.png)
+
+![US2 after the change: 12 tests pass](evidence/02-us2-after-green.png)
+
+![Without the refetch, 5 tests fail](evidence/03-us2-mutation-no-refetch.png)
+
+The whole mfe-chat suite (398 tests) and `nx run-many -t lint typecheck test` for mfe-chat, test-utils, mfe-auth,
+mfe-settings and shell pass.
+
+**Problems and fixes.**
+- Two of the new `FakeEventSource` tests passed before the code existed: `readyState` and `EventSource.CLOSED` were both
+  `undefined`, and `expect(undefined).toBe(undefined)` passes. A test now pins the constants to 0/1/2.
+- Our first fake server for `GET /chats/:id/messages` returned a bare array. The real service returns `{ messages: [...] }`;
+  the client's `unwrapEnvelope` accepts both, so the test passed either way. The fake now returns the real envelope.
+- `api/messages.ts` imports the registry, so the registry calls `apiClient.get` itself instead of importing
+  `fetchMessages` back (no import cycle).

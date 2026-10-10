@@ -218,6 +218,33 @@ describe("ChatView (AC-46, AC-51..AC-55)", () => {
     window.sessionStorage.clear();
   });
 
+  describe("AICHAT-168: connection drop", () => {
+    it("shows Reconnecting… while the stream is down, then the reply as saved once it is back", async () => {
+      const streaming: Message = { ...message, id: "msg-2", role: "assistant", content: "", status: "streaming" };
+      serveChat(chat, [message, streaming]);
+      renderWithClient(<ChatView chatId="chat-1" userId="user-1" />);
+      await screen.findByText("Hi");
+      const source = FakeEventSource.last;
+      act(() => {
+        source.emitOpen();
+        source.emit("token", { type: "token", messageId: "msg-2", token: "Hel" });
+      });
+      expect(screen.queryByRole("status", { name: /reconnecting/i })).not.toBeInTheDocument();
+
+      act(() => source.emitTransportError());
+      expect(await screen.findByRole("status", { name: /reconnecting/i })).toHaveTextContent("Reconnecting…");
+      await expectNoA11yViolations(document.body);
+
+      // The reply finished while we were away; the server now has it saved.
+      serveChat(chat, [message, { ...streaming, content: "Hello world", status: "sent" }]);
+      act(() => source.emitOpen());
+
+      expect(await screen.findByText("Hello world")).toBeInTheDocument();
+      expect(screen.queryByRole("status", { name: /reconnecting/i })).not.toBeInTheDocument();
+      expect(screen.queryByText("Stop")).not.toBeInTheDocument();
+    });
+  });
+
   describe("loading and error states", () => {
     it("shows the skeleton with a screen-reader label while the chat loads, then the chat", async () => {
       server.use(

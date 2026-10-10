@@ -1,8 +1,194 @@
 import { createTestQueryClient, FakeEventSource, installFakeEventSource } from "@platform/test-utils";
+import { http, HttpResponse, server } from "@platform/test-utils/msw";
+import { waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { queryKeys } from "../../../shared/query-keys";
 import type { Message } from "../../../shared/types";
-import { __resetStreamRegistryForTests, closeChatStream, ensureChatStream, isChatStreaming } from "./stream-registry";
+import {
+  __resetStreamRegistryForTests,
+  closeChatStream,
+  ensureChatStream,
+  isChatReconnecting,
+  isChatStreaming,
+  RECONNECT_DELAY_MS,
+} from "./stream-registry";
+
+/** What `GET /chats/:id/messages` returns after the reconnect; counts the requests. */
+function serverHas(messages: Partial<Message>[]) {
+  const requests: string[] = [];
+  server.use(
+    http.get("*/chats/:chatId/messages", ({ params }) => {
+      requests.push(String(params.chatId));
+      // Same envelope as conversation-service: { messages: [...] }.
+      return HttpResponse.json({
+        messages: messages.map((m) => ({ chatId: params.chatId, role: "assistant", attachments: [], createdAt: "2026-10-10T10:00:00.000Z", ...m })),
+      });
+    })
+  );
+  return requests;
+}
+
+const cached = (client: ReturnType<typeof createTestQueryClient>, chatId = "chat-1") =>
+  client.getQueryData<Message[]>(queryKeys.messages(chatId));
+
+describe("AICHAT-168: connection drop and reconnect (rule: refetch the messages on reconnect)", () => {
+  beforeEach(() => {
+    installFakeEventSource();
+  });
+
+  afterEach(() => {
+    __resetStreamRegistryForTests();
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("shows the chat as reconnecting from the drop until the stream is open again", () => {
+    serverHas([]);
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    const source = FakeEventSource.last;
+
+    source.emitOpen();
+    expect(isChatReconnecting("chat-1")).toBe(false);
+
+    source.emitTransportError();
+    expect(isChatReconnecting("chat-1")).toBe(true);
+
+    source.emitOpen();
+    expect(isChatReconnecting("chat-1")).toBe(false);
+  });
+
+  it("does not refetch on the first open, only on an open that follows a drop", async () => {
+    const requests = serverHas([]);
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+
+    FakeEventSource.last.emitOpen();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(requests).toEqual([]);
+
+    FakeEventSource.last.emitTransportError();
+    FakeEventSource.last.emitOpen();
+    await waitFor(() => expect(requests).toEqual(["chat-1"]));
+  });
+
+  it("a reply that finished during the drop is no longer streaming after the reconnect (the 'done' event was lost)", async () => {
+    serverHas([{ id: "msg-assistant-1", content: "Hello world", status: "sent", stopped: false }]);
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    const source = FakeEventSource.last;
+    source.emitOpen();
+    source.emit("token", { messageId: "msg-assistant-1", token: "Hel" });
+
+    source.emitTransportError();
+    // ...the rest of the tokens and `done` are published while the client is away...
+    source.emitOpen();
+
+    await waitFor(() => expect(cached(client)?.[0]).toMatchObject({ content: "Hello world", status: "sent" }));
+  });
+
+  it("a reply still being generated keeps the text already shown, because the server saves the text only at the end", async () => {
+    const requests = serverHas([{ id: "msg-assistant-1", content: "", status: "streaming" }]);
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    const source = FakeEventSource.last;
+    source.emitOpen();
+    source.emit("token", { messageId: "msg-assistant-1", token: "Hel" });
+
+    source.emitTransportError();
+    source.emitOpen();
+    await waitFor(() => expect(requests).toHaveLength(1));
+    source.emit("token", { messageId: "msg-assistant-1", token: "lo" });
+
+    expect(cached(client)?.[0]).toMatchObject({ content: "Hello", status: "streaming" });
+  });
+
+  it("messages that arrived during the drop (another member's, the next queued one) appear after the reconnect", async () => {
+    serverHas([
+      { id: "msg-assistant-1", content: "First answer", status: "sent" },
+      { id: "msg-user-2", role: "user", content: "Sent by a member while we were away", status: "sent" },
+    ]);
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    const source = FakeEventSource.last;
+    source.emitOpen();
+    source.emit("token", { messageId: "msg-assistant-1", token: "First" });
+
+    source.emitTransportError();
+    source.emitOpen();
+
+    await waitFor(() => expect(cached(client)?.map((m) => m.id)).toEqual(["msg-assistant-1", "msg-user-2"]));
+  });
+
+  it("a failed refetch keeps what is shown and does not throw; the next done refetches again", async () => {
+    server.use(http.get("*/chats/:chatId/messages", () => HttpResponse.json({ error: { code: "INTERNAL_ERROR" } }, { status: 500 })));
+    const client = createTestQueryClient();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    ensureChatStream("chat-1", client);
+    const source = FakeEventSource.last;
+    source.emitOpen();
+    source.emit("token", { messageId: "msg-assistant-1", token: "Hel" });
+
+    source.emitTransportError();
+    source.emitOpen();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(cached(client)?.[0]).toMatchObject({ content: "Hel", status: "streaming" });
+    source.emit("done", { type: "done", messageId: "msg-assistant-1" });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.messages("chat-1") });
+  });
+
+  it("when the browser gives up (CLOSED), opens a new stream after a delay, and that open recovers like a reconnect", async () => {
+    const requests = serverHas([{ id: "msg-assistant-1", content: "Hello world", status: "sent" }]);
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    const first = FakeEventSource.last;
+    first.emitOpen();
+    first.emit("token", { messageId: "msg-assistant-1", token: "Hel" });
+
+    first.emitTransportError({ final: true });
+    expect(first.closed).toBe(true);
+    expect(isChatReconnecting("chat-1")).toBe(true);
+    expect(isChatStreaming("chat-1")).toBe(true);
+
+    vi.advanceTimersByTime(RECONNECT_DELAY_MS - 1);
+    expect(FakeEventSource.instances).toHaveLength(1);
+    vi.advanceTimersByTime(1);
+    expect(FakeEventSource.instances).toHaveLength(2);
+
+    vi.useRealTimers();
+    FakeEventSource.last.emitOpen();
+    expect(isChatReconnecting("chat-1")).toBe(false);
+    await waitFor(() => expect(cached(client)?.[0]).toMatchObject({ content: "Hello world", status: "sent" }));
+    expect(requests).toEqual(["chat-1"]);
+  });
+
+  it("closing the chat's stream cancels a pending reconnect", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    FakeEventSource.last.emitTransportError({ final: true });
+
+    closeChatStream("chat-1");
+    vi.advanceTimersByTime(RECONNECT_DELAY_MS * 2);
+
+    expect(FakeEventSource.instances).toHaveLength(1);
+    expect(isChatStreaming("chat-1")).toBe(false);
+    expect(isChatReconnecting("chat-1")).toBe(false);
+  });
+
+  it("a drop in one chat does not mark the other chats as reconnecting", () => {
+    const client = createTestQueryClient();
+    ensureChatStream("chat-1", client);
+    ensureChatStream("chat-2", client);
+
+    FakeEventSource.instances[0]!.emitTransportError();
+
+    expect(isChatReconnecting("chat-1")).toBe(true);
+    expect(isChatReconnecting("chat-2")).toBe(false);
+  });
+});
 
 describe("stream-registry (AC-52, AC-55, AC-59, AC-60, AC-61, AC-72, AC-74)", () => {
   beforeEach(() => {

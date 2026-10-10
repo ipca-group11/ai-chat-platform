@@ -1,0 +1,15 @@
+$ cd apps/mfe-chat && pnpm exec vitest run src/shared/sse.test.ts src/features/chat-view/model/stream-registry.test.ts -t AICHAT-168 2>&1 | grep -E '✓|×|Tests ' 
+     × AICHAT-168: reports every open, the first connect and each reconnect, through onOpen 2ms
+     × AICHAT-168: says whether the browser will reconnect by itself or has given up 2ms
+     × shows the chat as reconnecting from the drop until the stream is open again 2ms
+     × does not refetch on the first open, only on an open that follows a drop 1041ms
+     × a reply that finished during the drop is no longer streaming after the reconnect (the 'done' event was lost) 1007ms
+     × a reply still being generated keeps the text already shown, because the server saves the text only at the end 1005ms
+     × messages that arrived during the drop (another member's, the next queued one) appear after the reconnect 1003ms
+     × when the browser gives up (CLOSED), opens a new stream after a delay, and that open recovers like a reconnect 3ms
+     × closing the chat's stream cancels a pending reconnect 1ms
+     × a drop in one chat does not mark the other chats as reconnecting 0ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  10 failed | 1 passed | 25 skipped (36)
+
+[exit 0]

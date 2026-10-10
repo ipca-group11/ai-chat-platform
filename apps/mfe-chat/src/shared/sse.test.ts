@@ -116,6 +116,27 @@ describe("subscribeToChatStream", () => {
     expect(h.onToken).toHaveBeenCalledWith({ type: "token", messageId: "m2", token: "after reconnect" });
   });
 
+  it("AICHAT-168: reports every open, the first connect and each reconnect, through onOpen", () => {
+    const h = { ...handlers(), onOpen: vi.fn() };
+    subscribeToChatStream("chat-1", h);
+
+    Source.last.emitOpen();
+    Source.last.emitTransportError();
+    Source.last.emitOpen();
+
+    expect(h.onOpen).toHaveBeenCalledTimes(2);
+  });
+
+  it("AICHAT-168: says whether the browser will reconnect by itself or has given up", () => {
+    const h = { ...handlers(), onConnectionError: vi.fn() };
+    subscribeToChatStream("chat-1", h);
+
+    Source.last.emitTransportError();
+    Source.last.emitTransportError({ final: true });
+
+    expect(h.onConnectionError.mock.calls.map((call) => call[1])).toEqual([{ willReconnect: true }, { willReconnect: false }]);
+  });
+
   it("close() closes only that chat's stream", () => {
     const first = subscribeToChatStream("chat-1", handlers());
     subscribeToChatStream("chat-2", handlers());
