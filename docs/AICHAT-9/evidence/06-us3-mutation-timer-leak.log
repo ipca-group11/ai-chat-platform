@@ -1,0 +1,5 @@
+$ cd services/conversation-service && F=src/features/streaming/routes.ts && cp $F /tmp/rt.ts && sed -i '' 's/        clearInterval(heartbeat);//' $F && git diff -U0 $F | grep '^-.*clearInterval'; pnpm exec vitest run src/features/streaming -t 'AICHAT-169' 2>&1 | grep -E '^ +×|Tests '; cp /tmp/rt.ts $F
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 5 passed | 11 skipped (17)
+
+[exit 0]

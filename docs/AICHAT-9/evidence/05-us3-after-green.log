@@ -1,0 +1,13 @@
+$ cd services/conversation-service && pnpm exec vitest run src/features/streaming src/integration/stream-reconnect.spec.ts -t 'AICHAT-169' --reporter=verbose 2>&1 | grep -E '✓|×|Tests '
+ ✓ src/features/streaming/sse.spec.ts > ChatEventBus > AICHAT-169: counts the subscribers of a chat, so a test can see a closed stream unsubscribe 1ms
+ ✓ src/features/streaming/sse.spec.ts > SSE response helpers > AICHAT-169: writeSseComment writes a comment line, which EventSource ignores 0ms
+ ✓ src/features/streaming/routes.spec.ts > streaming routes > AICHAT-169: disconnect and heartbeat > closing the connection unsubscribes it from the chat's event bus 63ms
+ ✓ src/integration/stream-reconnect.spec.ts > stream drop and reconnect (AICHAT-169) > a dropped connection is unsubscribed and no longer counted in active_streams 76ms
+ ✓ src/features/streaming/routes.spec.ts > streaming routes > AICHAT-169: disconnect and heartbeat > sends the comment ": ping" every 15 s on an idle stream, so proxies keep it open 129ms
+ ✓ src/features/streaming/routes.spec.ts > streaming routes > AICHAT-169: disconnect and heartbeat > stops the heartbeat when the client disconnects (no timer left behind) 54ms
+ ✓ src/features/streaming/routes.spec.ts > streaming routes > AICHAT-169: disconnect and heartbeat > events and heartbeats share the stream without breaking the SSE frames 54ms
+ ✓ src/integration/stream-reconnect.spec.ts > stream drop and reconnect (AICHAT-169) > the reply keeps being generated while no client is connected, and is saved complete 111ms
+ ✓ src/integration/stream-reconnect.spec.ts > stream drop and reconnect (AICHAT-169) > a new connection receives the events published after it opened, and none from before (no replay) 160ms
+      Tests  9 passed | 11 skipped (20)
+
+[exit 0]

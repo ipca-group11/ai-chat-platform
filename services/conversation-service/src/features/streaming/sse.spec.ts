@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Response } from "express";
-import { ChatEventBus, initSseResponse, writeSseEvent } from "./sse.js";
+import { ChatEventBus, initSseResponse, writeSseComment, writeSseEvent } from "./sse.js";
 
 describe("ChatEventBus", () => {
   it("AC-52: delivers published events to subscribers of the same chat", () => {
@@ -24,6 +24,19 @@ describe("ChatEventBus", () => {
 
     expect(receivedA).toHaveLength(1);
     expect(receivedB).toHaveLength(0);
+  });
+
+  it("AICHAT-169: counts the subscribers of a chat, so a test can see a closed stream unsubscribe", () => {
+    const bus = new ChatEventBus();
+    expect(bus.subscriberCount("chat-1")).toBe(0);
+
+    const first = bus.subscribe("chat-1", () => {});
+    bus.subscribe("chat-1", () => {});
+    bus.subscribe("chat-2", () => {});
+    expect(bus.subscriberCount("chat-1")).toBe(2);
+
+    first();
+    expect(bus.subscriberCount("chat-1")).toBe(1);
   });
 
   it("unsubscribe stops further delivery", () => {
@@ -57,5 +70,14 @@ describe("SSE response helpers", () => {
     expect(write).toHaveBeenCalledWith(
       `event: token\ndata: ${JSON.stringify({ type: "token", messageId: "m1", token: "hi" })}\n\n`,
     );
+  });
+
+  it("AICHAT-169: writeSseComment writes a comment line, which EventSource ignores", () => {
+    const write = vi.fn();
+    const res = { write } as unknown as Response;
+
+    writeSseComment(res, "ping");
+
+    expect(write).toHaveBeenCalledWith(": ping\n\n");
   });
 });

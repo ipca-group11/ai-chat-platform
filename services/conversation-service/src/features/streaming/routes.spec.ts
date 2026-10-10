@@ -3,14 +3,14 @@ import type { AddressInfo } from "node:net";
 import express from "express";
 import cookieParser from "cookie-parser";
 import request from "supertest";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { TEST_JWT_SECRET, tokenFor } from "../../test-utils/auth-token.js";
 import { authMiddleware } from "../../shared/auth-middleware.js";
 import { errorHandler, notFoundHandler } from "../../shared/error-handler.js";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
 import { ChatsService } from "../chats/index.js";
 import { ChatEventBus } from "./sse.js";
-import { createStreamingRouter } from "./routes.js";
+import { createStreamingRouter, HEARTBEAT_INTERVAL_MS } from "./routes.js";
 import { asUser } from "../../test-utils/principal.js";
 
 
@@ -122,5 +122,96 @@ describe("streaming routes", () => {
     } finally {
       server.close();
     }
+  });
+
+  describe("AICHAT-169: disconnect and heartbeat", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    /** Serves the stream on a real port and opens one connection that collects what it receives. */
+    async function openRealStream(bus = new ChatEventBus()) {
+      const { chatsService } = buildApp();
+      const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "anthropic", model: "claude-haiku-4-5" });
+      const streamApp = express();
+      streamApp.use(cookieParser());
+      streamApp.use(authMiddleware(TEST_JWT_SECRET));
+      streamApp.use("/chats", createStreamingRouter(chatsService, bus));
+      const server = streamApp.listen(0);
+      const port = (server.address() as AddressInfo).port;
+      let received = "";
+      const req = await new Promise<http.ClientRequest>((resolve, reject) => {
+        const r = http.get({ port, path: `/chats/${chat.id}/stream`, headers: { Cookie: `access_token=${tokenFor("user-1")}` } }, (res) => {
+          res.on("data", (chunk: Buffer) => (received += chunk.toString("utf-8")));
+          resolve(r);
+        });
+        r.on("error", (err) => {
+          if (!(err as NodeJS.ErrnoException).code?.includes("ECONNRESET")) reject(err);
+        });
+      });
+      return { bus, chatId: chat.id, req, server, received: () => received };
+    }
+
+    it("closing the connection unsubscribes it from the chat's event bus", async () => {
+      const stream = await openRealStream();
+      try {
+        expect(stream.bus.subscriberCount(stream.chatId)).toBe(1);
+
+        stream.req.destroy();
+
+        await vi.waitFor(() => expect(stream.bus.subscriberCount(stream.chatId)).toBe(0));
+      } finally {
+        stream.server.close();
+      }
+    });
+
+    it(`sends the comment ": ping" every ${HEARTBEAT_INTERVAL_MS / 1000} s on an idle stream, so proxies keep it open`, async () => {
+      vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+      const stream = await openRealStream();
+      try {
+        vi.advanceTimersByTime(HEARTBEAT_INTERVAL_MS - 1);
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        expect(stream.received()).toBe("");
+
+        vi.advanceTimersByTime(1);
+        await vi.waitFor(() => expect(stream.received()).toBe(": ping\n\n"));
+
+        vi.advanceTimersByTime(HEARTBEAT_INTERVAL_MS);
+        await vi.waitFor(() => expect(stream.received()).toBe(": ping\n\n: ping\n\n"));
+      } finally {
+        stream.req.destroy();
+        stream.server.close();
+      }
+    });
+
+    it("stops the heartbeat when the client disconnects (no timer left behind)", async () => {
+      vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+      const stream = await openRealStream();
+      try {
+        expect(vi.getTimerCount()).toBe(1);
+
+        stream.req.destroy();
+
+        await vi.waitFor(() => expect(vi.getTimerCount()).toBe(0));
+      } finally {
+        stream.server.close();
+      }
+    });
+
+    it("events and heartbeats share the stream without breaking the SSE frames", async () => {
+      vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+      const stream = await openRealStream();
+      try {
+        stream.bus.publish(stream.chatId, { type: "token", messageId: "m1", token: "hi" });
+        vi.advanceTimersByTime(HEARTBEAT_INTERVAL_MS);
+
+        await vi.waitFor(() =>
+          expect(stream.received()).toBe(`event: token\ndata: ${JSON.stringify({ type: "token", messageId: "m1", token: "hi" })}\n\n: ping\n\n`),
+        );
+      } finally {
+        stream.req.destroy();
+        stream.server.close();
+      }
+    });
   });
 });
