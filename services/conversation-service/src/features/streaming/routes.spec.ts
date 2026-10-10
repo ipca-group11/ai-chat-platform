@@ -70,8 +70,12 @@ describe("streaming routes", () => {
             // timing assumption.
             bus.publish(chat.id, { type: "token", messageId: "m1", token: "hi" });
 
+            // The stream starts with a ": connected" comment; read until the event's frame arrives.
+            let received = "";
             res.on("data", (chunk: Buffer) => {
-              resolve(chunk.toString("utf-8"));
+              received += chunk.toString("utf-8");
+              if (!received.includes("event: ")) return;
+              resolve(received);
               req.destroy();
             });
             res.on("error", reject);
@@ -125,6 +129,8 @@ describe("streaming routes", () => {
   });
 
   describe("AICHAT-169: disconnect and heartbeat", () => {
+    const CONNECTED = ": connected\n\n";
+
     afterEach(() => {
       vi.useRealTimers();
     });
@@ -152,6 +158,16 @@ describe("streaming routes", () => {
       return { bus, chatId: chat.id, req, server, received: () => received };
     }
 
+    it("writes a first comment at once, so a proxy that holds the headers until the first body bytes still opens the stream", async () => {
+      const stream = await openRealStream();
+      try {
+        await vi.waitFor(() => expect(stream.received()).toBe(CONNECTED));
+      } finally {
+        stream.req.destroy();
+        stream.server.close();
+      }
+    });
+
     it("closing the connection unsubscribes it from the chat's event bus", async () => {
       const stream = await openRealStream();
       try {
@@ -171,13 +187,13 @@ describe("streaming routes", () => {
       try {
         vi.advanceTimersByTime(HEARTBEAT_INTERVAL_MS - 1);
         await new Promise((resolve) => setTimeout(resolve, 20));
-        expect(stream.received()).toBe("");
+        expect(stream.received()).toBe(CONNECTED);
 
         vi.advanceTimersByTime(1);
-        await vi.waitFor(() => expect(stream.received()).toBe(": ping\n\n"));
+        await vi.waitFor(() => expect(stream.received()).toBe(`${CONNECTED}: ping\n\n`));
 
         vi.advanceTimersByTime(HEARTBEAT_INTERVAL_MS);
-        await vi.waitFor(() => expect(stream.received()).toBe(": ping\n\n: ping\n\n"));
+        await vi.waitFor(() => expect(stream.received()).toBe(`${CONNECTED}: ping\n\n: ping\n\n`));
       } finally {
         stream.req.destroy();
         stream.server.close();
@@ -206,7 +222,7 @@ describe("streaming routes", () => {
         vi.advanceTimersByTime(HEARTBEAT_INTERVAL_MS);
 
         await vi.waitFor(() =>
-          expect(stream.received()).toBe(`event: token\ndata: ${JSON.stringify({ type: "token", messageId: "m1", token: "hi" })}\n\n: ping\n\n`),
+          expect(stream.received()).toBe(`${CONNECTED}event: token\ndata: ${JSON.stringify({ type: "token", messageId: "m1", token: "hi" })}\n\n: ping\n\n`),
         );
       } finally {
         stream.req.destroy();
