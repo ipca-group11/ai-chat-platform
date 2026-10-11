@@ -6,13 +6,46 @@
 # headers to localhost origins, so Host is rewritten upstream and CORS for the remotes is
 # set here instead.
 
+# Security headers (H8): applied to the shell and every remote. The CSP is a default (?) so
+# Grafana, which sends its own policy under /grafana, keeps it.
+(security) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Frame-Options "DENY"
+		X-Content-Type-Options "nosniff"
+		?Content-Security-Policy "default-src 'self'; script-src 'self' https://{$DOMAIN}:3001 https://{$DOMAIN}:3002 https://{$DOMAIN}:3003; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https: wss:; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+	}
+}
+
+# Access logs (privacy): JSON to stdout with the query string stripped from the URI and
+# every client address field (remote/client IP, port, X-Forwarded-For) removed, so no raw IPs
+# or query-string values (tokens, search text) reach the logs.
+(accesslog) {
+	log {
+		output stdout
+		format filter {
+			wrap json
+			request>uri regexp \?.* ""
+			request>remote_ip delete
+			request>remote_port delete
+			request>client_ip delete
+			request>headers>X-Forwarded-For delete
+			request>headers>Cookie delete
+			request>headers>Authorization delete
+		}
+	}
+}
+
 (remote) {
+	import security
 	header Access-Control-Allow-Origin "https://{$DOMAIN}"
 	header Vary Origin
 	header -Server
 }
 
 {$DOMAIN} {
+	import security
+	import accesslog
 	encode gzip
 	# Grafana serves itself under /grafana (GF_SERVER_SERVE_FROM_SUB_PATH), so the prefix
 	# is passed through unchanged.
@@ -32,6 +65,7 @@
 
 {$DOMAIN}:3001 {
 	import remote
+	import accesslog
 	reverse_proxy mfe-auth:3001 {
 		header_up Host localhost
 		header_down -Access-Control-Allow-Origin
@@ -40,6 +74,7 @@
 
 {$DOMAIN}:3002 {
 	import remote
+	import accesslog
 	reverse_proxy mfe-chat:3002 {
 		header_up Host localhost
 		header_down -Access-Control-Allow-Origin
@@ -48,6 +83,7 @@
 
 {$DOMAIN}:3003 {
 	import remote
+	import accesslog
 	reverse_proxy mfe-settings:3003 {
 		header_up Host localhost
 		header_down -Access-Control-Allow-Origin

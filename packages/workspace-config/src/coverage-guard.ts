@@ -82,3 +82,121 @@ export function loadProject(dir: string) {
     config: configFile ? readRepoFile(`${dir}/${configFile}`) : undefined,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Threshold floors (NFR cov-guard-floor): no project may lower its coverage threshold
+// below the approved value. Run with `pnpm nx test workspace-config -- coverage-guard`.
+// ---------------------------------------------------------------------------
+
+export type ThresholdKey = "lines" | "statements" | "functions" | "branches";
+export type Thresholds = Partial<Record<ThresholdKey, number>>;
+
+const THRESHOLD_KEYS: ThresholdKey[] = ["lines", "statements", "functions", "branches"];
+
+/** Approved floors: 80 lines/functions/statements everywhere; branches 80 default, 75 apps, 70 e2e. */
+export const DEFAULT_FLOOR: Record<ThresholdKey, number> = { lines: 80, statements: 80, functions: 80, branches: 80 };
+export const APP_FLOOR: Record<ThresholdKey, number> = { ...DEFAULT_FLOOR, branches: 75 };
+export const E2E_FLOOR: Record<ThresholdKey, number> = { ...DEFAULT_FLOOR, branches: 70 };
+
+/** Approved floor for a project directory. */
+export function floorFor(dir: string): Record<ThresholdKey, number> {
+  if (dir === "e2e") return E2E_FLOOR;
+  if (dir.startsWith("apps/") || dir === "packages/test-utils") return APP_FLOOR;
+  return DEFAULT_FLOOR;
+}
+
+/** Named threshold constants exported by `@platform/test-config` (kept in sync by checkSharedConstants). */
+const NAMED: Record<string, Record<ThresholdKey, number>> = {
+  coverageThresholds: DEFAULT_FLOOR,
+  appCoverageThresholds: APP_FLOOR,
+  e2eCoverageThresholds: E2E_FLOOR,
+};
+
+/**
+ * Statically resolves the effective thresholds of a Vitest config text.
+ * Returns undefined keys when a value cannot be determined (reported as a problem by the checker).
+ * `coveragePreset(...)` without overrides inherits the shared 80 default.
+ */
+export function resolveThresholds(config: string, shared: Record<string, Thresholds> = NAMED): Thresholds {
+  const usesPreset = config.includes("coveragePreset(");
+  const idx = config.search(/\bthresholds\s*:/);
+  if (idx === -1) return usesPreset ? { ...(shared.coverageThresholds ?? DEFAULT_FLOOR) } : {};
+  let rest = config.slice(idx).replace(/^thresholds\s*:\s*/, "");
+  const result: Thresholds = usesPreset ? { ...(shared.coverageThresholds ?? DEFAULT_FLOOR) } : {};
+  if (rest.startsWith("{")) {
+    let depth = 0;
+    let end = 0;
+    for (; end < rest.length; end++) {
+      if (rest[end] === "{") depth++;
+      else if (rest[end] === "}" && --depth === 0) break;
+    }
+    const body = rest.slice(1, end);
+    for (const spread of body.matchAll(/\.\.\.\s*(\w+)/g)) Object.assign(result, shared[spread[1]!] ?? {});
+    for (const key of THRESHOLD_KEYS) {
+      const m = new RegExp(`\\b${key}\\s*:\\s*(-?\\d+(?:\\.\\d+)?)`).exec(body);
+      if (m) result[key] = Number(m[1]);
+      else if (new RegExp(`\\b${key}\\s*:`).test(body)) delete result[key]; // non-literal value: unknown
+    }
+    return result;
+  }
+  rest = rest.trimStart();
+  const ident = /^(\w+)/.exec(rest)?.[1];
+  if (ident && shared[ident]) return { ...shared[ident] };
+  return {}; // unknown expression
+}
+
+/** Problems for one project: any threshold below the approved floor (or not statically determinable). */
+export function checkThresholds(dir: string, config: string | undefined, shared: Record<string, Thresholds> = NAMED): string[] {
+  if (dir in COVERAGE_EXEMPT || config === undefined) return [];
+  const floor = floorFor(dir);
+  const actual = resolveThresholds(config, shared);
+  const problems: string[] = [];
+  for (const key of THRESHOLD_KEYS) {
+    const value = actual[key];
+    if (typeof value !== "number") {
+      problems.push(`${dir}: coverage threshold "${key}" is not set or cannot be resolved (approved >= ${floor[key]})`);
+    } else if (value < floor[key]) {
+      problems.push(`${dir}: coverage threshold ${key}=${value} is below the approved ${floor[key]}`);
+    }
+  }
+  return problems;
+}
+
+/** Problems for the shared threshold constants in packages/test-config/coverage-thresholds.ts. */
+export function checkSharedConstants(source = readRepoFile("packages/test-config/coverage-thresholds.ts")): string[] {
+  const problems: string[] = [];
+  const expected: Record<string, Record<ThresholdKey, number>> = {
+    coverageThresholds: DEFAULT_FLOOR,
+    appCoverageThresholds: APP_FLOOR,
+    e2eCoverageThresholds: E2E_FLOOR,
+  };
+  for (const [name, floor] of Object.entries(expected)) {
+    const block = new RegExp(`${name}\\s*=\\s*Object\\.freeze<[^>]+>\\(\\{([^}]*)\\}`).exec(source)?.[1];
+    if (block === undefined) {
+      problems.push(`${name}: constant not found in coverage-thresholds.ts`);
+      continue;
+    }
+    for (const key of THRESHOLD_KEYS) {
+      const m = new RegExp(`\\b${key}\\s*:\\s*(\\d+(?:\\.\\d+)?)`).exec(block);
+      if (!m || Number(m[1]) < floor[key]) {
+        problems.push(`${name}.${key}=${m?.[1] ?? "missing"} is below the approved ${floor[key]}`);
+      }
+    }
+  }
+  return problems;
+}
+
+/** All threshold problems across the workspace (empty when nothing was lowered). */
+export function findThresholdViolations(): string[] {
+  return [
+    ...checkSharedConstants(),
+    ...findTestProjects().flatMap((dir) => checkThresholds(dir, loadProject(dir).config)),
+  ];
+}
+
+// CLI: `node packages/workspace-config/src/coverage-guard.ts` exits 1 on any violation.
+if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+  const violations = findThresholdViolations();
+  for (const v of violations) console.error(v);
+  process.exit(violations.length ? 1 : 0);
+}

@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { loadEnv, parseEnv } from "./env.js";
 
+const S = "test-signing-secret";
+
 describe("parseEnv", () => {
   it("AC-45: applies safe defaults when optional variables are absent", () => {
-    const env = parseEnv({});
+    const env = parseEnv({ JWT_SECRET: S });
     expect(env.PORT).toBe(4002);
     expect(env.UPLOAD_DIR).toBe("./data/uploads");
     expect(env.MAX_UPLOAD_BYTES).toBe(10 * 1024 * 1024);
@@ -15,30 +17,30 @@ describe("parseEnv", () => {
   });
 
   it("AC-68: coerces MAX_UPLOAD_BYTES from a string env var to a number", () => {
-    const env = parseEnv({ MAX_UPLOAD_BYTES: "1048576" });
+    const env = parseEnv({ JWT_SECRET: S, MAX_UPLOAD_BYTES: "1048576" });
     expect(env.MAX_UPLOAD_BYTES).toBe(1048576);
   });
 
   it("has no system prompt unless SYSTEM_PROMPT is set (AICHAT-26)", () => {
-    expect(parseEnv({}).SYSTEM_PROMPT).toBeUndefined();
-    expect(parseEnv({ SYSTEM_PROMPT: "Be brief." }).SYSTEM_PROMPT).toBe("Be brief.");
-    expect(() => parseEnv({ SYSTEM_PROMPT: "" })).toThrow();
+    expect(parseEnv({ JWT_SECRET: S }).SYSTEM_PROMPT).toBeUndefined();
+    expect(parseEnv({ JWT_SECRET: S, SYSTEM_PROMPT: "Be brief." }).SYSTEM_PROMPT).toBe("Be brief.");
+    expect(() => parseEnv({ JWT_SECRET: S, SYSTEM_PROMPT: "" })).toThrow();
   });
 
   it("has no internal service token unless INTERNAL_SERVICE_TOKEN is set, and rejects a short one (AICHAT-79)", () => {
-    expect(parseEnv({}).INTERNAL_SERVICE_TOKEN).toBeUndefined();
-    expect(parseEnv({ INTERNAL_SERVICE_TOKEN: "x".repeat(32) }).INTERNAL_SERVICE_TOKEN).toBe("x".repeat(32));
-    expect(() => parseEnv({ INTERNAL_SERVICE_TOKEN: "too-short" })).toThrow();
+    expect(parseEnv({ JWT_SECRET: S }).INTERNAL_SERVICE_TOKEN).toBeUndefined();
+    expect(parseEnv({ JWT_SECRET: S, INTERNAL_SERVICE_TOKEN: "x".repeat(32) }).INTERNAL_SERVICE_TOKEN).toBe("x".repeat(32));
+    expect(() => parseEnv({ JWT_SECRET: S, INTERNAL_SERVICE_TOKEN: "too-short" })).toThrow();
   });
 
   it("runs the retention job every 6 hours by default, and 0 turns it off (AICHAT-137)", () => {
-    expect(parseEnv({}).RETENTION_INTERVAL_MINUTES).toBe(360);
-    expect(parseEnv({ RETENTION_INTERVAL_MINUTES: "0" }).RETENTION_INTERVAL_MINUTES).toBe(0);
-    expect(() => parseEnv({ RETENTION_INTERVAL_MINUTES: "-5" })).toThrow();
+    expect(parseEnv({ JWT_SECRET: S }).RETENTION_INTERVAL_MINUTES).toBe(360);
+    expect(parseEnv({ JWT_SECRET: S, RETENTION_INTERVAL_MINUTES: "0" }).RETENTION_INTERVAL_MINUTES).toBe(0);
+    expect(() => parseEnv({ JWT_SECRET: S, RETENTION_INTERVAL_MINUTES: "-5" })).toThrow();
   });
 
   it("AC-45: rejects an invalid NODE_ENV value", () => {
-    expect(() => parseEnv({ NODE_ENV: "not-a-real-env" })).toThrow();
+    expect(() => parseEnv({ JWT_SECRET: S, NODE_ENV: "not-a-real-env" })).toThrow();
   });
 });
 

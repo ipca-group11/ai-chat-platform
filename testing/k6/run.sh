@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs one load scenario with k6 + xk6-sse in Docker, on the network of the compose stack.
 #
-#   bash testing/k6/run.sh <seed|smoke|users_ramp|streams_ramp|soak>
+#   bash testing/k6/run.sh <seed|smoke|users_ramp|streams_ramp|soak|mixed>
 #
 # The stack must be up (LOAD=1 bash scripts/mock-compose.sh up llm). The k6 image is built on the
 # first run (testing/k6/Dockerfile). Output: docs/AICHAT-24/results/<scenario>-summary.json and
@@ -22,7 +22,7 @@ if ! docker image inspect "$image" > /dev/null 2>&1; then
 fi
 
 env_args=(-e "SCENARIO=$scenario" -e "BASE_URL=${BASE_URL:-http://shell:3000}")
-for var in USER_LEVELS STREAM_LEVELS STAGE_SECONDS RAMP_SECONDS SOAK_RATE SOAK_DURATION MAX_VUS SEED_USERS POOL_USERS \
+for var in USER_LEVELS STREAM_LEVELS STAGE_SECONDS RAMP_SECONDS SOAK_RATE SOAK_DURATION MIXED_USERS MIXED_STREAMS MIXED_DURATION MAX_VUS SEED_USERS POOL_USERS \
   REST_P95_MS TTFT_P95_MS STREAM_TIMEOUT_MS LLM_MODEL LLM_API_KEY K6_PASSWORD; do
   if [ -n "${!var:-}" ]; then env_args+=(-e "$var=${!var}"); fi
 done

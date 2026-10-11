@@ -32,6 +32,7 @@ If a port is taken (4001, 4002, 3300, 9090), set `AUTH_SERVICE_PORT`, `CONVERSAT
 | `smoke` | 1 VU, 1 iteration | One full flow; passes when the stream ends with `done` |
 | `users_ramp` | `ramping-vus` | Browsing users (chat list, messages) climb level by level |
 | `streams_ramp` | `ramping-arrival-rate` | New streams per second climb level by level; a stream lasts as long as the answer |
+| `mixed` | `constant-vus` + `constant-arrival-rate` | NFR: 100 browsing users and 30 streams/s together (`MIXED_USERS`, `MIXED_STREAMS`, `MIXED_DURATION`, default 3m); exits 99 if REST p95 >= 1000 ms, TTFT p95 >= 1500 ms or failures >= 1 %. Defined in `scenarios/mixed.ts` |
 | `soak` | `constant-arrival-rate` | A steady stream rate for `SOAK_DURATION` (30 min by default) |
 
 ## Settings (environment variables)

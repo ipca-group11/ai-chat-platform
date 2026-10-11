@@ -1,0 +1,37 @@
+# Full scheduled bundle size run (not only affected projects). Every size-limit group must stay within
+# its budget: `size-limit` exits non-zero when any group is over limit, which fails this job.
+name: size-full
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch: {}
+
+concurrency:
+  group: size-full-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  size:
+    name: size / full
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # run-many (not affected) builds and measures every project that has a size target.
+      - name: Build and size-limit, all projects
+        run: pnpm nx run-many -t build size --skip-nx-cache

@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vitest run --coverage",
+    "test:a11y": "vitest run a11y",
     "test:watch": "vitest"
   },
   "dependencies": {

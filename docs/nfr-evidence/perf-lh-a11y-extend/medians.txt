@@ -1,0 +1,5 @@
+/chats 3 {"fcp":773,"ttfb":104,"bytes":527628,"si":1119} FAIL: none
+/chats/:id 3 {"fcp":880,"ttfb":85,"bytes":530925,"si":1313} FAIL: none
+/login 3 {"fcp":913,"ttfb":25,"bytes":484700,"si":1030} FAIL: none
+/register 3 {"fcp":794,"ttfb":40,"bytes":484914,"si":897} FAIL: none
+/settings 3 {"fcp":804,"ttfb":35,"bytes":485089,"si":1300} FAIL: none

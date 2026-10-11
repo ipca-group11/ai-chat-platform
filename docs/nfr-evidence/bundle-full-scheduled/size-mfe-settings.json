@@ -1,0 +1,32 @@
+[
+  {
+    "name": "mfe-settings remoteEntry.js",
+    "passed": true,
+    "size": 6216,
+    "sizeLimit": 7000
+  },
+  {
+    "name": "mfe-settings route chunks",
+    "passed": true,
+    "size": 25879,
+    "sizeLimit": 29000
+  },
+  {
+    "name": "mfe-settings federation glue",
+    "passed": true,
+    "size": 116551,
+    "sizeLimit": 129000
+  },
+  {
+    "name": "mfe-settings shared-library copies",
+    "passed": true,
+    "size": 89635,
+    "sizeLimit": 99000
+  },
+  {
+    "name": "mfe-settings all emitted JS",
+    "passed": true,
+    "size": 238281,
+    "sizeLimit": 263000
+  }
+]

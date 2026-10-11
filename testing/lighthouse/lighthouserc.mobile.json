@@ -1,0 +1,36 @@
+{
+  "ci": {
+    "collect": {
+      "url": [
+        "http://localhost:8000/login",
+        "http://localhost:8000/register",
+        "http://localhost:8000/chats",
+        "http://localhost:8000/chats/{CHAT_ID}",
+        "http://localhost:8000/settings"
+      ],
+      "numberOfRuns": 3,
+      "settings": {
+        "formFactor": "mobile",
+        "screenEmulation": { "mobile": true, "width": 412, "height": 823, "deviceScaleFactor": 1.75, "disabled": false },
+        "throttlingMethod": "simulate",
+        "throttling": { "rttMs": 150, "throughputKbps": 1638.4, "requestLatencyMs": 562.5, "downloadThroughputKbps": 1474.56, "uploadThroughputKbps": 675, "cpuSlowdownMultiplier": 4 },
+        "onlyCategories": ["performance"],
+        "chromeFlags": "--headless=new --no-sandbox"
+      }
+    },
+    "assert": {
+      "assertMatrix": [
+        {
+          "matchingUrlPattern": "^http://[^/]+/(login|register|chats|chats/[^/]+|settings)$",
+          "aggregationMethod": "median",
+          "assertions": {
+            "largest-contentful-paint": ["error", { "maxNumericValue": 4000 }],
+            "total-blocking-time": ["error", { "maxNumericValue": 600 }],
+            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }]
+          }
+        }
+      ]
+    },
+    "upload": { "target": "filesystem", "outputDir": "lighthouse-results-mobile/lhci" }
+  }
+}

@@ -11,7 +11,9 @@
       "numberOfRuns": 3,
       "settings": {
         "preset": "desktop",
-        "onlyCategories": ["performance"],
+        "onlyCategories": [
+          "performance"
+        ],
         "chromeFlags": "--headless=new --no-sandbox"
       }
     },
@@ -21,18 +23,96 @@
           "matchingUrlPattern": "^http://[^/]+/(login|register)$",
           "aggregationMethod": "median",
           "assertions": {
-            "largest-contentful-paint": ["error", { "maxNumericValue": 2000 }],
-            "total-blocking-time": ["error", { "maxNumericValue": 200 }],
-            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }]
+            "largest-contentful-paint": [
+              "error",
+              {
+                "maxNumericValue": 2000
+              }
+            ],
+            "total-blocking-time": [
+              "error",
+              {
+                "maxNumericValue": 200
+              }
+            ],
+            "cumulative-layout-shift": [
+              "error",
+              {
+                "maxNumericValue": 0.05
+              }
+            ],
+            "first-contentful-paint": [
+              "error",
+              {
+                "maxNumericValue": 1800
+              }
+            ],
+            "server-response-time": [
+              "error",
+              {
+                "maxNumericValue": 600
+              }
+            ],
+            "total-byte-weight": [
+              "error",
+              {
+                "maxNumericValue": 1536000
+              }
+            ],
+            "speed-index": [
+              "error",
+              {
+                "maxNumericValue": 3400
+              }
+            ]
           }
         },
         {
           "matchingUrlPattern": "^http://[^/]+/(chats|chats/[^/]+|settings)$",
           "aggregationMethod": "median",
           "assertions": {
-            "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
-            "total-blocking-time": ["error", { "maxNumericValue": 300 }],
-            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }]
+            "largest-contentful-paint": [
+              "error",
+              {
+                "maxNumericValue": 2500
+              }
+            ],
+            "total-blocking-time": [
+              "error",
+              {
+                "maxNumericValue": 300
+              }
+            ],
+            "cumulative-layout-shift": [
+              "error",
+              {
+                "maxNumericValue": 0.1
+              }
+            ],
+            "first-contentful-paint": [
+              "error",
+              {
+                "maxNumericValue": 1800
+              }
+            ],
+            "server-response-time": [
+              "error",
+              {
+                "maxNumericValue": 600
+              }
+            ],
+            "total-byte-weight": [
+              "error",
+              {
+                "maxNumericValue": 1536000
+              }
+            ],
+            "speed-index": [
+              "error",
+              {
+                "maxNumericValue": 3400
+              }
+            ]
           }
         }
       ]

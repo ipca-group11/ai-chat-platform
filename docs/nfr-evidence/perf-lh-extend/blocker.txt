@@ -1,0 +1,1 @@
+docker daemon not running; stack (pnpm mock:up) unavailable; localhost:8000 ECONNREFUSED

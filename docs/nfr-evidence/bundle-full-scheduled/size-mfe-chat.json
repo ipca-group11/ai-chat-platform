@@ -1,0 +1,32 @@
+[
+  {
+    "name": "mfe-chat remoteEntry.js",
+    "passed": true,
+    "size": 6262,
+    "sizeLimit": 7000
+  },
+  {
+    "name": "mfe-chat route chunks",
+    "passed": true,
+    "size": 63250,
+    "sizeLimit": 70000
+  },
+  {
+    "name": "mfe-chat federation glue",
+    "passed": true,
+    "size": 123079,
+    "sizeLimit": 136000
+  },
+  {
+    "name": "mfe-chat shared-library copies",
+    "passed": true,
+    "size": 123745,
+    "sizeLimit": 137000
+  },
+  {
+    "name": "mfe-chat all emitted JS",
+    "passed": true,
+    "size": 316336,
+    "sizeLimit": 348000
+  }
+]

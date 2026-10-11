@@ -7,9 +7,9 @@
 // e2e/, no test is run), keeps every JavaScript response and looks for a marker string of each library in the
 // bodies. One file with the marker means one copy. Exit code 1 when a library is found in more than one file.
 //
-//   CHECK_PASSWORD=... node scripts/ci/shared-deps.ts [--list]   (--list also prints every JS request)
+//   [CHECK_PASSWORD=...] node scripts/ci/shared-deps.ts [--list]   (--list also prints every JS request)
 //
-// Variables: APP_URL (default http://localhost:8000, the stack of `pnpm mock:up`), CHECK_EMAIL, CHECK_PASSWORD (a throw-away account on the local stack; created if missing).
+// Variables: APP_URL (default http://localhost:8000, the stack of `pnpm mock:up`), CHECK_EMAIL, CHECK_PASSWORD (optional, a throw-away account on the local stack; created if missing).
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -127,8 +127,8 @@ export async function collectFiles(base: string, email: string, password: string
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const base = (process.env['APP_URL'] ?? 'http://localhost:8000').replace(/\/$/, '');
-  const password = process.env['CHECK_PASSWORD'];
-  if (!password) throw new Error('CHECK_PASSWORD is not set (an account of the throw-away local stack)');
+  // Throw-away account of the local mock stack; override with CHECK_PASSWORD.
+  const password = process.env['CHECK_PASSWORD'] ?? 'SharedDeps-Check-1!';
   const files = await collectFiles(base, process.env['CHECK_EMAIL'] ?? 'shared-deps@check.example.com', password);
   const results = countCopies(files);
   if (process.argv.includes('--list')) {
