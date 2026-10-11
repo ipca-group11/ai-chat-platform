@@ -1,0 +1,63 @@
+$ cd services/conversation-service && pnpm exec vitest run src/features/queue/queue-races.spec.ts -t 'error callback'
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/features/queue/queue-races.spec.ts (12 tests | 1 failed | 11 skipped) 4ms
+   ❯ QueueManager races (AICHAT-190) (10)
+     × an error callback that throws does not stall the queue either 4ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 11 skipped (12)
+     Errors  1 error
+   Start at  22:12:24
+   Duration  81ms (transform 37%, worker 36%, tests 16%, import 10%, setup 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > an error callback that throws does not stall the queue either
+AssertionError: expected [ 'm1' ] to deeply equal [ 'm1', 'm2' ]
+
+- Expected
++ Received
+
+  [
+    "m1",
+-   "m2",
+  ]
+
+ ❯ src/features/queue/queue-races.spec.ts:207:62
+    205|     for (let i = 0; i < 5; i += 1) await flush();
+    206|
+    207|     expect(processor.mock.calls.map(([, e]) => e.messageId)).toEqual([…
+       |                                                              ^
+    208|     expect(manager.getQueue("chat-1").isProcessing).toBe(false);
+    209|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+Error: the logger failed too
+ ❯ QueueManager.onProcessorError src/features/queue/queue-races.spec.ts:200:13
+    198|     );
+    199|     const manager = new QueueManager(processor, () => {
+    200|       throw new Error("the logger failed too");
+       |             ^
+    201|     });
+    202|
+ ❯ QueueManager.pump src/features/queue/queue-manager.ts:76:12
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "src/features/queue/queue-races.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The last test to run before this error was "an error callback that throws does not stall the queue either". This means either:
+- the error was thrown while Vitest was running this test, or
+- the error was thrown after the test completed, and this was the most recent test at that point.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+[exit 1]

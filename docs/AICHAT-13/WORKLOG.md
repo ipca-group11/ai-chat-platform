@@ -98,3 +98,66 @@ or a database lock, which is outside this epic.
 
 **Problems and fixes.** Reading the code against this table showed that S1, S4 and S5 do not hold today (see §1, races
 found). The fixes are part of US2–US4, each with a test that fails before the fix.
+
+### US2 · Race-condition unit tests for ChatQueue and QueueManager ([AICHAT-190](https://ipca-grupo11.atlassian.net/browse/AICHAT-190))
+
+**What and why.** The existing specs drive the queue one step at a time. Race bugs only show up when operations
+overlap, and they usually show up rarely, which makes them flaky. To make every interleaving deterministic, the new
+spec uses **deferred promises**: the fake processor returns a promise whose `resolve`/`reject` the test holds, so the
+test decides the exact moment each reply ends. A second hook (`onStart`) runs at the exact instant an entry becomes
+active, which is how we hit "cancel at the moment it starts" precisely instead of hoping a timer lands there.
+
+**Files.**
+- `services/conversation-service/src/features/queue/queue-races.spec.ts` (new): 12 race cases.
+- `services/conversation-service/src/features/queue/queue-manager.ts`: the error callback is guarded (see Problems and fixes).
+
+| Test | Scenario (US1) | What it proves |
+|---|---|---|
+| FIFO with submit, edit and cancel interleaved | S1, S6 | Survivors run once, in order, with the edited text; cancelled entries never run |
+| Cancel/edit at the instant an entry becomes active | S5, S6 | Both return `false` and the entry runs with its original text |
+| Cancel in the same tick as the previous reply ends | S6 | The decision point is `startNext`: before it the cancel wins and the entry never runs |
+| No idle gap between two replies | S1 | When a reply ends the next one starts in the same step, so a new submit is queued behind the waiting ones, never ahead |
+| N = 20 submits in the same tick | S1 | Exactly one `started`, nineteen `queued`, each runs once, in order |
+| Stop aborts only the active reply | S7 | The queued entry is untouched and later starts with a fresh, non-aborted signal |
+| A late stop | S7 | Documents current behaviour: the stop route names no message, so a stop that arrives after a reply ended aborts the reply active at that moment |
+| Processor throws, rejects or resolves | S10 | Every entry runs once and the chat ends idle (AC-74) |
+| Error callback that throws | S10 | The queue still moves on (failed before the fix) |
+| Two chats | S9 | A reply that never ends in one chat does not delay the other; stop stays in its chat |
+| `startNext` twice while active | S1 | Never two active entries |
+| `listQueued` is a snapshot | — | Callers cannot change the queue through the returned array |
+
+**How to run.**
+
+```sh
+cd services/conversation-service && pnpm exec vitest run src/features/queue --reporter=verbose
+```
+
+**How to repeat it manually.** Break the queue on purpose and check that the race tests notice, then restore it:
+
+1. In `chat-queue.ts`, delete `if (this.active) return null;` in `startNext`. Run the command above: 8 tests fail
+   (two entries can be active at once).
+2. Restore it. Replace `this.abortController = new AbortController();` with `this.abortController ??= new AbortController();`
+   and delete `this.abortController = null;` in `finishActive`: the two stop tests fail (the next reply would start already aborted).
+3. Restore it. In `cancelQueued`, return `this.active?.messageId === messageId` instead of `false`: the "instant it becomes
+   active" test fails.
+4. `git diff` must be empty for `chat-queue.ts` at the end.
+
+**Result.** 30 tests in the queue folder pass (18 existing + 12 new). The error-callback test failed first, with two
+symptoms: the next entry never ran (`expected ['m1'] to deeply equal ['m1', 'm2']`) and Vitest reported an
+**unhandled rejection**. The three deliberate mutations are each caught.
+
+![Error-callback test fails before the fix](evidence/01-queue-races-red.png)
+
+![All queue tests pass after the fix](evidence/02-queue-races-green.png)
+
+![Each deliberate mutation of chat-queue.ts is caught](evidence/03-queue-mutations.png)
+
+**Problems and fixes.**
+- **The last guard could stop the queue.** In `QueueManager.pump`, the call that moves on to the next entry comes after
+  the `try/catch/finally`. If `onProcessorError` itself threw, the error left `pump`, the next entry was never started and,
+  because `pump` runs with `void`, the error became an unhandled rejection (by default Node.js stops the process on one).
+  In the app the callback only logs, so this is unlikely, but the guard is there for the unexpected. The callback call is
+  now wrapped in its own `try/catch`.
+- **A late stop.** `POST /chats/:chatId/stop` names no message, so a stop that reaches the server just after a reply
+  ended aborts the next queued reply. We kept this behaviour (changing it would change the API that AICHAT-11 and AICHAT-12
+  lock) and recorded it in a test, so a future change is a conscious one.

@@ -1,0 +1,16 @@
+$ sh queue-mutations.sh   # break chat-queue.ts three ways, run the race tests, restore the file
+M1: startNext ignores the active entry
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  8 failed | 4 passed (12)
+
+M2: the AbortController is reused between entries
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 10 passed (12)
+
+M3: cancelQueued also matches the active entry
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 11 passed (12)
+
+chat-queue.ts restored
+
+[exit 0]

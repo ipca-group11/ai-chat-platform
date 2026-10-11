@@ -1,0 +1,42 @@
+$ cd services/conversation-service && pnpm exec vitest run src/features/queue --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-56: entries added while idle can be started immediately 1ms
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-56/59: a second entry added while processing stays queued until the first finishes 0ms
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-59: processes queued messages one at a time, in FIFO order 0ms
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-58: a queued message can be edited before processing starts 0ms
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-58: editing an already-active message is rejected 0ms
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-58: a queued message can be canceled before processing starts 0ms
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-58: canceling an already-active message is rejected 0ms
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-54: stopActive aborts the active entry's signal 0ms
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-54: stopActive is a no-op when nothing is processing 0ms
+ ✓ src/features/queue/chat-queue.spec.ts > ChatQueue > AC-59: activeEntry exposes the currently processing entry 0ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > keeps FIFO order when submit, edit and cancel interleave while a reply is active 1ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > a cancel or edit at the instant an entry becomes active returns false, and the entry runs unchanged 0ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > a cancel in the same tick as the previous reply ends still wins: the entry never runs 0ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > there is no idle gap between two replies: a submit as one ends is queued behind the waiting ones 0ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > N submits in the same tick: one started, the rest queued, each runs exactly once in order 1ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > stop aborts only the active reply; the next one starts with a fresh signal 0ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > a stop that arrives after a reply ended reaches the reply active at that moment (the stop route names no message) 0ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > a processor that throws, rejects or resolves: every entry runs once and the chat ends idle (AC-74) 0ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > an error callback that throws does not stall the queue either 0ms
+ ✓ src/features/queue/queue-races.spec.ts > QueueManager races (AICHAT-190) > two chats: a reply that never ends in one chat does not delay the other, and stop stays in its chat 0ms
+ ✓ src/features/queue/queue-races.spec.ts > ChatQueue races (AICHAT-190) > startNext twice while an entry is active never activates a second one 0ms
+ ✓ src/features/queue/queue-races.spec.ts > ChatQueue races (AICHAT-190) > listQueued is a snapshot: changing the returned array does not change the queue 0ms
+ ✓ src/features/queue/queue-manager.spec.ts > QueueManager > AC-56: submitting to an idle chat starts processing immediately 1ms
+ ✓ src/features/queue/queue-manager.spec.ts > QueueManager > AC-56: submitting while the chat is already processing queues the message 0ms
+ ✓ src/features/queue/queue-manager.spec.ts > QueueManager > AC-59: processes queued messages one at a time, in order 4ms
+ ✓ src/features/queue/queue-manager.spec.ts > QueueManager > AC-60/61: two chats process concurrently and independently 2ms
+ ✓ src/features/queue/queue-manager.spec.ts > QueueManager > AC-74: a processor failure does not block the rest of the queue 3ms
+ ✓ src/features/queue/queue-manager.spec.ts > QueueManager > AC-58: editQueued/cancelQueued delegate to the chat's queue 0ms
+ ✓ src/features/queue/queue-manager.spec.ts > QueueManager > AC-74: uses a silent no-op default when no onProcessorError callback is given 1ms
+ ✓ src/features/queue/queue-manager.spec.ts > QueueManager > AC-54: stop delegates to the chat's active queue entry 0ms
+
+ Test Files  3 passed (3)
+      Tests  30 passed (30)
+   Start at  22:12:37
+   Duration  93ms (transform 37%, worker 33%, tests 19%, import 9%, setup 2%)
+
+
+[exit 0]

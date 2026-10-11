@@ -73,7 +73,11 @@ export class QueueManager {
       // The processor (messages feature) is expected to catch provider errors itself
       // and persist a "failed" status; this is a last-resort guard so an unexpected
       // throw still never blocks the rest of the queue (AC-74).
-      this.onProcessorError(chatId, started.entry, error);
+      try {
+        this.onProcessorError(chatId, started.entry, error);
+      } catch {
+        // The guard itself must not stop the queue or escape as an unhandled rejection.
+      }
     } finally {
       queue.finishActive();
     }
