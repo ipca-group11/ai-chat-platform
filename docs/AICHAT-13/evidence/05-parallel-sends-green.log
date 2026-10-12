@@ -1,0 +1,30 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/parallel-sends.spec.ts src/features/messages/repository.spec.ts src/shared/turn-clock.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/shared/turn-clock.spec.ts > createTurnClock (AICHAT-191) > follows the wall clock when it moves forward 1ms
+ ✓ src/shared/turn-clock.spec.ts > createTurnClock (AICHAT-191) > never repeats a value: calls in the same millisecond are 1 ms apart 0ms
+ ✓ src/shared/turn-clock.spec.ts > createTurnClock (AICHAT-191) > never goes back when the wall clock does 0ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > AC-51: create includes attachments and delegates to prisma.message.create 1ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > AC-53: findByChatOrdered orders messages oldest first, ties broken by id 0ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > AICHAT-191: a message written before a reply started but queued behind it is listed after that reply 1ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > AICHAT-191: rows from before sentAt keep their creation order 0ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > AC-45: findByIdAndOwner scopes by id and ownerId 0ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > findById performs an unscoped lookup for the queue processor 0ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > AC-56: updateStatus delegates to prisma.message.update 0ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > AICHAT-191: updateStatus stamps sentAt when a turn starts 0ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > AC-55: updateContent delegates to prisma.message.update 0ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > updateContent stores web fetches as JSON and clears them with DbNull 0ms
+ ✓ src/features/messages/repository.spec.ts > createMessagesRepository > AC-58: delete delegates to prisma.message.delete 0ms
+ ✓ src/integration/parallel-sends.spec.ts > parallel sends to one chat, repository latency: none (AICHAT-191) > 5 sends at once: each saved and answered once, in the order shown (50 runs) 530ms
+ ✓ src/integration/parallel-sends.spec.ts > parallel sends to one chat, repository latency: none (AICHAT-191) > two chats at once run in parallel, each in its own order (50 runs) 287ms
+ ✓ src/integration/parallel-sends.spec.ts > parallel sends to one chat, repository latency: database (AICHAT-191) > 5 sends at once: each saved and answered once, in the order shown (50 runs) 3761ms
+ ✓ src/integration/parallel-sends.spec.ts > parallel sends to one chat, repository latency: database (AICHAT-191) > two chats at once run in parallel, each in its own order (50 runs) 1883ms
+
+ Test Files  3 passed (3)
+      Tests  18 passed (18)
+   Start at  08:29:10
+   Duration  6.69s (tests 96%, import 2%, transform 2%)
+
+
+[exit 0]
