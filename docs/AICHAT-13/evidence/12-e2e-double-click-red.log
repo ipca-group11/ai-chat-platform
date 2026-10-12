@@ -1,0 +1,47 @@
+$ cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/concurrent-sends.spec.ts -g double-click --reporter=line
+
+Running 1 test using 1 worker
+
+[1/1] [chromium] › src/tests/concurrent-sends.spec.ts:118:3 › Concurrent sends in a shared chat (AICHAT-193) › a double-click on Send is one message and one reply
+  1) [chromium] › src/tests/concurrent-sends.spec.ts:118:3 › Concurrent sends in a shared chat (AICHAT-193) › a double-click on Send is one message and one reply 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Array [
+        "Q:double click df62f923",
+        "A",
+    +   "Q:double click df62f923",
+    +   "A",
+      ]
+
+      127 |     await waitForAllReplies(page, 1);
+      128 |
+    > 129 |     expect(await conversation(page, [question])).toEqual([`Q:${question}`, "A"]);
+          |                                                  ^
+      130 |     await page.reload();
+      131 |     await waitForAllReplies(page, 1);
+      132 |     expect(await conversation(page, [question])).toEqual([`Q:${question}`, "A"]);
+        at /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/e2e/src/tests/concurrent-sends.spec.ts:129:50
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/concurrent-sends-Concurren-b1024-s-one-message-and-one-reply-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/concurrent-sends-Concurren-b1024-s-one-message-and-one-reply-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/concurrent-sends-Concurren-b1024-s-one-message-and-one-reply-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/concurrent-sends-Concurren-b1024-s-one-message-and-one-reply-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [chromium] › src/tests/concurrent-sends.spec.ts:118:3 › Concurrent sends in a shared chat (AICHAT-193) › a double-click on Send is one message and one reply 
+
+[exit 1]

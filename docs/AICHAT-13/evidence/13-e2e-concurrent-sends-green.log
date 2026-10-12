@@ -1,0 +1,14 @@
+$ cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/concurrent-sends.spec.ts --repeat-each=3 --reporter=list
+
+Running 6 tests using 3 workers
+
+  ✓  3 [chromium] › src/tests/concurrent-sends.spec.ts:65:3 › Concurrent sends in a shared chat (AICHAT-193) › owner and member send at the same moment: both see each message once, in the same order (17.2s)
+  ✓  1 [chromium] › src/tests/concurrent-sends.spec.ts:65:3 › Concurrent sends in a shared chat (AICHAT-193) › owner and member send at the same moment: both see each message once, in the same order (17.2s)
+  ✓  2 [chromium] › src/tests/concurrent-sends.spec.ts:65:3 › Concurrent sends in a shared chat (AICHAT-193) › owner and member send at the same moment: both see each message once, in the same order (17.2s)
+  ✓  4 [chromium] › src/tests/concurrent-sends.spec.ts:118:3 › Concurrent sends in a shared chat (AICHAT-193) › a double-click on Send is one message and one reply (5.5s)
+  ✓  6 [chromium] › src/tests/concurrent-sends.spec.ts:118:3 › Concurrent sends in a shared chat (AICHAT-193) › a double-click on Send is one message and one reply (5.5s)
+  ✓  5 [chromium] › src/tests/concurrent-sends.spec.ts:118:3 › Concurrent sends in a shared chat (AICHAT-193) › a double-click on Send is one message and one reply (5.5s)
+
+  6 passed (23.2s)
+
+[exit 0]
