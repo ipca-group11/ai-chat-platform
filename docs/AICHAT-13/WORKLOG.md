@@ -442,3 +442,9 @@ Defects found and fixed:
   the app: HTTP requests never arrive at exactly the same time, and supertest's default server can collide with a local
   port.
 
+- **Pre-existing failures outside this epic** (same result on the base branch `test/AICHAT-9-sse-reconnection`, not caused
+  by these changes, left for their owners): the workspace guards `packages/workspace-config/src/source-files.test.ts`
+  (ten source files without a unit test, none from this epic) and `coverage-guard.test.ts` (the `e2e` project is not
+  found); `pnpm sast` reports one ERROR, the fixed test-account password in `e2e/src/tests/support/auth.ts`; the mock
+  server's `faults.spec.ts` fails only on Node 26 (CI uses Node 24). Everything this epic touches passes lint, typecheck,
+  tests and build. The secret scan (`gitleaks`) runs in CI (`security.yml`).
