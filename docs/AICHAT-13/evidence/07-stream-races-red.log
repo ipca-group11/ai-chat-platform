@@ -1,0 +1,150 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/stream-races.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/stream-races.spec.ts (10 tests | 5 failed) 8175ms
+   ❯ retry, edit and cancel during a reply, repository latency: none (AICHAT-192) (5)
+     × S3: a retry while another reply streams is queued, runs after it, and is built from what is shown before it 33ms
+     × S5, worst case: the edit's write reaches the database only after the reply has started 11ms
+   ❯ retry, edit and cancel during a reply, repository latency: database (AICHAT-192) (5)
+     × S3: a retry while another reply streams is queued, runs after it, and is built from what is shown before it 57ms
+     × S4: two retries of the same failed reply at once: one 202, one 409, one new answer (50 runs) 2423ms
+     × S5, worst case: the edit's write reaches the database only after the reply has started 45ms
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 5 passed (10)
+   Start at  08:34:25
+   Duration  8.41s (tests 98%, import 1%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: none (AICHAT-192) > S3: a retry while another reply streams is queued, runs after it, and is built from what is shown before it
+ FAIL  src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: database (AICHAT-192) > S3: a retry while another reply streams is queued, runs after it, and is built from what is shown before it
+AssertionError: expected [ 'q0', 'reply to reply to q1', …(2) ] to deeply equal [ 'q0', 'reply to q0', 'q1', …(1) ]
+
+- Expected
++ Received
+
+  [
+    "q0",
+-   "reply to q0",
++   "reply to reply to q1",
+    "q1",
+    "reply to q1",
+  ]
+
+ ❯ src/integration/stream-races.spec.ts:79:41
+     77|
+     78|     // The failed reply was reused in place: no new message, and it an…
+     79|     expect(await contents(app, chatId)).toEqual(["q0", "reply to q0", …
+       |                                         ^
+     80|     expect(await statuses(app, chatId)).toEqual(["sent", "sent", "sent…
+     81|     expect(llm.calls[2]?.turns).toEqual(["user:q0"]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: none (AICHAT-192) > S5, worst case: the edit's write reaches the database only after the reply has started
+AssertionError: expected 'user:original' to be 'user:edited' // Object.is equality
+
+Expected: "user:edited"
+Received: "user:original"
+
+ ❯ src/integration/stream-races.spec.ts:186:40
+    184|     const expected = res.status === 200 ? "edited" : "original";
+    185|     expect([200, 409]).toContain(res.status);
+    186|     expect(llm.calls[1]?.turns.at(-1)).toBe(`user:${expected}`);
+       |                                        ^
+    187|     expect(await contents(app, chatId)).toEqual(["q0", "reply to q0", …
+    188|     expect(await statuses(app, chatId)).toEqual(["sent", "sent", "sent…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: database (AICHAT-192) > S4: two retries of the same failed reply at once: one 202, one 409, one new answer (50 runs)
+AssertionError: 50/50 runs inconsistent: expected [ …(50) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seed 1: retry statuses 202,202; final [q0 | ]",
++   "seed 2: retry statuses 202,202; final [q0 | ]",
++   "seed 3: retry statuses 202,202",
++   "seed 4: retry statuses 202,202; final [q0 | ]",
++   "seed 5: retry statuses 202,202; final [q0 | ]",
++   "seed 6: retry statuses 202,202",
++   "seed 7: retry statuses 202,202; final [q0 | ]",
++   "seed 8: retry statuses 202,202; final [q0 | ]",
++   "seed 9: retry statuses 202,202",
++   "seed 10: retry statuses 202,202; final [q0 | ]",
++   "seed 11: retry statuses 202,202",
++   "seed 12: retry statuses 202,202; final [q0 | ]",
++   "seed 13: retry statuses 202,202; final [q0 | ]",
++   "seed 14: retry statuses 202,202; final [q0 | ]",
++   "seed 15: retry statuses 202,202; final [q0 | ]",
++   "seed 16: retry statuses 202,202",
++   "seed 17: retry statuses 202,202; final [q0 | ]",
++   "seed 18: retry statuses 202,202; final [q0 | ]",
++   "seed 19: retry statuses 202,202; final [q0 | ]",
++   "seed 20: retry statuses 202,202; final [q0 | ]",
++   "seed 21: retry statuses 202,202",
++   "seed 22: retry statuses 202,202; final [q0 | ]",
++   "seed 23: retry statuses 202,202",
++   "seed 24: retry statuses 202,202; final [q0 | ]",
++   "seed 25: retry statuses 202,202; final [q0 | ]",
++   "seed 26: retry statuses 202,202; final [q0 | ]",
++   "seed 27: retry statuses 202,202; final [q0 | ]",
++   "seed 28: retry statuses 202,202",
++   "seed 29: retry statuses 202,202; final [q0 | ]",
++   "seed 30: retry statuses 202,202; final [q0 | ]",
++   "seed 31: retry statuses 202,202; final [q0 | ]",
++   "seed 32: retry statuses 202,202",
++   "seed 33: retry statuses 202,202; final [q0 | ]",
++   "seed 34: retry statuses 202,202; final [q0 | ]",
++   "seed 35: retry statuses 202,202",
++   "seed 36: retry statuses 202,202; final [q0 | ]",
++   "seed 37: retry statuses 202,202; final [q0 | ]",
++   "seed 38: retry statuses 202,202; final [q0 | ]",
++   "seed 39: retry statuses 202,202",
++   "seed 40: retry statuses 202,202",
++   "seed 41: retry statuses 202,202; final [q0 | ]",
++   "seed 42: retry statuses 202,202; final [q0 | ]",
++   "seed 43: retry statuses 202,202",
++   "seed 44: retry statuses 202,202",
++   "seed 45: retry statuses 202,202; final [q0 | ]",
++   "seed 46: retry statuses 202,202; final [q0 | ]",
++   "seed 47: retry statuses 202,202",
++   "seed 48: retry statuses 202,202",
++   "seed 49: retry statuses 202,202; final [q0 | ]",
++   "seed 50: retry statuses 202,202; final [q0 | ]",
++ ]
+
+ ❯ src/integration/stream-races.spec.ts:109:70
+    107|       open = undefined;
+    108|     }
+    109|     expect(failures, `${failures.length}/${RUNS} runs inconsistent`).t…
+       |                                                                      ^
+    110|   });
+    111|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: database (AICHAT-192) > S5, worst case: the edit's write reaches the database only after the reply has started
+AssertionError: expected 'assistant:reply to q0' to be 'user:edited' // Object.is equality
+
+Expected: "user:edited"
+Received: "assistant:reply to q0"
+
+ ❯ src/integration/stream-races.spec.ts:186:40
+    184|     const expected = res.status === 200 ? "edited" : "original";
+    185|     expect([200, 409]).toContain(res.status);
+    186|     expect(llm.calls[1]?.turns.at(-1)).toBe(`user:${expected}`);
+       |                                        ^
+    187|     expect(await contents(app, chatId)).toEqual(["q0", "reply to q0", …
+    188|     expect(await statuses(app, chatId)).toEqual(["sent", "sent", "sent…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+
+[exit 1]
