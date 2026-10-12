@@ -1,0 +1,19 @@
+$ sh send-mutations.sh   # undo each part of the fix in turn, run the parallel sends, restore
+M1: send() saves the message as sent again
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  3 failed | 1 passed (4)
+seed 1: 5 responses say \
+
+M2: the question gets no sentAt when its turn starts
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  4 failed (4)
+seed 1: message 3 is user (expected assistant)
+
+M3: the reply gets no sentAt
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 2 passed (4)
+seed 18: message 6 is assistant (expected user)
+
+service.ts and processor.ts restored
+
+[exit 0]
