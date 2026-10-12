@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { RemoteLoadError, loadRemote } from './loadRemote';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { REMOTE_LOAD_TIMEOUT_MS, RemoteLoadError, loadRemote } from './loadRemote';
 
 const Component = () => null;
 
@@ -48,6 +48,46 @@ describe('loadRemote', () => {
       throw new Error('bad entry');
     })();
     await expect(failure).rejects.toMatchObject({ scopeName: 'settings' });
+  });
+});
+
+describe('loadRemote timeout (AICHAT-163)', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('is 15 seconds', () => {
+    expect(REMOTE_LOAD_TIMEOUT_MS).toBe(15_000);
+  });
+
+  it('rejects with a RemoteLoadError when the remote never answers', async () => {
+    vi.useFakeTimers();
+    const failure = loadRemote('chat', () => new Promise(() => undefined))();
+    let settled = false;
+    failure.catch(() => undefined).finally(() => (settled = true));
+
+    await vi.advanceTimersByTimeAsync(REMOTE_LOAD_TIMEOUT_MS - 1);
+    expect(settled).toBe(false);
+
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(failure).rejects.toMatchObject({
+      name: 'RemoteLoadError',
+      scopeName: 'chat',
+      message: 'Failed to load remote "chat": no answer after 15000 ms',
+    });
+  });
+
+  it('resolves a remote that answers in time and leaves no timer behind', async () => {
+    vi.useFakeTimers();
+    const module = { default: Component };
+    const loading = loadRemote(
+      'chat',
+      () => new Promise((resolve) => setTimeout(() => resolve(module), REMOTE_LOAD_TIMEOUT_MS - 1)),
+    )();
+
+    await vi.advanceTimersByTimeAsync(REMOTE_LOAD_TIMEOUT_MS - 1);
+    await expect(loading).resolves.toBe(module);
+    expect(vi.getTimerCount()).toBe(0);
   });
 });
 
