@@ -67,8 +67,12 @@ export function createMessageProcessor(deps: CreateMessageProcessorDeps): QueueP
 
     deps.bus.publish(chatId, { type: "started", messageId: assistantMessage.id });
 
-    const historyRows = (await deps.messagesRepo.findByChatOrdered(chatId)).filter(
-      (m) => m.id !== assistantMessage.id && m.status !== "failed" && m.status !== "queued",
+    // A reply is built from what is listed before it (AICHAT-192): for a retry of an older
+    // failed reply, the messages after it are not part of its context.
+    const ordered = await deps.messagesRepo.findByChatOrdered(chatId);
+    const ownIndex = ordered.findIndex((m) => m.id === assistantMessage.id);
+    const historyRows = (ownIndex === -1 ? ordered : ordered.slice(0, ownIndex)).filter(
+      (m) => m.status !== "failed" && m.status !== "queued",
     );
     const history = await buildLlmMessages(historyRows);
     const llmMessages: LlmMessage[] = deps.systemPrompt ? [{ role: "system", content: deps.systemPrompt }, ...history] : history;

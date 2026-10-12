@@ -72,6 +72,23 @@ export class FakeMessagesRepository implements MessagesRepository {
     return updated;
   }
 
+  // Check and write happen in one synchronous step, like the database's conditional update.
+  async claimForRetry(id: string, chatId: string): Promise<MessageRecord | null> {
+    const existing = this.messages.get(id);
+    if (!existing || existing.chatId !== chatId || existing.role !== "assistant" || existing.status !== "failed") return null;
+    const updated = { ...existing, content: "", status: "queued" as const, error: null, updatedAt: new Date() };
+    this.messages.set(id, updated);
+    return updated;
+  }
+
+  async updateQueuedContent(id: string, content: string): Promise<MessageRecord | null> {
+    const existing = this.messages.get(id);
+    if (!existing || existing.role !== "user" || existing.status !== "queued") return null;
+    const updated = { ...existing, content, updatedAt: new Date() };
+    this.messages.set(id, updated);
+    return updated;
+  }
+
   async delete(id: string): Promise<void> {
     this.messages.delete(id);
   }

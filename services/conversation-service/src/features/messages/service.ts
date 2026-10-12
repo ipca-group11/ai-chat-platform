@@ -83,6 +83,12 @@ export interface MessagesRepository {
       stopped?: boolean;
     },
   ): Promise<MessageRecord>;
+  /** Resets a failed assistant reply of the chat to queued, in one conditional write; null
+   * when it is not (or no longer) a failed reply. Two retries at once: only one gets it. */
+  claimForRetry(id: string, chatId: string): Promise<MessageRecord | null>;
+  /** Changes the text of a user message that is still queued, in one conditional write; null
+   * once its reply has started (the processor marks it sent before it reads the history). */
+  updateQueuedContent(id: string, content: string): Promise<MessageRecord | null>;
   delete(id: string): Promise<void>;
 }
 
@@ -115,6 +121,17 @@ export function createMessagesRepository(prisma: PrismaClient): MessagesReposito
         data: { ...data, ...(webFetches !== undefined ? { webFetches: webFetches ?? Prisma.DbNull } : {}) },
         include: { attachments: true },
       });
+    },
+    async claimForRetry(id, chatId) {
+      const { count } = await prisma.message.updateMany({
+        where: { id, chatId, role: "assistant", status: "failed" },
+        data: { content: "", status: "queued", error: null },
+      });
+      return count === 1 ? prisma.message.findUnique({ where: { id }, include: { attachments: true } }) : null;
+    },
+    async updateQueuedContent(id, content) {
+      const { count } = await prisma.message.updateMany({ where: { id, role: "user", status: "queued" }, data: { content } });
+      return count === 1 ? prisma.message.findUnique({ where: { id }, include: { attachments: true } }) : null;
     },
     async delete(id) {
       await prisma.message.delete({ where: { id } });
@@ -178,11 +195,14 @@ export class MessagesService {
   /** AC-58: edit a queued (not yet processing) message. Only its author may. */
   async editQueued(user: Principal, chatId: string, messageId: string, content: string): Promise<MessageDto> {
     await this.assertAuthor(user, chatId, messageId);
-    const ok = this.queueManager.editQueued(chatId, messageId, content);
-    if (!ok) {
+    // The saved text is what the reply is built from, so the database decides: the edit only
+    // lands while the message is still queued (AICHAT-192). Checking the in-memory queue and
+    // then writing left a gap in which the reply could start with the old text.
+    const updated = await this.repo.updateQueuedContent(messageId, content);
+    if (!updated) {
       throw new HttpError(409, "MESSAGE_NOT_EDITABLE", "Message is not queued and can no longer be edited");
     }
-    const updated = await this.repo.updateContent(messageId, { content, status: "queued" });
+    this.queueManager.editQueued(chatId, messageId, content);
     return toMessageDto(updated);
   }
 
@@ -215,13 +235,13 @@ export class MessagesService {
   async retry(user: Principal, chatId: string, messageId: string, apiKey?: string): Promise<MessageDto> {
     await this.chatsService.getAccessible(user, chatId);
     // Not scoped to the caller: assistant replies belong to the chat owner, and any
-    // member may retry one (with their own API key).
-    const message = await this.repo.findById(messageId);
-    if (!message || message.chatId !== chatId || message.role !== "assistant" || message.status !== "failed") {
+    // member may retry one (with their own API key). Check and reset are one conditional
+    // write, so two retries at once cannot both get it (AICHAT-192).
+    const reset = await this.repo.claimForRetry(messageId, chatId);
+    if (!reset) {
       throw new HttpError(409, "MESSAGE_NOT_RETRYABLE", "Only a failed assistant message can be retried");
     }
 
-    const reset = await this.repo.updateContent(messageId, { content: "", status: "queued", error: null });
     this.queueManager.submit(chatId, {
       messageId,
       content: "",

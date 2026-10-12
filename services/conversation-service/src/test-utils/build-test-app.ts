@@ -10,7 +10,7 @@ import { FakeAttachmentsRepository } from "./fake-attachments-repository.js";
 import { FakeChatsRepository } from "./fake-chats-repository.js";
 import { FakeMessagesRepository } from "./fake-messages-repository.js";
 import { fakeProviderRegistry } from "./fake-provider-registry.js";
-import { createFakeQueue } from "./fake-queue.js";
+import { createFakeQueue, takingProcessor } from "./fake-queue.js";
 import { FakeStorage } from "./fake-storage.js";
 import { StubErasureRepository } from "./fake-erasure-repository.js";
 import { ChatEventBus } from "../features/streaming/index.js";
@@ -27,13 +27,14 @@ export interface TestAppOptions {
  * in-memory fakes. Nothing touches a database, the disk or the network. The returned
  * fakes are the same instances the app uses, so a test can seed or inspect them. */
 export function buildTestApp(options: TestAppOptions = {}) {
+  const messagesRepo = new FakeMessagesRepository();
   const fakes = {
     chatsRepo: new FakeChatsRepository(),
-    messagesRepo: new FakeMessagesRepository(),
+    messagesRepo,
     attachmentsRepo: new FakeAttachmentsRepository(),
     storage: new FakeStorage(),
     providerRegistry: fakeProviderRegistry(),
-    queueManager: createFakeQueue(),
+    queueManager: createFakeQueue(takingProcessor(messagesRepo)),
     bus: new ChatEventBus(),
     erasureRepo: new StubErasureRepository(),
   };

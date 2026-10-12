@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FakeChatsRepository } from "../../test-utils/fake-chats-repository.js";
-import { createFakeQueue, hangingProcessor } from "../../test-utils/fake-queue.js";
+import { createFakeQueue, takingProcessor } from "../../test-utils/fake-queue.js";
 import { FakeMessagesRepository } from "../../test-utils/fake-messages-repository.js";
 import { ChatsService } from "../chats/index.js";
 import type { QueueProcessor } from "../queue/index.js";
@@ -9,11 +9,11 @@ import { MessagesService } from "./service.js";
 import { HttpError } from "../../shared/error-handler.js";
 import { asUser } from "../../test-utils/principal.js";
 
-async function setup(processor: QueueProcessor = hangingProcessor()) {
+async function setup(processor?: QueueProcessor) {
   const chatsRepo = new FakeChatsRepository();
   const chatsService = new ChatsService(chatsRepo);
   const messagesRepo = new FakeMessagesRepository();
-  const queueManager = createFakeQueue(processor);
+  const queueManager = createFakeQueue(processor ?? takingProcessor(messagesRepo));
   const bus = new ChatEventBus();
   const service = new MessagesService(messagesRepo, chatsService, queueManager, bus);
   const chat = await chatsService.create(asUser("user-1"), { title: "Chat", provider: "ollama", model: "llama3.2:1b" });
