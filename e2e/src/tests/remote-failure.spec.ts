@@ -64,3 +64,48 @@ test.describe("AICHAT-162: each remote down in turn shows only its own fallback"
     }
   }
 });
+
+test.describe("AICHAT-163: a slow remote shows the skeleton, a hung one times out", () => {
+  for (const remote of remoteNames) {
+    const { path, scope, ready } = remotes[remote];
+
+    test(`${remote} slow: skeleton under the nav bar, then the content, no fallback`, async ({ page, account }) => {
+      void account;
+      await failRemote(page, remote, { delayMs: 1500 });
+      await page.goto(path);
+
+      const skeleton = page.getByTestId(`remote-loading-${scope}`);
+      await expect(skeleton).toBeVisible();
+      await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
+      await expect(page.getByTestId(ready)).toBeVisible({ timeout: 30_000 });
+      await expect(skeleton).toHaveCount(0);
+      await expect(fallbackOf(page, remote)).toHaveCount(0);
+    });
+
+    test(`${remote} never answers: the other pages do not wait for it`, async ({ page, account }) => {
+      void account;
+      await failRemote(page, remote, "hang");
+
+      for (const other of remoteNames.filter((name) => name !== remote)) {
+        await test.step(`${other} renders while ${remote} hangs`, async () => {
+          await page.goto(remotes[other].path);
+          await expect(page.getByTestId(remotes[other].ready)).toBeVisible();
+        });
+      }
+    });
+
+    test(`${remote} never answers: its page shows the fallback after the load timeout`, async ({
+      page,
+      account,
+    }) => {
+      void account;
+      await failRemote(page, remote, "hang");
+      await page.goto(path);
+
+      await expect(page.getByTestId(`remote-loading-${scope}`)).toBeVisible();
+      // The shell gives up after 15 s (REMOTE_LOAD_TIMEOUT_MS in loadRemote.ts).
+      await expect(fallbackOf(page, remote)).toBeVisible({ timeout: 25_000 });
+      await expect(page.getByTestId(`remote-loading-${scope}`)).toHaveCount(0);
+    });
+  }
+});
