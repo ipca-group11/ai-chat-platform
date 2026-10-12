@@ -71,7 +71,8 @@ test.describe("AICHAT-163: a slow remote shows the skeleton, a hung one times ou
 
     test(`${remote} slow: skeleton under the nav bar, then the content, no fallback`, async ({ page, account }) => {
       void account;
-      await failRemote(page, remote, { delayMs: 1500 });
+      // 500 ms per file: the remote loads a chain of ~6 files, so it stays well under the 15 s timeout.
+      await failRemote(page, remote, { delayMs: 500 });
       await page.goto(path);
 
       const skeleton = page.getByTestId(`remote-loading-${scope}`);
