@@ -1,0 +1,40 @@
+$ cd e2e && pnpm exec playwright test src/tests/support/remote-faults.spec.ts --reporter=line 2>&1 | grep -E 'passed|failed|›|Error:|Expected|Received' | grep -v '^\[' 
+[1/6] [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeAuth: matches its own entry and chunks, and no file of the other remotes
+  1) [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeAuth: matches its own entry and chunks, and no file of the other remotes 
+    Error: http://localhost:3002/remoteEntry.js
+    Expected: false
+    Received: true
+[2/6] [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeChat: matches its own entry and chunks, and no file of the other remotes
+  2) [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeChat: matches its own entry and chunks, and no file of the other remotes 
+    Error: http://localhost:3001/remoteEntry.js
+    Expected: false
+    Received: true
+[3/6] [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeSettings: matches its own entry and chunks, and no file of the other remotes
+  3) [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeSettings: matches its own entry and chunks, and no file of the other remotes 
+    Error: http://localhost:3001/remoteEntry.js
+    Expected: false
+    Received: true
+[4/6] [chromium] › src/tests/support/remote-faults.spec.ts:23:3 › matchesRemote › leaves the shell and the APIs alone, even on the same host
+  4) [chromium] › src/tests/support/remote-faults.spec.ts:23:3 › matchesRemote › leaves the shell and the APIs alone, even on the same host 
+    Error: http://localhost:8000/remoteEntry.js
+    Expected: false
+    Received: true
+[5/6] [chromium] › src/tests/support/remote-faults.spec.ts:34:3 › matchesRemote › compares origins, not text: scheme and host must match too
+  5) [chromium] › src/tests/support/remote-faults.spec.ts:34:3 › matchesRemote › compares origins, not text: scheme and host must match too 
+    Error: expect(received).toBe(expected) // Object.is equality
+    Expected: false
+    Received: true
+[6/6] [chromium] › src/tests/support/remote-faults.spec.ts:41:3 › matchesRemote › files 'chunks' lets remoteEntry.js through and matches everything else
+  6) [chromium] › src/tests/support/remote-faults.spec.ts:41:3 › matchesRemote › files 'chunks' lets remoteEntry.js through and matches everything else 
+    Error: expect(received).toBe(expected) // Object.is equality
+    Expected: false
+    Received: true
+  6 failed
+    [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeAuth: matches its own entry and chunks, and no file of the other remotes 
+    [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeChat: matches its own entry and chunks, and no file of the other remotes 
+    [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeSettings: matches its own entry and chunks, and no file of the other remotes 
+    [chromium] › src/tests/support/remote-faults.spec.ts:23:3 › matchesRemote › leaves the shell and the APIs alone, even on the same host 
+    [chromium] › src/tests/support/remote-faults.spec.ts:34:3 › matchesRemote › compares origins, not text: scheme and host must match too 
+    [chromium] › src/tests/support/remote-faults.spec.ts:41:3 › matchesRemote › files 'chunks' lets remoteEntry.js through and matches everything else 
+
+[exit 0]

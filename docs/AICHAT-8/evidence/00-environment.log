@@ -1,0 +1,7 @@
+$ node -v; pnpm -v; docker --version; pnpm --filter e2e exec playwright --version
+v26.8.2
+10.4.0
+Docker version 29.7.2, build a7dcaa6
+Version 1.63.0
+
+[exit 0]

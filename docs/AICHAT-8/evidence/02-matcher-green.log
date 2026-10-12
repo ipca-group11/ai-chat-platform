@@ -1,0 +1,14 @@
+$ cd e2e && pnpm exec playwright test src/tests/support/remote-faults.spec.ts --reporter=list
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeAuth: matches its own entry and chunks, and no file of the other remotes (2ms)
+  ✓  2 [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeChat: matches its own entry and chunks, and no file of the other remotes (0ms)
+  ✓  3 [chromium] › src/tests/support/remote-faults.spec.ts:13:5 › matchesRemote › mfeSettings: matches its own entry and chunks, and no file of the other remotes (0ms)
+  ✓  4 [chromium] › src/tests/support/remote-faults.spec.ts:23:3 › matchesRemote › leaves the shell and the APIs alone, even on the same host (0ms)
+  ✓  5 [chromium] › src/tests/support/remote-faults.spec.ts:34:3 › matchesRemote › compares origins, not text: scheme and host must match too (0ms)
+  ✓  6 [chromium] › src/tests/support/remote-faults.spec.ts:41:3 › matchesRemote › files 'chunks' lets remoteEntry.js through and matches everything else (0ms)
+
+  6 passed (234ms)
+
+[exit 0]
