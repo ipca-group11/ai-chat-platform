@@ -11,7 +11,7 @@ title: "AICHAT-13 · Concurrency testing: work log"
 | Owner | João Vieira |
 | Branch | `test/AICHAT-13-concurrency` (built on `test/AICHAT-9-sse-reconnection`, PR #34 not merged yet) |
 | Started / finished | 2026-10-11 / 2026-10-12 |
-| Pull requests | … |
+| Pull requests | #35 (base `test/AICHAT-9-sse-reconnection`, #34) |
 | Status | Review |
 
 ## 1. DoR review
