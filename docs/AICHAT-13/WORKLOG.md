@@ -83,7 +83,7 @@ How the design works today:
 | S1 | Two (or N) sends to one chat at the same time | Every message is saved once, in arrival order. The first is `sent` and starts a reply; the others are saved as `queued` (response, SSE event and database agree) and get their replies one at a time, in the same order. End state: N user + N assistant messages, no duplicates, no gaps | US2, US3 |
 | S2 | Double-click on Send | One message. The composer ignores the second submit while the first is in flight. The server has no idempotency key: two requests that do reach it are two messages | US5 |
 | S3 | Retry of a failed reply while another reply is streaming | The retry is queued and runs after the active reply. The failed message is reused in place; no new message is created | US4 |
-| S4 | Two retries of the same failed reply at the same time | Exactly one is accepted (200). The other gets 409 `MESSAGE_NOT_RETRYABLE`. One reply is generated | US4 |
+| S4 | Two retries of the same failed reply at the same time | Exactly one is accepted (202). The other gets 409 `MESSAGE_NOT_RETRYABLE`. One reply is generated | US4 |
 | S5 | Edit of a queued message at the moment it starts | Either the edit wins (200, the reply is built from the new text) or the start wins (409 `MESSAGE_NOT_EDITABLE`, the reply uses the old text). Never both, and the message never stays `queued` after its reply | US4 |
 | S6 | Cancel of a queued message at the moment it starts | Either the cancel wins (204, the message is deleted and never processed) or the start wins (409 `MESSAGE_NOT_CANCELABLE`, it is processed normally). Never both | US2, US4 |
 | S7 | Stop while other messages are queued | Only the active reply is aborted; the queued messages then run in order | US2 |
@@ -347,7 +347,7 @@ pnpm mock:up
 cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/concurrent-sends.spec.ts
 ```
 
-The spec is in `e2e/src/tests`, so the `e2e.yml` workflow runs it with the rest of the suite: a failure blocks the merge.
+The spec is in `e2e/src/tests`, so the `e2e.yml` workflow runs it with the rest of the suite, and a failure fails the job.
 
 **How to repeat it manually.**
 
@@ -420,7 +420,7 @@ Defects found and fixed:
 | DoD item | Met | Evidence |
 |---|---|---|
 | Tests run in CI and pass on `main` | ✅ on the branch (unit and integration in `ci.yml`, E2E in `e2e.yml`); `main` after the merge | [green runs](evidence/08-stream-races-green.png) |
-| Failure blocks the merge | ✅ the specs are in the suites both workflows already run as required checks | [E2E](evidence/13-e2e-concurrent-sends-green.png) |
+| Failure blocks the merge | ✅ the specs run in the same jobs as the other tests (`nx affected` in `ci.yml`, the E2E suite in `e2e.yml`), which fail on any failed test; "required check" is a team rule (branch protection unavailable, HTTP 403), as for AICHAT-12 | [red runs](evidence/07-stream-races-red.png), [E2E red](evidence/12-e2e-double-click-red.png) |
 | Run instructions added | ✅ `TESTING.md` (Concurrency) and §4 | — |
 | Two simultaneous sends and retry-during-stream tested | ✅ US3 (5 sends, 50 runs, two latency profiles), US4 (S3, S4), US5 (two browsers) | [US3](evidence/05-parallel-sends-green.png) |
 | No duplicate or lost messages | ✅ checked after every run: count, each question once, question/reply pairs, final status | [US4](evidence/08-stream-races-green.png) |
