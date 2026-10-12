@@ -35,6 +35,22 @@ Details: `docs/AICHAT-12/WORKLOG.md`.
 
 ---
 
+# Concurrency (AICHAT-13)
+
+```sh
+# queue races (deferred promises), N sends at once, retry/edit/cancel during a reply: 50 seeded runs each (no Docker)
+cd services/conversation-service && pnpm exec vitest run src/features/queue src/integration/parallel-sends.spec.ts src/integration/stream-races.spec.ts
+# double-click / double Enter on Send is one message (no Docker)
+cd apps/mfe-chat && pnpm exec vitest run src/features/composer
+# browser: owner and member send at the same moment, double-click on Send (Docker)
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/concurrent-sends.spec.ts
+```
+
+Details: `docs/AICHAT-13/WORKLOG.md`.
+
+---
+
 # SSE reconnection (AICHAT-9)
 
 ```sh

@@ -10,9 +10,9 @@ title: "AICHAT-13 · Concurrency testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | João Vieira |
 | Branch | `test/AICHAT-13-concurrency` (built on `test/AICHAT-9-sse-reconnection`, PR #34 not merged yet) |
-| Started / finished | 2026-10-11 / … |
+| Started / finished | 2026-10-11 / 2026-10-12 |
 | Pull requests | … |
-| Status | In Progress |
+| Status | Review |
 
 ## 1. DoR review
 
@@ -55,8 +55,8 @@ Blockers: none.
 | Node | v26.10.0 locally (CI uses Node 24 from `.nvmrc`) | nvm |
 | pnpm | 10.4.0 (pinned in `package.json`) | `pnpm install --frozen-lockfile` |
 | Vitest | 5.0.1 | workspace dev dependency |
-| Docker | … | Docker Desktop |
-| Playwright | … | workspace dev dependency |
+| Docker | 29.7.2 | Docker Desktop |
+| Playwright | 1.63.0 | workspace dev dependency |
 
 ## 3. Steps
 
@@ -316,3 +316,129 @@ whole service suite passes (685 tests). Each old pattern put back on its own is 
   cancelled and answered. The test now guards that.
 - **Wrong assumptions in the first draft of the test**, found on the first run: retry answers 202 (not 200) and the error
   code is in `error.code` (the shared error envelope).
+
+### US5 · E2E: two members send at once in a shared chat ([AICHAT-193](https://ipca-grupo11.atlassian.net/browse/AICHAT-193))
+
+**What and why.** The service-level tests prove the rules with controlled timing; this test checks them end to end with
+two real browsers against the stack with the LLM mock (`pnpm mock:up`). Owner and member are two Playwright **browser
+contexts**: separate cookies and `sessionStorage`, like two people on two computers. The owner creates a chat and
+invites the member; each saves their own key. In three rounds, both click Send in the same moment (`Promise.all`).
+
+Before the E2E test, the double-click rule was checked in the composer component test, where it can be forced: two
+clicks (or two Enters) in the same tick, before React renders again.
+
+**Files.**
+- `e2e/src/tests/concurrent-sends.spec.ts` (new): the shared chat and the double-click.
+- `apps/mfe-chat/src/features/composer/components/Composer.test.tsx`: three double-submit cases.
+- `apps/mfe-chat/src/features/composer/hooks/useComposer.ts`: the fix (see Problems and fixes).
+
+| Check | Rule (US1) |
+|---|---|
+| After 3 rounds, both live views show question, reply, question, reply…, each question once | S8 |
+| Both views are equal, also after a reload, and equal to `GET /chats/:id/messages` | Same order for everyone |
+| The LLM mock got one request per question, which finished, with that question last | No duplicated or lost answer |
+| `dblclick` on Send: one question, one reply, also after a reload | S2 |
+| Composer: `dblClick`, two clicks in the same tick, Enter twice: one `POST` | S2 |
+
+**How to run.**
+
+```sh
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/concurrent-sends.spec.ts
+```
+
+The spec is in `e2e/src/tests`, so the `e2e.yml` workflow runs it with the rest of the suite: a failure blocks the merge.
+
+**How to repeat it manually.**
+
+1. `pnpm mock:up`, open http://localhost:8000 in a normal window and in a private window, and register two accounts.
+2. In each window, save any Anthropic key in Settings (the mock accepts any key).
+3. In the first window create a chat and invite the second account's email from the chat's members panel.
+4. Type a message in both windows and press Send in both as close together as you can, a few times.
+5. Expected: both windows show the same list, question then reply, each question once; a reload shows the same list.
+6. Double-click Send on a new message: one message appears.
+
+**Result.** The component test failed before the fix (2 `POST`s for two clicks in the same tick and for two Enters;
+`userEvent.dblClick` alone passed, because it lets React render between the two clicks) and passes after it. The
+double-click E2E test failed against the stack built before the fix (two questions, two replies) and passes after
+`mfe-chat` was rebuilt. The whole spec passed three times in a row (`--repeat-each=3`), and the whole E2E suite passes
+against the new stack (37 tests).
+
+![Composer: two clicks or two Enters in one tick sent twice](evidence/10-double-submit-red.png)
+
+![Composer after the fix](evidence/11-double-submit-green.png)
+
+![E2E double-click before the fix: two messages](evidence/12-e2e-double-click-red.png)
+
+![E2E: shared chat and double-click, three runs each](evidence/13-e2e-concurrent-sends-green.png)
+
+**Problems and fixes.**
+- **The Send guard read React state.** `useComposer` blocked a second send with `isPending`, which only changes on the next
+  render; two clicks or two Enters a few milliseconds apart both saw "not sending". A `useRef` now marks the send as in
+  flight at once and is released when it settles (success or error, so a failed send can be tried again).
+- **The shared-chat test did not need a backend change.** It passed on its first run because the stack already had the
+  US3 and US4 fixes. Browser timing cannot force the narrow windows those races need, so they are proven at the service
+  level; this test guards the result end to end.
+- **`pnpm mock:up` reported exit 1** although every service was healthy: `--wait` counts the `ollama-pull` container,
+  which finishes with exit 0 by design. Not related to this epic.
+
+## 4. How to run everything
+
+```sh
+# no Docker
+cd services/conversation-service && pnpm exec vitest run src/features/queue src/features/messages src/shared/turn-clock.spec.ts \
+  src/integration/parallel-sends.spec.ts src/integration/stream-races.spec.ts
+cd apps/mfe-chat && pnpm exec vitest run src/features/composer
+# Docker
+pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/concurrent-sends.spec.ts
+```
+
+## 5. Results
+
+| Metric | Before | After |
+|---|---|---|
+| Race tests (queue, service, composer, E2E) | — | 12 + 4 + 10 + 3 + 2 new tests |
+| Parallel sends: consistent runs out of 50 | 0 / 50 | 50 / 50 (2,000 scenarios over 10 runs) |
+| Two retries at once (with latency) | 50 / 50 runs accepted both | one 202, one 409 in every run |
+| Defects found | — | 7 found and fixed (below) |
+| conversation-service tests | 671 | 685 + 3 repository cases, all pass |
+| E2E suite | 35 | 37, all pass |
+
+Defects found and fixed:
+
+1. Two sends at once could both be saved as `sent` (one was really queued) and enter the history of the reply before.
+2. Messages sent at once were listed before the replies that came before them (screen and model history).
+3. Two retries at once were both accepted; the second wiped the first answer.
+4. An edit could land after the reply started: the reply used the old text and the message went back to `queued`.
+5. A retried reply was built from later messages too.
+6. An error callback that threw stopped the chat queue and leaked an unhandled rejection.
+7. Two clicks or two Enters on Send in the same tick sent the message twice.
+
+## 6. DoD check
+
+| DoD item | Met | Evidence |
+|---|---|---|
+| Tests run in CI and pass on `main` | ✅ on the branch (unit and integration in `ci.yml`, E2E in `e2e.yml`); `main` after the merge | [green runs](evidence/08-stream-races-green.png) |
+| Failure blocks the merge | ✅ the specs are in the suites both workflows already run as required checks | [E2E](evidence/13-e2e-concurrent-sends-green.png) |
+| Run instructions added | ✅ `TESTING.md` (Concurrency) and §4 | — |
+| Two simultaneous sends and retry-during-stream tested | ✅ US3 (5 sends, 50 runs, two latency profiles), US4 (S3, S4), US5 (two browsers) | [US3](evidence/05-parallel-sends-green.png) |
+| No duplicate or lost messages | ✅ checked after every run: count, each question once, question/reply pairs, final status | [US4](evidence/08-stream-races-green.png) |
+
+## 7. Notes for the report
+
+- **What was found.** Seven defects, all fixed (§5). Six were on the server and none showed up in the existing tests:
+  the in-memory repository answers at once, so no other request could run between a read and a write.
+- **What made the races visible.** Deferred promises (the test decides when each reply ends); a seeded delay around every
+  repository call, like a database round trip, so a failing run can be replayed; 50 runs per scenario; a check that both
+  outcomes of a race happen; and, for a bad interleaving too rare for random timing, a test that forces it.
+- **The fix pattern.** "Check, await, write" is not atomic. The database now checks and writes in one conditional update
+  and the row count says who won (retry, edit). Ordering uses one rule in one place (`byConversationOrder`).
+- **Known limits.** Order is guaranteed with one conversation-service instance (in-memory queue, per-process clock). A stop
+  that arrives just after a reply ended stops the next reply, because the stop route names no message. Two `POST /messages`
+  that reach the server are two messages (no idempotency key, by decision).
+- **Lessons.** A test double must behave like the real part on the path under test (the fake processor had to mark
+  messages `sent`, the fake repository's ids had to grow like `cuid()`). Two failures on the way were in the tests, not
+  the app: HTTP requests never arrive at exactly the same time, and supertest's default server can collide with a local
+  port.
+
