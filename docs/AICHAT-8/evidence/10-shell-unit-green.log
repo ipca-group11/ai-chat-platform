@@ -1,0 +1,33 @@
+$ cd apps/shell && pnpm exec vitest run src/app/moduleFederationConfig.test.ts src/features/remote-loader --reporter=verbose 2>&1 | grep -E '✓|×|Tests|Test Files'
+ ✓ src/features/remote-loader/model/loadRemote.test.ts > loadRemote > resolves with the module the loader returns 2ms
+ ✓ src/features/remote-loader/model/loadRemote.test.ts > loadRemote > does not call the loader until the returned function is called 0ms
+ ✓ src/features/remote-loader/model/loadRemote.test.ts > loadRemote > wraps a rejection in a RemoteLoadError tagged with the scope and the original cause 1ms
+ ✓ src/features/remote-loader/model/loadRemote.test.ts > loadRemote > describes a non-Error rejection with String() 0ms
+ ✓ src/features/remote-loader/model/loadRemote.test.ts > loadRemote > also wraps a loader that throws synchronously inside the async function 0ms
+ ✓ src/features/remote-loader/model/loadRemote.test.ts > loadRemote timeout (AICHAT-163) > is 15 seconds 0ms
+ ✓ src/features/remote-loader/model/loadRemote.test.ts > loadRemote timeout (AICHAT-163) > rejects with a RemoteLoadError when the remote never answers 1ms
+ ✓ src/features/remote-loader/model/loadRemote.test.ts > loadRemote timeout (AICHAT-163) > resolves a remote that answers in time and leaves no timer behind 1ms
+ ✓ src/features/remote-loader/model/loadRemote.test.ts > RemoteLoadError > is an Error, so error boundaries and logging treat it normally 1ms
+ ✓ src/app/moduleFederationConfig.test.ts > AC-22: shell is a Module Federation host with remotes for every microfrontend > AC-22: configures mfeAuth, mfeChat, and mfeSettings as ESM remotes loaded at runtime 3ms
+ ✓ src/app/moduleFederationConfig.test.ts > AC-24: React, TanStack Router/Query, and the design system are shared singletons > AC-24: react and react-dom are shared as singletons 0ms
+ ✓ src/app/moduleFederationConfig.test.ts > AC-24: React, TanStack Router/Query, and the design system are shared singletons > AC-24: @tanstack/react-router and @tanstack/react-query are shared as singletons 0ms
+ ✓ src/app/moduleFederationConfig.test.ts > AC-24: React, TanStack Router/Query, and the design system are shared singletons > AC-24: the design system package is shared as a singleton across host and remotes 0ms
+ ✓ src/app/moduleFederationConfig.test.ts > AICHAT-163: a slow or hung remote never holds up the shell > loads a remote's entry only when one of its routes needs it ('loaded-first') 0ms
+ ✓ src/features/remote-loader/components/RemoteFallback.test.tsx > RemoteFallback > announces the failure as an alert that names the section 46ms
+ ✓ src/features/remote-loader/components/RemoteFallback.test.tsx > RemoteFallback > calls onRetry when the user presses Retry 16ms
+ ✓ src/features/remote-loader/components/RemoteFallback.test.tsx > RemoteFallback > can be activated from the keyboard 12ms
+ ✓ src/features/remote-loader/createRemoteRoute.test.tsx > createRemoteRoute > shows an accessible loading skeleton until the remote has loaded, then the remote 18ms
+ ✓ src/features/remote-loader/createRemoteRoute.test.tsx > createRemoteRoute > names the route after its scope, for React DevTools and error stacks 0ms
+ ✓ src/features/remote-loader/components/RemoteErrorBoundary.test.tsx > RemoteErrorBoundary / createRemoteRoute > AC-27/AC-28: a failed remote import renders a scoped fallback instead of a full-app crash 323ms
+ ✓ src/features/remote-loader/mockRemotes.test.tsx > RemoteFallback with the mock server remotes > shows the RemoteFallback when the remote is "404" 385ms
+ ✓ src/features/remote-loader/components/RemoteErrorBoundary.test.tsx > RemoteErrorBoundary / createRemoteRoute > AC-29: a sibling route outside the failed scope keeps working while one remote is down 313ms
+ ✓ src/features/remote-loader/components/RemoteErrorBoundary.test.tsx > RemoteErrorBoundary / createRemoteRoute > AC-27: catching a render error only unmounts the boundary's own scope, not its siblings 10ms
+ ✓ src/features/remote-loader/mockRemotes.test.tsx > RemoteFallback with the mock server remotes > shows the RemoteFallback when the remote is "broken-js" 321ms
+ ✓ src/features/remote-loader/mockRemotes.test.tsx > RemoteFallback with the mock server remotes > renders the remote, without a fallback, when it is "ok" 305ms
+ ✓ src/features/remote-loader/createRemoteRoute.test.tsx > createRemoteRoute > shows the scoped fallback with the failure logged when the import rejects 362ms
+ ✓ src/features/remote-loader/createRemoteRoute.test.tsx > createRemoteRoute > keeps failing visibly if the retry fails too, and recovers when a later retry works 956ms
+ ✓ src/features/remote-loader/components/RemoteErrorBoundary.test.tsx > RemoteErrorBoundary / createRemoteRoute > AC-27: clicking retry re-attempts the failed remote import 691ms
+ Test Files  6 passed (6)
+      Tests  28 passed (28)
+
+[exit 0]

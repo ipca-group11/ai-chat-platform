@@ -1,0 +1,26 @@
+$ cd e2e && pnpm exec playwright test src/tests/remote-failure.spec.ts -g AICHAT-163 --reporter=list 2>&1 | grep -E '✓|✘|passed|failed' | sed 's/.*AICHAT-163[^›]*› //'
+mfeAuth slow: skeleton under the nav bar, then the content, no fallback (12.3s)
+mfeAuth never answers: the other pages do not wait for it (11.8s)
+mfeAuth never answers: its page shows the fallback after the load timeout (11.9s)
+mfeChat slow: skeleton under the nav bar, then the content, no fallback (12.3s)
+mfeChat never answers: the other pages do not wait for it (11.9s)
+mfeChat never answers: its page shows the fallback after the load timeout (11.8s)
+mfeSettings slow: skeleton under the nav bar, then the content, no fallback (12.3s)
+mfeSettings never answers: the other pages do not wait for it (11.9s)
+mfeSettings never answers: its page shows the fallback after the load timeout (11.8s)
+    Error: expect(locator).toBeVisible() failed
+    test-results/remote-failure-AICHAT-163--772b4-er-pages-do-not-wait-for-it-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/remote-failure-AICHAT-163--a90d0-back-after-the-load-timeout-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/remote-failure-AICHAT-163--cae68-er-pages-do-not-wait-for-it-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/remote-failure-AICHAT-163--fd248-back-after-the-load-timeout-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/remote-failure-AICHAT-163--fb56f-er-pages-do-not-wait-for-it-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/remote-failure-AICHAT-163--caa29-back-after-the-load-timeout-chromium/test-failed-1.png
+  6 failed
+  3 passed (1.8m)
+
+[exit 0]
