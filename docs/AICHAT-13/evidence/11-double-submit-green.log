@@ -1,0 +1,30 @@
+$ cd apps/mfe-chat && pnpm exec vitest run src/features/composer --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/apps/mfe-chat
+
+ ✓ src/features/composer/hooks/useComposer.test.ts > useComposer > does nothing when send() is called while there is nothing to send 7ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > AC-51: sends a typed message and clears the input 107ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > the Send button is disabled while the message is empty and there are no attachments 2ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > AC-51: sends on Enter (without Shift) without inserting a newline 23ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > shows the send error when the message fails to send 30ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > AC-68: a rejected attachment blocks sending until it is removed 38ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > states of the composer > has no accessibility violations in its main state 18ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > states of the composer > sending: the Send button shows as busy and cannot be pressed twice until the server answers 40ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > states of the composer > Shift+Enter inserts a new line and does not send 29ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > states of the composer > compact: one line with a short placeholder, and the Send button still works 27ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > states of the composer > the regular layout shows the Shift+Enter hint and two rows 1ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > states of the composer > AC-71: warns about an image for a model that cannot read images, and blocks Send until it is removed 49ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > states of the composer > AC-56: a message the server queues (another reply is streaming) clears the input, shows no error and joins the cache as queued 29ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > states of the composer > sends the session's API key for the chat's provider in the X-Llm-Api-Key header 24ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer (AC-51, AC-66) > states of the composer > sends no key header when no key was entered in this session 25ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer: one message per send, however fast the user clicks (AICHAT-193) > a double-click on Send sends one message 29ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer: one message per send, however fast the user clicks (AICHAT-193) > two clicks in the same tick, before React re-renders, send one message 19ms
+ ✓ src/features/composer/components/Composer.test.tsx > Composer: one message per send, however fast the user clicks (AICHAT-193) > Enter pressed twice quickly sends one message 20ms
+
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+   Start at  23:42:55
+   Duration  1.54s (import 30%, environment 25%, tests 22%, transform 13%, setup 9%)
+
+
+[exit 0]
