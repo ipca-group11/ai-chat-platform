@@ -18,6 +18,12 @@ const settingsRemoteUrl = process.env.VITE_MFE_SETTINGS_URL ?? 'http://localhost
 export default createModuleFederationConfig({
   name: 'shell',
   filename: 'remoteEntry.js',
+  // 'loaded-first': the shell uses the shared libraries it already has and fetches a remote's
+  // remoteEntry.js only when one of its routes is opened. The default, 'version-first', awaits
+  // every remote's entry before the first render, so one remote that never answered left the
+  // whole app blank (AICHAT-163). All apps are built from this monorepo with the same versions,
+  // so comparing versions across remotes gains nothing.
+  shareStrategy: 'loaded-first',
   remotes: {
     mfeAuth: {
       type: 'module',

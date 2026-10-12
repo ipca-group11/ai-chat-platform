@@ -48,3 +48,11 @@ describe('AC-24: React, TanStack Router/Query, and the design system are shared 
     expect(designSystemEntry?.[1]?.singleton).toBe(true);
   });
 });
+
+describe('AICHAT-163: a slow or hung remote never holds up the shell', () => {
+  it("loads a remote's entry only when one of its routes needs it ('loaded-first')", () => {
+    // The default, 'version-first', awaits every remote's remoteEntry.js before the shell
+    // renders: one remote that never answers left the whole app blank.
+    expect(moduleFederationConfig.shareStrategy).toBe('loaded-first');
+  });
+});
