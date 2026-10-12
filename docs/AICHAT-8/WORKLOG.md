@@ -115,3 +115,59 @@ cd e2e && pnpm exec playwright test src/tests/support/remote-faults.spec.ts --re
   `drop-proxy.spec.ts`; it runs in the same job as the rest of the suite.
 - The shell's own defaults in `module-federation.config.ts` are the dev ports `5001`–`5003`; the stack the suite runs
   against publishes `3001`–`3003`, so the helper defaults to those.
+
+### US2 · Each remote blocked in turn shows its scoped fallback ([AICHAT-162](https://ipca-grupo11.atlassian.net/browse/AICHAT-162))
+
+**What and why.** The promise of the micro-frontend design: when one remote is down, only its part of the page fails.
+One parameterised test runs for each remote (`mfeAuth`, `mfeChat`, `mfeSettings`) and each failure (`abort`, `http-500`),
+6 cases. Each case signs in, breaks the remote, and then, **with the fault still active**:
+
+1. opens the remote's page: `remote-fallback-<scope>` is visible, has the `alert` role and a Retry button, the remote's
+   own content is absent, and the NavBar (`navigation "Main"`) is still there;
+2. opens the two other pages, by clicking the NavBar links (client-side navigation, no reload) or, for `/login`, which
+   has no link once signed in, with `page.goto`: each one renders its content and no fallback appears anywhere.
+
+`test.step` names each phase, so a failure says which page broke (for example "mfeAuth still works while mfeChat is
+down").
+
+**Files.**
+- `e2e/src/tests/remote-failure.spec.ts` (new): describe block `AICHAT-162`.
+- `e2e/src/tests/support/remote-faults.ts`: `ready`, the test id each remote renders once it has loaded
+  (`sign-in`, `new-chat`, `settings-heading`).
+
+**How to run.**
+
+```sh
+cd e2e && pnpm exec playwright test src/tests/remote-failure.spec.ts -g AICHAT-162 --reporter=list
+```
+
+**How to repeat it manually.**
+
+1. Start the stack (`pnpm mock:up`), open http://localhost:8000 and sign in.
+2. DevTools → Network → right-click any request to `localhost:3002` → **Block request domain**.
+3. Reload `/chats`: the alert "This section couldn't load" appears under the NavBar.
+4. Click **Settings**: the settings page works. Open `/login`: the sign-in form works.
+5. Remove the block (Network request blocking panel) and repeat with `localhost:3001` and `localhost:3003`.
+
+**Result.** 6 passed, together with the 6 matcher tests.
+
+![Chat fallback: NavBar and alert with Retry](evidence/06-chat-fallback.png)
+
+![12 passed](evidence/05-isolation-green.png)
+
+To check that the test can fail, we broke the helper in two ways:
+
+| Change | What the test reports |
+|---|---|
+| The fault spreads to all three remote origins (the shell itself still loads) | the fallback step passes, then **"mfeAuth still works while mfeChat is down"** fails: `sign-in` not found |
+| Back to the old US-9 pattern `/remoteEntry\|mfe-chat/i` | the first step fails on a **blank page**: the pattern also matches `http://localhost:8000/remoteEntry.js`, the shell's own entry (the shell is a federation container too), so the whole app stops |
+
+![Fault spreads: the isolation step fails](evidence/04-isolation-red-fault-spreads.png)
+
+![Old pattern: blank page, no fallback](evidence/03-isolation-red-all-remotes-blocked.png)
+
+**Problems and fixes.**
+- The second row is a finding about the deleted US-9 test: its pattern broke the shell, not only the chat remote, so it
+  could not have proved isolation.
+- With all three remotes down (and the shell up), the shell still shows its NavBar and the page's fallback: the runtime
+  tolerates a failed `remoteEntry.js` and only the route that needs it fails.
