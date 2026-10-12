@@ -1,0 +1,183 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/parallel-sends.spec.ts
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ❯ src/integration/parallel-sends.spec.ts (4 tests | 3 failed) 4658ms
+   ❯ parallel sends to one chat, repository latency: none (AICHAT-191) (2)
+     × 5 sends at once: each saved and answered once, in the order shown (50 runs) 546ms
+   ❯ parallel sends to one chat, repository latency: database (AICHAT-191) (2)
+     × 5 sends at once: each saved and answered once, in the order shown (50 runs) 3788ms
+     × two chats at once run in parallel, each in its own order (50 runs) 37ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  08:28:53
+   Duration  4.88s (tests 96%, import 2%, transform 2%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/integration/parallel-sends.spec.ts > parallel sends to one chat, repository latency: none (AICHAT-191) > 5 sends at once: each saved and answered once, in the order shown (50 runs)
+AssertionError: 50/50 runs inconsistent: expected [ …(50) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seed 1: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 2: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 3: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 4: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 5: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 6: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 7: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 8: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 9: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 10: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 11: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 12: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 13: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 14: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 15: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 16: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 17: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 18: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 19: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 20: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 21: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 22: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 23: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 24: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 25: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 26: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 27: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 28: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 29: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 30: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 31: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 32: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 33: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 34: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 35: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 36: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 37: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 38: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 39: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 40: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 41: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 42: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 43: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 44: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 45: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 46: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 47: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 48: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 49: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++   "seed 50: message 3 is user (expected assistant); message 5 is user (expected assistant); message 6 is assistant (expected user)",
++ ]
+
+ ❯ src/integration/parallel-sends.spec.ts:160:70
+    158|       if (problems.length > 0) failures.push(`seed ${seed}: ${problems…
+    159|     }
+    160|     expect(failures, `${failures.length}/${RUNS} runs inconsistent`).t…
+       |                                                                      ^
+    161|   });
+    162|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/integration/parallel-sends.spec.ts > parallel sends to one chat, repository latency: database (AICHAT-191) > 5 sends at once: each saved and answered once, in the order shown (50 runs)
+AssertionError: 50/50 runs inconsistent: expected [ …(50) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seed 1: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 2: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 3: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 4: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 5: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 6: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 7: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 8: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 9: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 10: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 11: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 12: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 13: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 14: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 15: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 16: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 17: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 18: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 19: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 20: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 21: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 22: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 23: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 24: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 25: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 26: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 27: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 28: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 29: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 30: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 31: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 32: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 33: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 34: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 35: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 36: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 37: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 38: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 39: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 40: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 41: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 42: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 43: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 44: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 45: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 46: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 47: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 48: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 49: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++   "seed 50: 5 responses say \"sent\" (expected 1, the rest \"queued\"); 0 \"queued\" events (expected 4); message 1 is user (expected assistant)",
++ ]
+
+ ❯ src/integration/parallel-sends.spec.ts:160:70
+    158|       if (problems.length > 0) failures.push(`seed ${seed}: ${problems…
+    159|     }
+    160|     expect(failures, `${failures.length}/${RUNS} runs inconsistent`).t…
+       |                                                                      ^
+    161|   });
+    162|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/integration/parallel-sends.spec.ts > parallel sends to one chat, repository latency: database (AICHAT-191) > two chats at once run in parallel, each in its own order (50 runs)
+AssertionError: seed 1: expected [ 'a0', 'reply to a1' ] to deeply equal [ 'a0', 'a1' ]
+
+- Expected
++ Received
+
+  [
+    "a0",
+-   "a1",
++   "reply to a1",
+  ]
+
+ ❯ src/integration/parallel-sends.spec.ts:187:51
+    185|         const contents = (await store.findByChatOrdered(chatId)).map((…
+    186|         const asked = contents.filter((_, i) => i % 2 === 0);
+    187|         expect([...asked].sort(), `seed ${seed}`).toEqual(questions);
+       |                                                   ^
+    188|         expect(contents, `seed ${seed}`).toEqual(asked.flatMap((q) => …
+    189|       }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+[exit 1]
