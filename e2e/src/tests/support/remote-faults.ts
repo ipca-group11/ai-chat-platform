@@ -19,15 +19,28 @@ export interface RemoteInfo {
   origin: string;
   /** A page of the shell that mounts this remote. */
   path: string;
+  /** Test id of an element the remote renders on that page once it has loaded. */
+  ready: string;
 }
 
 export const remotes: Record<RemoteName, RemoteInfo> = {
-  mfeAuth: { scope: "auth", origin: process.env["VITE_MFE_AUTH_URL"] ?? "http://localhost:3001", path: "/login" },
-  mfeChat: { scope: "chat", origin: process.env["VITE_MFE_CHAT_URL"] ?? "http://localhost:3002", path: "/chats" },
+  mfeAuth: {
+    scope: "auth",
+    origin: process.env["VITE_MFE_AUTH_URL"] ?? "http://localhost:3001",
+    path: "/login",
+    ready: "sign-in",
+  },
+  mfeChat: {
+    scope: "chat",
+    origin: process.env["VITE_MFE_CHAT_URL"] ?? "http://localhost:3002",
+    path: "/chats",
+    ready: "new-chat",
+  },
   mfeSettings: {
     scope: "settings",
     origin: process.env["VITE_MFE_SETTINGS_URL"] ?? "http://localhost:3003",
     path: "/settings",
+    ready: "settings-heading",
   },
 };
 
