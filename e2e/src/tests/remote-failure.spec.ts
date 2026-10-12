@@ -29,18 +29,29 @@ test.describe("AICHAT-162: each remote down in turn shows only its own fallback"
         account,
       }) => {
         void account;
-        const { path, ready } = remotes[remote];
+        const created = await page.request.post("/api/chats", {
+          data: { title: "Remote failure", provider: "anthropic", model: "claude-haiku-4-5" },
+        });
+        expect(created.status()).toBe(201);
+        const { id: chatId } = (await created.json()) as { id: string };
+        const pagesOf: Record<RemoteName, string[]> = {
+          mfeAuth: ["/login", "/register"],
+          mfeChat: ["/chats", `/chats/${chatId}`],
+          mfeSettings: ["/settings"],
+        };
         await failRemote(page, remote, mode);
 
-        await test.step(`the ${remote} page shows the scoped fallback`, async () => {
-          await page.goto(path);
-          const fallback = fallbackOf(page, remote);
-          await expect(fallback).toBeVisible();
-          await expect(fallback).toHaveRole("alert");
-          await expect(fallback.getByRole("button", { name: "Retry" })).toBeVisible();
-          await expect(page.getByTestId(ready)).toHaveCount(0);
-          await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
-        });
+        for (const path of pagesOf[remote]) {
+          await test.step(`${path} shows the scoped fallback`, async () => {
+            await page.goto(path);
+            const fallback = fallbackOf(page, remote);
+            await expect(fallback).toBeVisible();
+            await expect(fallback).toHaveRole("alert");
+            await expect(fallback.getByRole("button", { name: "Retry" })).toBeVisible();
+            await expect(page.getByTestId(remotes[remote].ready)).toHaveCount(0);
+            await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
+          });
+        }
 
         for (const other of remoteNames.filter((name) => name !== remote)) {
           await test.step(`${other} still works while ${remote} is down`, async () => {
