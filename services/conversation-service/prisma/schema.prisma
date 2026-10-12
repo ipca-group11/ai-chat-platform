@@ -101,6 +101,11 @@ model Message {
   /// True when the user stopped the reply before it finished (AICHAT-202); the partial
   /// text is kept in `content`. Additive column, existing rows read as false.
   stopped     Boolean       @default(false)
+  /// When the message took its place in the conversation (AICHAT-191): a user message when
+  /// its reply starts, a reply when it is created. Null while queued and on older rows; the
+  /// history is ordered by `sentAt ?? createdAt`, so messages sent at the same time still
+  /// read question, reply, question, reply. Additive column.
+  sentAt      DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   attachments Attachment[]
