@@ -161,3 +161,82 @@ symptoms: the next entry never ran (`expected ['m1'] to deeply equal ['m1', 'm2'
 - **A late stop.** `POST /chats/:chatId/stop` names no message, so a stop that reaches the server just after a reply
   ended aborts the next queued reply. We kept this behaviour (changing it would change the API that AICHAT-11 and AICHAT-12
   lock) and recorded it in a test, so a future change is a conscious one.
+
+### US3 · Parallel sends to one chat: no duplicate or lost messages ([AICHAT-191](https://ipca-grupo11.atlassian.net/browse/AICHAT-191))
+
+**What and why.** US2 tests the queue alone. Here the whole service runs: real Express app, routes, `MessagesService`,
+queue and message processor, with the in-memory repositories and a scripted LLM that answers `reply to <question>`
+and records the history it was given. N = 5 messages are sent to one chat with `Promise.all` and the final state is
+checked against the US1 rules.
+
+The in-memory repository answers every call at once, which hides races: a race needs another request to run in the
+gap between a read and a write, and a real database call is that gap. Each scenario therefore runs twice, once as is and
+once with `withLatency`, which wraps the repository so every call waits 0–2 ms before and after, like a database
+round trip. The delays come from a **seeded** random generator: run 37 always gets the same delays, so a failing seed can
+be replayed. Every scenario runs 50 times (seeds 1–50).
+
+**Files.**
+- `services/conversation-service/src/integration/parallel-sends.spec.ts` (new): the scenarios below.
+- `services/conversation-service/src/test-utils/with-latency.ts` (new): `withLatency` and `seededRandom`.
+- `services/conversation-service/src/shared/turn-clock.ts` and `.spec.ts` (new): a clock whose readings always increase.
+- `services/conversation-service/prisma/schema.prisma`: new nullable column `Message.sentAt`.
+- `services/conversation-service/src/features/messages/service.ts`, `processor.ts`: the fixes (see Problems and fixes).
+- `services/conversation-service/src/test-utils/fake-messages-repository.ts`: `sentAt`, the same order as the real
+  repository, ids that grow with creation order (like the database's `cuid()`).
+
+| Check, per run | Rule (US1) |
+|---|---|
+| Every response is 201; exactly one says `sent`, the others `queued`; N−1 `queued` events | S1: first started, rest queued |
+| 2N messages stored, every question exactly once, all `sent` at the end | No duplicates, no losses |
+| Stored order is question, reply, question, reply…, each reply right after its own question | Order shown = order answered |
+| The message answered first is the first one shown | Arrival order |
+| Reply k was given exactly the k questions and k−1 replies shown before it | The model never sees a question that is still waiting |
+| Two chats: both first replies are running at the same time; each chat ends question, reply, question, reply | S9: chats are independent |
+
+**How to run.**
+
+```sh
+cd services/conversation-service && pnpm exec vitest run src/integration/parallel-sends.spec.ts --reporter=verbose
+```
+
+**How to repeat it manually.**
+
+1. Run the command above: 4 tests (2 scenarios × 2 latency profiles), each 50 runs, about 7 s in total.
+2. To see the defects, put the fix aside and run the same test on the old code:
+   `git stash push -- services/conversation-service/src/features/messages/service.ts services/conversation-service/src/features/messages/processor.ts services/conversation-service/src/test-utils/fake-messages-repository.ts`,
+   run it (3 of 4 fail, 50/50 runs), then `git stash pop`.
+3. Expected output after the fix: `Tests 4 passed (4)`.
+
+**Result.** Before the fix, 50 of 50 runs broke the rules in both latency profiles. After the fix, 10 consecutive runs of
+the file (2,000 scenarios) passed. Undoing each part of the fix on its own is caught: the "sent" save fails 3 of 4 tests,
+the missing `sentAt` on the question fails 4 of 4, the missing `sentAt` on the reply fails only on seed 18 (the reply and
+the question fall in the same millisecond), which is why one run is not enough.
+
+![Before the fix: 50 of 50 runs inconsistent](evidence/04-parallel-sends-red.png)
+
+![After the fix](evidence/05-parallel-sends-green.png)
+
+![Undoing each part of the fix is caught](evidence/06-send-mutations.png)
+
+**Problems and fixes.**
+- **Two sends read "idle" at once (race 1).** `send()` decided "sent or queued" before `await repo.create(...)`. Fixed: the
+  message is always saved as `queued`; whether it starts is decided by `QueueManager.submit` after the save, and the
+  response and the `queued` event follow what `submit` returned. Only the processor writes `sent`, when the reply starts.
+- **Questions listed before the replies that came before them.** The history (screen and model) was ordered by
+  `createdAt`. Five questions sent at once were all created before the first reply existed, so the model got
+  `q0 q1 q2 q3 q4 r0 r1 …`: several questions in a row and, from the third reply on, a history ending with an assistant
+  message, which a provider treats as the start of its own answer (the scripted model answered `reply to reply to q1`).
+  The chat screen shows queued messages in a separate panel and adds them to the conversation when they start, so the
+  agreed rule is "a message takes its place when its turn starts". Fixed with an additive column `sentAt`: the processor
+  stamps the question, then its reply, when the turn starts; the history is ordered by `sentAt ?? createdAt`, then
+  `createdAt`, then `id`. Older rows have no `sentAt` and keep their order. `sentAt` stays inside the service: the API
+  already returns messages in this order and the chat screen keeps the order it receives, so no contract changes.
+- **Two turns in the same millisecond.** `sentAt` comes from `turnClock`, which always moves forward (at least 1 ms per
+  reading), so every stamp is unique. This holds for one instance, the setup recorded in US1.
+- **Ties in the database.** `ORDER BY createdAt` alone leaves rows with the same millisecond in no defined order. The query
+  now also orders by `id` (`cuid()` grows with creation time).
+- **Two test problems found on the way.** (1) With the instant repository a reply sometimes finished before the fifth
+  request arrived, so that request rightly started: the replies now wait until all N sends have been answered, so the N
+  requests really overlap. (2) About one run in ten failed with `POST /chats` answering 404: supertest opened a server per
+  request on all addresses and sometimes got a port that another local program (an editor helper) held on `127.0.0.1`,
+  so the request reached that program. Each run now uses one server bound to `127.0.0.1`.
