@@ -240,3 +240,79 @@ the question fall in the same millisecond), which is why one run is not enough.
   requests really overlap. (2) About one run in ten failed with `POST /chats` answering 404: supertest opened a server per
   request on all addresses and sometimes got a port that another local program (an editor helper) held on `127.0.0.1`,
   so the request reached that program. Each run now uses one server bound to `127.0.0.1`.
+
+### US4 · Retry, edit and cancel while a reply is streaming ([AICHAT-192](https://ipca-grupo11.atlassian.net/browse/AICHAT-192))
+
+**What and why.** The same setup as US3 (real app, queue and processor; in-memory repository with and without latency),
+now with a scripted LLM whose every reply **waits until the test releases it**, so the test decides when a turn ends.
+For the two races that depend on timing (edit or cancel at the moment a message starts), each of the 50 runs sends the
+request and ends the running reply with a seeded offset of 0–5 ms between them. Every run must end in one of the two
+allowed outcomes, and across the 50 runs **both outcomes must happen**; otherwise the race window was never hit and the
+test would prove nothing. Where a bad interleaving is too rare for random timing, a second test forces it.
+
+The setup moved to `test-utils/race-harness.ts`: it serves the app on `127.0.0.1` (see US3) and can wrap the repository
+to hold one chosen call.
+
+**Files.**
+- `services/conversation-service/src/integration/stream-races.spec.ts` (new): the scenarios below, in both latency profiles.
+- `services/conversation-service/src/test-utils/race-harness.ts` (new): `startRaceApp`, `until`.
+- `services/conversation-service/src/features/messages/service.ts`: `claimForRetry` and `updateQueuedContent` (repository),
+  `retry` and `editQueued` use them.
+- `services/conversation-service/src/features/messages/processor.ts`: a reply is built from the messages listed before it.
+- `services/conversation-service/src/features/messages/repository.spec.ts`: the two conditional writes.
+- `services/conversation-service/src/test-utils/fake-queue.ts`, `build-test-app.ts`, `features/messages/service.spec.ts`:
+  `takingProcessor`, the default fake processor (see Problems and fixes).
+
+| Test | Scenario (US1) | Allowed outcome |
+|---|---|---|
+| Retry while another reply streams | S3 | 202 `queued`; runs after the running reply; the failed reply is reused in place (4 messages); it is built from `q0` only |
+| Two retries at once (50 runs) | S4 | One 202, one 409 `MESSAGE_NOT_RETRYABLE`; the LLM is called once; the reply is `reply to q0` |
+| Edit as the message starts (50 runs) | S5 | 200: stored text, the text the model got and the reply are all "edited". 409 `MESSAGE_NOT_EDITABLE`: all "original". Every message ends `sent`. Both outcomes seen |
+| Edit, worst case (forced) | S5 | The edit's write is held until the processor has taken the message: the outcome must still be consistent |
+| Cancel as the message starts (50 runs) | S6 | 204: the message is gone and its reply never generated (2 messages). 409 `MESSAGE_NOT_CANCELABLE`: processed normally (4 messages). Both outcomes seen |
+
+**How to run.**
+
+```sh
+cd services/conversation-service && pnpm exec vitest run src/integration/stream-races.spec.ts --reporter=verbose
+```
+
+**How to repeat it manually.**
+
+1. Run the command above: 10 tests, about 10 s.
+2. Put an old pattern back, for example in `MessagesService.retry` replace the `claimForRetry` line with a `findById`
+   check followed by `updateContent(...)`: the "two retries at once" test fails in the `database` profile only.
+3. `git checkout -- services/conversation-service/src/features/messages/service.ts` to restore it.
+
+**Result.** Before the fixes, 5 of 10 tests failed: the retry was built from later messages (`reply to reply to q1`), two
+retries at once were both accepted in 50 of 50 runs and the reply ended empty, and the forced edit was accepted while the
+model answered the old text (or, with latency, a history without the edited question). After the fixes all 10 pass and the
+whole service suite passes (685 tests). Each old pattern put back on its own is caught.
+
+![Before the fixes](evidence/07-stream-races-red.png)
+
+![After the fixes](evidence/08-stream-races-green.png)
+
+![Each old pattern put back is caught](evidence/09-race-mutations.png)
+
+**Problems and fixes.**
+- **Check, await, write.** `retry` read the message, checked `status === "failed"`, awaited, then reset it; `editQueued`
+  checked the in-memory queue, then awaited the write of the text and of `status: "queued"`. Another request (or the queue
+  starting the message) could act in the gap. Both now make the database check and write in **one conditional update**
+  (`updateMany ... where status = failed` / `where role = user and status = queued`) and use the number of rows changed to
+  know who won. Two retries at once: one changes the row, the other changes none and gets 409. An edit lands only while the
+  message is still queued; the processor marks a message `sent` before it reads the history, so an accepted edit is always
+  what the model gets. The fake repository does the check and the write in one synchronous step, which is what the
+  database's row lock gives.
+- **A retry saw later messages.** A retried reply was built from the whole chat, so retrying an old failed reply after a
+  newer question sent the newer question and its answer too, and the history ended with an assistant message. A reply is
+  now built from the messages listed before it (the same rule as US3).
+- **A test double that no longer matched.** Two older tests ("editing a message that is being processed is rejected")
+  failed after the fix. They used a fake processor that never marks the message `sent`; before, `send()` wrote `sent`
+  itself, which hid the gap. The default fake processor (`takingProcessor`) now marks the message `sent` first, as the real
+  one does. Between "taken by the queue" and "marked sent" an edit is accepted, and correctly so: the model reads the
+  history after that point.
+- **Cancel was already right.** It removes the message from the in-memory queue before any await, so it can never be both
+  cancelled and answered. The test now guards that.
+- **Wrong assumptions in the first draft of the test**, found on the first run: retry answers 202 (not 200) and the error
+  code is in `error.code` (the shared error envelope).

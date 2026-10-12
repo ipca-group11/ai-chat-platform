@@ -1,0 +1,20 @@
+$ sh race-mutations.sh   # put each old pattern back in turn, run the race tests, restore
+M1: retry checks "failed", awaits, then writes (the old way)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 23 passed (24)
+
+M2: edit checks the in-memory queue, then writes text and status (the old way)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 22 passed (24)
+
+M3: a retried reply is built from the whole chat again
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 22 passed (24)
+
+M4: the database write for a retry is no longer conditional on "failed"
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 23 passed (24)
+
+service.ts and processor.ts restored
+
+[exit 0]
