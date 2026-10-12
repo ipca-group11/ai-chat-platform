@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+import type { MessagesRepository } from "../features/messages/index.js";
 import { QueueManager, type QueueProcessor } from "../features/queue/index.js";
 
 /** A processor that records every call and never finishes, so the first message of a
@@ -17,6 +18,16 @@ export function stoppableProcessor() {
         else signal.addEventListener("abort", () => resolve(), { once: true });
       }),
   );
+}
+
+/** Like `hangingProcessor`, but it first marks a sent message "sent", as the real processor
+ * does when a reply starts: only the processor writes "sent" (AICHAT-191), so a fake that
+ * skips it leaves the message "queued" and editable while it is being answered. */
+export function takingProcessor(repo: Pick<MessagesRepository, "updateStatus">) {
+  return vi.fn<QueueProcessor>(async (_chatId, entry) => {
+    if (entry.kind !== "retry") await repo.updateStatus(entry.messageId, "sent");
+    await new Promise<void>(() => {});
+  });
 }
 
 /** A real `QueueManager` driven by a fake processor: no provider is called, and the test

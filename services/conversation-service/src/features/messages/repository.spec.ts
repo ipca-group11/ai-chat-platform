@@ -11,6 +11,7 @@ function mockPrisma() {
       findFirst: vi.fn().mockResolvedValue({ id: "m1" }),
       findUnique: vi.fn().mockResolvedValue({ id: "m1" }),
       update: vi.fn().mockResolvedValue({ id: "m1" }),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       delete: vi.fn().mockResolvedValue(undefined),
     },
   } as unknown as PrismaClient;
@@ -122,5 +123,33 @@ describe("createMessagesRepository", () => {
     const repo = createMessagesRepository(prisma);
     await repo.delete("m1");
     expect(prisma.message.delete).toHaveBeenCalledWith({ where: { id: "m1" } });
+  });
+
+  it("AICHAT-192: claimForRetry resets a failed reply in one conditional write", async () => {
+    const prisma = mockPrisma();
+    const repo = createMessagesRepository(prisma);
+    expect(await repo.claimForRetry("m1", "c1")).toEqual({ id: "m1" });
+    expect(prisma.message.updateMany).toHaveBeenCalledWith({
+      where: { id: "m1", chatId: "c1", role: "assistant", status: "failed" },
+      data: { content: "", status: "queued", error: null },
+    });
+  });
+
+  it("AICHAT-192: claimForRetry returns null when another request already took it", async () => {
+    const prisma = mockPrisma();
+    vi.mocked(prisma.message.updateMany).mockResolvedValue({ count: 0 });
+    const repo = createMessagesRepository(prisma);
+    expect(await repo.claimForRetry("m1", "c1")).toBeNull();
+    expect(prisma.message.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("AICHAT-192: updateQueuedContent only changes a user message that is still queued", async () => {
+    const prisma = mockPrisma();
+    const repo = createMessagesRepository(prisma);
+    expect(await repo.updateQueuedContent("m1", "edited")).toEqual({ id: "m1" });
+    expect(prisma.message.updateMany).toHaveBeenCalledWith({ where: { id: "m1", role: "user", status: "queued" }, data: { content: "edited" } });
+
+    vi.mocked(prisma.message.updateMany).mockResolvedValue({ count: 0 });
+    expect(await repo.updateQueuedContent("m1", "too late")).toBeNull();
   });
 });
