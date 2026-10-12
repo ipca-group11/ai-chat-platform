@@ -8,13 +8,13 @@ Running 12 tests using 2 workers
   ✓   5 [chromium] › src/tests/support/remote-faults.spec.ts:23:3 › matchesRemote › leaves the shell and the APIs alone, even on the same host (1ms)
   ✓   6 [chromium] › src/tests/support/remote-faults.spec.ts:34:3 › matchesRemote › compares origins, not text: scheme and host must match too (0ms)
   ✓   7 [chromium] › src/tests/support/remote-faults.spec.ts:41:3 › matchesRemote › files 'chunks' lets remoteEntry.js through and matches everything else (0ms)
-  ✓   2 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeAuth abort: fallback with Retry, nav bar stays, the other remotes still work (4.2s)
-  ✓   8 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeAuth http-500: fallback with Retry, nav bar stays, the other remotes still work (4.1s)
-  ✓   9 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeChat abort: fallback with Retry, nav bar stays, the other remotes still work (4.3s)
-  ✓  10 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeChat http-500: fallback with Retry, nav bar stays, the other remotes still work (4.1s)
-  ✓  11 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeSettings abort: fallback with Retry, nav bar stays, the other remotes still work (4.2s)
+  ✓   2 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeAuth abort: fallback with Retry, nav bar stays, the other remotes still work (5.0s)
+  ✓   8 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeAuth http-500: fallback with Retry, nav bar stays, the other remotes still work (4.9s)
+  ✓   9 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeChat abort: fallback with Retry, nav bar stays, the other remotes still work (5.0s)
+  ✓  10 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeChat http-500: fallback with Retry, nav bar stays, the other remotes still work (5.0s)
+  ✓  11 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeSettings abort: fallback with Retry, nav bar stays, the other remotes still work (4.1s)
   ✓  12 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeSettings http-500: fallback with Retry, nav bar stays, the other remotes still work (4.2s)
 
-  12 passed (25.4s)
+  12 passed (28.5s)
 
 [exit 0]

@@ -122,7 +122,8 @@ cd e2e && pnpm exec playwright test src/tests/support/remote-faults.spec.ts --re
 One parameterised test runs for each remote (`mfeAuth`, `mfeChat`, `mfeSettings`) and each failure (`abort`, `http-500`),
 6 cases. Each case signs in, breaks the remote, and then, **with the fault still active**:
 
-1. opens the remote's page: `remote-fallback-<scope>` is visible, has the `alert` role and a Retry button, the remote's
+1. opens **every page** that mounts the remote (`/login` and `/register` for `mfeAuth`; `/chats` and `/chats/:id`, with
+   a chat created through the API, for `mfeChat`; `/settings` for `mfeSettings`): `remote-fallback-<scope>` is visible, has the `alert` role and a Retry button, the remote's
    own content is absent, and the NavBar (`navigation "Main"`) is still there;
 2. opens the two other pages, by clicking the NavBar links (client-side navigation, no reload) or, for `/login`, which
    has no link once signed in, with `page.goto`: each one renders its content and no fallback appears anywhere.
