@@ -40,9 +40,20 @@ export interface MessageRecord {
   error?: string | null;
   /** The user stopped this reply before it finished (AICHAT-202). Missing on old fakes = false. */
   stopped?: boolean;
+  /** When the message took its place in the conversation (AICHAT-191). Null while queued. */
+  sentAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
   attachments: AttachmentSummary[];
+}
+
+/** Conversation order (AICHAT-191): by the time a message took its place in the conversation,
+ * falling back to its creation time (queued messages and rows from before `sentAt`), then id.
+ * A message queued behind a reply is therefore listed after that reply, even if it was
+ * written before the reply started. */
+export function byConversationOrder(a: MessageRecord, b: MessageRecord): number {
+  const placed = (m: MessageRecord) => (m.sentAt ?? m.createdAt).getTime();
+  return placed(a) - placed(b) || a.createdAt.getTime() - b.createdAt.getTime() || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 }
 
 export interface MessagesRepository {
@@ -53,11 +64,14 @@ export interface MessagesRepository {
     role: MessageRole;
     content: string;
     status: MessageStatus;
+    sentAt?: Date;
   }): Promise<MessageRecord>;
+  /** Every message of the chat in conversation order (`byConversationOrder`). */
   findByChatOrdered(chatId: string): Promise<MessageRecord[]>;
   findByIdAndOwner(id: string, ownerId: string): Promise<MessageRecord | null>;
   findById(id: string): Promise<MessageRecord | null>;
-  updateStatus(id: string, status: MessageStatus): Promise<MessageRecord>;
+  /** `sentAt` is given when a queued user message starts its turn. */
+  updateStatus(id: string, status: MessageStatus, sentAt?: Date): Promise<MessageRecord>;
   updateContent(
     id: string,
     data: {
@@ -78,11 +92,12 @@ export function createMessagesRepository(prisma: PrismaClient): MessagesReposito
       return prisma.message.create({ data, include: { attachments: true } });
     },
     async findByChatOrdered(chatId) {
-      return prisma.message.findMany({
+      const rows = await prisma.message.findMany({
         where: { chatId },
-        orderBy: { createdAt: "asc" },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
         include: { attachments: true },
       });
+      return rows.sort(byConversationOrder);
     },
     async findByIdAndOwner(id, ownerId) {
       return prisma.message.findFirst({ where: { id, ownerId }, include: { attachments: true } });
@@ -90,8 +105,8 @@ export function createMessagesRepository(prisma: PrismaClient): MessagesReposito
     async findById(id) {
       return prisma.message.findUnique({ where: { id }, include: { attachments: true } });
     },
-    async updateStatus(id, status) {
-      return prisma.message.update({ where: { id }, data: { status }, include: { attachments: true } });
+    async updateStatus(id, status, sentAt) {
+      return prisma.message.update({ where: { id }, data: { status, ...(sentAt ? { sentAt } : {}) }, include: { attachments: true } });
     },
     async updateContent(id, { webFetches, ...data }) {
       return prisma.message.update({
@@ -129,18 +144,19 @@ export class MessagesService {
   async send(user: Principal, chatId: string, input: SendMessageInput, apiKey?: string): Promise<MessageDto> {
     await this.chatsService.getAccessible(user, chatId);
 
-    const queue = this.queueManager.getQueue(chatId);
-    const isIdle = !queue.isProcessing;
+    // Saved as queued; only the processor marks it sent, when its reply starts. Whether it
+    // starts now is decided by `submit`, after the save: deciding before the await let two
+    // sends at once both read "idle" (AICHAT-191).
     const userMessage = await this.repo.create({
       chatId,
       ownerId: user.userId,
       authorEmail: user.email,
       role: "user",
       content: input.content,
-      status: isIdle ? "sent" : "queued",
+      status: "queued",
     });
 
-    this.queueManager.submit(chatId, {
+    const result = this.queueManager.submit(chatId, {
       messageId: userMessage.id,
       content: input.content,
       attachmentIds: input.attachmentIds,
@@ -149,10 +165,10 @@ export class MessagesService {
       userId: user.userId,
     });
 
-    const dto = toMessageDto(userMessage);
+    const dto = toMessageDto(result === "started" ? { ...userMessage, status: "sent" } : userMessage);
     // Lets the other members viewing this chat see the message without a refetch.
     this.bus.publish(chatId, { type: "message", message: dto });
-    if (!isIdle) {
+    if (result === "queued") {
       this.bus.publish(chatId, { type: "queued", messageId: userMessage.id });
     }
 

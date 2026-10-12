@@ -27,15 +27,44 @@ describe("createMessagesRepository", () => {
     });
   });
 
-  it("AC-53: findByChatOrdered orders messages oldest first", async () => {
+  it("AC-53: findByChatOrdered orders messages oldest first, ties broken by id", async () => {
     const prisma = mockPrisma();
     const repo = createMessagesRepository(prisma);
     await repo.findByChatOrdered("c1");
     expect(prisma.message.findMany).toHaveBeenCalledWith({
       where: { chatId: "c1" },
-      orderBy: { createdAt: "asc" },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       include: { attachments: true },
     });
+  });
+
+  it("AICHAT-191: a message written before a reply started but queued behind it is listed after that reply", async () => {
+    const at = (ms: number) => new Date(ms);
+    const row = (id: string, createdAt: number, sentAt: number | null) => ({ id, createdAt: at(createdAt), sentAt: sentAt === null ? null : at(sentAt) });
+    const prisma = mockPrisma();
+    // As the database returns them (by createdAt): q1 was written at 2, before r0 existed.
+    vi.mocked(prisma.message.findMany).mockResolvedValue([
+      row("q0", 1, 10),
+      row("q1", 2, 30), // its turn started at 30, after r0
+      row("q2", 3, null), // still queued
+      row("r0", 11, 11),
+      row("r1", 31, 31),
+    ] as never);
+    const repo = createMessagesRepository(prisma);
+
+    expect((await repo.findByChatOrdered("c1")).map((m) => m.id)).toEqual(["q2", "q0", "r0", "q1", "r1"]);
+  });
+
+  it("AICHAT-191: rows from before sentAt keep their creation order", async () => {
+    const prisma = mockPrisma();
+    vi.mocked(prisma.message.findMany).mockResolvedValue([
+      { id: "old-q", createdAt: new Date(1), sentAt: null },
+      { id: "old-r", createdAt: new Date(2), sentAt: null },
+      { id: "new-q", createdAt: new Date(50), sentAt: new Date(60) },
+    ] as never);
+    const repo = createMessagesRepository(prisma);
+
+    expect((await repo.findByChatOrdered("c1")).map((m) => m.id)).toEqual(["old-q", "old-r", "new-q"]);
   });
 
   it("AC-45: findByIdAndOwner scopes by id and ownerId", async () => {
@@ -57,6 +86,14 @@ describe("createMessagesRepository", () => {
     const repo = createMessagesRepository(prisma);
     await repo.updateStatus("m1", "queued");
     expect(prisma.message.update).toHaveBeenCalledWith({ where: { id: "m1" }, data: { status: "queued" }, include: { attachments: true } });
+  });
+
+  it("AICHAT-191: updateStatus stamps sentAt when a turn starts", async () => {
+    const prisma = mockPrisma();
+    const repo = createMessagesRepository(prisma);
+    const sentAt = new Date(42);
+    await repo.updateStatus("m1", "sent", sentAt);
+    expect(prisma.message.update).toHaveBeenCalledWith({ where: { id: "m1" }, data: { status: "sent", sentAt }, include: { attachments: true } });
   });
 
   it("AC-55: updateContent delegates to prisma.message.update", async () => {

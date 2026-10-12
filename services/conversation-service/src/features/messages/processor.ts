@@ -3,6 +3,7 @@ import { ProviderError, type ProviderRegistry, type LlmMessage } from "../llm-ad
 import type { QueueEntry, QueueProcessor } from "../queue/index.js";
 import type { ChatEventBus } from "../streaming/index.js";
 import type { WebFetchDto } from "../../shared/contracts/chat.js";
+import { turnClock } from "../../shared/turn-clock.js";
 import type { MessageRecord, MessagesRepository } from "./service.js";
 
 /** Converts persisted messages into the LLM adapter's context shape. Ignores
@@ -20,6 +21,8 @@ export interface CreateMessageProcessorDeps {
   buildLlmMessages?: (messages: MessageRecord[]) => Promise<LlmMessage[]>;
   /** Added as a system message before the history of every reply; none when unset. */
   systemPrompt?: string;
+  /** Stamps `sentAt`; every reading is later than the previous one (AICHAT-191). */
+  clock?: () => Date;
 }
 
 /**
@@ -31,6 +34,7 @@ export interface CreateMessageProcessorDeps {
  */
 export function createMessageProcessor(deps: CreateMessageProcessorDeps): QueueProcessor {
   const buildLlmMessages = deps.buildLlmMessages ?? defaultBuildLlmMessages;
+  const clock = deps.clock ?? turnClock;
 
   return async function processQueueEntry(chatId: string, entry: QueueEntry, signal: AbortSignal): Promise<void> {
     const chat = await deps.chatsService.findById(chatId);
@@ -48,13 +52,16 @@ export function createMessageProcessor(deps: CreateMessageProcessorDeps): QueueP
         error: null,
       });
     } else {
-      await deps.messagesRepo.updateStatus(entry.messageId, "sent");
+      // The question and its reply take their place in the conversation now, one after the
+      // other, so a message written earlier but queued is listed after the replies before it.
+      await deps.messagesRepo.updateStatus(entry.messageId, "sent", clock());
       assistantMessage = await deps.messagesRepo.create({
         chatId,
         ownerId: chat.ownerId,
         role: "assistant",
         content: "",
         status: "streaming",
+        sentAt: clock(),
       });
     }
 
