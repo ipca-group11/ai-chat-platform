@@ -1,0 +1,22 @@
+$ cd services/conversation-service && pnpm exec vitest run src/integration/stream-races.spec.ts --reporter=verbose
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/services/conversation-service
+
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: none (AICHAT-192) > S3: a retry while another reply streams is queued, runs after it, and is built from what is shown before it 34ms
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: none (AICHAT-192) > S4: two retries of the same failed reply at once: one 202, one 409, one new answer (50 runs) 528ms
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: none (AICHAT-192) > S5: editing a queued message as it starts is applied before the start or rejected, never both (50 runs) 432ms
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: none (AICHAT-192) > S5, worst case: the edit's write reaches the database only after the reply has started 10ms
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: none (AICHAT-192) > S6: cancelling a queued message as it starts either removes it or is rejected, never both (50 runs) 714ms
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: database (AICHAT-192) > S3: a retry while another reply streams is queued, runs after it, and is built from what is shown before it 57ms
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: database (AICHAT-192) > S4: two retries of the same failed reply at once: one 202, one 409, one new answer (50 runs) 2288ms
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: database (AICHAT-192) > S5: editing a queued message as it starts is applied before the start or rejected, never both (50 runs) 1941ms
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: database (AICHAT-192) > S5, worst case: the edit's write reaches the database only after the reply has started 41ms
+ ✓ src/integration/stream-races.spec.ts > retry, edit and cancel during a reply, repository latency: database (AICHAT-192) > S6: cancelling a queued message as it starts either removes it or is rejected, never both (50 runs) 2054ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  08:36:48
+   Duration  8.33s (tests 98%, import 1%, transform 1%)
+
+
+[exit 0]
