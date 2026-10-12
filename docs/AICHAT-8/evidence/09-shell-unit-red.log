@@ -1,0 +1,11 @@
+$ cd apps/shell && pnpm exec vitest run src/app/moduleFederationConfig.test.ts src/features/remote-loader/model/loadRemote.test.ts 2>&1 | grep -E '✓|×|Tests|AssertionError'
+     × loads a remote's entry only when one of its routes needs it ('loaded-first') 1ms
+     × is 15 seconds 1ms
+     × rejects with a RemoteLoadError when the remote never answers 15003ms
+     × resolves a remote that answers in time and leaves no timer behind 15003ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected undefined to be 'loaded-first' // Object.is equality
+AssertionError: expected undefined to be 15000 // Object.is equality
+      Tests  4 failed | 10 passed (14)
+
+[exit 0]
