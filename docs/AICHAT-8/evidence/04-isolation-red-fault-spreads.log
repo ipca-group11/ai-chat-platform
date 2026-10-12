@@ -1,0 +1,12 @@
+$ cd e2e && pnpm exec playwright test src/tests/remote-failure.spec.ts -g 'mfeChat abort' --reporter=list 2>&1 | grep -E 'passed|failed|✘|✓|Error:|Expected|Locator|still works' | head -12
+  ✘  1 [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeChat abort: fallback with Retry, nav bar stays, the other remotes still work (12.8s)
+  1) [chromium] › src/tests/remote-failure.spec.ts:27:7 › AICHAT-162: each remote down in turn shows only its own fallback › mfeChat abort: fallback with Retry, nav bar stays, the other remotes still work › mfeAuth still works while mfeChat is down 
+    Error: expect(locator).toBeVisible() failed
+    Locator: getByTestId('sign-in')
+    Expected: visible
+    Error: element(s) not found
+      46 |           await test.step(`${other} still works while ${remote} is down`, async () => {
+    test-results/remote-failure-AICHAT-162--ca93f-he-other-remotes-still-work-chromium/test-failed-1.png
+  1 failed
+
+[exit 0]

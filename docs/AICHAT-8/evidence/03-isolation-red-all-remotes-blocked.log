@@ -1,0 +1,11 @@
+$ cd e2e && pnpm exec playwright test src/tests/remote-failure.spec.ts -g 'mfeChat abort' --reporter=line 2>&1 | grep -E 'passed|failed|Error:|Expected|Received|still works|toBeVisible' | head -14
+    Error: expect(locator).toBeVisible() failed
+    Expected: visible
+    Error: element(s) not found
+      - Expect "toBeVisible" getByTestId('remote-fallback-chat') with timeout 10000ms
+    > 38 |           await expect(fallback).toBeVisible();
+      40 |           await expect(fallback.getByRole("button", { name: "Retry" })).toBeVisible();
+    test-results/remote-failure-AICHAT-162--ca93f-he-other-remotes-still-work-chromium/test-failed-1.png
+  1 failed
+
+[exit 0]
