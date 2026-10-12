@@ -1,0 +1,57 @@
+$ cd apps/mfe-chat && pnpm exec vitest run src/features/composer/components/Composer.test.tsx -t AICHAT-193
+
+ RUN  v5.0.1 /Users/joaovieira/Desktop/MEI/grupo-11/ai-chat-platform/apps/mfe-chat
+
+ ❯ src/features/composer/components/Composer.test.tsx (17 tests | 2 failed | 14 skipped) 184ms
+   ❯ Composer: one message per send, however fast the user clicks (AICHAT-193) (3)
+     × two clicks in the same tick, before React re-renders, send one message 27ms
+     × Enter pressed twice quickly sends one message 27ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed | 14 skipped (17)
+   Start at  23:42:50
+   Duration  2.36s (import 40%, environment 30%, setup 12%, transform 10%, tests 8%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/composer/components/Composer.test.tsx > Composer: one message per send, however fast the user clicks (AICHAT-193) > two clicks in the same tick, before React re-renders, send one message
+AssertionError: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ src/features/composer/components/Composer.test.tsx:254:26
+    252|     slow.answer();
+    253|     await waitFor(() => expect(textbox).toHaveValue(""));
+    254|     expect(slow.posts()).toBe(1);
+       |                          ^
+    255|   });
+    256|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/features/composer/components/Composer.test.tsx > Composer: one message per send, however fast the user clicks (AICHAT-193) > Enter pressed twice quickly sends one message
+AssertionError: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ src/features/composer/components/Composer.test.tsx:266:26
+    264|     slow.answer();
+    265|     await waitFor(() => expect(textbox).toHaveValue(""));
+    266|     expect(slow.posts()).toBe(1);
+       |                          ^
+    267|   });
+    268| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+[exit 1]

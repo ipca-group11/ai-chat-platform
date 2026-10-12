@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSendMessage } from "../../chat-view";
 import { usePendingAttachments } from "../../attachments";
 import type { Provider } from "../../../shared/types";
@@ -19,6 +19,9 @@ export function useComposer({ chatId, userId, provider, model }: UseComposerArgs
   const [content, setContent] = useState("");
   const sendMessage = useSendMessage();
   const attachments = usePendingAttachments(chatId, provider, model);
+  // `isPending` only changes on the next render, so two clicks (or two Enters) in a row can
+  // both see "not sending". A ref changes at once: one send per message (AICHAT-193).
+  const sending = useRef(false);
 
   const hasRejectedAttachments = attachments.pending.some((p) => p.status === "rejected");
   const canSend =
@@ -28,13 +31,17 @@ export function useComposer({ chatId, userId, provider, model }: UseComposerArgs
     !sendMessage.isPending;
 
   function send() {
-    if (!canSend) return;
+    if (!canSend || sending.current) return;
+    sending.current = true;
     sendMessage.mutate(
       { chatId, content: content.trim(), attachmentIds: attachments.uploadedAttachmentIds, userId, provider },
       {
         onSuccess: () => {
           setContent("");
           attachments.clear();
+        },
+        onSettled: () => {
+          sending.current = false;
         },
       }
     );

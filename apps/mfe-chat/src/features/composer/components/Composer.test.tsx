@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithClient } from "@platform/test-utils";
@@ -205,5 +205,64 @@ describe("Composer (AC-51, AC-66)", () => {
       await waitFor(() => expect(requests.find((r) => r.method === "POST")).toBeDefined());
       expect(requests.find((r) => r.method === "POST")!.headers.has("X-Llm-Api-Key")).toBe(false);
     });
+  });
+});
+
+describe("Composer: one message per send, however fast the user clicks (AICHAT-193)", () => {
+  /** Counts the POSTs and holds each answer until `answer()`, so the first send stays pending. */
+  function slowServer() {
+    let posts = 0;
+    let answer!: () => void;
+    const answered = new Promise<void>((resolve) => (answer = resolve));
+    server.use(
+      http.post("*/chats/:chatId/messages", async () => {
+        posts += 1;
+        await answered;
+        return HttpResponse.json({ message: sentMessage }, { status: 201 });
+      }),
+    );
+    return { posts: () => posts, answer };
+  }
+
+  function renderComposer() {
+    renderWithClient(<Composer chatId="chat-1" userId="user-1" provider="anthropic" model="claude-3-5-haiku-latest" />);
+    return screen.getByLabelText("Message");
+  }
+
+  it("a double-click on Send sends one message", async () => {
+    const slow = slowServer();
+    const textbox = renderComposer();
+    await userEvent.type(textbox, "Hello");
+
+    await userEvent.dblClick(screen.getByTestId("send-message"));
+    await waitFor(() => expect(slow.posts()).toBe(1));
+    slow.answer();
+    await waitFor(() => expect(textbox).toHaveValue(""));
+    expect(slow.posts()).toBe(1);
+  });
+
+  it("two clicks in the same tick, before React re-renders, send one message", async () => {
+    const slow = slowServer();
+    const textbox = renderComposer();
+    await userEvent.type(textbox, "Hello");
+
+    const send = screen.getByTestId("send-message");
+    fireEvent.click(send);
+    fireEvent.click(send);
+    slow.answer();
+    await waitFor(() => expect(textbox).toHaveValue(""));
+    expect(slow.posts()).toBe(1);
+  });
+
+  it("Enter pressed twice quickly sends one message", async () => {
+    const slow = slowServer();
+    const textbox = renderComposer();
+    await userEvent.type(textbox, "Hello");
+
+    fireEvent.keyDown(textbox, { key: "Enter" });
+    fireEvent.keyDown(textbox, { key: "Enter" });
+    slow.answer();
+    await waitFor(() => expect(textbox).toHaveValue(""));
+    expect(slow.posts()).toBe(1);
   });
 });
