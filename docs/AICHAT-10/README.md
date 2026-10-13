@@ -98,3 +98,20 @@ Each in **light** and **dark** → ~30 scans.
 The repo already had the axe-core dependency and a tested helper, but no test used it, so accessibility was never checked.
 The epic wires the helper into a page × theme matrix as a merge gate, fixes what the first run finds, and adds keyboard and
 screen-reader checks that automated scanning cannot cover.
+
+## 9. Decision: component-level checks with vitest-axe (US5, AICHAT-176)
+
+Decided on 2026-10-13: **adopted**, no separate spike. AICHAT-18-US5 had already introduced `vitest-axe` (0.1.0) in
+`mfe-chat` and `mfe-settings`, with an `expectNoA11yViolations` helper and checks on Composer, ChatView and ProviderList
+([AICHAT-18 work log](../AICHAT-18/WORKLOG.md), US5). The shared components of `packages/ui` had none, so the same helper
+was added there with one check per component over its states: Button, Input, Alert, Dialog (open, in a portal) and
+Select (open listbox, in a portal), plus a negative case (icon button without a name must fail with `button-name`).
+
+| Level | Tool | Checks | Cannot check |
+|---|---|---|---|
+| Component (`packages/ui`, MFEs) | `vitest-axe` in jsdom | names, roles, ARIA, labels; milliseconds, every PR | colour contrast (no layout in jsdom), page landmarks |
+| Tokens (`packages/ui`) | `design-tokens.test.ts` | contrast of every text/surface token pair, both themes | how a page combines them |
+| Page (`e2e`) | `@axe-core/playwright` | the whole rendered page, contrast included, light and dark | states the matrix does not open |
+
+Two rules are off in the component helper of `packages/ui`, with the reason in `src/test/a11y.ts`: `color-contrast`
+(jsdom cannot compute it) and `region` (page-level rule; a component rendered alone has no landmarks).

@@ -18,6 +18,18 @@ function makeMessage(overrides: Partial<Message>): Message {
 }
 
 describe("MessageList (AC-52, AC-53, AC-54, AC-57)", () => {
+  it("AICHAT-175: the log is aria-busy while a reply streams, so a screen reader announces the reply once, at the end", () => {
+    const { rerender } = render(
+      <MessageList messages={[makeMessage({ status: "streaming", content: "Hel" })]} onStop={vi.fn()} onRetry={vi.fn()} />
+    );
+    const log = screen.getByRole("log", { name: "Messages" });
+    expect(log).toHaveAttribute("aria-live", "polite");
+    expect(log).toHaveAttribute("aria-busy", "true");
+
+    rerender(<MessageList messages={[makeMessage({ status: "sent", content: "Hello" })]} onStop={vi.fn()} onRetry={vi.fn()} />);
+    expect(log).toHaveAttribute("aria-busy", "false");
+  });
+
   it("AC-53: renders the chat's full history", () => {
     const messages = [
       makeMessage({ id: "1", role: "user", content: "Hi" }),

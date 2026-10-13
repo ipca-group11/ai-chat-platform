@@ -30,9 +30,12 @@ export function MessageList({
   compact = false,
 }: MessageListProps) {
   const historyMessages = messages.filter((m) => m.status !== "queued");
+  // AICHAT-175: while a reply streams the region is busy, so screen readers hold the announcement and read the reply
+  // once when it ends instead of after every token. "Generating…" (role="status") still says that something is running.
+  const replyStreaming = historyMessages.some((m) => m.status === "streaming");
 
   return (
-    <div role="log" aria-label="Messages" aria-live="polite" data-testid="messages">
+    <div role="log" aria-label="Messages" aria-live="polite" aria-busy={replyStreaming} data-testid="messages">
       {historyMessages.length === 0 ? (
         <div className={cn("flex flex-col items-center gap-1 text-center", compact ? "py-4" : "py-16")}>
           <p data-testid="messages-empty" className="text-sm font-medium">No messages yet. Say hello!</p>
