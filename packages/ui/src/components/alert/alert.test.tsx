@@ -2,6 +2,7 @@ import * as React from 'react';
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Alert, AlertDescription, AlertTitle, alertVariants } from './alert';
+import { expectNoA11yViolations } from '../../test/a11y';
 
 describe('Alert', () => {
   it('renders a div with the alert role and the default variant classes', () => {
@@ -47,6 +48,25 @@ describe('Alert', () => {
   it('exposes the variant classes through alertVariants', () => {
     expect(alertVariants()).toContain('text-card-foreground');
     expect(alertVariants({ variant: 'success' })).toContain('text-success');
+  });
+
+  it('AICHAT-176: no axe violations in the default, destructive and success variants', async () => {
+    const { container } = render(
+      <div>
+        <Alert>
+          <AlertTitle>Saved</AlertTitle>
+          <AlertDescription>Your key is stored for this session.</AlertDescription>
+        </Alert>
+        <Alert variant="destructive">
+          <AlertTitle>Response failed</AlertTitle>
+          <AlertDescription>The provider returned an error.</AlertDescription>
+        </Alert>
+        <Alert variant="success" role="status">
+          <AlertDescription>Connection successful.</AlertDescription>
+        </Alert>
+      </div>,
+    );
+    await expectNoA11yViolations(container);
   });
 });
 

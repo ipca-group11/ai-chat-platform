@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+import { expectNoA11yViolations } from '../../test/a11y';
 
 function renderSelect(onValueChange?: (value: string) => void) {
   return render(
@@ -49,5 +50,13 @@ describe('Select', () => {
       </Select>,
     );
     expect(screen.getByRole('combobox', { name: 'Model' })).toBeDisabled();
+  });
+
+  it('AICHAT-176: no axe violations when closed and when the listbox is open (in a portal)', async () => {
+    const { container } = renderSelect();
+    await expectNoA11yViolations(container);
+    await userEvent.click(screen.getByRole('combobox', { name: 'Model' }));
+    await screen.findByRole('listbox');
+    await expectNoA11yViolations(document.body);
   });
 });

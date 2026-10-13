@@ -1,0 +1,10 @@
+$ cd packages/ui && pnpm exec vitest run src/components/button src/components/input src/components/alert src/components/dialog src/components/select --coverage.enabled=false --reporter=verbose 2>&1 | grep -E '(✓|×).*AICHAT-176|Tests '
+ ✓ src/components/alert/alert.test.tsx > Alert > AICHAT-176: no axe violations in the default, destructive and success variants 21ms
+ ✓ src/components/button/button.test.tsx > Button > AICHAT-176: no axe violations in its variants, sizes and states 23ms
+ ✓ src/components/button/button.test.tsx > Button > AICHAT-176: the check fails for an icon button without a name (button-name) 7ms
+ ✓ src/components/input/input.test.tsx > Input > AICHAT-176: no axe violations when labelled, disabled and invalid 23ms
+ ✓ src/components/dialog/dialog.test.tsx > Dialog > AICHAT-176: no axe violations when closed and when open (the popup is in a portal) 51ms
+ ✓ src/components/select/select.test.tsx > Select > AICHAT-176: no axe violations when closed and when the listbox is open (in a portal) 65ms
+      Tests  34 passed (34)
+
+[exit 0]

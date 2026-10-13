@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './dialog';
+import { expectNoA11yViolations } from '../../test/a11y';
 
 function renderDialog(onOpenChange?: () => void) {
   return render(
@@ -58,5 +59,13 @@ describe('Dialog', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onOpenChange).toHaveBeenCalled();
     expect(onOpenChange.mock.calls.at(-1)?.[0]).toBe(false);
+  });
+
+  it('AICHAT-176: no axe violations when closed and when open (the popup is in a portal)', async () => {
+    const { container } = renderDialog();
+    await expectNoA11yViolations(container);
+    await userEvent.click(screen.getByRole('button', { name: 'Delete chat' }));
+    await screen.findByRole('dialog');
+    await expectNoA11yViolations(document.body);
   });
 });
