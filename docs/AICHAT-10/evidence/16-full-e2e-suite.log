@@ -1,0 +1,41 @@
+$ set -o pipefail; cd e2e && CI=true ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test --project=chromium --reporter=list 2>&1 | grep -E '✘|passed|failed$|flaky|skipped' | cut -c1-200
+  ✘   33 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): notes.txt (13.4s)
+  ✘   37 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): notes.txt (retry #1)
+  ✘   42 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): report.pdf (14.0s)
+  ✘   48 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): report.pdf (retry #1)[39
+  ✘   53 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): diagram.png (13.6s)
+  ✘   59 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): diagram.png (retry #1)[3
+  ✘   63 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): photo.jpg (13.5s)
+  ✘   67 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): photo.jpg (retry #1)
+  ✘   70 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): photo.jpeg (13.6s)
+  ✘   74 [chromium] › src/tests/attach-file.spec.ts:206:5 › Attach a file to a message › A valid file is staged and uploaded (AC-66, AC-67): photo.jpeg (retry #1)[39
+  ✘   79 [chromium] › src/tests/attach-file.spec.ts:213:3 › Attach a file to a message › Several files are attached at once (AC-66) (13.7s)
+  ✘   81 [chromium] › src/tests/attach-file.spec.ts:213:3 › Attach a file to a message › Several files are attached at once (AC-66) (retry #1) (13.5s)
+  ✘   84 [chromium] › src/tests/attach-file.spec.ts:222:3 › Attach a file to a message › A staged file is removed before sending (13.5s)
+  ✘   86 [chromium] › src/tests/attach-file.spec.ts:222:3 › Attach a file to a message › A staged file is removed before sending (retry #1) (13.5s)
+  ✘   88 [chromium] › src/tests/attach-file.spec.ts:228:3 › Attach a file to a message › The response takes the attached file into account (AC-69) (13.5s)
+  ✘   94 [chromium] › src/tests/attach-file.spec.ts:228:3 › Attach a file to a message › The response takes the attached file into account (AC-69) (retry #1)
+  ✘  108 [chromium] › src/tests/attach-file.spec.ts:275:3 › Attach a file to a message › A file of exactly 10 MB is accepted (AC-68) (13.9s)
+  ✘  119 [chromium] › src/tests/attach-file.spec.ts:275:3 › Attach a file to a message › A file of exactly 10 MB is accepted (AC-68) (retry #1) (13.9s)
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+    Error: expect(locator).toHaveText(expected) failed
+  1 skipped
+  159 passed (7.5m)
+
+[exit 1]
