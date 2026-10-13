@@ -67,6 +67,7 @@ All stories were created in Jira on 2026-10-03 as children of their epic, assign
 | AICHAT-12 | Review (committed on `test/AICHAT-12-api-schema-validation`, not pushed yet) | [WORKLOG](AICHAT-12/WORKLOG.md) | — |
 | AICHAT-9 | Review, US5 VM run pending | [WORKLOG](AICHAT-9/WORKLOG.md) | #34 |
 | AICHAT-13 | Review | [WORKLOG](AICHAT-13/WORKLOG.md) | #35 |
+| AICHAT-8 | Review | [WORKLOG](AICHAT-8/WORKLOG.md) | — |
 
 ## Suggested order
 

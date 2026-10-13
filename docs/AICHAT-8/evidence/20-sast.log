@@ -1,0 +1,9 @@
+$ grep -E 'ERROR finding|ERROR: [0-9]|\| ERROR \|' 20-sast-run.log; echo; echo 'findings in files changed by AICHAT-8:'; grep -cE 'remote-faults|remote-failure|reloadRemote|loadRemote|createRemoteRoute|module-federation.config|apps/shell/src/routes' 20-sast-run.log
+**1 ERROR finding(s): the merge is blocked.**
+ERROR: 1, WARNING: 68, INFO: 14. Only ERROR blocks; the rest is reported.
+| `ajinabraham.njsscan.generic.hardcoded_secrets.node_password` | ERROR | 1 | `e2e/src/tests/support/auth.ts:6` |
+
+findings in files changed by AICHAT-8:
+0
+
+[exit 1]

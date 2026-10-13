@@ -1,0 +1,32 @@
+M  apps/shell/module-federation.config.ts
+M  apps/shell/package.json
+M  apps/shell/src/app/moduleFederationConfig.test.ts
+M  apps/shell/src/features/remote-loader/createRemoteRoute.test.tsx
+M  apps/shell/src/features/remote-loader/createRemoteRoute.tsx
+M  apps/shell/src/features/remote-loader/index.ts
+M  apps/shell/src/features/remote-loader/model/loadRemote.test.ts
+M  apps/shell/src/features/remote-loader/model/loadRemote.ts
+M  apps/shell/src/routes/chats.$chatId.tsx
+M  apps/shell/src/routes/chats.tsx
+ Container llm-chat-shell-1 Healthy 
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--43a6e-oaded-AC-66-AC-67-notes-txt-chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--c2984-aded-AC-66-AC-67-report-pdf-chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--25e57-ded-AC-66-AC-67-diagram-png-chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--a4ae6-oaded-AC-66-AC-67-photo-jpg-chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--66873-aded-AC-66-AC-67-photo-jpeg-chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--8e98a-are-attached-at-once-AC-66--chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--81dc6-e-is-removed-before-sending-chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--94761-ed-file-into-account-AC-69--chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--19888-ly-10-MB-is-accepted-AC-68--chromium/test-failed-1.png
+  9 failed
+  10 passed (2.7m)
+[exited with code 0]

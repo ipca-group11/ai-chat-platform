@@ -1,0 +1,9 @@
+$ pnpm exec nx affected -t lint typecheck test build --base=test/AICHAT-13-concurrency 2>&1 | grep -E 'Successfully|failed|Failed tasks|^ +- ' | tail -15
+ ❯ src/coverage-guard.test.ts (27 tests | 1 failed) 11ms
+ ❯ src/source-files.test.ts (11 tests | 1 failed) 312ms
+ Test Files  2 failed | 10 passed (12)
+      Tests  2 failed | 242 passed (244)
+ NX   Running targets lint, typecheck, test, build for 19 projects and 2 tasks they depend on failed
+Failed tasks:
+
+[exit 0]
