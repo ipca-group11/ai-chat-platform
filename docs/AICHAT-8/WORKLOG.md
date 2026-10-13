@@ -11,7 +11,7 @@ title: "AICHAT-8 · Remote failure and fallback testing: work log"
 | Owner | João Vieira |
 | Branch | `test/AICHAT-8-remote-failure-fallback` (built on `test/AICHAT-13-concurrency`, PR #35 not merged yet) |
 | Started / finished | 2026-10-13 / 2026-10-13 |
-| Pull requests | … |
+| Pull requests | #37 (base `test/AICHAT-13-concurrency`, #35) |
 | Status | Review |
 
 ## 1. DoR review
