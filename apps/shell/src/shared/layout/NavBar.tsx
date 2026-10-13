@@ -56,7 +56,7 @@ export function NavBar({ userEmail, onLogout }: NavBarProps) {
             </nav>
 
             <div className="ml-auto flex items-center gap-2 sm:gap-3">
-              <span className="hidden text-sm text-muted-foreground sm:inline">{userEmail}</span>
+              <span data-testid="nav-user-email" className="hidden text-sm text-muted-foreground sm:inline">{userEmail}</span>
               <Button variant="outline" size="sm" data-testid="log-out" onClick={onLogout}>
                 <LogOut aria-hidden="true" />
                 Log out
