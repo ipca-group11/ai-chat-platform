@@ -1,8 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { RequireAuth } from '../features/auth-guard';
-import { createRemoteRoute } from '../features/remote-loader';
+import { createRemoteRoute, reloadRemote } from '../features/remote-loader';
 
-const RemoteSettingsRoutes = createRemoteRoute('settings', () => import('mfeSettings/routes'));
+const RemoteSettingsRoutes = createRemoteRoute(
+  'settings',
+  () => import('mfeSettings/routes'),
+  (attempt) => reloadRemote('mfeSettings/routes', attempt),
+);
 
 function SettingsRoute() {
   return (

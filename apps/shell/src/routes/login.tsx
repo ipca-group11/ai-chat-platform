@@ -1,7 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { createRemoteRoute } from '../features/remote-loader';
+import { createRemoteRoute, reloadRemote } from '../features/remote-loader';
 
-const RemoteAuthRoutes = createRemoteRoute('auth', () => import('mfeAuth/routes'));
+const RemoteAuthRoutes = createRemoteRoute(
+  'auth',
+  () => import('mfeAuth/routes'),
+  (attempt) => reloadRemote('mfeAuth/routes', attempt),
+);
 
 interface LoginSearch {
   /** URL to return to after a successful login, set by `RequireAuth`. */
