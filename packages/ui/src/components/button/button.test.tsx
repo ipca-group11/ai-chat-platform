@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Button } from './button';
+import { expectNoA11yViolations } from '../../test/a11y';
 
 describe('Button', () => {
   it('AC-15: renders a native button element with its children', () => {
@@ -44,5 +45,29 @@ describe('Button', () => {
     render(<Button onClick={onClick}>Go</Button>);
     await userEvent.click(screen.getByRole('button'));
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('AICHAT-176: no axe violations in its variants, sizes and states', async () => {
+    const { container } = render(
+      <div>
+        <Button>Save</Button>
+        <Button variant="destructive">Delete</Button>
+        <Button variant="outline">Cancel</Button>
+        <Button variant="ghost" size="icon" aria-label="Close pane">
+          <svg aria-hidden="true" />
+        </Button>
+        <Button disabled>Disabled</Button>
+      </div>,
+    );
+    await expectNoA11yViolations(container);
+  });
+
+  it('AICHAT-176: the check fails for an icon button without a name (button-name)', async () => {
+    const { container } = render(
+      <Button size="icon">
+        <svg aria-hidden="true" />
+      </Button>,
+    );
+    await expect(expectNoA11yViolations(container)).rejects.toThrow(/button-name/);
   });
 });

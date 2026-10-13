@@ -1,4 +1,9 @@
 import '@testing-library/jest-dom/vitest';
+import * as axeMatchers from 'vitest-axe/matchers';
+import { expect } from 'vitest';
+
+// Registers `toHaveNoViolations` for the accessibility check of each component (see `a11y.ts`, AICHAT-176).
+expect.extend(axeMatchers);
 
 // jsdom does not implement PointerEvent capture APIs used by Base UI's interaction
 // primitives (dialog/menu/select/tooltip). Stub them so component tests can simulate
