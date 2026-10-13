@@ -1,0 +1,14 @@
+$ cd packages/ui && pnpm exec vitest run src/design-tokens.test.ts 2>&1 | grep -E '✓|×|Tests '
+     × light: --muted-foreground on --muted (tabs, avatar, selected list row) 1ms
+     × light: --destructive on --background (field errors (FormField)) 0ms
+     × light: --destructive on --card (Alert variant="destructive") 0ms
+     × light: --destructive-foreground on --destructive (Button, Badge, Toast variant="destructive") 0ms
+     × light: --success on --card (Alert variant="success") 0ms
+     × light: --success-foreground on --success (Badge, Toast variant="success") 0ms
+     × dark: --destructive on --background (field errors (FormField)) 0ms
+     × dark: --destructive on --card (Alert variant="destructive") 0ms
+     × dark: --success-foreground on --success (Badge, Toast variant="success") 0ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  9 failed | 16 passed (25)
+
+[exit 0]

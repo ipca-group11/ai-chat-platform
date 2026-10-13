@@ -5,7 +5,7 @@
  */
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import { reportDir, summarizeScans, type SavedScan } from "../tests/support/axe.js";
+import { reportDir, summarizeScans, type SavedScan } from "./axe.js";
 
 const files = (await readdir(reportDir).catch(() => [])).filter((name) => name.endsWith(".json"));
 const scans = await Promise.all(

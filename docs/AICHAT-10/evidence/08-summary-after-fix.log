@@ -1,0 +1,7 @@
+$ pnpm --filter e2e run --silent axe-summary
+34 scans, 0 rules with violations
+
+| Rule | Impact | Blocking | Elements | Scans |
+|---|---|---|---|---|
+
+[exit 0]
