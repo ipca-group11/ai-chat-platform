@@ -106,3 +106,76 @@ States of the analysis draft that are not in the matrix:
 these 17 rows.
 
 **Problems and fixes.** None.
+
+### US2 · axe-core scan of every page in light and dark theme ([AICHAT-173](https://ipca-grupo11.atlassian.net/browse/AICHAT-173))
+
+**What and why.** A Playwright test opens each state of the US1 matrix in a real browser against the whole stack,
+stores the theme before the page loads, checks the `dark` class on `<html>` and runs axe-core on the page. axe-core reads
+the rendered DOM and the computed styles: names of buttons and fields, roles, ARIA attributes, heading order and the
+contrast between each text and the colour behind it.
+
+The helper named in the analysis (`e2e/src/a11y/axe-helper.ts`) had been removed in `5eb6221`, so we wrote it again in
+`e2e/src/tests/support/` next to the other test helpers, with three changes:
+
+| Change | Why |
+|---|---|
+| `withTags(wcag2a … wcag22aa)` | Without tags axe also runs its "best-practice" rules, which are not part of WCAG 2.2 AA (decision in §1) |
+| Waits for finite CSS animations before scanning | Dialogs fade in; axe measures contrast with the opacity of that moment, so a half-visible dialog gives false results |
+| Saves the full result as JSON (`e2e/axe-report/<label>.json`) and attaches it to the test | The `moderate` and `minor` findings, and the rules that passed, stay visible on a green run |
+
+**Files.**
+- `e2e/src/tests/support/axe.ts` (new): `assertNoCriticalA11yViolations(page, testInfo, label)`, the impact filter, the
+  message format, the JSON report and `summarizeScans` (Markdown table of a set of reports).
+- `e2e/src/tests/support/axe.spec.ts` (new): 8 Node-only tests of those decisions (no browser, no stack).
+- `e2e/src/tests/accessibility.spec.ts` (new): the 17 states × 2 themes = 34 tests.
+- `e2e/src/support/axe-summary-cli.ts` (new) and the `axe-summary` script in `e2e/package.json`: prints the table.
+- `.github/workflows/e2e.yml`: the table goes to the job summary and `e2e/axe-report` is uploaded as the `axe-report`
+  artifact on every run (`if: always()`). The spec is in `e2e/src/tests`, so the existing "Run Playwright E2E suite" step
+  runs it and a violation fails the `e2e` job.
+- `e2e/.gitignore`: `axe-report/`.
+
+**How to run.**
+
+```sh
+pnpm mock:up
+cd e2e
+pnpm exec playwright test src/tests/support/axe.spec.ts                                   # helper only, no stack
+ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test src/tests/accessibility.spec.ts   # ~2 min, 34 scans
+pnpm run --silent axe-summary                                                             # table of the last run
+```
+
+**How to repeat it manually.**
+
+1. Run one state: `pnpm exec playwright test src/tests/accessibility.spec.ts -g "register · field errors · dark"`.
+2. Open `e2e/axe-report/register-field-errors-dark.json`: `violations` has the failing rules, each `nodes[].any[0].data`
+   has the two colours and the ratio; `passes` lists the rules that were checked and passed.
+3. In the browser: install the axe DevTools extension, open http://localhost:8000/register in dark theme, submit an
+   invalid email and run "Scan all of my page": the same `color-contrast` finding appears.
+
+**Result.** The helper's own tests pass (8/8):
+
+![Helper tests](evidence/01-axe-helper-unit.png)
+
+First run of the scan (baseline, before any fix): **19 passed, 15 failed**, exit code 1. Every failure is the same rule,
+`color-contrast` (impact `serious`), on 25 elements. No missing names, labels or roles were found.
+
+![Baseline scan](evidence/02-baseline-scan-fails.png)
+
+![Baseline summary](evidence/03-baseline-summary.png)
+
+A failing scan names the state, the impact, the rule and the elements:
+
+![Failure message](evidence/04-failure-message.png)
+
+**Problems and fixes.**
+- **Attachment upload returns 404.** The client posts to `/chats/:chatId/attachments`; conversation-service only has
+  `/chats/:chatId/messages/:messageId/attachments`. It is the cause of the 9 `attach-file.spec.ts` failures recorded in
+  AICHAT-8 and is already tracked as [AICHAT-255](https://ipca-grupo11.atlassian.net/browse/AICHAT-255) (found by the
+  contract tests). Decision of the owner: the "attachments" state scans what can be reached today (a file rejected by
+  type and a file rejected by the server, both with their error alert); the "sent message with a file" state is added
+  when AICHAT-255 is fixed. AICHAT-255 is linked to AICHAT-173.
+- **The members dialog is named "Members", not "Chat members".** `DialogContent` gets `aria-label="Chat members"`, but
+  the dialog library also sets `aria-labelledby` to the `<h2>`, and `aria-labelledby` wins in the accessible name
+  computation. The name is correct; the test now looks for "Members". The `aria-label` has no effect.
+- **What the WCAG tags leave out.** axe's `aria-dialog-name` and `region` rules are tagged `best-practice`, so they are
+  outside the agreed scope. The keyboard and screen-reader checks of US4 cover the dialogs by hand.

@@ -69,6 +69,21 @@ jobs:
         env:
           CI: "true"
 
+      # AICHAT-10: one JSON per accessibility scan (page x state x theme), kept on every run so a
+      # passing build still shows the moderate/minor findings; the table goes to the job summary.
+      - name: Accessibility summary
+        if: always()
+        run: pnpm --filter e2e run --silent axe-summary >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload axe-core reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: axe-report
+          path: e2e/axe-report
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4

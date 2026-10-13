@@ -1,0 +1,8 @@
+$ pnpm --filter e2e run --silent axe-summary
+34 scans, 1 rule with violations
+
+| Rule | Impact | Blocking | Elements | Scans |
+|---|---|---|---|---|
+| color-contrast | serious | yes | 25 | chat · attachments · dark<br>chat · attachments · light<br>chat · failed reply · dark<br>chat · failed reply · light<br>chat · history · light<br>chat · members dialog · light<br>chat · not found · dark<br>chat · not found · light<br>chat · stopped reply · light<br>chats · remote fallback · dark<br>chats · remote fallback · light<br>register · field errors · dark<br>register · field errors · light<br>settings · saved key and errors · dark<br>settings · saved key and errors · light |
+
+[exit 0]

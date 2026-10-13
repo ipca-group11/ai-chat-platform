@@ -1,0 +1,16 @@
+$ cd e2e && pnpm exec playwright test src/tests/support/axe.spec.ts --reporter=list
+
+Running 8 tests using 1 worker
+
+  ✓  1 [chromium] › src/tests/support/axe.spec.ts:14:3 › filterBlockingViolations › keeps serious and critical violations (1ms)
+  ✓  2 [chromium] › src/tests/support/axe.spec.ts:19:3 › filterBlockingViolations › drops minor and moderate violations: they are reported, not blocking (0ms)
+  ✓  3 [chromium] › src/tests/support/axe.spec.ts:24:3 › filterBlockingViolations › a violation without an impact does not block (0ms)
+  ✓  4 [chromium] › src/tests/support/axe.spec.ts:30:3 › formatViolations › names the impact, the rule and every failing element (0ms)
+  ✓  5 [chromium] › src/tests/support/axe.spec.ts:42:3 › formatViolations › is empty when there is nothing to report (0ms)
+  ✓  6 [chromium] › src/tests/support/axe.spec.ts:47:1 › the scan runs WCAG 2.2 AA (with 2.0 and 2.1) and not the best-practice rules (0ms)
+  ✓  7 [chromium] › src/tests/support/axe.spec.ts:52:1 › summarizeScans lists each rule once, blocking ones first, with the scans it failed in (0ms)
+  ✓  8 [chromium] › src/tests/support/axe.spec.ts:66:1 › reportFileName turns the scan label into a safe file name (2ms)
+
+  8 passed (302ms)
+
+[exit 0]
