@@ -1,0 +1,7 @@
+$ node -v; pnpm -v; docker --version; grep axe-core e2e/package.json
+v26.8.2
+10.4.0
+Docker version 29.7.2, build a7dcaa6
+    "@axe-core/playwright": "^4.10.1",
+
+[exit 0]
