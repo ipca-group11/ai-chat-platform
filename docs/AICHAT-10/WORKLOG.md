@@ -11,7 +11,7 @@ title: "AICHAT-10 · Accessibility testing: work log"
 | Owner | João Vieira |
 | Branch | `test/AICHAT-10-accessibility` |
 | Started / finished | 2026-10-13 / 2026-10-13 |
-| Pull requests | … |
+| Pull requests | [#38](https://github.com/ipca-group11/ai-chat-platform/pull/38) |
 | Status | Review |
 
 ## 1. DoR review
