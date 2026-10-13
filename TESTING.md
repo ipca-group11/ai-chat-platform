@@ -35,6 +35,22 @@ Details: `docs/AICHAT-12/WORKLOG.md`.
 
 ---
 
+# Remote failure and fallback (AICHAT-8)
+
+```sh
+# shell: load timeout, share strategy, Retry through the federation runtime (no Docker)
+cd apps/shell && pnpm exec vitest run src/app/moduleFederationConfig.test.ts src/features/remote-loader
+# the failRemote URL matcher (no Docker)
+cd e2e && pnpm exec playwright test src/tests/support/remote-faults.spec.ts
+# browser: each remote down, slow, hung, back with Retry, chunks failing, down mid-session (Docker)
+AUTH_RATE_LIMIT_MAX=0 pnpm mock:up
+cd e2e && BASE_URL=http://localhost:8000 pnpm exec playwright test --project=chromium src/tests/remote-failure.spec.ts
+```
+
+Details: `docs/AICHAT-8/WORKLOG.md` and `e2e/README.md`.
+
+---
+
 # Concurrency (AICHAT-13)
 
 ```sh
