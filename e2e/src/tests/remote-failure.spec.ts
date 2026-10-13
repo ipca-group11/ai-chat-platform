@@ -17,6 +17,15 @@ async function open(page: Page, remote: RemoteName) {
   await expect(page).toHaveURL(new RegExp(`${remotes[remote].path}$`));
 }
 
+/** Creates a chat through the shell's `/api` proxy and returns its id. */
+async function createChat(page: Page, title: string): Promise<string> {
+  const created = await page.request.post("/api/chats", {
+    data: { title, provider: "anthropic", model: "claude-haiku-4-5" },
+  });
+  expect(created.status()).toBe(201);
+  return ((await created.json()) as { chat: { id: string } }).chat.id;
+}
+
 function fallbackOf(page: Page, remote: RemoteName) {
   return page.getByTestId(`remote-fallback-${remotes[remote].scope}`);
 }
@@ -29,11 +38,7 @@ test.describe("AICHAT-162: each remote down in turn shows only its own fallback"
         account,
       }) => {
         void account;
-        const created = await page.request.post("/api/chats", {
-          data: { title: "Remote failure", provider: "anthropic", model: "claude-haiku-4-5" },
-        });
-        expect(created.status()).toBe(201);
-        const { id: chatId } = (await created.json()) as { id: string };
+        const chatId = await createChat(page, "Remote failure");
         const pagesOf: Record<RemoteName, string[]> = {
           mfeAuth: ["/login", "/register"],
           mfeChat: ["/chats", `/chats/${chatId}`],
@@ -164,5 +169,67 @@ test.describe("AICHAT-164: Retry loads the remote again once it is back, without
     await fallback.getByRole("button", { name: "Retry" }).click();
     await expect(page.getByTestId("new-chat")).toBeVisible();
     expect(await pageWasKept(page)).toBe(true);
+  });
+});
+
+test.describe("AICHAT-165: a remote's chunks fail after its remoteEntry.js has loaded", () => {
+  for (const remote of remoteNames) {
+    const { path, scope, origin } = remotes[remote];
+
+    test(`${remote}: entry loads, chunks fail: fallback, logged with the scope, no uncaught error`, async ({
+      page,
+      account,
+    }) => {
+      void account;
+      const consoleErrors: string[] = [];
+      const pageErrors: Error[] = [];
+      page.on("console", (message) => message.type() === "error" && consoleErrors.push(message.text()));
+      page.on("pageerror", (error) => pageErrors.push(error));
+      await failRemote(page, remote, "abort", "chunks");
+
+      const entry = page.waitForResponse(`${origin}/remoteEntry.js`);
+      await page.goto(path);
+      expect((await entry).status()).toBe(200);
+
+      await expect(fallbackOf(page, remote)).toBeVisible();
+      await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
+      expect(consoleErrors).toContainEqual(expect.stringContaining(`[remote-loader] remote "${scope}" failed:`));
+      expect(pageErrors).toEqual([]);
+    });
+  }
+
+  test("mfeChat goes down mid-session: the loaded code keeps working until a reload", async ({ page, account }) => {
+    void account;
+    const first = await createChat(page, "First");
+    const second = await createChat(page, "Second");
+    await page.goto("/chats");
+    await expect(page.getByTestId("new-chat")).toBeVisible();
+    await page.waitForLoadState("networkidle");
+
+    let requestsWhileDown = 0;
+    page.on("request", (request) => request.url().startsWith(remotes.mfeChat.origin) && requestsWhileDown++);
+    const fault = await failRemote(page, "mfeChat", "abort");
+
+    await test.step("moving between chats and pages works from the code already loaded", async () => {
+      for (const id of [first, second]) {
+        await page.getByTestId(`chat-item-${id}`).click();
+        await expect(page).toHaveURL(new RegExp(`/chats/${id}$`));
+        await expect(page.getByTestId("message-input")).toBeVisible();
+      }
+      await page.getByTestId("nav-settings").click();
+      await expect(page.getByTestId("settings-heading")).toBeVisible();
+      await page.getByTestId("nav-chats").click();
+      await expect(page.getByTestId("new-chat")).toBeVisible();
+      await expect(fallbackOf(page, "mfeChat")).toHaveCount(0);
+      expect(requestsWhileDown).toBe(0);
+    });
+
+    await test.step("a reload needs the remote again: fallback, then Retry once it is back", async () => {
+      await page.reload();
+      await expect(fallbackOf(page, "mfeChat")).toBeVisible();
+      await fault.restore();
+      await fallbackOf(page, "mfeChat").getByRole("button", { name: "Retry" }).click();
+      await expect(page.getByTestId("new-chat")).toBeVisible();
+    });
   });
 });
