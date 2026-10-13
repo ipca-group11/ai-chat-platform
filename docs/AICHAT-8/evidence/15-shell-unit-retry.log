@@ -1,0 +1,11 @@
+$ cd apps/shell && pnpm exec vitest run src/features/remote-loader src/app --reporter=verbose 2>&1 | grep -E 'reloadRemote|retry loader|Tests|Test Files'
+ ✓ src/features/remote-loader/model/reloadRemote.test.ts > reloadRemote (AICHAT-164) > registers the remote again under a new entry URL, then loads the module 2ms
+ ✓ src/features/remote-loader/model/reloadRemote.test.ts > reloadRemote (AICHAT-164) > finds a remote by its name when it has no alias 0ms
+ ✓ src/features/remote-loader/model/reloadRemote.test.ts > reloadRemote (AICHAT-164) > fails, so the fallback stays, when the remote is unknown or there is no runtime 1ms
+ ✓ src/features/remote-loader/model/reloadRemote.test.ts > reloadRemote (AICHAT-164) > fails when the remote does not expose the module 0ms
+ ✓ src/features/remote-loader/model/reloadRemote.test.ts > reloadRemote (AICHAT-164) > passes the load error on, so the fallback is shown again 0ms
+ ✓ src/features/remote-loader/createRemoteRoute.test.tsx > createRemoteRoute > uses the retry loader, with the attempt number, for every load after the first (AICHAT-164) 945ms
+ Test Files  10 passed (10)
+      Tests  45 passed (45)
+
+[exit 0]
