@@ -10,9 +10,9 @@ title: "AICHAT-10 · Accessibility testing: work log"
 | Analysis | [README.md](README.md) |
 | Owner | João Vieira |
 | Branch | `test/AICHAT-10-accessibility` |
-| Started / finished | 2026-10-13 / … |
+| Started / finished | 2026-10-13 / 2026-10-13 |
 | Pull requests | … |
-| Status | In Progress |
+| Status | Review |
 
 ## 1. DoR review
 
@@ -31,7 +31,7 @@ Date: 2026-10-13
 Blockers: none.
 
 Finding at the start: the analysis (README §4.1) points at `e2e/src/a11y/axe-helper.ts`, but that file, its unit tests and
-the e2e fixtures were removed on 2026-10-04 in commit `5eb6221` ("chore: remove generated tests"). The dependency stayed,
+the e2e fixtures were removed on 2026-10-04 in commit `5eb6221`, together with other e2e specs. The dependency stayed,
 so no page of the application was scanned for accessibility. US2 restores the helper.
 
 ## 2. Environment
@@ -377,3 +377,93 @@ on purpose and expects the failure.
 - **The local pnpm rewrote the lockfile.** Adding the dependency with pnpm 12 also removed every `libc:` line of
   `pnpm-lock.yaml`. We restored the file and added only the three lines of the new importer entry;
   `pnpm install --frozen-lockfile` accepts it.
+
+## 4. How to run everything
+
+```sh
+# no stack
+cd packages/ui && pnpm exec vitest run src/design-tokens.test.ts src/components     # token contrast + axe per component
+cd apps/mfe-chat && pnpm exec vitest run src/features/chat-view/components/MessageList.test.tsx
+cd e2e && pnpm exec playwright test src/tests/support/axe                           # axe helper and summary CLI
+
+# with the stack (images built from this branch)
+pnpm mock:up
+cd e2e && ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test \
+  src/tests/accessibility.spec.ts src/tests/keyboard-and-live-region.spec.ts       # ~2.5 min
+cd e2e && pnpm run --silent axe-summary                                             # table of the last scan
+```
+
+The same commands are in `TESTING.md` and `e2e/README.md`.
+
+## 5. Results
+
+| Metric | Before | After |
+|---|---|---|
+| Pages/states scanned with axe-core | 0 (helper removed in `5eb6221`) | 17 states × 2 themes = 34 scans on every pull request |
+| Scans with a serious/critical violation | 15 of 34 | 0 of 34 |
+| Elements failing `color-contrast` | 25 | 0 (and no violation of any impact) |
+| Worst contrast | 1.76:1 (dark error text) | ≥ 4.5:1 for every text token pair, both themes (token test) |
+| Announcements of one streaming reply (screen reader) | 400 | 1 |
+| Keyboard flows tested (login, register, create, send, Stop) | 0 | 5, plus 2 dialogs and the focus ring in both themes |
+| `packages/ui` components with an axe check | 0 | 5 (Button, Input, Alert, Dialog, Select) |
+| Full e2e suite as in CI (`CI=true`, 2 workers, 1 retry) | AICHAT-8: 104 passed, 9 failed | 159 passed, 1 skipped, 9 failed (the same 9 `attach-file.spec.ts` tests, AICHAT-255) |
+
+## 6. DoD check
+
+| DoD item | Met | Evidence |
+|---|---|---|
+| Tests run in CI and pass on `main` | The specs are in `e2e/src/tests`, run by `e2e.yml` on every pull request; green locally. Pass on `main` after the merge | [07](evidence/07-scan-after-fix.png), [14](evidence/14-keyboard-live-region-after.png), [16](evidence/16-full-e2e-suite.png) |
+| Failure blocks the merge | A violation fails the `e2e` job (shown by the baseline run, exit code 1). Making `e2e` a required check is a repository setting (noted in `e2e.yml`) | [02](evidence/02-baseline-scan-fails.png), [04](evidence/04-failure-message.png) |
+| Run instructions added | `TESTING.md` (Accessibility section), `e2e/README.md`, §4 | — |
+| axe-core runs on every page, light and dark | 17 states × 2 themes; the theme is checked on `<html>` before each scan | [07](evidence/07-scan-after-fix.png) |
+| Zero serious/critical violations | 34/34 scans, no violation of any impact | [08](evidence/08-summary-after-fix.png) |
+
+**Full suite.** Run as in CI: **159 passed, 1 skipped, 9 failed**. The 9 failures (each shown twice because of the
+retry) are the `attach-file.spec.ts` tests that need a working upload: the 404 of AICHAT-255, already recorded in AICHAT-8.
+No spec of this epic fails and no other spec changed result.
+
+![Full e2e suite](evidence/16-full-e2e-suite.png)
+
+**Gates.** `nx run-many -t lint typecheck test` passes for `ui`, `mfe-chat` and `e2e`. Left as on the base branch, none
+from this epic: the workspace guards `source-files.test.ts` (the same 10 files without a unit test) and
+`coverage-guard.test.ts` (`e2e` not found), and `pnpm sast`'s one ERROR, the fixed test password in
+`e2e/src/tests/support/auth.ts`. SAST reports nothing in the files this epic changed. `gitleaks` is not installed on
+this machine; the secret scan runs in CI (`security.yml`).
+
+![SAST](evidence/17-sast.png)
+
+## 7. Notes for the report
+
+**What was found**
+- The repository had the axe-core dependency, but the helper and every spec using it had been removed (`5eb6221`), so
+  no page was ever scanned.
+- The first scan found one rule, `color-contrast`, on 25 elements in 15 of the 34 scans. All of them came from three
+  design tokens: `--destructive` used as text (1.92:1 in dark), the green badge (2.20:1) and `--muted-foreground` on
+  `--muted` (4.39:1). The dark red was a background colour used as a text colour.
+- The token contrast test also found a pair that no scanned page showed: white on the destructive button, 3.61:1.
+- A streaming reply was written into a polite live region token by token: a screen reader would have announced it
+  400 times. axe-core cannot see this, because each state of the DOM is valid on its own.
+- Attachment upload returns 404 (AICHAT-255, found earlier by the contract tests), so the "sent message with a file"
+  state cannot be scanned yet.
+
+**What was fixed / waived**
+- Fixed at the source: five token values in `packages/ui` (light and dark), and `aria-busy` on the message log.
+- No axe rule disabled and no selector excluded in the page scans. In the component checks, `color-contrast` (jsdom has
+  no layout) and `region` (page-level rule) are off, with the reason in the helper.
+
+**Open items**
+- Visual regression (AICHAT-19): the integration branch has 18 screenshot baselines and `visual.yml`, which this branch
+  does not contain. The token change alters the light muted text, the success badge and the error colours, so the
+  baselines that show them must be updated (`visual:update`) and reviewed when this branch is merged there.
+- Extend the "chat · attachments" state to a sent message with a file when AICHAT-255 is fixed.
+- Make `e2e` a required status check in the branch protection of `main` (repository setting).
+
+**Lessons learned**
+- Group violations by cause (colour pair, component) before fixing: 25 elements were 3 token values.
+- Check at three levels: tokens (fast, exhaustive pairs), components (jsdom, no contrast) and pages (real browser,
+  only the states that are opened). Each one found something the others did not.
+- An automated scan checks a snapshot of the DOM; keyboard use and announcements over time need their own tests.
+- Write the test first and see it fail: the token test failed with exactly the ratios axe reported, and the live-region
+  test measured the problem (400) before the one-line fix.
+- Accessibility libraries move focus asynchronously (focus guards, initial focus); assertions about focus must wait for
+  it to settle, or they fail randomly under load.

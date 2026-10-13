@@ -97,6 +97,17 @@ cd e2e && BASE_URL=http://localhost:8000 ANTHROPIC_API_KEY=mock-key-not-a-secret
   pnpm exec playwright test --project=chromium src/tests/stream-cancellation.spec.ts src/tests/chat-mock.spec.ts
 ```
 
+# Accessibility (AICHAT-10)
+
+```sh
+cd packages/ui && pnpm exec vitest run src/design-tokens.test.ts             # colour contrast of the tokens, both themes
+cd packages/ui && pnpm exec vitest run src/components -t AICHAT-176           # axe per component (vitest-axe)
+cd e2e && pnpm exec playwright test src/tests/support/axe                     # helper, no stack
+# Docker (pnpm mock:up)
+cd e2e && ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test src/tests/accessibility.spec.ts src/tests/keyboard-and-live-region.spec.ts
+cd e2e && pnpm run --silent axe-summary                                       # table of the last scan
+```
+
 # Unit testing (AICHAT-17)
 
 ```sh

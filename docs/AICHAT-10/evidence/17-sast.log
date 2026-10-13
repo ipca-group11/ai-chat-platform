@@ -1,0 +1,17 @@
+$ pnpm sast 2>&1 | grep -E '\| (ERROR|WARNING) \||Rule \|' ; echo 'files of this epic:'; pnpm sast 2>&1 | grep -cE 'axe|accessibility|keyboard-and-live|globals.css|design-tokens|MessageList|a11y.ts'
+| Rule | Severity | Count | Locations |
+| `ajinabraham.njsscan.generic.hardcoded_secrets.node_password` | ERROR | 1 | `e2e/src/tests/support/auth.ts:6` |
+| `yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag` | WARNING | 55 | `.github/workflows/api-schema.yml:45`, `.github/workflows/api-schema.yml:47`, `.github/workflows/api-schema.yml:50` +52 more |
+| `ajinabraham.njsscan.crypto.crypto_node.node_insecure_random_generator` | WARNING | 6 | `apps/mfe-auth/src/shared/correlation.ts:16`, `apps/mfe-chat/src/features/attachments/hooks/usePendingAttachments.ts:29`, `apps/mfe-chat/src/shared/api-client.ts:27` +3 more |
+| `ajinabraham.njsscan.dos.regex_dos.regex_dos` | WARNING | 1 | `scripts/lighthouse/config.ts:81` |
+| `ajinabraham.njsscan.generic.hardcoded_secrets.node_username` | WARNING | 1 | `packages/shared-types/src/__fixtures__/index.ts:35` |
+| `javascript.express.security.cors-misconfiguration.cors-misconfiguration` | WARNING | 1 | `testing/mock-server/src/backend/http.ts:82` |
+| `javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret` | WARNING | 1 | `services/conversation-service/src/test-utils/auth-token.ts:9` |
+| `package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age` | WARNING | 1 | `.npmrc:1` |
+| `package_managers.pnpm.pnpm-block-exotic-sub-dependencies.pnpm-block-exotic-sub-dependencies` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `package_managers.pnpm.pnpm-missing-minimum-release-age.pnpm-minimum-release-age` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+| `package_managers.pnpm.pnpm-trust-policy.pnpm-trust-policy` | WARNING | 1 | `pnpm-workspace.yaml:1` |
+files of this epic:
+0
+
+[exit 1]

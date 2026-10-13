@@ -45,3 +45,25 @@ pnpm exec playwright test src/tests/support/remote-faults.spec.ts               
 
 The tests need a shell image built from the same branch (`pnpm mock:up` rebuilds it). Details, evidence and the
 defects found: `docs/AICHAT-8/WORKLOG.md`.
+
+## Accessibility (AICHAT-10)
+
+`src/tests/accessibility.spec.ts` opens 17 pages and UI states (forms with errors, chat history, a stopped and a failed
+reply, dialogs, settings, the remote fallback) in the light and the dark theme and scans each one with axe-core
+(`@axe-core/playwright`, WCAG 2.2 AA rules). A `serious` or `critical` violation fails the test. Each scan is saved as
+JSON in `e2e/axe-report/`; CI uploads that folder as the `axe-report` artifact and writes a summary table to the job
+summary.
+
+`src/tests/keyboard-and-live-region.spec.ts` uses the keyboard only: login, register, create a chat, send, Stop, focus
+inside the dialogs, focus ring in both themes, and checks that a streaming reply is announced once by a screen reader.
+
+```sh
+cd e2e
+ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test src/tests/accessibility.spec.ts            # ~2 min
+ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test src/tests/accessibility.spec.ts -g "dark"  # one theme
+pnpm run --silent axe-summary                                                                                # last run
+ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test src/tests/keyboard-and-live-region.spec.ts # ~45 s
+```
+
+In a test, `assertNoCriticalA11yViolations(page, testInfo, label)` from `src/tests/support/axe.ts` scans the page as it
+is. Details, the matrix and the defects found: `docs/AICHAT-10/WORKLOG.md`.
