@@ -110,3 +110,59 @@ test.describe("AICHAT-163: a slow remote shows the skeleton, a hung one times ou
     });
   }
 });
+
+test.describe("AICHAT-164: Retry loads the remote again once it is back, without a reload", () => {
+  /** A reload clears `window`; the marker proves the page was never reloaded. */
+  const markPage = (page: Page) => page.evaluate(() => ((window as { noReload?: boolean }).noReload = true));
+  const pageWasKept = (page: Page) => page.evaluate(() => (window as { noReload?: boolean }).noReload === true);
+
+  for (const remote of remoteNames) {
+    const { path, ready } = remotes[remote];
+
+    test(`${remote}: Retry while down shows the fallback again, Retry once back shows the remote`, async ({
+      page,
+      account,
+    }) => {
+      void account;
+      const fault = await failRemote(page, remote, "abort");
+      await page.goto(path);
+      const fallback = fallbackOf(page, remote);
+      await expect(fallback).toBeVisible();
+      await markPage(page);
+
+      await test.step("Retry while the remote is still down", async () => {
+        // Retry must ask the remote again, not replay a load the runtime cached.
+        const fetched = page.waitForRequest((request) => request.url().startsWith(remotes[remote].origin), {
+          timeout: 10_000,
+        });
+        await fallback.getByRole("button", { name: "Retry" }).click();
+        await fetched;
+        await expect(fallback).toBeVisible();
+        await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
+      });
+
+      await test.step("Retry once the remote is back", async () => {
+        await fault.restore();
+        await fallback.getByRole("button", { name: "Retry" }).click();
+        await expect(page.getByTestId(ready)).toBeVisible();
+        await expect(fallback).toHaveCount(0);
+        await expect(page).toHaveURL(new RegExp(`${path}$`));
+        expect(await pageWasKept(page)).toBe(true);
+      });
+    });
+  }
+
+  test("mfeChat: Retry after the load timeout recovers once the remote answers", async ({ page, account }) => {
+    void account;
+    const fault = await failRemote(page, "mfeChat", "hang");
+    await page.goto("/chats");
+    const fallback = fallbackOf(page, "mfeChat");
+    await expect(fallback).toBeVisible({ timeout: 25_000 });
+    await markPage(page);
+
+    await fault.restore();
+    await fallback.getByRole("button", { name: "Retry" }).click();
+    await expect(page.getByTestId("new-chat")).toBeVisible();
+    expect(await pageWasKept(page)).toBe(true);
+  });
+});
