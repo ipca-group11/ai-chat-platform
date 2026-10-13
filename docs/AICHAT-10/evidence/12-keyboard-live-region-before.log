@@ -1,0 +1,18 @@
+$ set -o pipefail; cd e2e && ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test src/tests/keyboard-and-live-region.spec.ts --reporter=list --workers=4 2>&1 | grep -E '✓|✘|passed|failed$|Error: the region|Error: announced' | cut -c1-230
+  ✓   1 [chromium] › src/tests/keyboard-and-live-region.spec.ts:68:5 › AICHAT-175: main flows with the keyboard only › login with Tab and Enter, focus ring visible (light) (1.7s)
+  ✓   2 [chromium] › src/tests/keyboard-and-live-region.spec.ts:91:5 › AICHAT-175: main flows with the keyboard only › register with Tab and Enter, focus ring visible (light) (1.4s)
+  ✓   3 [chromium] › src/tests/keyboard-and-live-region.spec.ts:68:5 › AICHAT-175: main flows with the keyboard only › login with Tab and Enter, focus ring visible (dark) (1.6s)
+  ✓   4 [chromium] › src/tests/keyboard-and-live-region.spec.ts:91:5 › AICHAT-175: main flows with the keyboard only › register with Tab and Enter, focus ring visible (dark) (1.4s)
+  ✓   5 [chromium] › src/tests/keyboard-and-live-region.spec.ts:111:3 › AICHAT-175: main flows with the keyboard only › create a chat and send a message with the keyboard (4.8s)
+  ✓   6 [chromium] › src/tests/keyboard-and-live-region.spec.ts:137:3 › AICHAT-175: main flows with the keyboard only › stop a reply with the keyboard (3.6s)
+  ✘   7 [chromium] › src/tests/keyboard-and-live-region.spec.ts:177:3 › AICHAT-175: dialogs keep the focus inside and give it back › new chat dialog: focus moves in, stays in, Escape returns it to New chat
+  ✓   8 [chromium] › src/tests/keyboard-and-live-region.spec.ts:193:3 › AICHAT-175: dialogs keep the focus inside and give it back › members dialog: focus moves in, stays in, Escape returns it to Share (3.1s
+  ✓   9 [chromium] › src/tests/keyboard-and-live-region.spec.ts:214:5 › AICHAT-175: every element reached with Tab shows a focus indicator › chat page (light) (2.5s)
+  ✓  10 [chromium] › src/tests/keyboard-and-live-region.spec.ts:214:5 › AICHAT-175: every element reached with Tab shows a focus indicator › chat page (dark) (2.5s)
+  ✘  11 [chromium] › src/tests/keyboard-and-live-region.spec.ts:236:3 › AICHAT-175: a streaming reply reaches a screen reader once › Generating is a polite status and the reply is announced once, when it en
+    Error: the region is busy while the reply is written
+    expect(locator).toHaveAttribute(expected) failed
+    Error: announced 400 times: 2, 9, 12, 15, 21, 29, 34, 39, 46, 51, 57, 64, 71, 76, 80, 86, 93, 99, 102, 104, 110, 116, 123, 127, 132, 134, 138, 143, 154, 162, 168, 173, 180, 184, 187, 190, 195, 202, 208, 211, 216, 222, 226, 229
+  9 passed (39.2s)
+
+[exit 1]

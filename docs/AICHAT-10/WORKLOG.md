@@ -263,3 +263,117 @@ blocking one).
   10 source files without a unit test (e2e support files and the OpenAPI/contract files of the services) and the
   coverage guard missing `e2e`. None of them comes from this epic; the one new file of the epic (`axe-summary-cli.ts`)
   has its own test.
+
+### US4 · Keyboard navigation, focus and live-region checks ([AICHAT-175](https://ipca-grupo11.atlassian.net/browse/AICHAT-175))
+
+**What and why.** axe-core checks what is in the DOM; it cannot press keys or listen to a screen reader. This story
+drives the main flows with the keyboard only and checks the contract a screen reader relies on.
+
+| Check | How the test does it |
+|---|---|
+| Reachable with the keyboard | `tabTo(locator)` presses Tab (or Shift+Tab) until the element has the focus and fails after 40 presses: present on the page is not enough, it has to be in the Tab order |
+| Usable with the keyboard | inside the flows there is no `click()`: typing, Tab, Enter and Escape only (login, register, create chat, send, Stop) |
+| Focus trap in dialogs | after Enter on the trigger the focus moves into the dialog; 15 Tab / Shift+Tab presses never leave it; Escape closes it and the focus is back on the trigger |
+| Visible focus ring | every element reached with Tab on the chat page has an outline or a ring (Tailwind draws `ring-*` as `box-shadow`), light and dark |
+| Live region | `Generating…` has `role="status"` (polite); the reply is announced once, at the end |
+
+**The live-region defect.** The message list is `role="log" aria-live="polite"`, and the reply is written into it token
+by token. A screen reader announces every change of a polite live region, so it would read the reply from the start
+again after every chunk. The test records what would be announced: a `MutationObserver` in the page stores the reply text
+each time it changes **while the region is not `aria-busy`** (assistive technologies hold back the changes of a busy
+region and read them when it stops being busy). Before the fix the same reply was recorded **400 times** (2, 9, 12 …
+2089 characters). The fix is one attribute: `aria-busy` on the log while a message has `status = "streaming"`. After it,
+the reply is recorded once, with its final text. `Generating…` still tells the user that something is running.
+
+**Files.**
+- `e2e/src/tests/keyboard-and-live-region.spec.ts` (new): 11 tests (login and register in both themes, create chat and
+  send, Stop, two dialogs, focus ring in both themes, live region).
+- `apps/mfe-chat/src/features/chat-view/components/MessageList.tsx`: `aria-busy={replyStreaming}` on the log.
+- `apps/mfe-chat/src/features/chat-view/components/MessageList.test.tsx`: the same contract at component level.
+
+**How to run.**
+
+```sh
+cd apps/mfe-chat && pnpm exec vitest run src/features/chat-view/components/MessageList.test.tsx   # no stack
+pnpm mock:up
+cd e2e && ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test src/tests/keyboard-and-live-region.spec.ts
+```
+
+**How to repeat it manually.**
+
+1. Open http://localhost:8000/login, put the mouse away and press Tab: the focus goes through the nav bar to Email,
+   Password and "Sign in", each with a visible ring. Type the credentials and press Enter.
+2. On /chats press Tab to "New chat", Enter, type a title, Enter. In a chat, Tab to the message field, type, Enter. While
+   a long reply is written, Shift+Tab to "Stop" and press Enter.
+3. Open "Share" with Enter, press Tab many times: the focus never leaves the dialog. Escape: the focus is on "Share".
+4. Screen reader (VoiceOver: Cmd+F5 on macOS): send a message. You hear "Generating…" and, at the end, the reply once.
+   Without the fix (remove `aria-busy` in `MessageList.tsx`) VoiceOver starts reading the reply again on every update.
+
+**Result.** Component test: red without the attribute, green with it.
+
+![MessageList before](evidence/10-messagelist-busy-red.png)
+
+![MessageList after](evidence/11-messagelist-busy-green.png)
+
+E2E before the fix: the live-region test fails with `announced 400 times`. The "new chat dialog" failure in this run is
+a timing problem of the test, fixed afterwards (see Problems and fixes), not a defect of the application.
+
+![Keyboard and live region before](evidence/12-keyboard-live-region-before.png)
+
+E2E after the fix: 11 passed. The keyboard tests also passed 40 times in a row (`--repeat-each=4`, 4 workers).
+
+![Keyboard and live region after](evidence/14-keyboard-live-region-after.png)
+
+Focus ring on "Share" reached with Tab:
+
+![Focus ring, light](evidence/15-focus-ring-light.png)
+
+![Focus ring, dark](evidence/15-focus-ring-dark.png)
+
+**Problems and fixes.**
+- **Focus "left" the dialog in the first run.** At the edges of a modal, Base UI puts invisible focus guards
+  (`data-base-ui-focus-guard`). Shift+Tab on the first field lands on a guard, which moves the focus to the last button
+  a moment later. We printed the focused element right after the key press and 300 ms later: guard first, "Close" after.
+  The trap works; the test now waits (`expect.poll`) until the focus settles on an element that is not a guard. The
+  initial focus inside the dialog is also set a moment after it opens, which made the same check flaky under 4 workers.
+- **Register ends on /login, not /chats.** That is the behaviour of the application (`registration.spec.ts` expects
+  it); the test was wrong.
+- **Settings dialog in the criteria.** Settings has no dialog (keys are an inline form); the two dialogs of the
+  application, "New chat" and "Members", are tested.
+
+### US5 · Spike: component-level a11y checks with vitest-axe ([AICHAT-176](https://ipca-grupo11.atlassian.net/browse/AICHAT-176))
+
+**What and why.** Decision in §1: no separate spike, because AICHAT-18-US5 had already adopted `vitest-axe` in `mfe-chat`
+and `mfe-settings`. The shared components of `packages/ui` had no check, so we added the same helper there and one axe
+check per component. The decision and a comparison of the three levels (component, tokens, page) are in
+[README.md §9](README.md#9-decision-component-level-checks-with-vitest-axe-us5-aichat-176).
+
+**Files.**
+- `packages/ui/src/test/a11y.ts` (new): `expectNoA11yViolations`; `color-contrast` and `region` off, with the reason.
+- `packages/ui/src/test/setup.ts`: registers the `toHaveNoViolations` matcher.
+- `packages/ui/src/components/{button,input,alert,dialog,select}/*.test.tsx`: one check each over the component's
+  states; Dialog and Select are scanned open (their popup renders in a portal, so the scan covers `document.body`).
+- `packages/ui/package.json`, `pnpm-lock.yaml`: `vitest-axe` `^0.1.0` (the version the MFEs already use).
+
+**How to run.**
+
+```sh
+cd packages/ui && pnpm exec vitest run src/components --reporter=verbose -t AICHAT-176
+```
+
+**How to repeat it manually.** Remove `aria-label="Close pane"` from the icon button in the Button check and run the
+command: the test fails with `Buttons must have discernible text (button-name)`. The second Button test does exactly this
+on purpose and expects the failure.
+
+**Result.** 6 checks, all passing; the negative case fails as it should.
+
+![Component checks](evidence/13-ui-components-axe.png)
+
+**Problems and fixes.**
+- **The open Select failed with `region`.** That rule asks for all content to be inside landmarks (`<main>`, …). A
+  component rendered alone has no page around it, so any popup in a portal fails it. It says nothing about the
+  component; it is turned off in the component helper with the reason, and pages are scanned with their landmarks in
+  the e2e suite.
+- **The local pnpm rewrote the lockfile.** Adding the dependency with pnpm 12 also removed every `libc:` line of
+  `pnpm-lock.yaml`. We restored the file and added only the three lines of the new importer entry;
+  `pnpm install --frozen-lockfile` accepts it.
