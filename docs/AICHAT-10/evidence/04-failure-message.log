@@ -1,0 +1,9 @@
+$ set -o pipefail; cd e2e && ANTHROPIC_API_KEY=mock-key-not-a-secret pnpm exec playwright test src/tests/accessibility.spec.ts -g 'register · field errors · dark' --reporter=line 2>&1 | sed -n '/Error:/,/Expected/p' | head -8
+    Error: register · field errors · dark
+    [serious] color-contrast: Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds (#base-ui-_r_7_, #base-ui-_r_8_)
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+
+[exit 1]
