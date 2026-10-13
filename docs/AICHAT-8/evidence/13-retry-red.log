@@ -1,0 +1,15 @@
+$ cd e2e && pnpm exec playwright test src/tests/remote-failure.spec.ts -g AICHAT-164 --reporter=list 2>&1 | grep -E '✓|✘|passed|failed|Error:' | sed 's/.*AICHAT-164[^›]*› //'
+mfeAuth: Retry while down shows the fallback again, Retry once back shows the remote (12.6s)
+mfeChat: Retry while down shows the fallback again, Retry once back shows the remote (12.6s)
+mfeSettings: Retry while down shows the fallback again, Retry once back shows the remote (12.6s)
+mfeChat: Retry after the load timeout recovers once the remote answers (17.8s)
+    TimeoutError: page.waitForRequest: Timeout 10000ms exceeded while waiting for event "request"
+    test-results/remote-failure-AICHAT-164--b778d--once-back-shows-the-remote-chromium/test-failed-1.png
+    TimeoutError: page.waitForRequest: Timeout 10000ms exceeded while waiting for event "request"
+    test-results/remote-failure-AICHAT-164--21a1c--once-back-shows-the-remote-chromium/test-failed-1.png
+    TimeoutError: page.waitForRequest: Timeout 10000ms exceeded while waiting for event "request"
+    test-results/remote-failure-AICHAT-164--4c05b--once-back-shows-the-remote-chromium/test-failed-1.png
+  3 failed
+  1 passed (56.7s)
+
+[exit 0]
