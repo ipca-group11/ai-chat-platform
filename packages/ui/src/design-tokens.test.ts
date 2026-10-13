@@ -45,3 +45,58 @@ describe('design tokens: light/dark parity (AC-16)', () => {
     expect(extra).toEqual([]);
   });
 });
+
+// AICHAT-174: WCAG 2.2 AA contrast (1.4.3) between every text token and the surface the components draw it on.
+// The axe scan of the running app (AICHAT-173) found `--destructive`, `--success` and `--muted-foreground` below
+// 4.5:1; this test checks the same pairs straight from the token values, without a browser.
+
+/** Reads `--name: H S% L%` from a block and converts it to sRGB (0-255). */
+function tokenRgb(block: string, name: string): [number, number, number] {
+  const match = new RegExp(`--${name}:\\s*([\\d.]+)\\s+([\\d.]+)%\\s+([\\d.]+)%`).exec(block);
+  expect(match, `expected --${name} in the block`).not.toBeNull();
+  const [h, s, l] = [Number(match?.[1]), Number(match?.[2]) / 100, Number(match?.[3]) / 100];
+  const a = s * Math.min(l, 1 - l);
+  const channel = (n: number) => {
+    const k = (n + h / 30) % 12;
+    return Math.round((l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))) * 255);
+  };
+  return [channel(0), channel(8), channel(4)];
+}
+
+/** WCAG 2 relative luminance and contrast ratio. */
+function contrast(a: [number, number, number], b: [number, number, number]): number {
+  const luminance = (rgb: [number, number, number]) => {
+    const [r, g, b] = rgb.map((v) => {
+      const c = v / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    }) as [number, number, number];
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number];
+  return (high + 0.05) / (low + 0.05);
+}
+
+/** [text token, surface token, where the pair is used]. */
+const textPairs: [string, string, string][] = [
+  ['foreground', 'background', 'body text'],
+  ['muted-foreground', 'background', 'descriptions, placeholders'],
+  ['muted-foreground', 'muted', 'tabs, avatar, selected list row'],
+  ['destructive', 'background', 'field errors (FormField)'],
+  ['destructive', 'card', 'Alert variant="destructive"'],
+  ['destructive-foreground', 'destructive', 'Button, Badge, Toast variant="destructive"'],
+  ['success', 'card', 'Alert variant="success"'],
+  ['success-foreground', 'success', 'Badge, Toast variant="success"'],
+  ['primary-foreground', 'primary', 'Button default'],
+  ['secondary-foreground', 'secondary', 'Button secondary'],
+  ['accent-foreground', 'accent', 'hover and selected items'],
+];
+
+describe('design tokens: text contrast meets WCAG 2.2 AA, 4.5:1 (AICHAT-174)', () => {
+  for (const [theme, selector] of [['light', ':root'], ['dark', '.dark']] as const) {
+    const block = extractBlock(css, selector);
+    it.each(textPairs)(`${theme}: --%s on --%s (%s)`, (text, surface) => {
+      const ratio = contrast(tokenRgb(block, text), tokenRgb(block, surface));
+      expect(ratio, `${theme} --${text} on --${surface} is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+});

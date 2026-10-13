@@ -1,0 +1,4 @@
+$ cd packages/ui && pnpm exec vitest run src/design-tokens.test.ts 2>&1 | grep -E '✓|×|Tests '
+      Tests  25 passed (25)
+
+[exit 0]

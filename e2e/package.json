@@ -9,7 +9,7 @@
     "e2e:ui": "playwright test --ui",
     "wait-for-stack": "tsx src/support/wait-for-stack-cli.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "axe-summary": "tsx src/support/axe-summary-cli.ts"
+    "axe-summary": "tsx src/tests/support/axe-summary-cli.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",

@@ -42,15 +42,18 @@
     --secondary-foreground: 240 5.9% 10%;
 
     --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    /* AICHAT-174: 43% (was 46.1%) keeps 4.5:1 on --muted as well as on --background. */
+    --muted-foreground: 240 3.8% 43%;
 
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
 
-    --destructive: 0 84.2% 60.2%;
+    /* AICHAT-174: --destructive and --success are both a text colour (Alert, field errors) and a background under
+       their -foreground (Button, Badge, Toast); every pair is checked for 4.5:1 in design-tokens.test.ts. */
+    --destructive: 0 73.7% 41.8%;
     --destructive-foreground: 0 0% 98%;
 
-    --success: 142 71% 45%;
+    --success: 142 72% 29%;
     --success-foreground: 0 0% 98%;
 
     --border: 240 5.9% 90%;
@@ -80,11 +83,12 @@
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    /* AICHAT-174: a light red and green read on the dark surfaces, so the text drawn on them is dark. */
+    --destructive: 0 91% 71%;
+    --destructive-foreground: 240 10% 3.9%;
 
-    --success: 142 71% 35%;
-    --success-foreground: 0 0% 98%;
+    --success: 142 69% 58%;
+    --success-foreground: 240 10% 3.9%;
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
