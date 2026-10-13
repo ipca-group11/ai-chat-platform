@@ -1,0 +1,8 @@
+$ cd e2e && pnpm exec playwright test src/tests/remote-failure.spec.ts -g AICHAT-165 --reporter=list 2>&1 | grep -E '✓|✘|passed|failed' | sed 's/.*AICHAT-165[^›]*› //'
+mfeAuth: entry loads, chunks fail: fallback, logged with the scope, no uncaught error (2.5s)
+mfeChat: entry loads, chunks fail: fallback, logged with the scope, no uncaught error (2.5s)
+mfeSettings: entry loads, chunks fail: fallback, logged with the scope, no uncaught error (2.5s)
+mfeChat goes down mid-session: the loaded code keeps working until a reload (6.1s)
+  4 passed (13.8s)
+
+[exit 0]

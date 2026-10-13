@@ -174,6 +174,9 @@ To check that the test can fail, we broke the helper in two ways:
   could not have proved isolation.
 - With all three remotes down (and the shell up), the shell still shows its NavBar and the page's fallback: the runtime
   tolerates a failed `remoteEntry.js` and only the route that needs it fails.
+- Found later, in US5: the first version read the new chat's id as `id`, but the API answers `{ chat: { id } }`, so the
+  `/chats/:id` case opened `/chats/undefined` (which shows the same fallback). A shared `createChat` helper now checks
+  the 201 and reads `chat.id`.
 
 ### US3 · Slow remote shows the loading skeleton, then the content ([AICHAT-163](https://ipca-grupo11.atlassian.net/browse/AICHAT-163))
 
@@ -350,3 +353,57 @@ the rest of the epic's suite (25 tests).
   and the Docker build.
 - Newer `@module-federation/vite` releases (up to 1.23.5) generate the same `??=` cache, so upgrading would not have
   fixed it. Worth reporting upstream.
+
+### US5 · Remote chunk failure after remoteEntry has loaded ([AICHAT-165](https://ipca-grupo11.atlassian.net/browse/AICHAT-165))
+
+**What and why.** Two partial failures that the other stories do not cover:
+
+1. **Chunks fail, entry loads**: as after a redeploy, when the `remoteEntry.js` the browser gets points to chunk names
+   that no longer exist. `failRemote(page, remote, "abort", "chunks")` lets `remoteEntry.js` through and aborts every
+   other file of the remote.
+2. **Mid-session outage**: the remote was already loaded, then its server goes down while the user keeps navigating.
+
+**Behaviour recorded** (checked first in the browser, then asserted):
+
+| Case | Result |
+|---|---|
+| Chunks fail, entry 200 | scoped fallback, NavBar kept, console `[remote-loader] remote "<scope>" failed: RemoteLoadError …`, **no uncaught error** (`pageerror`) |
+| `mfeChat` down after `/chats` loaded | opening a chat, another chat, Settings and back to Chats all keep working, with **no request** to `localhost:3002`: the remote's code is already in memory |
+| Same, after a reload | the remote is needed again: fallback; once it is back, Retry shows the chats (US4 fix) |
+
+**Tests** (`AICHAT-165` block):
+
+| Test | Checks |
+|---|---|
+| chunks fail, for each remote | `remoteEntry.js` answered 200; fallback and NavBar visible; a console error contains `[remote-loader] remote "<scope>" failed:`; no `pageerror` |
+| mid-session, `mfeChat` | two chats created through the API; after the fault: both chats open (URL and `message-input`), Settings and Chats render, no fallback, **0 requests** to the remote; then reload → fallback → `restore()` → Retry → chat list |
+
+**Files.**
+- `e2e/src/tests/remote-failure.spec.ts`: describe block `AICHAT-165`, `createChat` helper.
+
+**How to run.**
+
+```sh
+cd e2e && pnpm exec playwright test src/tests/remote-failure.spec.ts -g AICHAT-165 --reporter=list
+```
+
+**How to repeat it manually.**
+
+1. Sign in at http://localhost:8000, open `/chats` and wait until the list shows.
+2. `docker stop llm-chat-mfe-chat-1`.
+3. Open a chat, go to Settings and back to Chats: everything still works (Network panel: no request to `localhost:3002`).
+4. Reload: "This section couldn't load". `docker start llm-chat-mfe-chat-1`, wait a few seconds, click **Retry**.
+5. Chunk failure: DevTools → Network → **Block request URL** `localhost:3002/assets/*`, reload `/chats`: the fallback
+   appears and the Console shows `[remote-loader] remote "chat" failed`.
+
+**Result.** 4 passed. No defect in this story: the error boundary already catches a chunk failure, and a loaded remote
+does not need its server again until the page reloads.
+
+![4 passed](evidence/16-partial-failure-green.png)
+
+**Problems and fixes.**
+- The mid-session test first failed with `chat-item-undefined`: the API answers `{ chat: { id } }`. The same mistake had
+  made the `/chats/:id` case of US2 open `/chats/undefined` without failing; both now use `createChat`, which checks the
+  status and reads `chat.id`.
+- The local auth-service limit (300 requests per 15 minutes) kept failing sign-ins after many runs. For the remaining
+  runs we started it like CI does: `AUTH_RATE_LIMIT_MAX=0`.
