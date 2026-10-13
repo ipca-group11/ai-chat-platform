@@ -1,0 +1,33 @@
+$ pnpm exec nx run e2e:e2e --skip-nx-cache 2>&1 | grep -E '✘|passed|failed|flaky|skipped|did not run' | tail -30
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--25e57-ded-AC-66-AC-67-diagram-png-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--a4ae6-oaded-AC-66-AC-67-photo-jpg-chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--a4ae6-oaded-AC-66-AC-67-photo-jpg-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--66873-aded-AC-66-AC-67-photo-jpeg-chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--66873-aded-AC-66-AC-67-photo-jpeg-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--8e98a-are-attached-at-once-AC-66--chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--8e98a-are-attached-at-once-AC-66--chromium-retry1/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--81dc6-e-is-removed-before-sending-chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--81dc6-e-is-removed-before-sending-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--94761-ed-file-into-account-AC-69--chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--94761-ed-file-into-account-AC-69--chromium-retry1/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--19888-ly-10-MB-is-accepted-AC-68--chromium/test-failed-1.png
+    Error: expect(locator).toHaveText(expected) failed
+    test-results/attach-file-Attach-a-file--19888-ly-10-MB-is-accepted-AC-68--chromium-retry1/test-failed-1.png
+  9 failed
+  1 skipped
+  104 passed (6.2m)
+ NX   Running target e2e for project e2e failed
+
+[exit 0]
