@@ -65,4 +65,24 @@ describe('createRemoteRoute', () => {
     expect(await screen.findByText('chat is here')).toBeInTheDocument();
     expect(loader).toHaveBeenCalledTimes(3);
   });
+
+  it('uses the retry loader, with the attempt number, for every load after the first (AICHAT-164)', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const user = userEvent.setup();
+    const loader = vi.fn(() => Promise.reject(new Error('first')));
+    const retryLoader = vi
+      .fn<(attempt: number) => Promise<{ default: () => React.ReactElement }>>()
+      .mockRejectedValueOnce(new Error('still down'))
+      .mockResolvedValue({ default: () => <p>chat is here</p> });
+    const Remote = createRemoteRoute('chat', loader, retryLoader);
+
+    render(<Remote />);
+
+    await user.click(await screen.findByRole('button', { name: 'Retry' }));
+    await user.click(await screen.findByRole('button', { name: 'Retry' }));
+
+    expect(await screen.findByText('chat is here')).toBeInTheDocument();
+    expect(loader).toHaveBeenCalledTimes(1);
+    expect(retryLoader.mock.calls).toEqual([[1], [2]]);
+  });
 });

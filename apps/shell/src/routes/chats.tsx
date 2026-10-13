@@ -1,8 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { RequireAuth } from '../features/auth-guard';
-import { createRemoteRoute } from '../features/remote-loader';
+import { createRemoteRoute, reloadRemote } from '../features/remote-loader';
 
-const RemoteChatRoutes = createRemoteRoute('chat', () => import('mfeChat/routes'));
+const RemoteChatRoutes = createRemoteRoute(
+  'chat',
+  () => import('mfeChat/routes'),
+  (attempt) => reloadRemote('mfeChat/routes', attempt),
+);
 
 function ChatsRoute() {
   return (

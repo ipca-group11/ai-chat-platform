@@ -23,8 +23,16 @@ function RemoteLoadingFallback({ scopeName }: { scopeName: string }) {
  * On retry (triggered from `RemoteErrorBoundary`'s fallback UI), a fresh
  * `React.lazy` is created so the failed import is actually re-attempted
  * (`React.lazy` otherwise caches a rejected load forever for its lifetime).
+ *
+ * `retryLoader(attempt)` is used for every load after the first: the static
+ * `import('mfeChat/routes')` keeps its first rejection, so a retry has to go
+ * through the runtime (`reloadRemote`, AICHAT-164).
  */
-export function createRemoteRoute(scopeName: string, loader: RemoteLoader): ComponentType {
+export function createRemoteRoute(
+  scopeName: string,
+  loader: RemoteLoader,
+  retryLoader?: (attempt: number) => ReturnType<RemoteLoader>,
+): ComponentType {
   function RemoteRoute() {
     const [retryKey, setRetryKey] = useState(0);
 
@@ -34,7 +42,13 @@ export function createRemoteRoute(scopeName: string, loader: RemoteLoader): Comp
     // actually re-attempt a failed remote load on retry. `scopeName`/`loader`
     // are stable for a given `createRemoteRoute` call.
     const LazyRemote = useMemo(
-      () => lazy(loadRemote(scopeName, loader)),
+      () =>
+        lazy(
+          loadRemote(
+            scopeName,
+            retryKey > 0 && retryLoader ? () => retryLoader(retryKey) : loader,
+          ),
+        ),
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [retryKey],
     );

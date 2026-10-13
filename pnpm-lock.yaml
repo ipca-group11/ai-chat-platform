@@ -308,6 +308,9 @@ importers:
       '@grafana/faro-web-sdk':
         specifier: ^2.12.1
         version: 2.12.1
+      '@module-federation/runtime':
+        specifier: 2.9.0
+        version: 2.9.0
       '@tanstack/react-query':
         specifier: ^5.103.2
         version: 5.103.2(react@19.3.0)
