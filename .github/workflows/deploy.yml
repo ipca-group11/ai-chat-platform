@@ -126,7 +126,7 @@ jobs:
           path: sbom
           merge-multiple: true
 
-      - uses: anchore/scan-action/download-grype@v6
+      - uses: anchore/scan-action/download-grype@v7
         id: grype
 
       - name: Grype report (does not fail)
