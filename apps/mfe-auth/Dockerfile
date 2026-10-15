@@ -7,7 +7,7 @@
 # `/auth/...`, proxied by the shell) so the session cookies are set on the host the
 # browser actually uses. See compose.yaml / docs/DEPLOY.md.
 
-FROM node:24-alpine AS base
+FROM node:25-alpine AS base
 WORKDIR /workspace
 RUN corepack enable
 
