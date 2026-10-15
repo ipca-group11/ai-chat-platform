@@ -58,6 +58,45 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Build once into the local daemon and scan it (AICHAT-7). HIGH+ findings fail the job
+      # before anything reaches GHCR, so the deploy never starts. The push below reuses the
+      # layer cache. Run instructions: docs/AICHAT-7/README.md.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          platforms: linux/amd64
+          load: true
+          tags: scan/${{ matrix.name }}:${{ env.SHA }}
+          # The shell bakes the remotes' public URLs, the Faro collector URL and its
+          # version into its bundle; the other images ignore these args.
+          build-args: |
+            VITE_MFE_AUTH_URL=https://${{ vars.DOMAIN }}:3001
+            VITE_MFE_CHAT_URL=https://${{ vars.DOMAIN }}:3002
+            VITE_MFE_SETTINGS_URL=https://${{ vars.DOMAIN }}:3003
+            VITE_FARO_URL=https://${{ vars.DOMAIN }}/collect
+            VITE_APP_VERSION=${{ env.SHA }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+
+      - name: Trivy scan (HIGH+ blocks)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: scan/${{ matrix.name }}:${{ env.SHA }}
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          format: json
+          output: trivy-${{ matrix.name }}.json
+
+      - name: Keep Trivy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-${{ matrix.name }}.json
+          path: trivy-${{ matrix.name }}.json
+          if-no-files-found: ignore
+          retention-days: 90
+
       - uses: docker/build-push-action@v6
         with:
           context: .
