@@ -2,7 +2,7 @@
 # testing/mock-server. Build context is the repo root:
 #   docker build -f testing/mock-server/Dockerfile -t ai-chat-mock-server .
 
-FROM node:24-alpine AS base
+FROM node:25-alpine AS base
 WORKDIR /workspace
 RUN corepack enable
 
@@ -17,7 +17,7 @@ COPY testing/mock-server ./testing/mock-server
 RUN pnpm --filter @platform/mock-server run build
 
 # The bundle contains every dependency, so the runtime image needs Node only.
-FROM node:24-alpine AS runtime
+FROM node:25-alpine AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /workspace/testing/mock-server/dist/main.cjs ./main.cjs
