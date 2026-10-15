@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.2",
-    "@eslint/js": "^9.17.0",
+    "@eslint/js": "^10.0.1",
     "@platform/test-config": "workspace:*",
     "@storybook/addon-a11y": "^10.0.0",
     "@storybook/react-vite": "^10.0.0",
