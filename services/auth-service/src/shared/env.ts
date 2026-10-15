@@ -25,8 +25,6 @@ const envSchema = z.object({
     .default("true")
     .transform((value) => value.toLowerCase() !== "false"),
   LOG_LEVEL: z.string().default("info"),
-  // Requests per client every 15 minutes, over all routes. Raised only on throw-away CI stacks.
-  RATE_LIMIT_MAX: z.coerce.number().int().positive().default(300),
 });
 
 export type Env = {
@@ -46,8 +44,6 @@ export type Env = {
   RATE_LIMIT_MAX: number;
   COOKIE_SECURE: boolean;
   LOG_LEVEL: string;
-  /** Requests per client every 15 minutes (default 300). */
-  RATE_LIMIT_MAX: number;
 };
 
 export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
@@ -66,7 +62,6 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     RATE_LIMIT_MAX: parsed.RATE_LIMIT_MAX,
     COOKIE_SECURE: parsed.COOKIE_SECURE,
     LOG_LEVEL: parsed.LOG_LEVEL,
-    RATE_LIMIT_MAX: parsed.RATE_LIMIT_MAX,
   };
 }
 
