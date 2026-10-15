@@ -7,7 +7,7 @@
 # the bundle. They default to same-origin (`/auth`, `/api`), proxied by the shell, so the
 # session cookie is always sent. See compose.yaml / docs/DEPLOY.md.
 
-FROM node:24-alpine AS base
+FROM node:25-alpine AS base
 WORKDIR /workspace
 RUN corepack enable
 
