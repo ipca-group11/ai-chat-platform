@@ -8,7 +8,7 @@
 # *browser's* point of view (i.e. the host-published port for each remote), not from
 # inside the Docker network. See compose.yaml / docs/DEPLOY.md.
 
-FROM node:24-alpine AS base
+FROM node:25-alpine AS base
 WORKDIR /workspace
 RUN corepack enable
 
