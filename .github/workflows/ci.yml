@@ -149,7 +149,7 @@ jobs:
         run: pnpm exec nx run-many -t pact:consumer --skip-nx-cache
 
       - name: Upload the pacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pacts
           path: pacts/
