@@ -46,16 +46,16 @@
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
-    "@nx/eslint": "23.2.1",
-    "@nx/js": "23.2.1",
-    "@nx/workspace": "23.2.1",
-    "@size-limit/file": "^14.1.0",
+    "@nx/eslint": "23.3.0",
+    "@nx/js": "23.3.0",
+    "@nx/workspace": "23.3.0",
+    "@size-limit/file": "^14.2.0",
     "@types/node": "^24.13.6",
     "eslint": "^10.11.0",
     "jiti": "^2.7.0",
-    "nx": "23.2.1",
-    "puppeteer-core": "^25.12.0",
-    "size-limit": "^14.1.0",
+    "nx": "23.3.0",
+    "puppeteer-core": "^25.13.0",
+    "size-limit": "^14.2.0",
     "typescript": "6.0.3"
   },
   "pnpm": {
