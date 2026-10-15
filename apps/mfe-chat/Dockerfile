@@ -7,7 +7,7 @@
 # apps/shell's preview server proxies `/api` -> conversation-service (see
 # apps/shell/vite.config.ts), so no build-time URL is needed here.
 
-FROM node:24-alpine AS base
+FROM node:25-alpine AS base
 WORKDIR /workspace
 RUN corepack enable
 
