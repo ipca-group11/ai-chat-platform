@@ -47,7 +47,7 @@ jobs:
       - uses: pnpm/action-setup@v4
 
       # The session helper (scripts/schemathesis/session.ts) runs on Node's built-in TypeScript support.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 

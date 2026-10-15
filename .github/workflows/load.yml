@@ -40,7 +40,7 @@ jobs:
       - uses: pnpm/action-setup@v4
 
       # The sampler and summary scripts run on Node's built-in TypeScript support, so the runner needs the pinned Node.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
