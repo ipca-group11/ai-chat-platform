@@ -84,6 +84,42 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          The scan sits inside <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">.github/workflows/deploy.yml</code>,
+          one step per image in the build matrix. Each of the 10 app images (shell, mfe-auth, mfe-chat, mfe-settings,
+          auth-service, conversation-service, plus prometheus, grafana, loki and alloy) is built once into the
+          runner's local Docker as <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">scan/&lt;name&gt;:&lt;sha&gt;</code>,
+          then handed to <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">aquasecurity/trivy-action@0.28.0</code>
+          before the real push step runs. <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">postgres</code> and
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">caddy</code> are pulled as third-party images rather
+          than built, so they are not scanned here, only covered by the separate SBOM job.
+        </p>
+        <div class="scrollx mt-4">
+        <table class="ttable card">
+          <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>Severity gate</td><td>HIGH, CRITICAL</td></tr>
+            <tr><td>Exit code on a finding</td><td>1, fails the <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">build</code> job</td></tr>
+            <tr><td>Report format</td><td>JSON, one file per image (<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">trivy-&lt;name&gt;.json</code>)</td></tr>
+            <tr><td>Report retention</td><td>90 days, uploaded even if the scan fails</td></tr>
+            <tr><td>Images scanned</td><td>10 of 12, postgres and caddy excluded</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          A HIGH or CRITICAL finding on any single image stops that image's push, and because the matrix runs with
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">fail-fast: true</code> it stops the rest of the
+          build job too, so <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">deploy</code> never starts.
+          Clearing a blocked finding means bumping the base image or the affected package, or, if there's no fix yet,
+          recording the CVE in a root <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">.trivyignore</code>
+          with a comment and an expiry.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

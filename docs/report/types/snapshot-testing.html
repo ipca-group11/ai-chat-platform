@@ -85,6 +85,42 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Every DTO fixture in <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">packages/shared-types/src/__fixtures__/dto-snapshots.test.ts</code>
+          is pinned with <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">toMatchInlineSnapshot</code>: user profile,
+          auth response, access token claims, chat, chat member, message, attachment, test-connection response and the error
+          response shape, about ten in total. The six SSE event types the streaming pipeline emits (token, reasoning,
+          web_fetch, done, error, queued) are parsed through the same schema and checked together as one file snapshot.
+          Ids and dates never go into the snapshot as themselves: a serializer from <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">@platform/test-config</code>
+          normalises them to <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">&lt;uuid&gt;</code> and
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">&lt;date&gt;</code> first, so a snapshot only breaks on a real shape change.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          The wire frames get the same treatment on the server side: <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">sse.snapshot.spec.ts</code>
+          snapshots the exact <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">event:</code>/<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">data:</code>
+          text written to the response for every event type, and <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">error-handler.snapshot.spec.ts</code>
+          pins the JSON body for seven HttpError status codes (400 to 500), run in both conversation-service and auth-service so the
+          two services can't drift from each other's error shape.
+        </p>
+        <div class="scrollx">
+        <table class="ttable card">
+          <thead><tr><th>Rule</th><th>Scope</th><th>Enforces</th></tr></thead>
+          <tbody>
+            <tr><td><span class="mono text-xs">platform/no-component-snapshots</span></td><td><span class="mono text-xs">.test.tsx</span> / <span class="mono text-xs">.spec.tsx</span> files</td><td>Any snapshot matcher is a lint error; component tests must assert on roles and text instead</td></tr>
+            <tr><td><span class="mono text-xs">vitest/no-large-snapshots</span></td><td>every test file</td><td><span class="mono text-xs">maxSize: 50</span> lines per inline snapshot, so a snapshot stays a data shape, not a dump</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          Snapshots are refreshed locally with <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">vitest -u</code>, never in CI,
+          and a changed snapshot needs a reason in the pull request, per the comment at the top of the DTO test file.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">
@@ -94,11 +130,11 @@
         </div>
         <div class="card p-5">
           <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Inputs</div>
-          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Canonical fixture objects for the shared DTOs</li><li>Sample SSE frames for each event type the streaming pipeline emits</li><li>The type definitions these contracts are built from</li></ul>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Canonical fixture objects for the shared DTOs</li><li>Sample SSE frames for each event type the streaming pipeline emits</li><li>The type definitions these contracts are built from</li><li>In practice that's about ten DTO fixtures (user profile, auth response, chat, message, attachment, and so on) plus the six SSE event types (token, reasoning, web_fetch, done, error, queued), and the same error-body table, seven HttpError status codes from 400 to 500, checked against both conversation-service and auth-service.</li></ul>
         </div>
         <div class="card p-5">
           <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Acceptance Criteria</div>
-          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>A change to a shared DTO's serialized shape is caught by a failing snapshot before it reaches main.</li><li>A change to the SSE wire format used for streaming responses is caught the same way, including for error and heartbeat frames.</li><li>Snapshots stay small and targeted at specific data shapes rather than ballooning into full component-tree dumps.</li><li>The frontend's stream parser and the shared type definitions it depends on can't silently drift apart without a test catching it.</li></ul>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>A change to a shared DTO's serialized shape is caught by a failing snapshot before it reaches main.</li><li>A change to the SSE wire format used for streaming responses is caught the same way, including for error and heartbeat frames.</li><li>Snapshots stay small and targeted at specific data shapes rather than ballooning into full component-tree dumps.</li><li>The frontend's stream parser and the shared type definitions it depends on can't silently drift apart without a test catching it.</li><li>Concretely, the ESLint rule caps any inline snapshot at 50 lines and blocks snapshot matchers outright in .tsx test files, so a component test has to assert on roles and text instead of a markup dump.</li></ul>
         </div>
         <div class="card p-5">
           <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tooling / Tech Stack</div>
@@ -110,7 +146,7 @@
         </div>
         <div class="card p-5">
           <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Definition of Done</div>
-          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>All of this area's snapshot and drift checks run automatically in CI, and a failure blocks the merge until it's reviewed.</li></ul>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>All of this area's snapshot and drift checks run automatically in CI, and a failure blocks the merge until it's reviewed.</li><li>A changed snapshot has to carry a reason in the pull request, and snapshots are only ever refreshed locally with vitest -u, never written or accepted during the CI run itself.</li></ul>
         </div>
       </div>
       <div class="mt-10 flex justify-between">

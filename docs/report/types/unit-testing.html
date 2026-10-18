@@ -84,6 +84,43 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Each app, service and shared package carries its own <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">vitest.config.ts</code>
+          (frontend apps define the same <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">test</code> block inside
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">vite.config.ts</code> instead), all built on a shared
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">coveragePreset()</code> from
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">packages/test-config</code> so the coverage provider and
+          reporters stay the same everywhere: Vitest's <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">v8</code> provider,
+          text + lcov + json-summary output. As of this run the monorepo has 161 spec files, 152
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">.spec.ts</code> and 9
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">.spec.tsx</code>, excluding the separate
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">.db.spec.ts</code>, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">.pact.spec.ts</code>
+          and <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">.verify.spec.ts</code> suites, which run under their own configs.
+        </p>
+        <div class="scrollx mt-4">
+        <table class="ttable card">
+          <thead><tr><th>Project type</th><th>Lines / statements / functions</th><th>Branches</th><th>Test timeout</th></tr></thead>
+          <tbody>
+            <tr><td>Services and shared packages</td><td>80%</td><td>80%</td><td>20 s (bcrypt at real cost is slow under <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">nx --parallel</code>)</td></tr>
+            <tr><td>Frontend apps (<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">apps/mfe-*</code>, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">shell</code>)</td><td>80%</td><td>75%</td><td>15 s, jsdom environment</td></tr>
+            <tr><td><code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">e2e</code> helper project</td><td>80%</td><td>70%</td><td>n/a</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-4">
+          A project's own <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">nx test</code> target fails outright if it
+          drops below its threshold, which is what makes the thresholds a real gate rather than a report. In CI,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">nx affected -t lint typecheck test build size</code> runs
+          on every pull request and on every push to <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">main</code>,
+          only against the projects a change actually touches, and a failing test blocks the merge. Locally the same
+          projects re-run on every save through Vitest's watch mode.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

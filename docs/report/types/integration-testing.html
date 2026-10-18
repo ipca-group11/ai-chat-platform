@@ -86,6 +86,42 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          33 spec files under <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">src/integration</code>
+          in the two services: 22 in conversation-service, 11 in auth-service. Each one boots the real
+          Express app with <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">buildTestApp()</code>
+          and drives it with Supertest, Postgres, the job queue and the LLM providers all swapped for
+          in-memory fakes, so the whole suite runs on every pull request with no Docker dependency.
+        </p>
+        <div class="scrollx mt-3">
+        <table class="ttable card">
+          <thead><tr><th>Service</th><th>Spec files</th><th>Routes tracked by the guard</th></tr></thead>
+          <tbody>
+            <tr><td>conversation-service</td><td>22</td><td>20</td></tr>
+            <tr><td>auth-service</td><td>11</td><td>8</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          The route count is not a loose estimate: <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">route-inventory.spec.ts</code>
+          in each service lists every registered route against the spec file that must cover it, fails if a
+          new route has no matching test, and fails again if an entry points at a test title that no longer
+          exists. This is the guard the Jira Acceptance Criteria calls out: a route added without a test
+          cannot slip through unnoticed.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          A separate Nx target, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">test-db</code>,
+          goes one step further than this epic's scope: it starts a throwaway Postgres 16 Alpine container
+          with Testcontainers, applies the Prisma schema with <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">prisma db push</code>,
+          and runs against it for real, 30 seconds per test and up to 120 seconds for setup and teardown,
+          files executed one at a time rather than in parallel so they do not race on the same container.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

@@ -84,6 +84,48 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Each of the four apps (shell, mfe-auth, mfe-chat, mfe-settings) carries its own
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">.size-limit.ts</code>, read by
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">size-limit</code> 14.1.0 with
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">@size-limit/file</code> as an Nx
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">size</code> target, after a production
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">nx build</code>. Every file is split into
+          five groups by name: the <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">remoteEntry.js</code>
+          federation manifest, the app's own route chunks, Module Federation runtime/loader glue, copies of
+          shared libraries (react, react-dom, router, query, UI) that a remote emits as a fallback but the
+          browser never downloads once the shell provides them, and a total over all emitted JS. Each limit is
+          the measured baseline plus 10%, rounded up to the next kB (1 kB = 1000 bytes), measured on 2026-10-03
+          on Node 24.21.0; size-limit exits non-zero if any group goes over, which fails the job.
+        </p>
+        <div class="scrollx mt-4">
+        <table class="ttable card">
+          <thead><tr><th>App</th><th>remoteEntry.js</th><th>Own chunks</th><th>Federation glue</th><th>Shared-library copies</th><th>All emitted JS</th></tr></thead>
+          <tbody>
+            <tr><td>shell</td><td>7 KB</td><td>57 KB</td><td>130 KB</td><td>134 KB</td><td>327 KB</td></tr>
+            <tr><td>mfe-chat</td><td>7 KB</td><td>70 KB</td><td>136 KB</td><td>137 KB</td><td>348 KB</td></tr>
+            <tr><td>mfe-auth</td><td>7 KB</td><td>28 KB</td><td>129 KB</td><td>137 KB</td><td>299 KB</td></tr>
+            <tr><td>mfe-settings</td><td>7 KB</td><td>29 KB</td><td>129 KB</td><td>99 KB</td><td>263 KB</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          This runs two ways: the <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">size</code> target
+          is part of <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">nx affected</code> on every pull
+          request, so it only measures apps the change touched, and a separate scheduled workflow
+          (<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">size-full.yml</code>, every Monday at
+          03:00 UTC) runs <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">nx run-many</code> over all
+          four apps regardless of what changed, to catch drift a narrow PR diff would miss. On top of the
+          pass/fail budget, every PR also gets an informational gzip size diff per file (before/after/percent
+          change) posted to the job summary by <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">scripts/ci/bundle-size.ts</code>,
+          comparing the PR build against a build of the base branch; that diff never fails the job on its own.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

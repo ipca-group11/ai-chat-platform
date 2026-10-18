@@ -86,6 +86,46 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          One spec, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">recorded-replay.spec.ts</code>,
+          drives the real Anthropic and OpenAI adapter code against 20 recorded or hand-written
+          fixtures (12 for Anthropic, 8 for OpenAI) stored in <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">test-utils/fixtures/llm</code>.
+          Each streaming fixture is replayed three times, once per chunk layout, so the same
+          bytes get cut differently every pass: an uneven cycle of 1, 7, 64, 3 bytes, one byte
+          at a time, and the whole body in one piece. That is on purpose: multi-byte UTF-8
+          characters in the fixtures (<span class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">ça</span>,
+          <span class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">atenção</span>,
+          <span class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">😀</span>) land on different
+          byte boundaries depending on the layout, so the adapter has to reassemble them
+          correctly no matter where the network happened to cut.
+        </p>
+        <div class="scrollx">
+        <table class="ttable card">
+          <thead><tr><th>Case</th><th>Covers</th></tr></thead>
+          <tbody>
+            <tr><td>text, text-ping, thinking</td><td>Plain text deltas, ignored ping events, reasoning blocks before the answer</td></tr>
+            <tr><td>max-tokens</td><td>A truncated answer streamed like a complete one (tracked as AICHAT-212)</td></tr>
+            <tr><td>web-fetch-error, pause-turn-1/2</td><td>A server-side tool error, and resuming a paused turn with the reply built so far</td></tr>
+            <tr><td>overloaded-midstream, error-midstream</td><td>Partial text followed by a mid-stream failure, one retryable, one swallowed today (AICHAT-211)</td></tr>
+            <tr><td>HTTP errors</td><td>8 cases: status 400/401/429/529 for Anthropic, 400/401/429/500 for OpenAI, each asserted for message and the retryable flag</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          Nothing here touches the network: <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">replayFetch</code>
+          hands the adapter a fake <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">fetch</code>
+          that serves the fixture bytes and records the outgoing request bodies, which is how
+          the pause-turn test checks the exact continuation payload the adapter sends back.
+          Two known defects, AICHAT-211 and AICHAT-212, are asserted as today's actual
+          behaviour with an <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">it.todo</code>
+          describing the fix, so the suite documents the bug instead of hiding it.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

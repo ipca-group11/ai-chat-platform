@@ -84,6 +84,52 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Every project's own Vitest config spreads a shared threshold object from
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">packages/test-config/coverage-thresholds.ts</code>
+          into its <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">test.coverage.thresholds</code> option, using
+          the v8 coverage provider. The floor is 80% for lines, statements and functions everywhere. Branches are 80%
+          by default, 75% for <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">apps/*</code> and
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">packages/test-utils</code>, and 70% for
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">e2e</code>, since UI branching and end-to-end helper
+          code carry more paths that are impractical to hit directly.
+        </p>
+        <div class="scrollx mt-4">
+        <table class="ttable card">
+          <thead><tr><th>Scope</th><th>Lines</th><th>Statements</th><th>Functions</th><th>Branches</th></tr></thead>
+          <tbody>
+            <tr><td>Default (services, packages)</td><td>80%</td><td>80%</td><td>80%</td><td>80%</td></tr>
+            <tr><td>apps/*, packages/test-utils</td><td>80%</td><td>80%</td><td>80%</td><td>75%</td></tr>
+            <tr><td>e2e</td><td>80%</td><td>80%</td><td>80%</td><td>70%</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-4">
+          A second check, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">packages/workspace-config/src/coverage-guard.ts</code>,
+          runs as its own Vitest suite and walks every <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">apps</code>,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">services</code> and
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">packages</code> directory with an Nx <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">test</code>
+          target. For each one it confirms the test command actually runs with <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">--coverage</code>,
+          the Vitest config imports the shared <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">@platform/test-config</code>
+          preset, and the resolved threshold values are at or above the approved floor for that project's scope, failing
+          the build if any value is missing, lowered, or not statically resolvable from the config text. Only one project,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">testing/k6</code>, is exempt, because it is k6
+          runtime script text with no Node source to instrument, and every exemption needs a written reason or the guard's
+          own test fails.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          This runs per pull request as part of <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">nx affected -t test</code>
+          in CI: each affected project's own coverage run fails the job the moment it drops below its threshold, and a
+          separate step collects every project's <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">coverage-summary.json</code>
+          into one lines/branches/functions/statements table in the job summary, so a regression is visible on the PR
+          even for projects that still pass their floor.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

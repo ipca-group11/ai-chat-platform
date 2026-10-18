@@ -84,6 +84,49 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          No broker: contracts are an artifact of the CI run itself. Each consumer's
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">*.pact.spec.ts</code> files drive the real
+          API client against a local Pact mock server and write one JSON file per consumer-provider pair into
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">pacts/</code>, through the shared
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">@platform/pact-config</code> package so the
+          directory, naming and log level can't drift between pods. The provider side then replays every one of
+          those files against its real app code wired to in-memory fakes, through Pact's <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">Verifier</code>,
+          with provider states (<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">"a user is logged in"</code>,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">"a user exists"</code>, and so on) setting up
+          the right state through the public API before each interaction replays.
+        </p>
+        <div class="scrollx mt-4">
+        <table class="ttable card">
+          <thead><tr><th>Pact file</th><th>Consumer</th><th>Provider</th><th>Interactions</th></tr></thead>
+          <tbody>
+            <tr><td>mfe-chat-conversation-service.json</td><td>mfe-chat</td><td>conversation-service</td><td>18</td></tr>
+            <tr><td>mfe-auth-auth-service.json</td><td>mfe-auth</td><td>auth-service</td><td>10</td></tr>
+            <tr><td>shell-auth-service.json</td><td>shell</td><td>auth-service</td><td>3</td></tr>
+            <tr><td>mfe-chat-auth-service.json</td><td>mfe-chat</td><td>auth-service</td><td>2</td></tr>
+            <tr><td>mfe-settings-auth-service.json</td><td>mfe-settings</td><td>auth-service</td><td>2</td></tr>
+            <tr><td>mfe-settings-conversation-service.json</td><td>mfe-settings</td><td>conversation-service</td><td>2</td></tr>
+            <tr><td>auth-service-conversation-service.json</td><td>auth-service</td><td>conversation-service</td><td>2</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-4">
+          That's 7 pact files, 39 interactions in total, across 5 consumers (mfe-auth, shell, mfe-settings,
+          mfe-chat, and auth-service itself acting as a consumer of conversation-service's internal routes) and
+          2 providers (auth-service, conversation-service). CI runs both sides on every pull request, not only
+          the Nx-affected ones: the <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">contracts-consumer</code>
+          job runs <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">nx run-many -t pact:consumer</code> and
+          uploads <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">pacts/</code> as a build artifact, then
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">contracts-provider</code> downloads it and runs
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">pact:verify</code> once per provider in a matrix.
+          A failing interaction on either side fails the job and blocks the merge.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

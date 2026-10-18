@@ -85,6 +85,43 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Three layers, in order. Inside the process, supertest hits every route of both services and strict-parses
+          the body with the same Zod schema the route itself uses, so a response has to match exactly what the spec
+          says (<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">additionalProperties: false</code> on
+          every object, request and response). A negative-request table then sends the inputs nobody wrote a happy-path
+          test for: 40 rows against conversation-service, 16 against auth-service, covering a missing field, a wrong
+          type, a value outside what's allowed, a field that's too long, an extra field, malformed JSON, a body over
+          100&nbsp;kB, a path parameter that can't be decoded, and a bad upload MIME type or size. Every one of those
+          has to come back 400 with a <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">fieldErrors</code>
+          body, never a 500.
+        </p>
+        <div class="scrollx mt-4">
+        <table class="ttable card">
+          <thead><tr><th>Layer</th><th>Tool</th><th>Scope</th><th>Checks</th></tr></thead>
+          <tbody>
+            <tr><td>Route validation</td><td>Zod + supertest, in-process</td><td>Every route, both services</td><td>Request and response strict-parsed against the schema that generated the spec</td></tr>
+            <tr><td>Negative requests</td><td>Vitest table (<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">invalid-requests.spec.ts</code>)</td><td>40 rows conversation-service, 16 rows auth-service</td><td>400 + <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">fieldErrors</code>, never 500</td></tr>
+            <tr><td>Fuzzing</td><td>Schemathesis 4.28.0, against the real compose stack</td><td>Both OpenAPI specs, 30 generated examples per operation</td><td><code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">not_a_server_error</code>, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">status_code_conformance</code>, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">response_schema_conformance</code></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-4">
+          Schemathesis runs against the real auth-service and conversation-service containers (<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">pnpm mock:up</code>,
+          mock LLM), signed in as a seeded user, about 1,200 requests across both specs in total. Three operations are
+          excluded on purpose: deleting the signed-in account mid-run, the internal erasure endpoint (service-token only,
+          covered elsewhere), and the SSE stream, which never ends. Because that volume would otherwise trip auth-service's
+          own rate limiter, the CI workflow raises <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">RATE_LIMIT_MAX</code>
+          from its default of 300 to 100,000 for the run. The job is named <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">api-schema / schemathesis</code>
+          and runs on every pull request; the first real run it caught a malformed multipart upload answering 500 instead
+          of 400, fixed in the attachment route's error handling.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

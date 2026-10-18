@@ -85,6 +85,43 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          No load profile here, this is a content check. The shared
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">@platform/pii-detector</code> package scans
+          whatever text a test hands it (captured log lines, a <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/metrics</code>
+          scrape, a browser telemetry payload) for four kinds of personal data, and every test asserts the match
+          list comes back empty.
+        </p>
+        <div class="scrollx mt-3">
+        <table class="ttable card">
+          <thead><tr><th>Kind</th><th>What it matches</th></tr></thead>
+          <tbody>
+            <tr><td>email</td><td>standard email syntax</td></tr>
+            <tr><td>ip</td><td>IPv4 and IPv6 addresses</td></tr>
+            <tr><td>token</td><td>JWT, a <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">Bearer</code> header, a session/<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">sid</code> cookie value, a provider <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">sk-</code> key</td></tr>
+            <tr><td>canary</td><td>a unique string the test itself planted (an email, an IP, a tag like <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">PII-CANARY-7f3a</code>)</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          Each text is scanned twice, as-is and percent-decoded, so an email hiding behind URL encoding in a query
+          string still gets caught. The auth-service log suite drives every route (health, metrics, register,
+          login, refresh reuse, logout, a malformed-JSON body, an unexpected 500) with four planted canaries,
+          captures the logger output in memory, and asserts zero PII matches with the <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">token</code>
+          kind ignored there on purpose (sessions and cookies get their own dedicated spec). A second suite scrapes
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/metrics</code> after sending traffic through matched and unmatched routes and
+          checks the same way, plus that an unmatched route is labelled <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">route="unmatched"</code>
+          rather than ever showing the raw URL. The masking rule itself, in <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">pii-scrub.ts</code>,
+          drops emails, IPs and JWTs to <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">[REDACTED]</code> rather than hashing them, strips
+          the query string from any logged URL entirely, and keeps only an error's type plus its scrubbed message
+          and stack.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

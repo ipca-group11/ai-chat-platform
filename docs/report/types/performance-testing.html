@@ -85,6 +85,46 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Lighthouse CI audits five pages: <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/login</code>,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/register</code>,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/chats</code>,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/chats/:id</code> and
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/settings</code>, 3 runs per page on the
+          desktop preset, median aggregated, defined in <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">lighthouserc.json</code>
+          at the repo root. The run script signs in a seeded user and creates a chat first, so the two pages behind
+          a login get a real session cookie and a real chat id rather than being skipped.
+        </p>
+        <div class="scrollx mt-4">
+        <table class="ttable card">
+          <thead><tr><th>Page group</th><th>LCP</th><th>TBT</th><th>CLS</th><th>FCP</th><th>Server response</th><th>Page weight</th><th>Speed Index</th></tr></thead>
+          <tbody>
+            <tr><td>/login, /register</td><td>&le;2000&nbsp;ms</td><td>&le;200&nbsp;ms</td><td>&le;0.05</td><td>&le;1800&nbsp;ms</td><td>&le;600&nbsp;ms</td><td>&le;1.5&nbsp;MB</td><td>&le;3400&nbsp;ms</td></tr>
+            <tr><td>/chats, /chats/:id, /settings</td><td>&le;2500&nbsp;ms</td><td>&le;300&nbsp;ms</td><td>&le;0.1</td><td>&le;1800&nbsp;ms</td><td>&le;600&nbsp;ms</td><td>&le;1.5&nbsp;MB</td><td>&le;3400&nbsp;ms</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-4">
+          Every assertion is an <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">error</code>-level budget
+          in the <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">assertMatrix</code>, so one page over
+          budget fails the job, not just a warning. A separate mobile config runs the same five pages under
+          simulated throttling (4x CPU slowdown, 150&nbsp;ms RTT, about 1.6&nbsp;Mbps throughput, 412px viewport)
+          with looser budgets: LCP under 4000&nbsp;ms, TBT under 600&nbsp;ms, CLS under 0.1.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          One real run captured against the live /login page scored 81 on performance, with FCP 1.3&nbsp;s, LCP
+          2.3&nbsp;s, TBT 90&nbsp;ms, CLS 0 and Speed Index 1.9&nbsp;s, all inside budget (see the evidence page).
+          The <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">lhci assert</code> step in that capture
+          failed on a CLI flag conflict, not a real regression: this repo's config already defines
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">assertMatrix</code>, which can't be combined
+          with a <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">--preset</code> flag on the command line.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

@@ -84,6 +84,41 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">sse-reconnect.test.ts</code> in
+          mfe-chat drives a fake <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">EventSource</code>
+          under vitest's fake timers, so the drop and the recovery happen on virtual time, not a real clock.
+          The drop itself is a single call, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">source.emitTransportError()</code>,
+          fired while new messages keep landing server-side that the client never saw live.
+        </p>
+        <div class="scrollx mt-4">
+        <table class="ttable card">
+          <thead><tr><th>Parameter</th><th>Value</th><th>Where it comes from</th></tr></thead>
+          <tbody>
+            <tr><td>Resync budget</td><td>5,000&nbsp;ms</td><td><code class="mono text-xs">RESYNC_BUDGET_MS</code>, the test's pass bar</td></tr>
+            <tr><td>Browser's own EventSource retry</td><td>3,000&nbsp;ms</td><td><code class="mono text-xs">BROWSER_RETRY_MS</code>, the spec default</td></tr>
+            <tr><td>App-level reconnect after the browser gives up</td><td>3,000&nbsp;ms</td><td><code class="mono text-xs">RECONNECT_DELAY_MS</code> in <code class="mono text-xs">stream-registry.ts</code></td></tr>
+            <tr><td>Simulated history-endpoint latency</td><td>250&nbsp;ms</td><td><code class="mono text-xs">SERVER_LATENCY_MS</code>, the resync request's fake delay</td></tr>
+            <tr><td>Backend keepalive heartbeat</td><td>15,000&nbsp;ms</td><td><code class="mono text-xs">HEARTBEAT_INTERVAL_MS</code> in <code class="mono text-xs">conversation-service/.../streaming/routes.ts</code></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          There is no server-side replay buffer at all: the comment in <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">stream-registry.ts</code>
+          spells it out, events published while the connection is down are just lost. So the reconnect logic
+          does not ask the backend to catch it up, it refetches the chat's full message list once the stream
+          reopens and merges that onto what is already shown, matching by message id so a replayed event
+          never creates a duplicate. Three cases are checked: every message persisted during the outage is
+          present within the 5s budget with no duplicates and none missing, a message the server replays after
+          the drop does not get added twice, and the stream itself stays subscribed through the drop (not
+          closed) so the browser's own retry, not a fresh connection, is what brings it back.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">

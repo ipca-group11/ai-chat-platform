@@ -82,6 +82,43 @@
         </div>
       </div>
 
+      <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          No test suite here, two CI steps generate an inventory and a report. The <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">deploy</code>
+          workflow runs <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">anchore/sbom-action</code> (Syft) once per image to produce a CycloneDX
+          JSON SBOM, for 12 images total: the 10 we build (auth-service, conversation-service, the shell, the three
+          MFEs, Prometheus, Grafana, Loki, Alloy) plus 2 third-party base images pulled as-is
+          (<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">postgres:16-alpine</code>,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">caddy:2-alpine</code>). Each pushed image also
+          carries a BuildKit SPDX SBOM and SLSA provenance as attestations (<code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">sbom: true</code>,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">provenance: mode=max</code>). On every pull
+          request, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">ci.yml</code> generates a 13th SBOM,
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">sbom-source.cdx.json</code>, straight from the pnpm
+          lockfile.
+        </p>
+        <div class="scrollx mt-3">
+        <table class="ttable card">
+          <thead><tr><th>Job</th><th>Input</th><th>Tool</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td>build (×10)</td><td>freshly built image</td><td>anchore/sbom-action (Syft)</td><td><span class="mono text-xs">sbom-&lt;name&gt;.cdx.json</span>, 90-day artifact</td></tr>
+            <tr><td>sbom-third-party (×2)</td><td><span class="mono text-xs">postgres:16-alpine</span>, <span class="mono text-xs">caddy:2-alpine</span></td><td>anchore/sbom-action (Syft)</td><td>same naming, 90-day artifact</td></tr>
+            <tr><td>source-sbom (ci.yml)</td><td>pnpm lockfile</td><td>anchore/sbom-action (Syft)</td><td><span class="mono text-xs">sbom-source.cdx.json</span></td></tr>
+            <tr><td>scan-sbom</td><td>all 12 deploy-run SBOMs</td><td>Grype</td><td>vulnerability table in the job summary</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          The <span class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">scan-sbom</span> job downloads all 12 artifacts
+          and runs Grype against each, but the step ends in <span class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">|| true</span>
+          so it never fails the run today: the severity gate (Grype supports <span class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">--fail-on high</span>)
+          belongs to AICHAT-7. A local run (Syft, CycloneDX 1.7) is the only captured pass/fail data point so far: component
+          counts ranged from 406 (caddy) to 4013 (alloy) per image, and 2323 for the source SBOM, with Grype reporting
+          between 5 and 82 findings per image depending on the base, 0 to 2 of them critical.
+        </p>
+      </div>
 
       <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>

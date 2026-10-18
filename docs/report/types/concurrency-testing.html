@@ -85,6 +85,39 @@
 
 
       <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          The races live in <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">services/conversation-service/src/integration</code>,
+          running against the real app, queue and processor with only the LLM scripted. Each scenario is checked
+          twice: once against the in-memory repository as it answers instantly, and once with a seeded random
+          delay of 0 to 3&nbsp;ms wrapped around every repository call, standing in for a database round trip and
+          giving two requests room to overlap between a read and a write. The seed makes a failing run repeatable.
+        </p>
+        <div class="scrollx mt-3">
+        <table class="ttable card">
+          <thead><tr><th>Scenario</th><th>What it fires</th><th>Runs</th><th>What must hold</th></tr></thead>
+          <tbody>
+            <tr><td>Parallel sends, one chat</td><td>5 messages at once into the same chat</td><td>50 seeded runs x 2 latency modes</td><td>Exactly 10 messages stored, each reply built from what was shown before it, 1 response says "sent" and 4 say "queued"</td></tr>
+            <tr><td>Parallel sends, two chats</td><td>2 messages each into 2 chats at once</td><td>50 seeded runs x 2 latency modes</td><td>Each chat's own order holds, nothing from one chat leaks into the other</td></tr>
+            <tr><td>Retry vs. streaming reply</td><td>a retry while another reply streams</td><td>1 run</td><td>Retry is queued, not dropped, and runs only after the current reply finishes</td></tr>
+            <tr><td>Two retries at once</td><td>the same failed message retried twice simultaneously</td><td>50 seeded runs x 2 latency modes</td><td>One 202, one 409 MESSAGE_NOT_RETRYABLE, only one call reaches the LLM</td></tr>
+            <tr><td>Edit vs. reply starting</td><td>an edit landing 0-5&nbsp;ms around a reply's start, offset = seed % 6</td><td>50 seeded runs x 2 latency modes</td><td>Either a 200 that the model actually saw, or a 409 MESSAGE_NOT_EDITABLE, both outcomes must show up across the 50 runs</td></tr>
+            <tr><td>Cancel vs. reply starting</td><td>a cancel landing 0-5&nbsp;ms around a reply's start, offset = seed % 6</td><td>50 seeded runs x 2 latency modes</td><td>Either a 204 and no LLM call, or a 409 MESSAGE_NOT_CANCELABLE, both outcomes must show up across the 50 runs</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          A run only passes if nothing in the result looks wrong: no duplicate or missing question, no message
+          left in a status other than "sent", no reply built from a history that still included something
+          unanswered. For the two true race scenarios (edit-vs-start, cancel-vs-start) the suite also asserts
+          that across the 50 runs both outcomes were actually observed, a pass where every run landed the same
+          way would mean the timing window was never hit, not that the race is safe.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
       </div>
       <div class="space-y-3">
