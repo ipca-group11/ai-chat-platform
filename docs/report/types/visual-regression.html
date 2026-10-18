@@ -27,6 +27,7 @@
       <a href="../requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
       <div class="navgroup-title">Part 2: Automation</div>
       <a href="../automation.html" class="navlink">Automated Tests</a>
+      <a href="../traceability.html" class="navlink">Traceability Matrix</a>
       <div class="navgroup-title">Strategy</div>
       <a href="../strategy.html" class="navlink">Testing Strategy</a>
       <a href="../blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
@@ -79,7 +80,7 @@
         </div>
         <div class="card p-5">
           <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Cadence</div>
-          <p class="text-sm text-slate-600">Every pull request; a diff fails CI and attaches the before/after image.</p>
+          <p class="text-sm text-slate-600">Designed to run on every pull request once wired in; not yet part of CI, see the strategy section below.</p>
         </div>
       </div>
 
@@ -88,20 +89,47 @@
         <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Testing strategy</h2>
       </div>
       <div class="card p-6">
-        <p class="text-sm text-slate-600 leading-relaxed">The visual project screenshots nine key screens (login, login with a validation error, register, chat list empty, chat list with chats, chat detail with messages, the new chat dialog, settings, and the remote failure fallback) in light and dark theme, 18 images in total. Each screen renders at a fixed 1280x800 viewport with deviceScaleFactor 1, animations disabled and the caret hidden, inside the Playwright Docker image (<span class="mono">mcr.microsoft.com/playwright:v1.63.0-noble</span>) so fonts and anti-aliasing match CI exactly. The clock is frozen at 2026-03-10 10:00 UTC and every API call is answered with fixed JSON, so nothing in the image depends on real time or a real backend.</p>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="badge badge-slate">Designed, not yet merged</span>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          The strategy below is fully designed and documented in <span class="mono">docs/AICHAT-19/RUNNING.md</span>,
+          but it has not landed on <span class="mono">main</span>. The current
+          <span class="mono">e2e/playwright.config.ts</span> defines one project, <span class="mono">chromium</span>,
+          and no <span class="mono">visual</span> project or baseline images exist in the repo yet. This page
+          states the plan as a plan, not as something already running, to match what
+          <a href="evidence/visual-regression.html" class="text-blue-600 hover:underline">the evidence page</a>
+          and <a href="../automation.html" class="text-blue-600 hover:underline">the automation status table</a>
+          already say honestly.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          The plan: a dedicated <span class="mono">visual</span> Playwright project screenshots nine key screens
+          (login, a login validation error, register, chat list empty, chat list with chats, chat detail with
+          messages, the new chat dialog, settings, and the remote-failure fallback) in light and dark theme, 18
+          images in total. Renders would come only from the pinned Playwright Docker image
+          (<span class="mono">mcr.microsoft.com/playwright:v1.63.0-noble</span>), since fonts and anti-aliasing
+          differ enough between macOS, Windows and Linux that a locally generated baseline would not match CI.
+          No backend would be needed: the production builds of the shell and remotes are served directly, every
+          API call answered with fixed JSON, the clock frozen at a fixed timestamp.
+        </p>
         <div class="scrollx mt-3">
           <table class="ttable card">
-            <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+            <thead><tr><th>Parameter</th><th>Planned value</th></tr></thead>
             <tbody>
-              <tr><td>Viewport</td><td class="mono">1280 x 800 (1,024,000 px)</td></tr>
+              <tr><td>Viewport</td><td class="mono">1280 x 800</td></tr>
               <tr><td>maxDiffPixels</td><td class="mono">50</td></tr>
               <tr><td>Per-pixel threshold</td><td class="mono">0.2</td></tr>
               <tr><td>Screens x themes</td><td class="mono">9 x 2 = 18 baselines</td></tr>
-              <tr><td>Determinism check</td><td class="mono">10 runs, byte-identical images</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="text-sm text-slate-600 leading-relaxed mt-3">A pull request fails the check once more than 50 of the 1,024,000 pixels differ, with each flagged pixel needing a colour difference past the 0.2 threshold; that is tight enough that a changed heading, which moves about 650 pixels, always fails, while sub-pixel anti-aliasing noise between runs does not. <span class="mono">scripts/visual/determinism.ts</span> proves the second half of that: it reruns the suite ten times, rewriting every baseline each time, and checks the images come out byte-for-byte identical, so a flaky render can't hide behind the tolerance. The baselines and their generation are documented in <span class="mono">docs/AICHAT-19/RUNNING.md</span>, including how to update them deliberately with <span class="mono">--update-snapshots</span> and review the PNG diff before committing.</p>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          What's missing to turn this on: add the <span class="mono">visual</span> project to
+          <span class="mono">playwright.config.ts</span>, generate and commit the 18 baseline images from the
+          pinned Docker image, and wire a CI job to run it on pull requests. Tracked as the remaining work on
+          <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-19" target="_blank" class="text-blue-600 hover:underline">AICHAT-19</a>
+          and on the <a href="../future-work.html" class="text-blue-600 hover:underline">Future Work</a> page.
+        </p>
       </div>
 
       <div class="flex items-center gap-2 mt-10 mb-3">

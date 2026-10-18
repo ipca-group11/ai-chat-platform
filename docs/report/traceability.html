@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traceability Matrix: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="nfr.html" class="navlink">Non-Functional Requirements</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <a href="traceability.html" class="navlink active">Traceability Matrix</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink">Future Work &amp; Roadmap</a>
+    </nav>
+    <div class="px-3 py-3 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10">
+
+      <span class="badge badge-blue">Part 2</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Traceability Matrix</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        The 5 functionalities from <a href="requirements.html" class="text-blue-600 hover:underline">Part 1</a>,
+        traced end to end: the Jira story that defines each one, the manual test cases written against it, the
+        Playwright spec that automates it, and where its real evidence actually lives. This is the single page
+        that answers "does a check exist for this, and did it pass."
+      </p>
+
+      <div class="scrollx mt-8">
+      <table class="ttable card">
+        <thead><tr><th>Functionality</th><th>Story</th><th>Test cases</th><th>Automated spec</th><th>Last real result</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="requirements.html#f1" class="text-blue-600 hover:underline">1. Sign up</a></td>
+            <td><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-223" target="_blank" class="text-blue-600 hover:underline">AICHAT-223</a></td>
+            <td>TC1–TC7</td>
+            <td class="mono">registration.spec.ts</td>
+            <td><a href="types/evidence/e2e-frontend.html" class="text-sm"><span class="badge badge-red">0/38 failed</span></a></td>
+          </tr>
+          <tr>
+            <td><a href="requirements.html#f2" class="text-blue-600 hover:underline">2. Log in</a></td>
+            <td><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-224" target="_blank" class="text-blue-600 hover:underline">AICHAT-224</a></td>
+            <td>TC1–TC6</td>
+            <td class="mono">login.spec.ts</td>
+            <td><a href="types/evidence/e2e-frontend.html" class="text-sm"><span class="badge badge-red">0/38 failed</span></a></td>
+          </tr>
+          <tr>
+            <td><a href="requirements.html#f3" class="text-blue-600 hover:underline">3. Add a provider API key</a></td>
+            <td><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-225" target="_blank" class="text-blue-600 hover:underline">AICHAT-225</a></td>
+            <td>TC1–TC6</td>
+            <td class="mono">api-keys.spec.ts</td>
+            <td><a href="types/evidence/e2e-frontend.html" class="text-sm"><span class="badge badge-red">0/38 failed</span></a></td>
+          </tr>
+          <tr>
+            <td><a href="requirements.html#f4" class="text-blue-600 hover:underline">4. Create chats &amp; send messages</a></td>
+            <td><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-226" target="_blank" class="text-blue-600 hover:underline">AICHAT-226</a></td>
+            <td>TC1–TC7</td>
+            <td class="mono">chat-management.spec.ts</td>
+            <td><a href="project.html" class="text-sm"><span class="badge badge-slate">Not run this pass</span></a></td>
+          </tr>
+          <tr>
+            <td><a href="requirements.html#f5" class="text-blue-600 hover:underline">5. Attach a file</a></td>
+            <td><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-227" target="_blank" class="text-blue-600 hover:underline">AICHAT-227</a></td>
+            <td>TC1–TC6</td>
+            <td class="mono">attach-file.spec.ts</td>
+            <td><a href="project.html" class="text-sm"><span class="badge badge-slate">Not run this pass</span></a></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Reading the last column honestly</h2>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Every spec exists, is checked into <span class="mono">e2e/src/tests/</span>, and runs on every pull
+          request per <a href="automation.html" class="text-blue-600 hover:underline">the automation status
+          table</a>. The red badges above are not a gap in automation, they are a real, captured failure: a
+          bounded run of <span class="mono">registration.spec.ts</span>, <span class="mono">login.spec.ts</span>
+          and <span class="mono">api-keys.spec.ts</span> against the live stack scored 0 of 38 passing, each
+          for a different concrete reason (a missing test-id on <span class="mono">/register</span>, a cleanup
+          bug that leaves emails registered, a login that never completes within 60s). See the full breakdown
+          and raw output on the
+          <a href="types/evidence/e2e-frontend.html" class="text-blue-600 hover:underline">e2e-frontend
+          evidence page</a>.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          <span class="mono">chat-management.spec.ts</span> and <span class="mono">attach-file.spec.ts</span>
+          were not part of that bounded run, so this report has no fresh automated pass/fail for them. What it
+          does have is real, manually captured screenshots of both flows working on the live app, on
+          <a href="project.html" class="text-blue-600 hover:underline">The Project</a> page. That is a weaker
+          form of evidence than a green CI run, and this page says so rather than implying otherwise.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Beyond the 5 functionalities</h2>
+      <p class="text-sm text-slate-500 mb-4 max-w-3xl leading-relaxed">
+        Part 1 is five functionalities. The project as a whole is 30 testing epics. That broader map, test
+        type to Jira epic to evidence, already exists as two pages rather than duplicated here:
+      </p>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <a href="functional-tests.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Test types</div>
+          <div class="font-semibold text-slate-900">Functional Tests</div>
+          <p class="text-sm text-slate-500 mt-1">14 test types checking what the app does, each linking to its own Jira epic and evidence.</p>
+        </a>
+        <a href="nonfunctional-tests.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Test types</div>
+          <div class="font-semibold text-slate-900">Non-Functional Tests</div>
+          <p class="text-sm text-slate-500 mt-1">16 test types checking how well the app does it, same structure.</p>
+        </a>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="automation.html" class="btn btn-ghost">← Automated Tests</a>
+        <a href="strategy.html" class="btn btn-primary">Next: Testing Strategy →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

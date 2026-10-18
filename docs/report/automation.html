@@ -28,6 +28,7 @@
       <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
       <div class="navgroup-title">Part 2: Automation</div>
       <a href="automation.html" class="navlink active">Automated Tests</a>
+      <a href="traceability.html" class="navlink">Traceability Matrix</a>
       <div class="navgroup-title">Strategy</div>
       <a href="strategy.html" class="navlink">Testing Strategy</a>
       <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
@@ -58,11 +59,12 @@
       <div class="card p-6 mt-6">
         <p class="text-sm text-slate-700 leading-relaxed">
           <b class="text-slate-900">Is this all the automated tests?</b> No, it's just the 5 Part 1 asks for.
-          The project as a whole automates 28 of its 30 test types: unit, integration, contract, API schema,
-          every security scan, performance, accessibility, load, and more, each already running in CI. The
-          only two that aren't fully automated are penetration testing (a scripted check plus a manual,
-          time-boxed review, by nature) and visual regression (documented in Jira, not yet wired into the
-          Playwright config). See the full picture on
+          The project as a whole automates 27 of its 30 test types: unit, integration, contract, API schema,
+          every security scan, performance, accessibility, and more, each already running in CI. Three
+          aren't fully automated, each for a different, deliberate reason: penetration testing (a scripted
+          check plus a manual, time-boxed review, by nature), load testing (k6 run by hand against a
+          deployed environment, not wired into CI, see its own strategy page for why), and visual regression
+          (documented in Jira, not yet wired into the Playwright config). See the full picture on
           <a href="functional-tests.html" class="text-blue-600 hover:underline">Functional Tests</a> and
           <a href="nonfunctional-tests.html" class="text-blue-600 hover:underline">Non-Functional Tests</a>,
           each type links to its own "How to run" page and a page of real captured evidence.
@@ -160,7 +162,8 @@ for (const { email, password, message } of emptyFields) {
           <tr><td>SAST, SCA, Secret scanning, Container scanning, SBOM, PII masking, GDPR retention</td><td><span class="badge badge-green">Automated</span></td><td>Every pull request</td></tr>
           <tr><td>DAST, Prompt injection</td><td><span class="badge badge-green">Automated</span></td><td>Scheduled, weekly</td></tr>
           <tr><td>Accessibility, Bundle size, Coverage thresholds, Mock server</td><td><span class="badge badge-green">Automated</span></td><td>Every pull request</td></tr>
-          <tr><td>Performance (frontend), Load testing</td><td><span class="badge badge-green">Automated</span></td><td>Scheduled / on demand</td></tr>
+          <tr><td>Performance (frontend)</td><td><span class="badge badge-green">Automated</span></td><td>Every pull request, a required check</td></tr>
+          <tr><td>Load testing</td><td><span class="badge badge-slate">Manual</span></td><td>By hand, against a deployed environment, see <a href="types/load-testing.html" class="text-blue-600 hover:underline">its strategy</a></td></tr>
           <tr><td>Penetration testing</td><td><span class="badge badge-amber">Scripted + manual</span></td><td>Per milestone, time-boxed</td></tr>
           <tr><td>Visual regression</td><td><span class="badge badge-slate">Not wired up yet</span></td><td>Planned, see its Jira epic</td></tr>
         </tbody>
@@ -169,7 +172,7 @@ for (const { email, password, message } of emptyFields) {
 
       <div class="mt-10 flex justify-between">
         <a href="requirements.html" class="btn btn-ghost">← Part 1: Requirements</a>
-        <a href="strategy.html" class="btn btn-primary">Next: Testing strategy →</a>
+        <a href="traceability.html" class="btn btn-primary">Next: Traceability Matrix →</a>
       </div>
     </div>
   </main>
