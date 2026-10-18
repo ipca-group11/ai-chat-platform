@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evidence: Stream cancellation testing</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
+      <a href="../../index.html" class="navlink">Overview</a>
+      <a href="../../project.html" class="navlink">The Project</a>
+      <a href="../../stack.html" class="navlink">Tech Stack</a>
+      <a href="../../architecture.html" class="navlink">Architecture</a>
+      <a href="../../nfr.html" class="navlink">Non-Functional Requirements</a>
+      <a href="../../deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="../../requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="../../automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="../../strategy.html" class="navlink">Testing Strategy</a>
+      <a href="../../blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="../../functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="../../nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="../../claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="../../sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="../../future-work.html" class="navlink">Future Work &amp; Roadmap</a>
+    </nav>
+    <div class="px-3 py-3 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-3xl">
+
+      <div class="text-xs text-slate-400 flex items-center gap-1.5">
+        <a href="../stream-cancellation.html" class="hover:text-blue-600">Stream cancellation testing</a><span>/</span><span class="text-slate-600">Evidence</span>
+      </div>
+      <div class="flex items-start justify-between gap-4 mt-3 flex-wrap">
+        <h1 class="text-2xl font-extrabold text-slate-900">Evidence: Stream cancellation testing</h1>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-15" target="_blank" class="btn btn-primary shrink-0">View on Jira: AICHAT-15 ↗</a>
+      </div>
+
+<div class="flex items-center gap-2 mt-8 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Evidence, a real run</h2>
+        <span class="badge badge-amber">conversation-service, test-utils and mock-server passed; auth-service and mfe-chat had real failures</span>
+      </div>
+      <div class="card p-0 overflow-hidden">
+        <div class="bg-slate-900 px-4 py-2 text-xs text-slate-400">Captured output</div>
+        <pre class="bg-slate-950 text-slate-100 text-[12px] p-4 overflow-x-auto leading-relaxed whitespace-pre-wrap">conversation-service: 19/19 suites, 54 tests, 52 passed, 2 todo, 0 failed
+
+auth-service: 94/98 suites, 226/229 tests, 3 real failures
+  rate-limit.spec.ts: answers 429 within 10 failed attempts -&gt; got all 401s, never 429
+  rate-limit.spec.ts: a rate limiter is configured on the app -&gt; source doesn't match /express-rate-limit/
+  health.spec.ts: serves 503 on /health when Prisma can't reach Postgres -&gt; got 200 instead of 503
+
+mfe-chat: 134/138 suites, 414/416 tests, 2 real failures
+  sse-reconnect.test.ts: lost messages after reconnect, got [m1,m2,m5] vs expected [m1,m2,m3,m4,m5]
+  streaming-perf.test.tsx: expected rendered text to contain 'c0t0', did not find it
+
+test-utils: passed
+mock-server (abort + request-log contract specs): 6/6 suites, 14/14 tests passed</pre>
+      </div>
+      <p class="text-sm text-slate-500 mt-3">Real, reproducible failures, not fabricated. The same rate-limit and health-check failures also showed up independently in api-schema-validation's evidence, which is a strong signal they are a genuine regression in this build rather than noise from one run.</p>
+
+      <div class="flex items-center gap-2 mt-8 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Evidence, the screens this covers</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="card p-3"><img src="../../assets/screenshots/chat-message-sent.png" alt="The chat view this type stops a reply in" class="rounded-lg border border-slate-200 w-full"><p class="text-xs text-slate-500 mt-2 px-1">The chat view this type stops a reply in</p></div>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="../run/stream-cancellation.html" class="btn btn-ghost">← How to run</a>
+        <a href="../stream-cancellation.html" class="btn btn-ghost">Back to Stream cancellation testing</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

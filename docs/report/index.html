@@ -12,8 +12,8 @@
 <div class="flex min-h-screen">
 
   <!-- Sidebar -->
-  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
-    <div class="px-5 py-5 border-b border-slate-100">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
         <div>
@@ -22,11 +22,12 @@
         </div>
       </div>
     </div>
-    <nav class="flex-1 overflow-y-auto px-3 py-3">
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
       <a href="index.html" class="navlink active">Overview</a>
       <a href="project.html" class="navlink">The Project</a>
       <a href="stack.html" class="navlink">Tech Stack</a>
       <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="nfr.html" class="navlink">Non-Functional Requirements</a>
       <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
 
       <div class="navgroup-title">Part 1: Requirements</div>
@@ -41,8 +42,12 @@
       <div class="navgroup-title">Test Types</div>
       <a href="functional-tests.html" class="navlink">Functional Tests</a>
       <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink">Future Work &amp; Roadmap</a>
     </nav>
-    <div class="px-4 py-4 border-t border-slate-100">
+    <div class="px-3 py-3 border-t border-slate-100">
       <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
     </div>
   </aside>
@@ -119,6 +124,11 @@
           <div class="font-semibold text-slate-900">Architecture</div>
           <p class="text-sm text-slate-500 mt-1">C4 context and container diagrams, and how to run it locally.</p>
         </a>
+        <a href="nfr.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Reference</div>
+          <div class="font-semibold text-slate-900">Non-Functional Requirements</div>
+          <p class="text-sm text-slate-500 mt-1">ISO/IEC 25010's 8 quality characteristics, ranked by priority for this project.</p>
+        </a>
         <a href="deploy-release.html" class="card p-5 block hover:border-blue-300 transition">
           <div class="badge badge-slate mb-2">Reference</div>
           <div class="font-semibold text-slate-900">Deploy &amp; Release</div>
@@ -153,6 +163,21 @@
           <div class="badge badge-slate mb-2">Strategy</div>
           <div class="font-semibold text-slate-900">Black-box vs White-box</div>
           <p class="text-sm text-slate-500 mt-1">Which tests treat the app as a sealed box, and which ones look inside the code.</p>
+        </a>
+        <a href="claude-process.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Appendix</div>
+          <div class="font-semibold text-slate-900">Claude, Workflows &amp; Skills</div>
+          <p class="text-sm text-slate-500 mt-1">How Claude Code was used to produce this work, and how to run the same process again.</p>
+        </a>
+        <a href="sdd-process.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Appendix</div>
+          <div class="font-semibold text-slate-900">Jira &amp; Spec-Driven Development</div>
+          <p class="text-sm text-slate-500 mt-1">Why every epic is written as a full spec first, and the SDLC that results when AI implements and tests against it.</p>
+        </a>
+        <a href="future-work.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Appendix</div>
+          <div class="font-semibold text-slate-900">Future Work &amp; Roadmap</div>
+          <p class="text-sm text-slate-500 mt-1">What's still in progress, like prompt testing, and what comes after it.</p>
         </a>
       </div>
     </section>

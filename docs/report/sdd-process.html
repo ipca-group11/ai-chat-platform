@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jira &amp; Spec-Driven Development: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="nfr.html" class="navlink">Non-Functional Requirements</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink active">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink">Future Work &amp; Roadmap</a>
+    </nav>
+    <div class="px-3 py-3 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-5xl">
+
+      <span class="badge badge-slate">Appendix</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Jira &amp; Spec-Driven Development</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        Why every epic on the AICHAT board is written as a full specification before any code or test
+        exists, and how that choice is what makes working with an AI assistant safe instead of risky.
+      </p>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">What spec-driven development means here</h2>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          A normal backlog ticket says what to build in a sentence or two and leaves the rest to whoever
+          picks it up. Spec-driven development flips that order: the detailed, testable description comes
+          first, and it is the thing both a developer and an AI assistant are held to, not a summary of
+          work already decided informally elsewhere.
+        </p>
+        <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+          On this board that means every one of the 30 testing epics follows the same fixed shape:
+          Description, Inputs, Acceptance Criteria, Tooling, Definition of Ready, Definition of Done.
+          Nothing about what "done" means is left to interpretation once an epic is picked up.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Why it matters more with AI in the loop</h2>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          An AI assistant has no memory of a hallway conversation or an earlier Slack thread. It only
+          has what is written down. A vague ticket gets a plausible-looking but guessed result. A full
+          spec, acceptance criteria included, gives it an unambiguous contract to implement or test
+          against, and gives a human reviewer the same contract to check the result by.
+        </p>
+        <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+          This is also what let automated evidence be collected honestly for this report. Each test
+          type page traces back to the acceptance criteria of its own epic, so a result is either a
+          real pass, a real fail, or an honest note that it could not be run, never a guess dressed up
+          as a result.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Roles and stakeholders</h2>
+      <p class="text-sm text-slate-500 mb-4 max-w-3xl leading-relaxed">
+        A spec is only as good as who reviews it, and who is allowed to say it's actually done.
+        Architecture and QA are deliberately placed at both ends of the lifecycle: before any build
+        starts, and again before any epic closes. Everyone else sits in between them.
+      </p>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Product Manager</div>
+          <p class="text-sm text-slate-500 mt-1">Owns the why. Decides which problem is worth solving and for whom, before it ever becomes a spec.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Product Owner</div>
+          <p class="text-sm text-slate-500 mt-1">Owns the spec itself. Writes or approves the Description, Inputs and Acceptance Criteria, and is the one who confirms, at the end, that the result still matches the original intent.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Architects</div>
+          <p class="text-sm text-slate-500 mt-1">Stakeholders of the <a href="nfr.html" class="text-blue-600 hover:underline">non-functional requirements</a>. Review a spec up front for whether it's buildable and whether it protects the system's security, reliability and performance budgets, then validate at the end that those NFRs actually hold.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Frontend Architect</div>
+          <p class="text-sm text-slate-500 mt-1">The stakeholder for the UI/UX side of NFRs specifically, usability, accessibility, UI consistency. Reviews any spec touching the micro-frontends up front, and signs off on it at the end alongside QA.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">QA</div>
+          <p class="text-sm text-slate-500 mt-1">Validates both functional and non-functional requirements against their acceptance criteria. Reviews a spec up front for whether it's actually testable, then is the final gate: an epic does not close until QA confirms the evidence matches.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Development (with AI assistance)</div>
+          <p class="text-sm text-slate-500 mt-1">Builds against the spec once it's ready, with Claude Code carrying out much of the implementation and test-running work described on the <a href="claude-process.html" class="text-blue-600 hover:underline">previous page</a>.</p>
+        </div>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Who's involved, and when</h2>
+      <div class="scrollx">
+      <table class="ttable card">
+        <thead><tr><th>Role</th><th>Spec (start)</th><th>Build</th><th>Test &amp; evidence</th><th>Done (end)</th></tr></thead>
+        <tbody>
+          <tr><td>Product Manager</td><td>Sets the why</td><td class="text-slate-400">&mdash;</td><td class="text-slate-400">&mdash;</td><td class="text-slate-400">&mdash;</td></tr>
+          <tr><td>Product Owner</td><td>Writes/approves AC</td><td class="text-slate-400">Available for questions</td><td class="text-slate-400">&mdash;</td><td>Confirms intent met</td></tr>
+          <tr><td>Architects</td><td>Reviews feasibility, NFRs</td><td class="text-slate-400">&mdash;</td><td class="text-slate-400">&mdash;</td><td>Validates NFRs hold</td></tr>
+          <tr><td>Frontend Architect</td><td>Reviews UI/UX NFRs</td><td class="text-slate-400">&mdash;</td><td class="text-slate-400">&mdash;</td><td>Validates UI/UX NFRs</td></tr>
+          <tr><td>QA</td><td>Reviews testability</td><td class="text-slate-400">&mdash;</td><td>Runs/validates FR &amp; NFR checks</td><td>Signs Definition of Done</td></tr>
+          <tr><td>Development + AI</td><td class="text-slate-400">Consulted</td><td>Implements against the spec</td><td>Produces the real evidence</td><td class="text-slate-400">&mdash;</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+        Architects and QA are the only two rows active at both ends of the table. That's intentional:
+        the same people who judge whether a spec is buildable and testable are the ones who get the
+        final say on whether it was actually met, so the bar doesn't move partway through.
+      </p>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">The SDLC, with AI in the loop</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 980 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spec-driven development lifecycle with AI in the loop" class="min-w-[800px]">
+          <defs>
+            <marker id="arrSd" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748b"/></marker>
+            <marker id="arrSdR" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#b91c1c"/></marker>
+          </defs>
+          <style>
+            .sd-box{fill:#fff;stroke:#2563eb;stroke-width:1.6;rx:8}
+            .sd-boxw{fill:#2563eb;rx:8}
+            .sd-gate{fill:#f8fafc;stroke:#94a3b8;stroke-width:1.4;stroke-dasharray:4,3;rx:8}
+            .sd-t{font:600 11.5px -apple-system,sans-serif;fill:#1e293b;text-anchor:middle}
+            .sd-tw{font:600 11.5px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+            .sd-d{font:9.5px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+            .sd-dw{font:9.5px -apple-system,sans-serif;fill:#dbeafe;text-anchor:middle}
+            .sd-l{font:9.5px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+          </style>
+
+          <rect x="30" y="30" width="190" height="70" class="sd-boxw"/>
+          <text x="125" y="58" class="sd-tw">1. Spec in Jira</text>
+          <text x="125" y="75" class="sd-dw">Description, Inputs, AC,</text>
+          <text x="125" y="88" class="sd-dw">Tooling, DoR, DoD</text>
+
+          <rect x="30" y="150" width="190" height="55" class="sd-gate"/>
+          <text x="125" y="170" class="sd-t" font-size="10.5">Gate: Definition of Ready</text>
+          <text x="125" y="184" class="sd-d">Reviewed by Product Owner,</text>
+          <text x="125" y="196" class="sd-d">Architects and QA</text>
+
+          <rect x="310" y="30" width="190" height="70" class="sd-box"/>
+          <text x="405" y="58" class="sd-t">2. AI-assisted build</text>
+          <text x="405" y="75" class="sd-d">Claude Code implements or</text>
+          <text x="405" y="88" class="sd-d">automates against the spec</text>
+
+          <rect x="310" y="150" width="190" height="70" class="sd-box"/>
+          <text x="405" y="178" class="sd-t">3. Testing against the AC</text>
+          <text x="405" y="195" class="sd-d">same criteria, not reinvented</text>
+
+          <rect x="590" y="30" width="190" height="70" class="sd-box"/>
+          <text x="685" y="58" class="sd-t">4. Evidence captured</text>
+          <text x="685" y="75" class="sd-d">real command output,</text>
+          <text x="685" y="88" class="sd-d">screenshots, logs</text>
+
+          <rect x="590" y="150" width="190" height="55" class="sd-gate"/>
+          <text x="685" y="170" class="sd-t" font-size="10.5">Gate: Definition of Done</text>
+          <text x="685" y="184" class="sd-d">Validated by QA (FR + NFR),</text>
+          <text x="685" y="196" class="sd-d">Architects and Frontend Architect (NFR)</text>
+
+          <rect x="860" y="30" width="100" height="70" fill="#16a34a" rx="8"/>
+          <text x="910" y="58" class="sd-tw">5. Closed</text>
+          <text x="910" y="75" class="sd-dw" fill="#dcfce7">epic done</text>
+
+          <line x1="125" y1="100" x2="125" y2="150" stroke="#64748b" stroke-width="2" marker-end="url(#arrSd)"/>
+          <line x1="220" y1="65" x2="310" y2="65" stroke="#64748b" stroke-width="2" marker-end="url(#arrSd)"/>
+          <line x1="405" y1="100" x2="405" y2="150" stroke="#64748b" stroke-width="2" marker-end="url(#arrSd)"/>
+          <line x1="500" y1="185" x2="590" y2="65" stroke="#64748b" stroke-width="2" marker-end="url(#arrSd)"/>
+          <line x1="685" y1="100" x2="685" y2="150" stroke="#64748b" stroke-width="2" marker-end="url(#arrSd)"/>
+          <line x1="780" y1="65" x2="860" y2="65" stroke="#64748b" stroke-width="2" marker-end="url(#arrSd)"/>
+
+          <path d="M 685 205 C 685 320 125 320 125 205" fill="none" stroke="#b91c1c" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrSdR)"/>
+          <text x="405" y="340" class="sd-l" fill="#b91c1c">feedback: a failed check or missing acceptance criterion sends the epic back to the spec, not to a quick patch</text>
+
+          <rect x="30" y="360" width="920" height="46" class="sd-gate"/>
+          <text x="490" y="382" class="sd-t" font-size="10.5">Humans own steps 1 and the gates. AI carries out steps 2 to 4 and reports honestly, including failures.</text>
+          <text x="490" y="396" class="sd-d">It never marks its own epic done.</text>
+        </svg>
+        </div>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">What each spec field forces</h2>
+      <div class="scrollx">
+      <table class="ttable card">
+        <thead><tr><th>Field</th><th>What it forces before work starts</th></tr></thead>
+        <tbody>
+          <tr><td>Description</td><td>A plain statement of what is being tested and why, not a restatement of the title.</td></tr>
+          <tr><td>Inputs</td><td>The exact data, environment or tool a test needs, so nothing is assumed to already be set up.</td></tr>
+          <tr><td>Acceptance Criteria</td><td>The pass/fail condition, written so both a person and an automated check can evaluate it the same way.</td></tr>
+          <tr><td>Tooling</td><td>The specific command or framework to use, so the result is reproducible instead of ad hoc.</td></tr>
+          <tr><td>Definition of Ready</td><td>The gate before work can start: the spec itself must be complete, not just written.</td></tr>
+          <tr><td>Definition of Done</td><td>The gate before work can close: evidence exists and matches every acceptance criterion above.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+        This report is itself the output of that process applied at scale. 30 epics, each written this
+        way, each with its own test type page tracing straight back to its own acceptance criteria and
+        its own evidence.
+      </p>
+
+      <div class="mt-10 flex justify-between">
+        <a href="claude-process.html" class="btn btn-ghost">← Claude, Workflows &amp; Skills</a>
+        <a href="future-work.html" class="btn btn-primary">Next: Future Work &amp; Roadmap →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

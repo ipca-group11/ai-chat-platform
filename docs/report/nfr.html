@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Non-Functional Requirements: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="nfr.html" class="navlink active">Non-Functional Requirements</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink">Future Work &amp; Roadmap</a>
+    </nav>
+    <div class="px-3 py-3 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-5xl">
+
+      <span class="badge badge-slate">Reference</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Non-Functional Requirements</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        A functional requirement says what the app does. A non-functional requirement says how well
+        it has to do it: fast enough, secure enough, available enough. This page uses
+        <b class="text-slate-700">ISO/IEC 25010</b>, the standard software quality model, to name
+        those qualities precisely and say which ones matter most for a multi-user chat app holding a
+        person's own AI provider key.
+      </p>
+
+      <!-- Diagram 1: ISO 25010 tree -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">ISO/IEC 25010, the 8 quality characteristics</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 1000 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ISO 25010 product quality tree" class="min-w-[820px]">
+          <defs>
+            <marker id="arrQ" markerWidth="8" markerHeight="8" refX="6" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="#94a3b8"/></marker>
+          </defs>
+          <style>
+            .qroot{fill:#0f172a} .qbox{fill:#2563eb} .qt{font:600 11px -apple-system,sans-serif;fill:#fff;text-anchor:middle} .qrt{font:700 12.5px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+          </style>
+          <rect x="400" y="10" width="200" height="40" rx="8" class="qroot"/>
+          <text x="500" y="35" class="qrt">Software Product Quality</text>
+
+          <!-- 8 boxes -->
+          <g>
+            <rect x="10"  y="120" width="110" height="60" rx="8" class="qbox"/><text x="65" y="146" class="qt">Functional</text><text x="65" y="160" class="qt">Suitability</text>
+            <rect x="130" y="120" width="110" height="60" rx="8" class="qbox"/><text x="185" y="146" class="qt">Performance</text><text x="185" y="160" class="qt">Efficiency</text>
+            <rect x="250" y="120" width="110" height="60" rx="8" class="qbox"/><text x="305" y="153" class="qt">Compatibility</text>
+            <rect x="370" y="120" width="110" height="60" rx="8" class="qbox"/><text x="425" y="153" class="qt">Usability</text>
+            <rect x="490" y="120" width="110" height="60" rx="8" class="qbox"/><text x="545" y="153" class="qt">Reliability</text>
+            <rect x="610" y="120" width="110" height="60" rx="8" class="qbox"/><text x="665" y="153" class="qt">Security</text>
+            <rect x="730" y="120" width="110" height="60" rx="8" class="qbox"/><text x="785" y="153" class="qt">Maintainability</text>
+            <rect x="850" y="120" width="110" height="60" rx="8" class="qbox"/><text x="905" y="153" class="qt">Portability</text>
+          </g>
+
+          <line x1="65" y1="120" x2="480" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
+          <line x1="185" y1="120" x2="490" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
+          <line x1="305" y1="120" x2="498" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
+          <line x1="425" y1="120" x2="500" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
+          <line x1="545" y1="120" x2="502" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
+          <line x1="665" y1="120" x2="510" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
+          <line x1="785" y1="120" x2="520" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
+          <line x1="905" y1="120" x2="530" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
+
+          <text x="500" y="220" font-size="11.5" fill="#64748b" text-anchor="middle">Each characteristic has its own sub-characteristics (shown below, per box, with this project's priority).</text>
+        </svg>
+        </div>
+      </div>
+
+      <!-- Diagram 2: priority bars -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Priority for this project</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 760 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ISO 25010 priority ranking for this project" class="min-w-[620px]">
+          <style>
+            .pl{font:11.5px -apple-system,sans-serif;fill:#334155} .pv{font:600 11px -apple-system,sans-serif;fill:#fff}
+          </style>
+          <!-- rows: label, width(px, max ~430), color -->
+          <text x="0" y="20" class="pl">Security</text>
+          <rect x="140" y="6" width="430" height="20" rx="4" fill="#b91c1c"/><text x="150" y="20" class="pv">Critical</text>
+
+          <text x="0" y="52" class="pl">Reliability</text>
+          <rect x="140" y="38" width="430" height="20" rx="4" fill="#b91c1c"/><text x="150" y="52" class="pv">Critical</text>
+
+          <text x="0" y="84" class="pl">Performance Efficiency</text>
+          <rect x="140" y="70" width="330" height="20" rx="4" fill="#c2410c"/><text x="150" y="84" class="pv">High</text>
+
+          <text x="0" y="116" class="pl">Functional Suitability</text>
+          <rect x="140" y="102" width="330" height="20" rx="4" fill="#c2410c"/><text x="150" y="116" class="pv">High</text>
+
+          <text x="0" y="148" class="pl">Usability</text>
+          <rect x="140" y="134" width="230" height="20" rx="4" fill="#2563eb"/><text x="150" y="148" class="pv">Medium</text>
+
+          <text x="0" y="180" class="pl">Maintainability</text>
+          <rect x="140" y="166" width="230" height="20" rx="4" fill="#2563eb"/><text x="150" y="180" class="pv">Medium</text>
+
+          <text x="0" y="212" class="pl">Compatibility</text>
+          <rect x="140" y="198" width="130" height="20" rx="4" fill="#94a3b8"/><text x="150" y="212" class="pv" fill="#1e293b">Low</text>
+
+          <text x="0" y="244" class="pl">Portability</text>
+          <rect x="140" y="230" width="130" height="20" rx="4" fill="#94a3b8"/><text x="150" y="244" class="pv" fill="#1e293b">Low</text>
+        </svg>
+        </div>
+        <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+          Security and Reliability rank highest because of what this app actually is: a multi-user service
+          holding chat history and routing a person's own paid AI provider key. Compatibility and Portability
+          rank lowest because the project targets one browser engine and one deployment environment by design,
+          not because they don't matter at all.
+        </p>
+      </div>
+
+      <!-- Detail cards -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Each characteristic, in detail</h2>
+      <div class="space-y-4">
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="font-semibold text-slate-900">Security</div>
+            <span class="badge badge-red">Critical</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Confidentiality, Integrity, Non-repudiation, Accountability, Authenticity</p>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            A leaked provider API key or another user's chat history is the worst thing this app could do.
+            10 of the 30 testing epics exist for this alone: SAST, DAST, penetration testing, dependency and
+            container scanning, SBOM, secret scanning, prompt injection, PII masking, GDPR retention.
+          </p>
+          <a href="nonfunctional-tests.html" class="text-sm text-blue-600 hover:underline mt-2 inline-block">See the security test types →</a>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="font-semibold text-slate-900">Reliability</div>
+            <span class="badge badge-red">Critical</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Maturity, Availability, Fault Tolerance, Recoverability</p>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            Four micro-frontends and a streaming connection give this app more ways to partially fail than a
+            single-page app has. Remote failure/fallback, SSE reconnection, concurrency, and stream
+            cancellation are each their own epic specifically to catch those partial failures.
+          </p>
+          <a href="nonfunctional-tests.html" class="text-sm text-blue-600 hover:underline mt-2 inline-block">See the resilience test types →</a>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="font-semibold text-slate-900">Performance Efficiency</div>
+            <span class="badge badge-amber">High</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Time Behaviour, Resource Utilisation, Capacity</p>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            Measured directly: LCP/INP/CLS budgets per page via Lighthouse CI, and a k6 load test that ramps
+            virtual users until the 4&nbsp;GB production VM saturates, so the real capacity ceiling is a
+            written-down number, not a guess.
+          </p>
+          <a href="types/performance-testing.html" class="text-sm text-blue-600 hover:underline mt-2 inline-block">See performance testing →</a>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="font-semibold text-slate-900">Functional Suitability</div>
+            <span class="badge badge-amber">High</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Functional Completeness, Functional Correctness, Functional Appropriateness</p>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            Technically a functional, not non-functional, characteristic in ISO 25010, included here because
+            it anchors everything else: Part 1 and Part 2 of this report, plus unit, integration, contract and
+            API schema testing, exist to prove it.
+          </p>
+          <a href="requirements.html" class="text-sm text-blue-600 hover:underline mt-2 inline-block">See Part 1 →</a>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="font-semibold text-slate-900">Usability</div>
+            <span class="badge badge-blue">Medium</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Appropriateness Recognisability, Learnability, Operability, User Error Protection, UI Aesthetics, Accessibility</p>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            Accessibility is formally tested (WCAG 2.1 AA via axe-core) and visual regression is planned for
+            the UI-aesthetics side. The other sub-characteristics, learnability, operability, are not
+            formally measured, a reasonable gap for a small app with one core flow.
+          </p>
+          <a href="types/accessibility-testing.html" class="text-sm text-blue-600 hover:underline mt-2 inline-block">See accessibility testing →</a>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="font-semibold text-slate-900">Maintainability</div>
+            <span class="badge badge-blue">Medium</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Modularity, Reusability, Analysability, Modifiability, Testability</p>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            Modularity comes from the pod/micro-frontend split itself. Testability is the one sub-characteristic
+            with a dedicated epic: the mock server exists specifically so every other test type can run without
+            a real database or a paid API key.
+          </p>
+          <a href="types/mock-server.html" class="text-sm text-blue-600 hover:underline mt-2 inline-block">See the mock server →</a>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="font-semibold text-slate-900">Compatibility</div>
+            <span class="badge badge-slate">Low</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Co-existence, Interoperability</p>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            No dedicated test type. The Playwright config currently runs one browser project (Chromium); there
+            is no cross-browser or third-party-integration surface to test against beyond the two LLM provider
+            APIs, which are covered under Reliability and Functional Suitability instead.
+          </p>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="font-semibold text-slate-900">Portability</div>
+            <span class="badge badge-slate">Low</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Adaptability, Installability, Replaceability</p>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+            Addressed architecturally rather than by a test type: Docker Compose makes the whole stack
+            installable in one command on any machine with Docker, and every config value is an environment
+            variable. Not actively tested as a standalone quality attribute.
+          </p>
+          <a href="architecture.html" class="text-sm text-blue-600 hover:underline mt-2 inline-block">See Architecture →</a>
+        </div>
+
+      </div>
+
+      <!-- Quality in use -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Quality in use</h2>
+      <p class="text-sm text-slate-500 mb-4">
+        ISO 25010's second model: not the product itself, but the outcome when a real person uses it in
+        context. Five characteristics, each with a one-line read on this project.
+      </p>
+      <div class="scrollx">
+      <table class="ttable card">
+        <thead><tr><th>Characteristic</th><th>What it means</th><th>For this project</th></tr></thead>
+        <tbody>
+          <tr><td>Effectiveness</td><td>Accuracy and completeness of reaching a goal</td><td>Does a sent message reliably produce the right stored, streamed reply? Covered by functional and resilience testing.</td></tr>
+          <tr><td>Efficiency</td><td>Resources spent reaching that goal</td><td>How fast the reply starts streaming and how light each page loads, covered by Performance Efficiency testing.</td></tr>
+          <tr><td>Satisfaction</td><td>Usefulness, trust, pleasure, comfort</td><td>Not formally measured, no user research or satisfaction survey in this project's scope.</td></tr>
+          <tr><td>Freedom from risk</td><td>Economic, health &amp; safety, environmental risk mitigation</td><td>Mainly economic here: a leaked key or a runaway load could cost the user money, which is exactly what Security and Load testing guard against.</td></tr>
+          <tr><td>Context coverage</td><td>Works across different situations</td><td>Limited: one browser engine tested, one deployment target, no offline or low-bandwidth scenario testing.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="architecture.html" class="btn btn-ghost">← Architecture</a>
+        <a href="deploy-release.html" class="btn btn-primary">Next: Deploy &amp; Release →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -9,18 +9,19 @@
 </head>
 <body class="min-h-screen">
 <div class="flex min-h-screen">
-  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
-    <div class="px-5 py-5 border-b border-slate-100">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
         <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
       </div>
     </div>
-    <nav class="flex-1 overflow-y-auto px-3 py-3">
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
       <a href="../../index.html" class="navlink">Overview</a>
       <a href="../../project.html" class="navlink">The Project</a>
       <a href="../../stack.html" class="navlink">Tech Stack</a>
       <a href="../../architecture.html" class="navlink">Architecture</a>
+      <a href="../../nfr.html" class="navlink">Non-Functional Requirements</a>
       <a href="../../deploy-release.html" class="navlink">Deploy &amp; Release</a>
       <div class="navgroup-title">Part 1: Requirements</div>
       <a href="../../requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
@@ -32,8 +33,12 @@
       <div class="navgroup-title">Test Types</div>
       <a href="../../functional-tests.html" class="navlink">Functional Tests</a>
       <a href="../../nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="../../claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="../../sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="../../future-work.html" class="navlink">Future Work &amp; Roadmap</a>
     </nav>
-    <div class="px-4 py-4 border-t border-slate-100">
+    <div class="px-3 py-3 border-t border-slate-100">
       <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
     </div>
   </aside>
@@ -65,23 +70,11 @@ pnpm --filter @app/mfe-chat exec vitest run src/features -t accessibility</code>
       </div>
       
 
-      <div class="flex items-center gap-2 mt-8 mb-3">
-        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Evidence, a real run</h2>
-        <span class="badge badge-green">166 / 166 passed</span>
-      </div>
-      <div class="card p-0 overflow-hidden">
-        <div class="bg-slate-900 px-4 py-2 text-xs text-slate-400">Captured output</div>
-        <pre class="bg-slate-950 text-slate-100 text-[12px] p-4 overflow-x-auto leading-relaxed whitespace-pre-wrap">pnpm --filter @app/mfe-chat exec vitest run src/features/composer src/features/chat-view
-
- Test Files  13 passed (13)
-      Tests  166 passed (166)
-   Duration  7.40s</pre>
-      </div>
-      <p class="text-sm text-slate-500 mt-3">Captured live on this machine, Composer and ChatView component suites, full pass.</p>
-
+      
 
       <div class="mt-10 flex justify-between">
         <a href="../component-testing.html" class="btn btn-ghost">← Back to Component testing</a>
+        <a href="../evidence/component-testing.html" class="btn btn-primary">Evidence →</a>
       </div>
     </div>
   </main>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Future Work &amp; Roadmap: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="nfr.html" class="navlink">Non-Functional Requirements</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink active">Future Work &amp; Roadmap</a>
+    </nav>
+    <div class="px-3 py-3 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-5xl">
+
+      <span class="badge badge-slate">Appendix</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Future Work &amp; Roadmap</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        This report covers the testing delivered so far: the 5 functionalities from Part 1 and Part 2,
+        the wider strategy, and 30 test types with real evidence. This page is about what comes next,
+        and one piece of it that is already underway.
+      </p>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">In progress now: prompt testing</h2>
+      <div class="card p-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+          <span class="font-semibold text-slate-900">Prompt and response quality testing</span>
+          <span class="badge badge-amber">In progress</span>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          The security side of prompts is already covered: the prompt-injection epic checks that a
+          malicious message cannot make the assistant ignore its own rules or leak another user's data.
+          What is not covered yet is the quality of a normal, well-behaved reply.
+        </p>
+        <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+          This is being built as its own test type, separate from functional and security testing,
+          because it tests the model's output rather than the application's code. The plan is a small
+          fixed set of representative prompts, a golden or acceptable-range answer for each, and an
+          automated check, either a rule-based match or a second model acting as a judge, that scores
+          each real reply against that expectation. The suite would run whenever a prompt template, a
+          model choice, or a provider adapter changes, so a regression in answer quality is caught the
+          same way a regression in code is caught today.
+        </p>
+        <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+          This work is not finished. It will be delivered as its own epic on the Jira board, with its own
+          test type page in this report, once the first version of the suite is running in CI.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Roadmap</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 980 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Roadmap timeline" class="min-w-[760px]">
+          <defs>
+            <marker id="arrRm" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/></marker>
+          </defs>
+          <style>
+            .rm-col{fill:#f8fafc;stroke:#e2e8f0;stroke-width:1.4;rx:10}
+            .rm-ht{font:700 13px -apple-system,sans-serif;fill:#1e293b;text-anchor:middle}
+            .rm-sub{font:9.5px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+            .rm-item{fill:#fff;stroke:#2563eb;stroke-width:1.4;rx:7}
+            .rm-itemw{fill:#2563eb;rx:7}
+            .rm-t{font:600 10.5px -apple-system,sans-serif;fill:#1e293b;text-anchor:middle}
+            .rm-tw{font:600 10.5px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+          </style>
+
+          <rect x="10" y="10" width="300" height="220" class="rm-col"/>
+          <text x="160" y="35" class="rm-ht">Now</text>
+          <text x="160" y="50" class="rm-sub">this delivery</text>
+
+          <rect x="35" y="65" width="250" height="40" class="rm-itemw"/>
+          <text x="160" y="89" class="rm-tw">30 test types, real evidence</text>
+
+          <rect x="35" y="115" width="250" height="40" class="rm-item"/>
+          <text x="160" y="139" class="rm-t">Part 1 &amp; 2 of the assignment</text>
+
+          <rect x="35" y="165" width="250" height="40" class="rm-item"/>
+          <text x="160" y="189" class="rm-t">Strategy and NFR pages, ISO 25010</text>
+
+          <rect x="340" y="10" width="300" height="220" class="rm-col"/>
+          <text x="490" y="35" class="rm-ht">Next</text>
+          <text x="490" y="50" class="rm-sub">already started</text>
+
+          <rect x="365" y="65" width="250" height="40" class="rm-itemw"/>
+          <text x="490" y="89" class="rm-tw">Prompt and response quality suite</text>
+
+          <rect x="365" y="115" width="250" height="40" class="rm-item"/>
+          <text x="490" y="139" class="rm-t">Golden prompts in CI, per provider</text>
+
+          <rect x="365" y="165" width="250" height="40" class="rm-item"/>
+          <text x="490" y="184" class="rm-t" font-size="9.5">Cost and token-budget tracking</text>
+          <text x="490" y="196" class="rm-t" font-size="9.5">per release</text>
+
+          <rect x="670" y="10" width="300" height="220" class="rm-col"/>
+          <text x="820" y="35" class="rm-ht">Later</text>
+          <text x="820" y="50" class="rm-sub">not started</text>
+
+          <rect x="695" y="65" width="250" height="40" class="rm-item"/>
+          <text x="820" y="89" class="rm-t">Visual regression baseline</text>
+
+          <rect x="695" y="115" width="250" height="40" class="rm-item"/>
+          <text x="820" y="139" class="rm-t">Cross-browser test matrix</text>
+
+          <rect x="695" y="165" width="250" height="40" class="rm-item"/>
+          <text x="820" y="184" class="rm-t" font-size="9.5">Chaos drills and synthetic</text>
+          <text x="820" y="196" class="rm-t" font-size="9.5">production monitoring</text>
+
+          <line x1="310" y1="120" x2="340" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrRm)"/>
+          <line x1="640" y1="120" x2="670" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrRm)"/>
+        </svg>
+        </div>
+        <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+          "Next" is the only column already underway, the prompt testing work described above. "Later"
+          is scoped but not started, and is ordered by what the <a href="nfr.html" class="text-blue-600 hover:underline">NFR page</a>
+          already names as lower priority for this project: Compatibility and Portability over Usability
+          polish such as visual regression.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Other gaps worth naming</h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Visual regression</div>
+          <p class="text-sm text-slate-500 mt-1">The test type exists and is wired into CI, but has no approved baseline screenshots yet, so it currently has nothing to compare against.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Cross-browser coverage</div>
+          <p class="text-sm text-slate-500 mt-1">Playwright currently runs one browser project. Firefox and WebKit projects would catch engine-specific rendering or SSE handling differences.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Chaos and synthetic monitoring</div>
+          <p class="text-sm text-slate-500 mt-1">Resilience is tested in controlled conditions today (remote failure, SSE drop, cancellation). Nothing yet injects faults into the live production VM or watches it continuously.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Due dates on the Jira board</div>
+          <p class="text-sm text-slate-500 mt-1">Priority and due dates have been set on the epics but not yet rolled out across every one of the 169 underlying stories.</p>
+        </div>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="sdd-process.html" class="btn btn-ghost">← Jira &amp; Spec-Driven Development</a>
+        <a href="index.html" class="btn btn-primary">Back to Overview →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -10,18 +10,19 @@
 <body class="min-h-screen">
 <div class="flex min-h-screen">
 
-  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
-    <div class="px-5 py-5 border-b border-slate-100">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
         <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
       </div>
     </div>
-    <nav class="flex-1 overflow-y-auto px-3 py-3">
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
       <a href="index.html" class="navlink">Overview</a>
       <a href="project.html" class="navlink">The Project</a>
       <a href="stack.html" class="navlink">Tech Stack</a>
       <a href="architecture.html" class="navlink active">Architecture</a>
+      <a href="nfr.html" class="navlink">Non-Functional Requirements</a>
       <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
       <div class="navgroup-title">Part 1: Requirements</div>
       <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
@@ -33,8 +34,12 @@
       <div class="navgroup-title">Test Types</div>
       <a href="functional-tests.html" class="navlink">Functional Tests</a>
       <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink">Future Work &amp; Roadmap</a>
     </nav>
-    <div class="px-4 py-4 border-t border-slate-100">
+    <div class="px-3 py-3 border-t border-slate-100">
       <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
     </div>
   </aside>
@@ -185,6 +190,228 @@
           whose API client defaults to a same-origin <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/api</code>
           path, proxied by <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">shell</code> to
           <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">conversation-service</code>.
+        </p>
+      </div>
+
+      <!-- C4 Component -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">C4 component: conversation-service</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 980 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="C4 component diagram of conversation-service" class="min-w-[760px]">
+          <defs>
+            <marker id="arrC3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748b"/></marker>
+          </defs>
+          <style>
+            .co-box{fill:#fff;stroke:#2563eb;stroke-width:1.6;rx:8}
+            .co-ext{fill:#94a3b8}
+            .co-t{font:600 11px -apple-system,sans-serif;fill:#1e293b;text-anchor:middle}
+            .co-tw{font:600 11px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+            .co-d{font:9.5px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+            .co-dw{font:9.5px -apple-system,sans-serif;fill:#e2e8f0;text-anchor:middle}
+            .co-l{font:9px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+          </style>
+
+          <rect x="20" y="10" width="940" height="42" rx="8" fill="#eef5ff" stroke="#bfdbfe"/>
+          <text x="470" y="35" class="co-t">conversation-service (Express API, one Node process)</text>
+
+          <rect x="40" y="90" width="150" height="60" class="co-box"/>
+          <text x="115" y="113" class="co-t">Chats controller</text>
+          <text x="115" y="130" class="co-d">create/rename/delete</text>
+
+          <rect x="220" y="90" width="150" height="60" class="co-box"/>
+          <text x="295" y="113" class="co-t">Messages controller</text>
+          <text x="295" y="130" class="co-d">send, SSE stream</text>
+
+          <rect x="400" y="90" width="150" height="60" class="co-box"/>
+          <text x="475" y="113" class="co-t">Attachments controller</text>
+          <text x="475" y="130" class="co-d">upload, 10&nbsp;MB cap</text>
+
+          <rect x="580" y="90" width="170" height="60" class="co-box"/>
+          <text x="665" y="113" class="co-t">Auth middleware</text>
+          <text x="665" y="130" class="co-d">verifies JWT from auth-service</text>
+
+          <rect x="130" y="200" width="180" height="60" class="co-box"/>
+          <text x="220" y="223" class="co-t">Provider adapter layer</text>
+          <text x="220" y="240" class="co-d">common interface, retries</text>
+
+          <rect x="350" y="200" width="150" height="55" fill="#2563eb" rx="8"/>
+          <text x="425" y="223" class="co-tw">Anthropic adapter</text>
+          <text x="425" y="240" class="co-dw">streams tokens</text>
+
+          <rect x="520" y="200" width="150" height="55" fill="#2563eb" rx="8"/>
+          <text x="595" y="223" class="co-tw">OpenAI adapter</text>
+          <text x="595" y="240" class="co-dw">streams tokens</text>
+
+          <rect x="40" y="300" width="160" height="50" class="co-box"/>
+          <text x="120" y="321" class="co-t">Repositories</text>
+          <text x="120" y="336" class="co-d">Postgres via Prisma</text>
+
+          <rect x="720" y="200" width="150" height="55" class="co-ext" rx="8"/>
+          <text x="795" y="223" class="co-tw">Anthropic API</text>
+          <text x="795" y="240" class="co-dw">external</text>
+
+          <rect x="720" y="300" width="150" height="50" class="co-ext" rx="8"/>
+          <text x="795" y="321" class="co-tw">OpenAI API</text>
+          <text x="795" y="336" class="co-dw">external</text>
+
+          <line x1="115" y1="150" x2="120" y2="300" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrC3)"/>
+          <line x1="295" y1="150" x2="220" y2="200" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrC3)"/>
+          <line x1="475" y1="150" x2="120" y2="300" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrC3)"/>
+          <line x1="665" y1="150" x2="295" y2="150" stroke="#cbd5e1" stroke-width="1.4" stroke-dasharray="3,3"/>
+          <text x="480" y="170" class="co-l">every controller checks auth first</text>
+
+          <line x1="310" y1="225" x2="350" y2="225" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrC3)"/>
+          <line x1="310" y1="235" x2="520" y2="225" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrC3)"/>
+          <line x1="500" y1="225" x2="720" y2="225" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrC3)"/>
+          <line x1="670" y1="235" x2="720" y2="320" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrC3)"/>
+        </svg>
+        </div>
+        <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">conversation-service</code> is one
+          deployable container, but internally split into controllers, a provider adapter layer, and
+          repositories. The adapter layer is what makes provider-adapter testing and remote-failure
+          testing possible: both providers sit behind the same interface, so a fault can be injected at
+          one seam instead of two.
+        </p>
+      </div>
+
+      <!-- Sequence diagram -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Sequence: sending a message and streaming a reply</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 980 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sequence diagram for sending a chat message and streaming the reply" class="min-w-[800px]">
+          <defs>
+            <marker id="arrSq" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#475569"/></marker>
+            <marker id="arrSqD" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#2563eb"/></marker>
+          </defs>
+          <style>
+            .sq-h{fill:#2563eb} .sq-ht{font:600 11px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+            .sq-life{stroke:#cbd5e1;stroke-width:1.4}
+            .sq-m{font:10.5px -apple-system,sans-serif;fill:#334155;text-anchor:middle}
+            .sq-n{font:9px -apple-system,sans-serif;fill:#94a3b8;text-anchor:middle}
+          </style>
+
+          <!-- lifelines -->
+          <g>
+            <rect x="20" y="10" width="140" height="34" rx="6" class="sq-h"/><text x="90" y="32" class="sq-ht">Browser (mfe-chat)</text>
+            <rect x="260" y="10" width="160" height="34" rx="6" class="sq-h"/><text x="340" y="32" class="sq-ht">conversation-service</text>
+            <rect x="520" y="10" width="150" height="34" rx="6" class="sq-h"/><text x="595" y="32" class="sq-ht">Provider adapter</text>
+            <rect x="780" y="10" width="180" height="34" rx="6" class="sq-h"/><text x="870" y="32" class="sq-ht">AI provider (Anthropic/OpenAI)</text>
+          </g>
+          <line x1="90" y1="44" x2="90" y2="360" class="sq-life"/>
+          <line x1="340" y1="44" x2="340" y2="360" class="sq-life"/>
+          <line x1="595" y1="44" x2="595" y2="360" class="sq-life"/>
+          <line x1="870" y1="44" x2="870" y2="360" class="sq-life"/>
+
+          <line x1="90" y1="70" x2="340" y2="70" stroke="#475569" stroke-width="1.6" marker-end="url(#arrSq)"/>
+          <text x="215" y="63" class="sq-m">POST /chats/:id/messages {text, key}</text>
+
+          <line x1="340" y1="100" x2="340" y2="100" stroke="#475569"/>
+          <text x="340" y="93" class="sq-n">validate, persist user message</text>
+
+          <line x1="340" y1="120" x2="595" y2="120" stroke="#475569" stroke-width="1.6" marker-end="url(#arrSq)"/>
+          <text x="467" y="113" class="sq-m">send(messages, key)</text>
+
+          <line x1="595" y1="148" x2="870" y2="148" stroke="#475569" stroke-width="1.6" marker-end="url(#arrSq)"/>
+          <text x="732" y="141" class="sq-m">chat completion, stream=true</text>
+
+          <rect x="840" y="160" width="4" height="150" fill="#2563eb" opacity="0"/>
+          <line x1="870" y1="180" x2="595" y2="180" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrSqD)"/>
+          <text x="732" y="173" class="sq-m" fill="#2563eb">token chunk</text>
+
+          <line x1="595" y1="205" x2="340" y2="205" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrSqD)"/>
+          <text x="467" y="198" class="sq-m" fill="#2563eb">normalised chunk</text>
+
+          <line x1="340" y1="230" x2="90" y2="230" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arrSqD)"/>
+          <text x="215" y="223" class="sq-m" fill="#2563eb">SSE event: data: {token}</text>
+
+          <text x="500" y="250" class="sq-n">(loop: repeats for every token until the reply ends or the user stops it)</text>
+
+          <line x1="870" y1="280" x2="595" y2="280" stroke="#475569" stroke-width="1.6" stroke-dasharray="4,3" marker-end="url(#arrSq)"/>
+          <text x="732" y="273" class="sq-m">stream end</text>
+
+          <line x1="595" y1="305" x2="340" y2="305" stroke="#475569" stroke-width="1.6" marker-end="url(#arrSq)"/>
+          <text x="467" y="298" class="sq-m">final text, persist assistant message</text>
+
+          <line x1="340" y1="330" x2="90" y2="330" stroke="#475569" stroke-width="1.6" stroke-dasharray="4,3" marker-end="url(#arrSq)"/>
+          <text x="215" y="323" class="sq-m">SSE event: done</text>
+        </svg>
+        </div>
+        <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+          The provider's own key never reaches the server's database, it travels only inside this one
+          request and is discarded once the reply finishes streaming. Every arrow after the first
+          token chunk repeats per token, which is what sse-reconnection and stream-cancellation testing
+          target: dropping or interrupting the connection mid-loop.
+        </p>
+      </div>
+
+      <!-- Deployment diagram -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Deployment</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Deployment diagram" class="min-w-[720px]">
+          <defs>
+            <marker id="arrDp" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748b"/></marker>
+          </defs>
+          <style>
+            .dp-node{fill:#f8fafc;stroke:#94a3b8;stroke-width:1.4;stroke-dasharray:4,3;rx:10}
+            .dp-box{fill:#fff;stroke:#2563eb;stroke-width:1.6;rx:8}
+            .dp-boxw{fill:#2563eb;rx:8}
+            .dp-t{font:600 11px -apple-system,sans-serif;fill:#1e293b;text-anchor:middle}
+            .dp-tw{font:600 11px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+            .dp-d{font:9.5px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+            .dp-nt{font:600 11px -apple-system,sans-serif;fill:#475569;text-anchor:middle}
+            .dp-l{font:9.5px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+          </style>
+
+          <rect x="30" y="20" width="140" height="60" rx="8" fill="#334155"/>
+          <text x="100" y="45" class="dp-tw">GHCR</text>
+          <text x="100" y="62" class="dp-d" fill="#cbd5e1">tagged by commit SHA</text>
+
+          <rect x="250" y="10" width="620" height="290" class="dp-node"/>
+          <text x="560" y="34" class="dp-nt">Azure VM (one node, 4&nbsp;GB)</text>
+
+          <rect x="280" y="55" width="140" height="55" class="dp-box"/>
+          <text x="350" y="78" class="dp-t">Caddy</text>
+          <text x="350" y="94" class="dp-d">reverse proxy, TLS</text>
+
+          <rect x="280" y="140" width="130" height="50" class="dp-boxw"/>
+          <text x="345" y="162" class="dp-tw">shell : 8000</text>
+          <rect x="280" y="200" width="130" height="50" class="dp-boxw"/>
+          <text x="345" y="222" class="dp-tw">mfe-auth : 3001</text>
+          <rect x="280" y="260" width="130" height="35" class="dp-boxw"/>
+          <text x="345" y="282" class="dp-tw" font-size="10">mfe-chat : 3002 / mfe-settings : 3003</text>
+
+          <rect x="450" y="140" width="150" height="50" class="dp-boxw"/>
+          <text x="525" y="162" class="dp-tw">auth-service : 4001</text>
+          <rect x="450" y="200" width="150" height="50" class="dp-boxw"/>
+          <text x="525" y="222" class="dp-tw">conversation-service : 4002</text>
+
+          <rect x="630" y="140" width="110" height="50" fill="#334155" rx="8"/>
+          <text x="685" y="162" class="dp-tw">Postgres</text>
+          <text x="685" y="176" class="dp-d" fill="#cbd5e1">named volume</text>
+
+          <rect x="630" y="210" width="220" height="50" fill="#94a3b8" rx="8"/>
+          <text x="740" y="232" class="dp-tw">Prometheus, Grafana,</text>
+          <text x="740" y="246" class="dp-tw" font-size="10">Loki, Alloy</text>
+
+          <line x1="170" y1="50" x2="300" y2="55" stroke="#64748b" stroke-width="2" marker-end="url(#arrDp)"/>
+          <text x="235" y="42" class="dp-l">SSH: docker pull + up</text>
+
+          <line x1="350" y1="110" x2="345" y2="140" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrDp)"/>
+          <line x1="420" y1="85" x2="525" y2="140" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrDp)"/>
+          <line x1="525" y1="250" x2="630" y2="165" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrDp)"/>
+
+          <rect x="20" y="265" width="150" height="40" class="dp-node"/>
+          <text x="95" y="289" class="dp-nt" font-size="10">User's browser</text>
+          <line x1="95" y1="265" x2="350" y2="110" stroke="#64748b" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrDp)"/>
+          <text x="180" y="200" class="dp-l">HTTPS, public</text>
+        </svg>
+        </div>
+        <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+          Everything in production runs on a single Azure VM, as the same containers from the diagrams
+          above, pulled from GHCR already built and already scanned. Caddy is the only container with a
+          public port, every other service is reachable only inside the VM's Docker network.
         </p>
       </div>
 

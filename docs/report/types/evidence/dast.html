@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evidence: DAST</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
+      <a href="../../index.html" class="navlink">Overview</a>
+      <a href="../../project.html" class="navlink">The Project</a>
+      <a href="../../stack.html" class="navlink">Tech Stack</a>
+      <a href="../../architecture.html" class="navlink">Architecture</a>
+      <a href="../../nfr.html" class="navlink">Non-Functional Requirements</a>
+      <a href="../../deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="../../requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="../../automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="../../strategy.html" class="navlink">Testing Strategy</a>
+      <a href="../../blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="../../functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="../../nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="../../claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="../../sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="../../future-work.html" class="navlink">Future Work &amp; Roadmap</a>
+    </nav>
+    <div class="px-3 py-3 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-3xl">
+
+      <div class="text-xs text-slate-400 flex items-center gap-1.5">
+        <a href="../dast.html" class="hover:text-blue-600">DAST</a><span>/</span><span class="text-slate-600">Evidence</span>
+      </div>
+      <div class="flex items-start justify-between gap-4 mt-3 flex-wrap">
+        <h1 class="text-2xl font-extrabold text-slate-900">Evidence: DAST</h1>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-28" target="_blank" class="btn btn-primary shrink-0">View on Jira: AICHAT-28 ↗</a>
+      </div>
+
+<div class="flex items-center gap-2 mt-8 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Evidence, a real run</h2>
+        <span class="badge badge-slate">OWASP ZAP not installed</span>
+      </div>
+      <div class="card p-0 overflow-hidden">
+        <div class="bg-slate-900 px-4 py-2 text-xs text-slate-400">Captured output</div>
+        <pre class="bg-slate-950 text-slate-100 text-[12px] p-4 overflow-x-auto leading-relaxed whitespace-pre-wrap">$ command -v zap-baseline.py || command -v zap.sh || echo "zap: command not found"
+zap: command not found</pre>
+      </div>
+      <p class="text-sm text-slate-500 mt-3">Neither ZAP CLI tool is installed on this machine. The already-running app at localhost:8000 was left untouched. Install ZAP and point zap-baseline.py at it for a real scan.</p>
+
+      <div class="mt-10 flex justify-between">
+        <a href="../run/dast.html" class="btn btn-ghost">← How to run</a>
+        <a href="../dast.html" class="btn btn-ghost">Back to DAST</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

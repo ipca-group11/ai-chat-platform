@@ -10,18 +10,19 @@
 <body class="min-h-screen">
 <div class="flex min-h-screen">
 
-  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
-    <div class="px-5 py-5 border-b border-slate-100">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
         <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
       </div>
     </div>
-    <nav class="flex-1 overflow-y-auto px-3 py-3">
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
       <a href="index.html" class="navlink">Overview</a>
       <a href="project.html" class="navlink">The Project</a>
       <a href="stack.html" class="navlink">Tech Stack</a>
       <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="nfr.html" class="navlink">Non-Functional Requirements</a>
       <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
       <div class="navgroup-title">Part 1: Requirements</div>
       <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
@@ -33,8 +34,12 @@
       <div class="navgroup-title">Test Types</div>
       <a href="functional-tests.html" class="navlink">Functional Tests</a>
       <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink">Future Work &amp; Roadmap</a>
     </nav>
-    <div class="px-4 py-4 border-t border-slate-100">
+    <div class="px-3 py-3 border-t border-slate-100">
       <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
     </div>
   </aside>
@@ -45,11 +50,24 @@
       <span class="badge badge-blue">Part 2</span>
       <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Automated Tests</h1>
       <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
-        The same 5 functionalities from Part 1, automated with <b class="text-slate-700">Playwright</b>.
-        Each step and check follows the acceptance criteria and test cases already defined. Tests run against the
-        real app in a browser, with a mock backend standing in for the AI provider so nothing needs a live key
-        or costs anything.
+        This page is the assignment's Part 2 deliverable: the 5 functionalities from Part 1, automated with
+        <b class="text-slate-700">Playwright</b>. Each step and check follows the acceptance criteria and test
+        cases already defined.
       </p>
+
+      <div class="card p-6 mt-6">
+        <p class="text-sm text-slate-700 leading-relaxed">
+          <b class="text-slate-900">Is this all the automated tests?</b> No, it's just the 5 Part 1 asks for.
+          The project as a whole automates 28 of its 30 test types: unit, integration, contract, API schema,
+          every security scan, performance, accessibility, load, and more, each already running in CI. The
+          only two that aren't fully automated are penetration testing (a scripted check plus a manual,
+          time-boxed review, by nature) and visual regression (documented in Jira, not yet wired into the
+          Playwright config). See the full picture on
+          <a href="functional-tests.html" class="text-blue-600 hover:underline">Functional Tests</a> and
+          <a href="nonfunctional-tests.html" class="text-blue-600 hover:underline">Non-Functional Tests</a>,
+          each type links to its own "How to run" page and a page of real captured evidence.
+        </p>
+      </div>
 
       <div class="card p-6 mt-8">
         <h2 class="text-base font-bold text-slate-900">Why Playwright</h2>
@@ -62,7 +80,7 @@
         </p>
       </div>
 
-      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">The 5 specs</h2>
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">The 5 specs, Part 1 functionalities</h2>
       <div class="grid sm:grid-cols-2 gap-3">
         <div class="card p-4">
           <div class="flex items-center justify-between"><span class="font-mono text-sm text-slate-800">registration.spec.ts</span><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-223" target="_blank" class="badge badge-blue text-[11px]">AICHAT-223 ↗</a></div>
@@ -130,6 +148,23 @@ for (const { email, password, message } of emptyFields) {
           <li>Chat specs that would need a live AI provider key run against the mock backend instead, same assertions, no cost, no flaky network.</li>
           <li>A failing spec blocks the merge, same as any other CI check.</li>
         </ul>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">All 30 test types, automation status</h2>
+      <div class="scrollx">
+      <table class="ttable card">
+        <thead><tr><th>Test type</th><th>Status</th><th>Runs</th></tr></thead>
+        <tbody>
+          <tr><td>Unit, Component, Snapshot, Integration, Contract, API schema, Provider adapter</td><td><span class="badge badge-green">Automated</span></td><td>Every pull request</td></tr>
+          <tr><td>E2E frontend &amp; backend, Remote failure, SSE reconnection, Concurrency, Stream cancellation</td><td><span class="badge badge-green">Automated</span></td><td>Every pull request</td></tr>
+          <tr><td>SAST, SCA, Secret scanning, Container scanning, SBOM, PII masking, GDPR retention</td><td><span class="badge badge-green">Automated</span></td><td>Every pull request</td></tr>
+          <tr><td>DAST, Prompt injection</td><td><span class="badge badge-green">Automated</span></td><td>Scheduled, weekly</td></tr>
+          <tr><td>Accessibility, Bundle size, Coverage thresholds, Mock server</td><td><span class="badge badge-green">Automated</span></td><td>Every pull request</td></tr>
+          <tr><td>Performance (frontend), Load testing</td><td><span class="badge badge-green">Automated</span></td><td>Scheduled / on demand</td></tr>
+          <tr><td>Penetration testing</td><td><span class="badge badge-amber">Scripted + manual</span></td><td>Per milestone, time-boxed</td></tr>
+          <tr><td>Visual regression</td><td><span class="badge badge-slate">Not wired up yet</span></td><td>Planned, see its Jira epic</td></tr>
+        </tbody>
+      </table>
       </div>
 
       <div class="mt-10 flex justify-between">

@@ -10,18 +10,19 @@
 <body class="min-h-screen">
 <div class="flex min-h-screen">
 
-  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
-    <div class="px-5 py-5 border-b border-slate-100">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
         <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
       </div>
     </div>
-    <nav class="flex-1 overflow-y-auto px-3 py-3">
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
       <a href="index.html" class="navlink">Overview</a>
       <a href="project.html" class="navlink active">The Project</a>
       <a href="stack.html" class="navlink">Tech Stack</a>
       <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="nfr.html" class="navlink">Non-Functional Requirements</a>
       <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
       <div class="navgroup-title">Part 1: Requirements</div>
       <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
@@ -33,8 +34,12 @@
       <div class="navgroup-title">Test Types</div>
       <a href="functional-tests.html" class="navlink">Functional Tests</a>
       <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink">Future Work &amp; Roadmap</a>
     </nav>
-    <div class="px-4 py-4 border-t border-slate-100">
+    <div class="px-3 py-3 border-t border-slate-100">
       <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
     </div>
   </aside>
@@ -97,29 +102,34 @@
       </p>
       <div class="grid sm:grid-cols-2 gap-4">
         <div class="card p-3">
-          <img src="assets/screenshots/login.png" alt="Login screen" class="rounded-lg border border-slate-200 w-full">
-          <p class="text-xs text-slate-500 mt-2 px-1">Login</p>
+          <img src="assets/screenshots/login.png" alt="Login screen" class="shot rounded-lg border border-slate-200 w-full" onclick="openLightbox(this)">
+          <p class="text-xs text-slate-500 mt-2 px-1">Login — click to enlarge</p>
         </div>
         <div class="card p-3">
-          <img src="assets/screenshots/register.png" alt="Registration screen" class="rounded-lg border border-slate-200 w-full">
-          <p class="text-xs text-slate-500 mt-2 px-1">Sign up</p>
+          <img src="assets/screenshots/register.png" alt="Registration screen" class="shot rounded-lg border border-slate-200 w-full" onclick="openLightbox(this)">
+          <p class="text-xs text-slate-500 mt-2 px-1">Sign up — click to enlarge</p>
         </div>
         <div class="card p-3">
-          <img src="assets/screenshots/chats-empty.png" alt="Chats screen, no chats yet" class="rounded-lg border border-slate-200 w-full">
-          <p class="text-xs text-slate-500 mt-2 px-1">Chats, empty state</p>
+          <img src="assets/screenshots/chats-empty.png" alt="Chats screen, no chats yet" class="shot rounded-lg border border-slate-200 w-full" onclick="openLightbox(this)">
+          <p class="text-xs text-slate-500 mt-2 px-1">Chats, empty state — click to enlarge</p>
         </div>
         <div class="card p-3">
-          <img src="assets/screenshots/settings.png" alt="Settings screen, provider API keys" class="rounded-lg border border-slate-200 w-full">
-          <p class="text-xs text-slate-500 mt-2 px-1">Settings, provider API keys</p>
+          <img src="assets/screenshots/settings.png" alt="Settings screen, provider API keys" class="shot rounded-lg border border-slate-200 w-full" onclick="openLightbox(this)">
+          <p class="text-xs text-slate-500 mt-2 px-1">Settings, provider API keys — click to enlarge</p>
         </div>
         <div class="card p-3">
-          <img src="assets/screenshots/new-chat-dialog.png" alt="New chat dialog" class="rounded-lg border border-slate-200 w-full">
-          <p class="text-xs text-slate-500 mt-2 px-1">Starting a new chat</p>
+          <img src="assets/screenshots/new-chat-dialog.png" alt="New chat dialog" class="shot rounded-lg border border-slate-200 w-full" onclick="openLightbox(this)">
+          <p class="text-xs text-slate-500 mt-2 px-1">Starting a new chat — click to enlarge</p>
         </div>
         <div class="card p-3">
-          <img src="assets/screenshots/chat-message-sent.png" alt="Chat with a sent message" class="rounded-lg border border-slate-200 w-full">
-          <p class="text-xs text-slate-500 mt-2 px-1">A sent message in a chat</p>
+          <img src="assets/screenshots/chat-message-sent.png" alt="Chat with a sent message" class="shot rounded-lg border border-slate-200 w-full" onclick="openLightbox(this)">
+          <p class="text-xs text-slate-500 mt-2 px-1">A sent message in a chat — click to enlarge</p>
         </div>
+      </div>
+
+      <div id="lightbox" onclick="closeLightbox()">
+        <span class="lb-close" onclick="closeLightbox()">&times;</span>
+        <img id="lightbox-img" src="" alt="">
       </div>
 
       <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">User flows covered in this report</h2>
@@ -136,5 +146,6 @@
     </div>
   </main>
 </div>
+<script src="assets/lightbox.js"></script>
 </body>
 </html>

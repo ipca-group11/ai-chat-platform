@@ -10,18 +10,19 @@
 <body class="min-h-screen">
 <div class="flex min-h-screen">
 
-  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
-    <div class="px-5 py-5 border-b border-slate-100">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
         <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
       </div>
     </div>
-    <nav class="flex-1 overflow-y-auto px-3 py-3">
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
       <a href="index.html" class="navlink">Overview</a>
       <a href="project.html" class="navlink">The Project</a>
       <a href="stack.html" class="navlink">Tech Stack</a>
       <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="nfr.html" class="navlink">Non-Functional Requirements</a>
       <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
       <div class="navgroup-title">Part 1: Requirements</div>
       <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
@@ -33,8 +34,12 @@
       <div class="navgroup-title">Test Types</div>
       <a href="functional-tests.html" class="navlink">Functional Tests</a>
       <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink">Future Work &amp; Roadmap</a>
     </nav>
-    <div class="px-4 py-4 border-t border-slate-100">
+    <div class="px-3 py-3 border-t border-slate-100">
       <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
     </div>
   </aside>
@@ -45,9 +50,36 @@
       <span class="badge badge-slate">Strategy</span>
       <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Testing Strategy</h1>
       <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
-        How the 30 testing epics fit together: what runs first, what depends on what, and why security and
-        the core chat flow get priority over everything else.
+        How the 30 testing epics fit together: test levels vs test types, entry and exit criteria, how risk
+        decides priority, what environments and test data each stage needs, and what runs when.
       </p>
+
+      <!-- Levels vs types -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Test levels vs test types</h2>
+      <p class="text-sm text-slate-500 mb-4">Two different axes, easy to mix up. A level is <i>where in the system</i> a test runs; a type is <i>what quality</i> it checks. Most of this project's 30 epics are a type run at a specific level.</p>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Levels, by scope</div>
+          <ul class="text-sm text-slate-600 mt-2 space-y-1.5 list-disc pl-5">
+            <li><b class="text-slate-700">Unit</b>, one function or hook, isolated</li>
+            <li><b class="text-slate-700">Component</b>, one React component, isolated</li>
+            <li><b class="text-slate-700">Integration</b>, one service's own routes against fakes</li>
+            <li><b class="text-slate-700">Contract</b>, the boundary between two services</li>
+            <li><b class="text-slate-700">System / E2E</b>, the whole app through a real browser</li>
+          </ul>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Types, by quality checked</div>
+          <ul class="text-sm text-slate-600 mt-2 space-y-1.5 list-disc pl-5">
+            <li><b class="text-slate-700">Functional</b>, does it do the right thing</li>
+            <li><b class="text-slate-700">Security</b>, can it be attacked or leak data</li>
+            <li><b class="text-slate-700">Performance</b>, is it fast and light enough</li>
+            <li><b class="text-slate-700">Reliability</b>, does it survive partial failure</li>
+            <li><b class="text-slate-700">Usability</b>, accessibility and visual consistency</li>
+          </ul>
+        </div>
+      </div>
+      <p class="text-sm text-slate-500 mt-3">The full breakdown, mapped to ISO 25010's quality characteristics, is on the <a href="nfr.html" class="text-blue-600 hover:underline">Non-Functional Requirements</a> page.</p>
 
       <!-- Pyramid -->
       <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">The test pyramid for this project</h2>
@@ -88,6 +120,80 @@
           <div class="font-semibold text-slate-900 text-sm">Chat correctness</div>
           <p class="text-xs text-slate-500 mt-1.5">Provider adapter replay, API schema validation, contract tests, integration tests, making sure the AI's answer is shown right.</p>
         </div>
+      </div>
+      <p class="text-sm text-slate-500 mt-3 leading-relaxed">
+        <b class="text-slate-700">How this is decided:</b> risk-based, likelihood × impact. A leaked API key
+        or another user's chat history (security) is both easy to get wrong and expensive if it happens, so
+        it's a merge gate everywhere it can be. A slow Lighthouse score (performance) is real but survivable,
+        so it's a budget check, not a release blocker. The full severity-to-priority mapping used across every
+        epic is on the <a href="nfr.html" class="text-blue-600 hover:underline">NFR page</a>.
+      </p>
+
+      <!-- Entry/exit -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Entry &amp; exit criteria</h2>
+      <p class="text-sm text-slate-500 mb-4">What has to be true before a stage starts, and what "done" means for it.</p>
+      <div class="scrollx">
+      <table class="ttable card">
+        <thead><tr><th>Stage</th><th>Entry criteria</th><th>Exit criteria</th></tr></thead>
+        <tbody>
+          <tr><td>Unit / component</td><td>Code compiles, mock server available</td><td>All green, coverage threshold met</td></tr>
+          <tr><td>Integration / contract</td><td>Unit stage green</td><td>Every route/contract checked, including error paths</td></tr>
+          <tr><td>E2E / system</td><td>Contract &amp; integration green, stack boots</td><td>The 5 Part-1 flows pass against a real browser</td></tr>
+          <tr><td>Security scans</td><td>Image built (for container/SBOM scans)</td><td>Zero new High/Critical finding, or an accepted waiver on file</td></tr>
+          <tr><td>Performance / load</td><td>Staging deployed</td><td>Every page inside its LCP/INP/CLS budget; capacity ceiling documented</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <!-- Environments -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Test environments</h2>
+      <div class="grid sm:grid-cols-3 gap-4">
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Local</div>
+          <p class="text-sm text-slate-500 mt-1.5">A developer's machine, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">docker compose up</code>. Unit through E2E all run here.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">CI</div>
+          <p class="text-sm text-slate-500 mt-1.5">A fresh GitHub Actions runner per PR, the same Compose stack, torn down after the job.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Staging / production</div>
+          <p class="text-sm text-slate-500 mt-1.5">The Azure VM behind Caddy, only reachable target for DAST, pentest, and the deploy smoke test.</p>
+        </div>
+      </div>
+
+      <!-- Test data -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Test data</h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">No real AI provider, ever</div>
+          <p class="text-sm text-slate-500 mt-1.5">The mock server (AICHAT-144) replays recorded Anthropic/OpenAI streams, so tests are deterministic, free, and never depend on a live key.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Isolated, disposable databases</div>
+          <p class="text-sm text-slate-500 mt-1.5">Integration tests use in-memory fake repositories; GDPR/retention tests use Testcontainers, a throwaway Postgres per run, never the shared dev database.</p>
+        </div>
+      </div>
+
+      <!-- Tooling matrix -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Tooling, by test type</h2>
+      <div class="scrollx">
+      <table class="ttable card">
+        <thead><tr><th>Test type</th><th>Tool</th></tr></thead>
+        <tbody>
+          <tr><td>Unit, component, integration, snapshot</td><td>Vitest + Testing Library</td></tr>
+          <tr><td>End-to-end</td><td>Playwright</td></tr>
+          <tr><td>Contract</td><td>Pact</td></tr>
+          <tr><td>Accessibility</td><td>axe-core</td></tr>
+          <tr><td>Performance</td><td>Lighthouse CI, Grafana Faro</td></tr>
+          <tr><td>Load</td><td>k6</td></tr>
+          <tr><td>SAST</td><td>Semgrep</td></tr>
+          <tr><td>DAST</td><td>OWASP ZAP</td></tr>
+          <tr><td>Dependency / container / SBOM</td><td>pnpm audit, Trivy, Syft</td></tr>
+          <tr><td>Secrets</td><td>gitleaks</td></tr>
+          <tr><td>Prompt injection</td><td>promptfoo</td></tr>
+        </tbody>
+      </table>
       </div>
 
       <!-- Pipeline -->

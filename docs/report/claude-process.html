@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude, Workflows &amp; Skills: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col sticky top-0 h-screen">
+    <div class="px-5 py-3 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-2 py-2">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="nfr.html" class="navlink">Non-Functional Requirements</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+      <div class="navgroup-title">Appendix</div>
+      <a href="claude-process.html" class="navlink active">Claude, Workflows &amp; Skills</a>
+      <a href="sdd-process.html" class="navlink">Jira &amp; Spec-Driven Development</a>
+      <a href="future-work.html" class="navlink">Future Work &amp; Roadmap</a>
+    </nav>
+    <div class="px-3 py-3 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-5xl">
+
+      <span class="badge badge-slate">Appendix</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Claude, Workflows &amp; Skills</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        How Claude Code was actually used to produce the testing work in this report, and how to run
+        the same process again. Written for transparency, not as a sales pitch for the tool.
+      </p>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">What Claude Code is</h2>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Claude Code is a command-line AI assistant that can read and edit files, run shell commands,
+          browse the running app, and talk to external services like Jira over a controlled connection
+          called MCP (Model Context Protocol). In this project it was used as a pair-programmer for
+          the testing work, not as a replacement for deciding what to test.
+        </p>
+        <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+          Every decision about what matters, which 5 functionalities to cover in Part 1, which risks
+          justify a Critical priority in the NFR page, was made by the team. Claude Code carried out
+          the resulting work: writing epics and stories in Jira, writing this report, running real
+          commands and capturing their real output.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">What it actually did on this project</h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Jira content</div>
+          <p class="text-sm text-slate-500 mt-1">Wrote and rewrote the 30 testing epics and their stories directly in Jira, through an Atlassian connection, in the same tone and structure as the rest of the board.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">This report</div>
+          <p class="text-sm text-slate-500 mt-1">Built every page in <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">docs/report/</code>, pulling the Jira content, the architecture docs and the real test commands into one site.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Running real tests</div>
+          <p class="text-sm text-slate-500 mt-1">Executed the project's actual Vitest, Playwright and scanning commands against the running stack, and kept the real pass/fail output, including real failures, as evidence.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Screenshots</div>
+          <p class="text-sm text-slate-500 mt-1">Drove a real Chromium browser through Chrome DevTools to capture the screens on <a href="project.html" class="text-blue-600 hover:underline">The Project</a> page and several evidence pages.</p>
+        </div>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Workflows: running many tests at once</h2>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          A workflow is a script that fans a task out across several Claude Code agents that run at the
+          same time, each one scoped to a single test type. It was used here to collect real evidence
+          for a large batch of the 30 test types in one pass instead of one at a time.
+        </p>
+        <div class="scrollx mt-4">
+        <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Workflow fan-out diagram" class="min-w-[700px]">
+          <defs>
+            <marker id="arrWf" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748b"/></marker>
+          </defs>
+          <style>
+            .wf-box{fill:#fff;stroke:#2563eb;stroke-width:1.6;rx:8}
+            .wf-boxw{fill:#2563eb;rx:8}
+            .wf-t{font:600 11px -apple-system,sans-serif;fill:#1e293b;text-anchor:middle}
+            .wf-tw{font:600 10.5px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+            .wf-d{font:9.5px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+          </style>
+          <rect x="20" y="80" width="150" height="60" class="wf-boxw"/>
+          <text x="95" y="105" class="wf-tw">List of test types</text>
+          <text x="95" y="122" class="wf-tw" font-size="9">one per command</text>
+
+          <rect x="260" y="10" width="140" height="50" class="wf-box"/>
+          <text x="330" y="38" class="wf-t">Agent: unit-testing</text>
+          <rect x="260" y="70" width="140" height="50" class="wf-box"/>
+          <text x="330" y="98" class="wf-t">Agent: load-testing</text>
+          <rect x="260" y="130" width="140" height="50" class="wf-box"/>
+          <text x="330" y="158" class="wf-t">Agent: sast</text>
+          <rect x="260" y="160" width="0" height="0"/>
+          <text x="330" y="188" class="wf-d">... one agent per type</text>
+
+          <rect x="560" y="80" width="180" height="60" class="wf-boxw"/>
+          <text x="650" y="105" class="wf-tw">Structured result</text>
+          <text x="650" y="122" class="wf-tw" font-size="9">status, summary, real output</text>
+
+          <rect x="800" y="80" width="80" height="60" class="wf-box"/>
+          <text x="840" y="105" class="wf-t" font-size="10">Evidence</text>
+          <text x="840" y="120" class="wf-t" font-size="10">page</text>
+
+          <line x1="170" y1="110" x2="260" y2="35" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrWf)"/>
+          <line x1="170" y1="110" x2="260" y2="95" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrWf)"/>
+          <line x1="170" y1="110" x2="260" y2="155" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrWf)"/>
+          <line x1="400" y1="35" x2="560" y2="95" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrWf)"/>
+          <line x1="400" y1="95" x2="560" y2="105" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrWf)"/>
+          <line x1="400" y1="155" x2="560" y2="120" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrWf)"/>
+          <line x1="740" y1="110" x2="800" y2="110" stroke="#64748b" stroke-width="1.6" marker-end="url(#arrWf)"/>
+        </svg>
+        </div>
+        <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+          Each agent ran its own real command, for example <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">pnpm exec vitest run</code>
+          for a unit-testing agent, or a Trivy scan for a container-scanning agent, and reported back a
+          fixed shape: whether it ran, a short summary, and the real terminal output. Nothing was invented
+          to fill a gap. Where a tool was missing locally or needed infrastructure that could not be
+          touched safely, the result honestly says so instead of making up a result.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Skills used along the way</h2>
+      <div class="scrollx">
+      <table class="ttable card">
+        <thead><tr><th>Skill or capability</th><th>What it was for</th></tr></thead>
+        <tbody>
+          <tr><td>Jira connection (Atlassian)</td><td>Reading and writing epics and stories directly on the AICHAT board, so Jira stays the single source of truth.</td></tr>
+          <tr><td>Chrome DevTools connection</td><td>Driving a real browser against the running app to take the screenshots used in this report.</td></tr>
+          <tr><td>Chrome DevTools troubleshooting</td><td>Diagnosing and clearing a stuck browser profile lock left over from a previous session, so screenshots could resume.</td></tr>
+          <tr><td>Workflow authoring</td><td>Writing the multi-agent script described above, so a large batch of test types could be run and captured in one pass.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">How to use this yourself</h2>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Anyone with access to this repository and Claude Code can repeat this process. There is no
+          special setup beyond what is already in <a href="stack.html" class="text-blue-600 hover:underline">Tech Stack</a>
+          and <a href="architecture.html" class="text-blue-600 hover:underline">Architecture</a>.
+        </p>
+        <ol class="list-decimal list-inside text-sm text-slate-600 mt-3 space-y-2 leading-relaxed">
+          <li>Start the app locally (see <a href="architecture.html" class="text-blue-600 hover:underline">Run it locally</a>), so there is something real to test against.</li>
+          <li>Ask Claude Code, in plain English, for the specific test type or evidence you need, for example "run the unit tests for conversation-service and show me the result."</li>
+          <li>For a large batch across many test types at once, ask it to use a workflow, so each type runs as its own independent agent instead of one at a time.</li>
+          <li>Review the actual output before trusting it. Every evidence page in this report links back to the real command that produced it, so it can always be re-run and checked.</li>
+        </ol>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">What this process does not replace</h2>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Claude Code did not decide what the application should do, what counts as a bug, or which risk
+          deserves a Critical rating on the <a href="nfr.html" class="text-blue-600 hover:underline">NFR page</a>.
+          Those calls stayed with the team. It also never ran anything destructive against the shared
+          development stack, commands that would stop or reset the running containers were treated as
+          off-limits throughout this work.
+        </p>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="blackbox-whitebox.html" class="btn btn-ghost">← Black-box vs White-box</a>
+        <a href="sdd-process.html" class="btn btn-primary">Next: Jira &amp; Spec-Driven Development →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
