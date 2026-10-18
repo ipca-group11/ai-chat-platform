@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to run: SBOM generation</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="../../index.html" class="navlink">Overview</a>
+      <a href="../../project.html" class="navlink">The Project</a>
+      <a href="../../stack.html" class="navlink">Tech Stack</a>
+      <a href="../../architecture.html" class="navlink">Architecture</a>
+      <a href="../../deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="../../requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="../../automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="../../strategy.html" class="navlink">Testing Strategy</a>
+      <a href="../../blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="../../functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="../../nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-3xl">
+
+      <div class="text-xs text-slate-400 flex items-center gap-1.5">
+        <a href="../sbom.html" class="hover:text-blue-600">SBOM generation</a><span>/</span><span class="text-slate-600">How to run</span>
+      </div>
+      <div class="flex items-start justify-between gap-4 mt-3 flex-wrap">
+        <h1 class="text-2xl font-extrabold text-slate-900">How to run: SBOM generation</h1>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-30" target="_blank" class="btn btn-primary shrink-0">View on Jira: AICHAT-30 ↗</a>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mt-4">
+        <span class="badge badge-amber">Needs Docker</span>
+      </div>
+      
+
+      <div class="card p-0 overflow-hidden mt-6">
+        <div class="bg-slate-900 px-4 py-2 text-xs text-slate-400">Terminal, from the repo root</div>
+        <pre class="bg-slate-950 text-slate-100 text-[12.5px] p-4 overflow-x-auto leading-relaxed"><code>pnpm --filter e2e exec vitest run src/ci/sbom-workflow.spec.ts</code></pre>
+      </div>
+      <p class="text-sm text-slate-500 mt-4">Details: <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">Full image proof (builds 10 images, roughly 1h): docs/AICHAT-30/WORKLOG.md section 4.</code></p>
+
+      <div class="flex items-center gap-2 mt-8 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Evidence</h2>
+        <span class="badge badge-slate">Not captured in this pass</span>
+      </div>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          This one needs the full Docker stack and/or a longer-running scan, so no live run was captured
+          for this report. The command above is the real one from this repo, run it locally or check the
+          matching CI workflow for the latest result.
+        </p>
+      </div>
+
+
+      <div class="mt-10 flex justify-between">
+        <a href="../sbom.html" class="btn btn-ghost">← Back to SBOM generation</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

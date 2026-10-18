@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snapshot testing: AI Chat Platform</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="../index.html" class="navlink">Overview</a>
+      <a href="../project.html" class="navlink">The Project</a>
+      <a href="../stack.html" class="navlink">Tech Stack</a>
+      <a href="../architecture.html" class="navlink">Architecture</a>
+      <a href="../deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="../requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="../automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="../strategy.html" class="navlink">Testing Strategy</a>
+      <a href="../blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="../functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="../nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-3xl">
+
+      <div class="text-xs text-slate-400 flex items-center gap-1.5">
+        <a href="../functional-tests.html" class="hover:text-blue-600">Functional Tests</a><span>/</span><span class="text-slate-600">Snapshot testing</span>
+      </div>
+      <div class="flex items-start justify-between gap-4 mt-3 flex-wrap">
+        <h1 class="text-2xl font-extrabold text-slate-900">Snapshot testing</h1>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-20" target="_blank" class="btn btn-primary shrink-0">View on Jira, AICHAT-20 ↗</a>
+        <a href="run/snapshot-testing.html" class="btn btn-ghost shrink-0">How to run →</a>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mt-4">
+        <span class="badge badge-blue">Quality foundation</span>
+        <span class="badge badge-slate">Functional</span>
+        <span class="badge badge-slate">White-box</span>
+      </div>
+
+      <div class="card p-6 mt-6">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">What it checks</div>
+        <p class="text-sm text-slate-700 leading-relaxed">Only small, stable outputs, serialized DTOs and SSE frames, are snapshotted. Whole component trees are not, because they break on every unrelated change and stop meaning anything.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 mt-4">
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tooling</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>Vitest snapshot serializers</li>
+            <li>A lint rule against oversized snapshots</li>
+          </ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Cadence</div>
+          <p class="text-sm text-slate-600">Every pull request.</p>
+        </div>
+      </div>
+
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
+      </div>
+      <div class="space-y-3">
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Description</div>
+          <p class="text-sm text-slate-600 leading-relaxed mb-2">This epic covers snapshot testing for the shared data contracts the platform depends on, the DTOs passed between the chat frontend, the conversation service, and auth, plus the raw server-sent event frames used for streaming AI responses. Rather than checking rendered pixels, this snapshots the actual data shapes, catching silent drift in a contract before it breaks something downstream that depends on it.</p>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Inputs</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Canonical fixture objects for the shared DTOs</li><li>Sample SSE frames for each event type the streaming pipeline emits</li><li>The type definitions these contracts are built from</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Acceptance Criteria</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>A change to a shared DTO's serialized shape is caught by a failing snapshot before it reaches main.</li><li>A change to the SSE wire format used for streaming responses is caught the same way, including for error and heartbeat frames.</li><li>Snapshots stay small and targeted at specific data shapes rather than ballooning into full component-tree dumps.</li><li>The frontend's stream parser and the shared type definitions it depends on can't silently drift apart without a test catching it.</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tooling / Tech Stack</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Vitest snapshot testing</li><li>TypeScript's type system for structural comparisons</li><li>A custom ESLint rule to keep snapshots targeted and reasonably sized</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Definition of Ready</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>The underlying DTOs and SSE frame formats are stable enough to build fixtures and snapshots against.</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Definition of Done</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>All of this area's snapshot and drift checks run automatically in CI, and a failure blocks the merge until it's reviewed.</li></ul>
+        </div>
+      </div>
+      <div class="mt-10 flex justify-between">
+        <a href="../functional-tests.html" class="btn btn-ghost">← Back to Functional Tests</a>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-20" target="_blank" class="btn btn-ghost">Open AICHAT-20 on Jira ↗</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

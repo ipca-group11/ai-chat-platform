@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink active">Architecture</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-5xl">
+
+      <span class="badge badge-slate">Reference</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Architecture</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        How the system is put together, as C4 diagrams, and how to run it on your own machine.
+        Source: <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">docs/ARCHITECTURE.md</code>,
+        <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">docs/DEPLOY.md</code>.
+      </p>
+
+      <!-- C4 Context -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">C4 context</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="C4 context diagram" class="min-w-[680px]">
+          <defs>
+            <marker id="arrC1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748b"/></marker>
+          </defs>
+          <style>
+            .c4person{fill:#1d4ed8} .c4sys{fill:#2563eb} .c4ext{fill:#94a3b8}
+            .c4t{font:600 13px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+            .c4d{font:11px -apple-system,sans-serif;fill:#e2e8f0;text-anchor:middle}
+            .c4l{font:11px -apple-system,sans-serif;fill:#475569;text-anchor:middle}
+          </style>
+
+          <rect x="30" y="90" width="150" height="80" rx="10" class="c4person"/>
+          <text x="105" y="125" class="c4t">User</text>
+          <text x="105" y="142" class="c4d">Person, browser</text>
+
+          <rect x="340" y="80" width="220" height="100" rx="10" class="c4sys"/>
+          <text x="450" y="120" class="c4t">AI Chat Platform</text>
+          <text x="450" y="138" class="c4d">Software system</text>
+          <text x="450" y="154" class="c4d">Chat with login, streaming</text>
+          <text x="450" y="168" class="c4d">replies and attachments</text>
+
+          <rect x="720" y="30" width="150" height="70" rx="10" class="c4ext"/>
+          <text x="795" y="60" class="c4t">Anthropic API</text>
+          <text x="795" y="77" class="c4d">External system</text>
+
+          <rect x="720" y="160" width="150" height="70" rx="10" class="c4ext"/>
+          <text x="795" y="190" class="c4t">OpenAI API</text>
+          <text x="795" y="207" class="c4d">External system</text>
+
+          <line x1="180" y1="130" x2="340" y2="130" stroke="#64748b" stroke-width="2" marker-end="url(#arrC1)"/>
+          <text x="260" y="122" class="c4l">Uses, HTTPS</text>
+
+          <line x1="560" y1="110" x2="720" y2="70" stroke="#64748b" stroke-width="2" marker-end="url(#arrC1)"/>
+          <text x="650" y="80" class="c4l">Per-request key</text>
+
+          <line x1="560" y1="150" x2="720" y2="195" stroke="#64748b" stroke-width="2" marker-end="url(#arrC1)"/>
+          <text x="650" y="195" class="c4l">Per-request key</text>
+        </svg>
+        </div>
+        <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+          One user-facing system, two external AI providers. The provider key is entered by the user and sent
+          per request. It is never stored on the server.
+        </p>
+      </div>
+
+      <!-- C4 Container -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">C4 containers</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 980 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="C4 container diagram" class="min-w-[760px]">
+          <defs>
+            <marker id="arrC2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748b"/></marker>
+          </defs>
+          <style>
+            .cc-box{fill:#fff;stroke:#2563eb;stroke-width:1.6;rx:8}
+            .cc-db{fill:#334155}
+            .cc-t{font:600 11.5px -apple-system,sans-serif;fill:#1e293b;text-anchor:middle}
+            .cc-tw{font:600 11.5px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+            .cc-d{font:10px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+            .cc-dw{font:10px -apple-system,sans-serif;fill:#cbd5e1;text-anchor:middle}
+            .cc-l{font:9.5px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+          </style>
+
+          <rect x="20" y="10" width="940" height="60" rx="8" fill="#eef5ff" stroke="#bfdbfe"/>
+          <text x="470" y="30" class="cc-t">Browser (user's device)</text>
+          <text x="470" y="48" class="cc-d">Loads shell, which Module-Federation-loads each remote directly</text>
+
+          <rect x="40" y="110" width="150" height="60" class="cc-box"/>
+          <text x="115" y="135" class="cc-t">shell</text>
+          <text x="115" y="152" class="cc-d">Vite + React host</text>
+
+          <rect x="220" y="110" width="150" height="60" class="cc-box"/>
+          <text x="295" y="135" class="cc-t">mfe-auth</text>
+          <text x="295" y="152" class="cc-d">MF remote, login/register</text>
+
+          <rect x="400" y="110" width="150" height="60" class="cc-box"/>
+          <text x="475" y="135" class="cc-t">mfe-chat</text>
+          <text x="475" y="152" class="cc-d">MF remote, chat UI</text>
+
+          <rect x="580" y="110" width="150" height="60" class="cc-box"/>
+          <text x="655" y="135" class="cc-t">mfe-settings</text>
+          <text x="655" y="152" class="cc-d">MF remote, API keys</text>
+
+          <rect x="220" y="230" width="150" height="60" fill="#2563eb" rx="8"/>
+          <text x="295" y="255" class="cc-tw">auth-service</text>
+          <text x="295" y="272" class="cc-dw">Express API, JWT</text>
+
+          <rect x="400" y="230" width="150" height="60" fill="#2563eb" rx="8"/>
+          <text x="475" y="255" class="cc-tw">conversation-service</text>
+          <text x="475" y="272" class="cc-dw">Express API, SSE, queue</text>
+
+          <rect x="310" y="340" width="150" height="55" class="cc-db" rx="8"/>
+          <text x="385" y="365" class="cc-tw">Postgres</text>
+          <text x="385" y="380" class="cc-dw">Internal only</text>
+
+          <rect x="760" y="230" width="170" height="60" fill="#94a3b8" rx="8"/>
+          <text x="845" y="255" class="cc-tw">Prometheus + Grafana</text>
+          <text x="845" y="272" class="cc-dw">Metrics, dashboards</text>
+
+          <rect x="760" y="310" width="170" height="60" fill="#94a3b8" rx="8"/>
+          <text x="845" y="335" class="cc-tw">Loki + Alloy</text>
+          <text x="845" y="352" class="cc-dw">Logs</text>
+
+          <line x1="115" y1="170" x2="115" y2="400" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <text x="115" y="412" class="cc-l">shell only renders the remotes above</text>
+
+          <line x1="295" y1="170" x2="295" y2="230" stroke="#64748b" stroke-width="2" marker-end="url(#arrC2)"/>
+          <text x="330" y="202" class="cc-l">REST, direct</text>
+
+          <line x1="475" y1="170" x2="475" y2="230" stroke="#64748b" stroke-width="2" marker-end="url(#arrC2)"/>
+          <text x="510" y="202" class="cc-l">REST + SSE</text>
+
+          <line x1="655" y1="170" x2="475" y2="230" stroke="#64748b" stroke-width="2" marker-end="url(#arrC2)"/>
+
+          <line x1="295" y1="290" x2="360" y2="340" stroke="#64748b" stroke-width="2" marker-end="url(#arrC2)"/>
+          <line x1="475" y1="290" x2="410" y2="340" stroke="#64748b" stroke-width="2" marker-end="url(#arrC2)"/>
+
+          <line x1="550" y1="255" x2="760" y2="255" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrC2)"/>
+          <text x="655" y="248" class="cc-l">/metrics scrape</text>
+        </svg>
+        </div>
+        <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+          Only <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">shell</code> is a single published
+          entry point. The browser calls every other remote and service directly, their URLs are baked into
+          the built JavaScript at image-build time.
+        </p>
+        <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+          The one exception is <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">mfe-chat</code>,
+          whose API client defaults to a same-origin <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/api</code>
+          path, proxied by <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">shell</code> to
+          <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">conversation-service</code>.
+        </p>
+      </div>
+
+      <!-- Run locally -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Run it locally</h2>
+      <div class="card p-0 overflow-hidden">
+        <div class="bg-slate-900 px-4 py-2 text-xs text-slate-400">Terminal</div>
+        <pre class="bg-slate-950 text-slate-100 text-[12.5px] p-4 overflow-x-auto leading-relaxed"><code>cp .env.example .env   # optional, every variable has a safe local default
+docker compose -f compose.yaml up --build</code></pre>
+      </div>
+      <p class="text-sm text-slate-600 mt-3">
+        Open <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">http://127.0.0.1:8000/</code> once
+        <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">shell</code> reports healthy. Register,
+        add a provider API key in Settings, then start chatting.
+      </p>
+
+      <div class="scrollx mt-4">
+      <table class="ttable card">
+        <thead><tr><th>Service</th><th>Port</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">shell</td><td class="mono">127.0.0.1:8000</td><td>Entry point, open this in a browser</td></tr>
+          <tr><td class="mono">mfe-auth</td><td class="mono">127.0.0.1:3001</td><td>Login/register remote</td></tr>
+          <tr><td class="mono">mfe-chat</td><td class="mono">127.0.0.1:3002</td><td>Chat UI remote</td></tr>
+          <tr><td class="mono">mfe-settings</td><td class="mono">127.0.0.1:3003</td><td>API key settings remote</td></tr>
+          <tr><td class="mono">auth-service</td><td class="mono">127.0.0.1:4001</td><td>Auth REST API</td></tr>
+          <tr><td class="mono">conversation-service</td><td class="mono">127.0.0.1:4002</td><td>Chat REST/SSE API</td></tr>
+          <tr><td class="mono">prometheus</td><td class="mono">127.0.0.1:9090</td><td>Metrics</td></tr>
+          <tr><td class="mono">grafana</td><td class="mono">127.0.0.1:3300</td><td>Dashboards, admin/admin by default</td></tr>
+          <tr><td class="mono">postgres</td><td class="text-slate-400">not published</td><td>Internal only</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="stack.html" class="btn btn-ghost">← Tech Stack</a>
+        <a href="deploy-release.html" class="btn btn-primary">Next: Deploy &amp; Release →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

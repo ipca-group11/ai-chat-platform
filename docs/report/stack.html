@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Stack: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink active">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-5xl">
+
+      <span class="badge badge-slate">Reference</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Tech Stack</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        The full set of languages, frameworks and tools the AI Chat Platform is built with.
+        Source: <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">docs/STACK.md</code>.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-4 mt-8">
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Language &amp; runtime</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>TypeScript, across frontend and backend</li>
+            <li>Node.js</li>
+            <li>pnpm workspaces (monorepo)</li>
+            <li>Nx: project graph, cached tasks, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">nx affected</code> in CI</li>
+          </ul>
+        </div>
+
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Frontend</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>React, built with Vite</li>
+            <li>Micro-frontends via Vite Module Federation: one shell host plus one remote per domain (auth, chat, settings)</li>
+            <li>TanStack Router for type-safe, file-based routes</li>
+            <li>TanStack Query for server state</li>
+            <li>shadcn/ui on Base UI primitives, styled with Tailwind CSS</li>
+            <li>Design system in <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">packages/ui</code>, documented in Storybook</li>
+          </ul>
+        </div>
+
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Backend</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>Express, with <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">helmet</code>, <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">cors</code> and <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">express-rate-limit</code></li>
+            <li>Postgres, via Prisma</li>
+            <li>JWT access tokens (15 min) plus a rotating refresh token (7 days), both as httpOnly cookies</li>
+            <li>bcrypt for password hashing</li>
+            <li>Zod for request/response validation, schemas shared from <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">packages/shared-types</code></li>
+            <li>Server-sent events for streamed chat replies</li>
+          </ul>
+        </div>
+
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Testing</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>Vitest, for unit, component, integration and snapshot tests</li>
+            <li>Playwright, for end-to-end tests</li>
+            <li>axe-core, for accessibility</li>
+            <li>Pact, for consumer-driven contract tests</li>
+            <li>k6, for load tests</li>
+          </ul>
+        </div>
+
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Containers &amp; infrastructure</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>Docker and Docker Compose, the whole system starts with one <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">docker compose up</code></li>
+            <li>GitHub Actions for CI, GHCR for image storage</li>
+            <li>An Azure VM as the production host, behind Caddy as a TLS-terminating reverse proxy</li>
+          </ul>
+        </div>
+
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Observability</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>Prometheus for metrics, scraping each service's <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">/metrics</code> endpoint</li>
+            <li>Grafana for dashboards</li>
+            <li>Loki for log aggregation, Grafana Alloy as the collector</li>
+            <li>pino structured JSON logging with a correlation ID on every request</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Why these choices</h2>
+      <div class="space-y-3">
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Micro-frontends, not one app</div>
+          <p class="text-sm text-slate-500 mt-1">Auth, chat and settings ship and deploy independently. A broken remote shouldn't be able to take down the other two, which is exactly what the remote-failure test type checks.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Server-sent events over WebSockets</div>
+          <p class="text-sm text-slate-500 mt-1">Chat replies only flow one way, from the server to the browser. SSE is simpler than a full duplex connection and plays well with standard HTTP infrastructure and proxies.</p>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold text-slate-900 text-sm">Provider keys stay in the browser</div>
+          <p class="text-sm text-slate-500 mt-1">Anthropic and OpenAI API keys are entered per-user in Settings and sent per-request. They are never stored server-side, which removes an entire class of data-breach risk.</p>
+        </div>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="project.html" class="btn btn-ghost">← The Project</a>
+        <a href="deploy-release.html" class="btn btn-primary">Next: Deploy &amp; Release →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

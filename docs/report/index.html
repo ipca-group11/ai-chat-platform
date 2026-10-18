@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chat Platform: Test Report</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+
+<div class="flex min-h-screen">
+
+  <!-- Sidebar -->
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div>
+          <div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div>
+          <div class="text-xs text-slate-500 leading-tight">Software Testing Report</div>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="index.html" class="navlink active">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 min-w-0">
+
+    <!-- Mobile top bar -->
+    <div class="lg:hidden sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+      <span class="font-bold text-sm">AI Chat Platform, Test Report</span>
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="badge badge-blue">Jira ↗</a>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero-gradient text-white px-6 sm:px-10 py-14">
+      <div class="max-w-4xl">
+        <span class="badge badge-blue bg-blue-500/20 !text-blue-200">Software Testing Assignment: Parts 1 &amp; 2</span>
+        <h1 class="mt-4 text-3xl sm:text-4xl font-extrabold tracking-tight">Testing the AI Chat Platform</h1>
+        <p class="mt-3 text-slate-300 max-w-2xl leading-relaxed">
+          A chat application with login, provider API keys, streaming replies and file attachments.
+          Built as four micro-frontends on top of two Node services.
+        </p>
+        <p class="mt-2 text-slate-300 max-w-2xl leading-relaxed">
+          Requirements, test cases, techniques, automation and strategy are all tracked live in Jira
+          and run in CI.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="requirements.html" class="btn btn-primary">See the 5 functionalities →</a>
+          <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn bg-white/10 text-white border border-white/20 hover:bg-white/20">Open the Jira board ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Numbers -->
+    <section class="px-6 sm:px-10 -mt-8">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-5xl">
+        <div class="card p-5">
+          <div class="text-3xl font-extrabold text-blue-700">235</div>
+          <div class="text-sm text-slate-500 mt-1">Jira issues total</div>
+        </div>
+        <div class="card p-5">
+          <div class="text-3xl font-extrabold text-blue-700">30</div>
+          <div class="text-sm text-slate-500 mt-1">Testing epics</div>
+        </div>
+        <div class="card p-5">
+          <div class="text-3xl font-extrabold text-blue-700">169</div>
+          <div class="text-sm text-slate-500 mt-1">Stories &amp; tasks</div>
+        </div>
+        <div class="card p-5">
+          <div class="text-3xl font-extrabold text-blue-700">12</div>
+          <div class="text-sm text-slate-500 mt-1">Playwright E2E suites</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What's in this report -->
+    <section class="px-6 sm:px-10 py-10 max-w-5xl">
+      <h2 class="text-lg font-bold text-slate-900 mb-1">What's in this report</h2>
+      <p class="text-sm text-slate-500 mb-6">Follows the assignment structure: requirements and manual test design first, then automation and the wider strategy.</p>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <a href="project.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Reference</div>
+          <div class="font-semibold text-slate-900">The Project</div>
+          <p class="text-sm text-slate-500 mt-1">What the app does, its core features, and the screens it's built from.</p>
+        </a>
+        <a href="stack.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Reference</div>
+          <div class="font-semibold text-slate-900">Tech Stack</div>
+          <p class="text-sm text-slate-500 mt-1">Every language, framework and tool it's built with, and why.</p>
+        </a>
+        <a href="architecture.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Reference</div>
+          <div class="font-semibold text-slate-900">Architecture</div>
+          <p class="text-sm text-slate-500 mt-1">C4 context and container diagrams, and how to run it locally.</p>
+        </a>
+        <a href="deploy-release.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Reference</div>
+          <div class="font-semibold text-slate-900">Deploy &amp; Release</div>
+          <p class="text-sm text-slate-500 mt-1">What happens from merge to production, rollback, and how to stop it.</p>
+        </a>
+        <a href="requirements.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-blue mb-2">Part 1</div>
+          <div class="font-semibold text-slate-900">Requirements &amp; Test Cases</div>
+          <p class="text-sm text-slate-500 mt-1">5 functionalities, their acceptance criteria, test cases ordered by priority, and the techniques used to design them.</p>
+        </a>
+        <a href="automation.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-blue mb-2">Part 2</div>
+          <div class="font-semibold text-slate-900">Automated Tests</div>
+          <p class="text-sm text-slate-500 mt-1">The same 5 functionalities turned into Playwright specs, real code, running in CI on every pull request.</p>
+        </a>
+        <a href="strategy.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Strategy</div>
+          <div class="font-semibold text-slate-900">Testing Strategy</div>
+          <p class="text-sm text-slate-500 mt-1">The test pyramid for this project, what runs when, and why security and core user flows come first.</p>
+        </a>
+        <a href="functional-tests.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Test types</div>
+          <div class="font-semibold text-slate-900">Functional Tests</div>
+          <p class="text-sm text-slate-500 mt-1">14 test types checking what the app does, each with its own page and Jira link.</p>
+        </a>
+        <a href="nonfunctional-tests.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Test types</div>
+          <div class="font-semibold text-slate-900">Non-Functional Tests</div>
+          <p class="text-sm text-slate-500 mt-1">16 test types checking how well the app does it, security, performance, accessibility.</p>
+        </a>
+        <a href="blackbox-whitebox.html" class="card p-5 block hover:border-blue-300 transition">
+          <div class="badge badge-slate mb-2">Strategy</div>
+          <div class="font-semibold text-slate-900">Black-box vs White-box</div>
+          <p class="text-sm text-slate-500 mt-1">Which tests treat the app as a sealed box, and which ones look inside the code.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- App under test -->
+    <section class="px-6 sm:px-10 py-10 max-w-5xl border-t border-slate-200">
+      <h2 class="text-lg font-bold text-slate-900 mb-4">The app under test</h2>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          A chat application where a user signs up, logs in, adds their own API key for an AI provider
+          (Anthropic or OpenAI), and chats with it. This includes attaching files and seeing replies
+          stream in live.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          The frontend is four micro-frontends (shell, auth, chat, settings) loaded together. The backend
+          is two Node services (auth and conversations) behind an API.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed mt-3">
+          A mock backend stands in for the real AI provider during tests, so nothing depends on a live key
+          or costs anything to run.
+        </p>
+      </div>
+    </section>
+
+    <footer class="px-6 sm:px-10 py-8 text-xs text-slate-400 border-t border-slate-200">
+      AI Chat Platform · Software Testing Assignment · Board: <a class="text-blue-600" href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank">AICHAT on Jira</a>
+    </footer>
+
+  </main>
+</div>
+
+</body>
+</html>

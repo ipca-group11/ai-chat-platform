@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Requirements &amp; Test Cases: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div>
+          <div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div>
+          <div class="text-xs text-slate-500 leading-tight">Software Testing Report</div>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink active">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-4xl">
+
+      <span class="badge badge-blue">Part 1</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Requirements &amp; Test Cases</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        Five functionalities of the AI Chat Platform, each described with its own acceptance criteria and a
+        test case table ordered by execution priority. Every test case names the technique used to design it:
+        <b class="text-slate-700">Boundary Value Analysis</b> for anything with a numeric or length limit, and
+        <b class="text-slate-700">Equivalence Partitioning</b> for anything with distinct valid/invalid classes
+        of input. P1 is the happy path plus the boundary that would break the feature outright; P2 covers the
+        remaining invalid-class and error-path cases.
+      </p>
+
+      <!-- Jump links -->
+      <div class="mt-6 flex flex-wrap gap-2 text-sm">
+        <a href="#f1" class="badge badge-slate hover:bg-slate-200">1. Sign up</a>
+        <a href="#f2" class="badge badge-slate hover:bg-slate-200">2. Log in</a>
+        <a href="#f3" class="badge badge-slate hover:bg-slate-200">3. Add a provider API key</a>
+        <a href="#f4" class="badge badge-slate hover:bg-slate-200">4. Create chats &amp; send messages</a>
+        <a href="#f5" class="badge badge-slate hover:bg-slate-200">5. Attach a file</a>
+      </div>
+
+      <!-- Functionality 1, Sign up -->
+      <section id="f1" class="mt-10 card p-6">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h2 class="text-lg font-bold text-slate-900">1. Sign up with email and password</h2>
+          <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-223" target="_blank" class="badge badge-blue">AICHAT-223 ↗</a>
+        </div>
+        <p class="text-sm text-slate-600 mt-2">As someone opening the app for the first time, I want to create an account with my email and a password, so I can start using the chat platform.</p>
+
+        <div class="grid sm:grid-cols-2 gap-4 mt-4">
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Inputs</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>Email, required, valid format, unique</li>
+              <li>Password, required, 8–128 chars, upper + lower + digit</li>
+              <li>Confirm password, must match</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Acceptance criteria</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>A valid, unused email + a password meeting the rules creates the account.</li>
+              <li>An email already in use is rejected, no duplicate account created.</li>
+              <li>A password under 8 characters is blocked client-side, before any request.</li>
+              <li>A mismatched confirm-password is rejected with a clear error.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-5 scrollx">
+          <table class="ttable card">
+            <thead><tr><th>#</th><th>Priority</th><th>Technique</th><th>Input</th><th>Expected output</th></tr></thead>
+            <tbody>
+              <tr><td>TC1</td><td><span class="badge badge-blue">P1</span></td><td>Equivalence Partitioning</td><td>Valid email + password "Passw0rd1" + matching confirm</td><td>Account created</td></tr>
+              <tr><td>TC2</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Password length = 7 chars</td><td>Rejected, "min 8 characters"</td></tr>
+              <tr><td>TC3</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Password length = 8 chars</td><td>Accepted (exact minimum)</td></tr>
+              <tr><td>TC4</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Password length = 128 chars</td><td>Accepted (exact maximum)</td></tr>
+              <tr><td>TC5</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Password length = 129 chars</td><td>Rejected, "max 128 characters"</td></tr>
+              <tr><td>TC6</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Email without "@" (invalid class)</td><td>Rejected client-side</td></tr>
+              <tr><td>TC7</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Already-registered email (invalid class)</td><td>409 "email already in use"</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Functionality 2, Log in -->
+      <section id="f2" class="mt-8 card p-6">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h2 class="text-lg font-bold text-slate-900">2. Log in to the app</h2>
+          <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-224" target="_blank" class="badge badge-blue">AICHAT-224 ↗</a>
+        </div>
+        <p class="text-sm text-slate-600 mt-2">As a returning user, I want to log in with my email and password, so I can get back into my account and continue my conversations.</p>
+
+        <div class="grid sm:grid-cols-2 gap-4 mt-4">
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Inputs</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>Email address</li>
+              <li>Password</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Acceptance criteria</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>Correct credentials log the user in and land on the chat screen.</li>
+              <li>A wrong password shows one generic error, without revealing whether the email exists.</li>
+              <li>Repeated failed attempts get throttled instead of allowed forever.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-5 scrollx">
+          <table class="ttable card">
+            <thead><tr><th>#</th><th>Priority</th><th>Technique</th><th>Input</th><th>Expected output</th></tr></thead>
+            <tbody>
+              <tr><td>TC1</td><td><span class="badge badge-blue">P1</span></td><td>Equivalence Partitioning</td><td>Valid email + correct password</td><td>Session issued, redirected to chats</td></tr>
+              <tr><td>TC2</td><td><span class="badge badge-blue">P1</span></td><td>Equivalence Partitioning</td><td>Valid email + wrong password (invalid class)</td><td>401, generic "invalid credentials"</td></tr>
+              <tr><td>TC3</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Login attempt # = rate-limit max</td><td>Still processed normally</td></tr>
+              <tr><td>TC4</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Login attempt # = rate-limit max + 1</td><td>429, throttled</td></tr>
+              <tr><td>TC5</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Unregistered email (invalid class)</td><td>401, same generic error</td></tr>
+              <tr><td>TC6</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Empty password (invalid class)</td><td>Blocked client-side</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Functionality 3, Add API key -->
+      <section id="f3" class="mt-8 card p-6">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h2 class="text-lg font-bold text-slate-900">3. Add a provider API key</h2>
+          <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-225" target="_blank" class="badge badge-blue">AICHAT-225 ↗</a>
+        </div>
+        <p class="text-sm text-slate-600 mt-2">As a user, I want to add my own API key for an AI provider, so the app can generate chat responses on my behalf, billed to my own account.</p>
+
+        <div class="grid sm:grid-cols-2 gap-4 mt-4">
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Inputs</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>Provider, Anthropic or OpenAI</li>
+              <li>API key value, provider-specific format, ~20–200 chars</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Acceptance criteria</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>A valid, working key is saved and shown masked.</li>
+              <li>A revoked or invalid key fails validation and nothing is saved.</li>
+              <li>The key is never shown in full again, nor logged.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-5 scrollx">
+          <table class="ttable card">
+            <thead><tr><th>#</th><th>Priority</th><th>Technique</th><th>Input</th><th>Expected output</th></tr></thead>
+            <tbody>
+              <tr><td>TC1</td><td><span class="badge badge-blue">P1</span></td><td>Equivalence Partitioning</td><td>Valid key that passes the provider's live check</td><td>Saved, masked display</td></tr>
+              <tr><td>TC2</td><td><span class="badge badge-blue">P1</span></td><td>Equivalence Partitioning</td><td>Syntactically valid but revoked key (invalid class)</td><td>401 "invalid key", not persisted</td></tr>
+              <tr><td>TC3</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Key length = 19 chars (below minimum)</td><td>Rejected client-side</td></tr>
+              <tr><td>TC4</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Key length = 20 chars (minimum)</td><td>Accepted, sent for validation</td></tr>
+              <tr><td>TC5</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Key prefix for the wrong provider (invalid class)</td><td>Rejected, format mismatch</td></tr>
+              <tr><td>TC6</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Empty key field (invalid class)</td><td>Blocked client-side</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Functionality 4, Chat messaging -->
+      <section id="f4" class="mt-8 card p-6">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h2 class="text-lg font-bold text-slate-900">4. Create chats and send messages</h2>
+          <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-226" target="_blank" class="badge badge-blue">AICHAT-226 ↗</a>
+        </div>
+        <p class="text-sm text-slate-600 mt-2">As a user, I want to start a chat and send messages in it, so I can have a conversation with the AI assistant. The core of the app.</p>
+
+        <div class="grid sm:grid-cols-2 gap-4 mt-4">
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Inputs</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>Message text, 1 to 32,000 characters</li>
+              <li>An existing chat, or a new one being started</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Acceptance criteria</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>A new chat can be started and a first message sent.</li>
+              <li>A sent message appears right away, the reply streams in live.</li>
+              <li>A message right at the 32,000-character limit is accepted; longer is rejected clearly.</li>
+              <li>An empty message can't be sent.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-5 scrollx">
+          <table class="ttable card">
+            <thead><tr><th>#</th><th>Priority</th><th>Technique</th><th>Input</th><th>Expected output</th></tr></thead>
+            <tbody>
+              <tr><td>TC1</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Message length = 31,999 chars</td><td>Accepted, sent normally</td></tr>
+              <tr><td>TC2</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Message length = 32,000 chars</td><td>Accepted (exact limit)</td></tr>
+              <tr><td>TC3</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>Message length = 32,001 chars</td><td>Rejected client &amp; server-side, "too long"</td></tr>
+              <tr><td>TC4</td><td><span class="badge badge-blue">P1</span></td><td>Equivalence Partitioning</td><td>Non-empty valid message, under limit</td><td>Persisted, reply streams in</td></tr>
+              <tr><td>TC5</td><td><span class="badge badge-blue">P1</span></td><td>Equivalence Partitioning</td><td>Empty message body (invalid class)</td><td>Blocked client-side</td></tr>
+              <tr><td>TC6</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Send to a chat not owned by the user (invalid class)</td><td>403/404, nothing persisted</td></tr>
+              <tr><td>TC7</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Delete a chat, then fetch its messages</td><td>404 / empty result</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Functionality 5, Attach a file -->
+      <section id="f5" class="mt-8 card p-6">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h2 class="text-lg font-bold text-slate-900">5. Attach a file to a message</h2>
+          <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-227" target="_blank" class="badge badge-blue">AICHAT-227 ↗</a>
+        </div>
+        <p class="text-sm text-slate-600 mt-2">As a user, I want to attach a file to my message, so I can share something with the AI assistant alongside my text.</p>
+
+        <div class="grid sm:grid-cols-2 gap-4 mt-4">
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Inputs</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>A file, .txt, .pdf, .png, .jpg/.jpeg, up to 10 MB</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Acceptance criteria</div>
+            <ul class="text-sm text-slate-600 list-disc pl-5 space-y-0.5">
+              <li>An allowed file under the size limit uploads and sends with the message.</li>
+              <li>A too-large file is rejected before upload, with a clear size error.</li>
+              <li>An unsupported file type is rejected with a clear type error.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-5 scrollx">
+          <table class="ttable card">
+            <thead><tr><th>#</th><th>Priority</th><th>Technique</th><th>Input</th><th>Expected output</th></tr></thead>
+            <tbody>
+              <tr><td>TC1</td><td><span class="badge badge-blue">P1</span></td><td>Equivalence Partitioning</td><td>Valid PNG, 2 MB</td><td>Uploaded, shown on message</td></tr>
+              <tr><td>TC2</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>File size = 10 MB − 1 byte</td><td>Accepted</td></tr>
+              <tr><td>TC3</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>File size = exactly 10 MB</td><td>Accepted (exact limit)</td></tr>
+              <tr><td>TC4</td><td><span class="badge badge-blue">P1</span></td><td>Boundary Value Analysis</td><td>File size = 10 MB + 1 byte</td><td>Rejected client-side, "too large"</td></tr>
+              <tr><td>TC5</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Unsupported type, e.g. .exe (invalid class)</td><td>Rejected, "unsupported type"</td></tr>
+              <tr><td>TC6</td><td><span class="badge badge-slate">P2</span></td><td>Equivalence Partitioning</td><td>Valid PDF to a chat not owned by the user</td><td>403/404, not stored</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="mt-10 flex justify-end">
+        <a href="automation.html" class="btn btn-primary">Next: Part 2: Automated tests →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concurrency testing: AI Chat Platform</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="../index.html" class="navlink">Overview</a>
+      <a href="../project.html" class="navlink">The Project</a>
+      <a href="../stack.html" class="navlink">Tech Stack</a>
+      <a href="../architecture.html" class="navlink">Architecture</a>
+      <a href="../deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="../requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="../automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="../strategy.html" class="navlink">Testing Strategy</a>
+      <a href="../blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="../functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="../nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-3xl">
+
+      <div class="text-xs text-slate-400 flex items-center gap-1.5">
+        <a href="../functional-tests.html" class="hover:text-blue-600">Functional Tests</a><span>/</span><span class="text-slate-600">Concurrency testing</span>
+      </div>
+      <div class="flex items-start justify-between gap-4 mt-3 flex-wrap">
+        <h1 class="text-2xl font-extrabold text-slate-900">Concurrency testing</h1>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-13" target="_blank" class="btn btn-primary shrink-0">View on Jira, AICHAT-13 ↗</a>
+        <a href="run/concurrency-testing.html" class="btn btn-ghost shrink-0">How to run →</a>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mt-4">
+        <span class="badge badge-blue">Core user flows</span>
+        <span class="badge badge-slate">Functional</span>
+        <span class="badge badge-slate">Black-box</span>
+      </div>
+
+      <div class="card p-6 mt-6">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">What it checks</div>
+        <p class="text-sm text-slate-700 leading-relaxed">Two sends fired at once, or a retry while a reply is still streaming. The result has to be exactly as many messages as were actually sent. No duplicates, and nothing silently lost.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 mt-4">
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tooling</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>Vitest/integration tests with simulated network jitter</li>
+            <li>Playwright for the two-tab scenario</li>
+          </ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Cadence</div>
+          <p class="text-sm text-slate-600">Every pull request.</p>
+        </div>
+      </div>
+
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
+      </div>
+      <div class="space-y-3">
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Description</div>
+          <p class="text-sm text-slate-600 leading-relaxed mb-2">This epic covers testing how the chat platform behaves when more than one thing happens at the same time: two messages landing in the same chat together, someone retrying or cancelling while a reply is still streaming, or several people in a shared chat typing at once. It matters because the one thing users trust a chat app to get right is their message history, a race condition that drops, duplicates, or scrambles a message is something people notice immediately, and it undermines confidence in the whole product.</p>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Inputs</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Multiple send, retry, edit, and cancel actions happening close together or at the exact same time</li><li>Several people active in the same shared chat at once</li><li>The queue and streaming state the chat relies on internally</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Acceptance Criteria</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Messages sent at the same time to the same chat are never duplicated and never silently dropped.</li><li>Retrying, editing, or cancelling a reply while it's streaming always leaves the chat in a single, consistent state, never two replies running at once, never a half-saved message.</li><li>When several people are active in the same chat at the same time, everyone ends up seeing the exact same messages in the exact same order.</li><li>The internal queue that chat messages pass through holds up correctly under many simultaneous operations, with no race conditions.</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tooling / Tech Stack</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Vitest for queue- and service-level concurrency tests</li><li>Playwright for end-to-end multi-browser scenarios</li><li>A race-detecting test harness for repeated, randomized-timing runs</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Definition of Ready</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>The expected outcome for each kind of concurrent scenario is agreed before the tests that rely on it are built.</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Definition of Done</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>All the concurrency scenarios above are covered by automated tests that run in CI.</li><li>A failure in any of them blocks the merge.</li><li>Evidence from the underlying tests is available to back up this epic's results.</li></ul>
+        </div>
+      </div>
+      <div class="mt-10 flex justify-between">
+        <a href="../functional-tests.html" class="btn btn-ghost">← Back to Functional Tests</a>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-13" target="_blank" class="btn btn-ghost">Open AICHAT-13 on Jira ↗</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

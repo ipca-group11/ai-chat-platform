@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automated Tests: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink active">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-4xl">
+
+      <span class="badge badge-blue">Part 2</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Automated Tests</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        The same 5 functionalities from Part 1, automated with <b class="text-slate-700">Playwright</b>.
+        Each step and check follows the acceptance criteria and test cases already defined. Tests run against the
+        real app in a browser, with a mock backend standing in for the AI provider so nothing needs a live key
+        or costs anything.
+      </p>
+
+      <div class="card p-6 mt-8">
+        <h2 class="text-base font-bold text-slate-900">Why Playwright</h2>
+        <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+          The app is four micro-frontends loaded together behind one shell, with a login-gated flow and a
+          streaming chat UI. Playwright handles all three cleanly: real browser automation, built-in waiting
+          for streamed content to finish rendering, and network interception to mock the AI provider or
+          simulate a failed request. It's also free, actively maintained, and already the tool used across
+          the rest of this project's end-to-end suite.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">The 5 specs</h2>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="card p-4">
+          <div class="flex items-center justify-between"><span class="font-mono text-sm text-slate-800">registration.spec.ts</span><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-223" target="_blank" class="badge badge-blue text-[11px]">AICHAT-223 ↗</a></div>
+          <p class="text-xs text-slate-500 mt-1">Sign up, new account, duplicate email, weak password, bad email format.</p>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between"><span class="font-mono text-sm text-slate-800">login.spec.ts</span><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-224" target="_blank" class="badge badge-blue text-[11px]">AICHAT-224 ↗</a></div>
+          <p class="text-xs text-slate-500 mt-1">Log in, valid/invalid credentials, empty fields, no request leaked.</p>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between"><span class="font-mono text-sm text-slate-800">api-keys.spec.ts</span><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-225" target="_blank" class="badge badge-blue text-[11px]">AICHAT-225 ↗</a></div>
+          <p class="text-xs text-slate-500 mt-1">Add a provider API key, save, mask, update, remove, test connection.</p>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between"><span class="font-mono text-sm text-slate-800">chat-management.spec.ts</span><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-226" target="_blank" class="badge badge-blue text-[11px]">AICHAT-226 ↗</a></div>
+          <p class="text-xs text-slate-500 mt-1">Create/rename/delete chats, send a message, streamed reply, stop.</p>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between"><span class="font-mono text-sm text-slate-800">attach-file.spec.ts</span><a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-227" target="_blank" class="badge badge-blue text-[11px]">AICHAT-227 ↗</a></div>
+          <p class="text-xs text-slate-500 mt-1">Attach a file, allowed types, size limit, server-side rejection.</p>
+        </div>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">A real excerpt: <span class="font-mono text-sm">login.spec.ts</span></h2>
+      <p class="text-sm text-slate-500 mb-3">TC2 from Part 1 (wrong email/password → one generic error) and TC6 (empty field blocks the request), as they're actually implemented:</p>
+      <div class="card p-0 overflow-hidden">
+        <div class="bg-slate-900 px-4 py-2 text-xs text-slate-400 flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-400/70"></span><span class="w-2.5 h-2.5 rounded-full bg-amber-400/70"></span><span class="w-2.5 h-2.5 rounded-full bg-green-400/70"></span>
+          <span class="ml-2">e2e/src/tests/login.spec.ts</span>
+        </div>
+        <pre class="bg-slate-950 text-slate-100 text-[12.5px] p-4 overflow-x-auto leading-relaxed"><code>const invalidCredentials = [
+  { name: "unknown email", email: "nobody@example.com", password: "Passw0rd1" },
+  { name: "wrong password", email: "tester@example.com", password: "Wrong0pass" },
+  { name: "malformed email", email: "not-an-email", password: "Passw0rd1" },
+];
+
+for (const { name, email, password } of invalidCredentials) {
+  test(`Invalid credentials show one generic error: ${name}`, async ({ page }) => {
+    await submitLogin(page, email, password);
+    await expect(page.getByTestId("login-error")).toHaveText("Invalid email or password");
+    await expect(page.getByTestId(/-error$/)).toHaveCount(1);
+    await expectStillOnLoginPage(page);
+  });
+}
+
+const emptyFields = [
+  { email: "", password: "Passw0rd1", message: "Email is required" },
+  { email: "tester@example.com", password: "", message: "Password is required" },
+];
+
+for (const { email, password, message } of emptyFields) {
+  test(`An empty field blocks the sign-in`, async ({ page }) => {
+    const loginRequests = trackLoginRequests(page);
+    await submitLogin(page, email, password);
+    await expect(page.getByTestId("login-error")).toHaveText(message);
+    expect(loginRequests).toHaveLength(0); // never reaches the server
+  });
+}</code></pre>
+      </div>
+
+      <div class="card p-6 mt-8">
+        <h2 class="text-base font-bold text-slate-900">Where this runs</h2>
+        <ul class="text-sm text-slate-600 mt-2 space-y-1.5 list-disc pl-5">
+          <li>Every pull request, against the full stack started with Docker Compose.</li>
+          <li>Chat specs that would need a live AI provider key run against the mock backend instead, same assertions, no cost, no flaky network.</li>
+          <li>A failing spec blocks the merge, same as any other CI check.</li>
+        </ul>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="requirements.html" class="btn btn-ghost">← Part 1: Requirements</a>
+        <a href="strategy.html" class="btn btn-primary">Next: Testing strategy →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Functional Tests: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink active">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-3xl">
+
+      <span class="badge badge-blue">Functional Tests</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Functional Tests</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">Checks <b class="text-slate-700">what the app does</b>: does a feature behave the way the requirement says? There are 14 test types here, including the mock server they all run against.</p>
+
+      <div class="space-y-2 mt-8">
+        <a href="types/unit-testing.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Unit testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-17</span></div>
+          <p class="text-xs text-slate-500 mt-1">Hooks, utilities, service logic and model capability tables, tested in isolation.</p>
+        </a>
+        <a href="types/component-testing.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Component testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-18</span></div>
+          <p class="text-xs text-slate-500 mt-1">Composer, ChatView, settings, render, interaction and error states.</p>
+        </a>
+        <a href="types/snapshot-testing.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Snapshot testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-20</span></div>
+          <p class="text-xs text-slate-500 mt-1">Only small, stable outputs, serialized DTOs and SSE frames, nothing larger.</p>
+        </a>
+        <a href="types/integration-testing.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Integration testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-23</span></div>
+          <p class="text-xs text-slate-500 mt-1">Every Express route against real code, with fake repositories for the database.</p>
+        </a>
+        <a href="types/contract-testing.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Consumer-driven contract testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-11</span></div>
+          <p class="text-xs text-slate-500 mt-1">Each micro-frontend's expectations replayed against the real service code.</p>
+        </a>
+        <a href="types/api-schema-validation.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">API schema validation testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-12</span></div>
+          <p class="text-xs text-slate-500 mt-1">Requests and responses checked against the shared Zod schemas.</p>
+        </a>
+        <a href="types/provider-adapter-testing.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Provider adapter testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-25</span></div>
+          <p class="text-xs text-slate-500 mt-1">Replays recorded Anthropic/OpenAI streams, no live model call needed.</p>
+        </a>
+        <a href="types/e2e-frontend.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">E2E testing, frontend flows</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-4</span></div>
+          <p class="text-xs text-slate-500 mt-1">The 5 functionalities from Part 1, driven through a real browser.</p>
+        </a>
+        <a href="types/e2e-backend.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">E2E testing, backend flows</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-5</span></div>
+          <p class="text-xs text-slate-500 mt-1">The same journeys, checked at the backend afterwards.</p>
+        </a>
+        <a href="types/remote-failure.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Remote failure and fallback testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-8</span></div>
+          <p class="text-xs text-slate-500 mt-1">A micro-frontend remote goes down, does the rest of the app still work?</p>
+        </a>
+        <a href="types/sse-reconnection.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">SSE reconnection testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-9</span></div>
+          <p class="text-xs text-slate-500 mt-1">The network drops mid-stream, resume, or a clear error, never a hang.</p>
+        </a>
+        <a href="types/concurrency-testing.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Concurrency testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-13</span></div>
+          <p class="text-xs text-slate-500 mt-1">Two sends at once, or a retry mid-stream, no duplicate or lost messages.</p>
+        </a>
+        <a href="types/stream-cancellation.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Stream cancellation testing</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-15</span></div>
+          <p class="text-xs text-slate-500 mt-1">Stopping a reply actually aborts the call upstream, not just in the UI.</p>
+        </a>
+        <a href="types/mock-server.html" class="card p-4 block hover:border-blue-300">
+          <div class="flex items-center justify-between gap-2"><span class="font-semibold text-slate-900 text-sm">Mock server</span><span class="badge badge-slate text-[11px] shrink-0">AICHAT-144</span></div>
+          <p class="text-xs text-slate-500 mt-1">Stands in for the real backend and the LLM provider, so every layer above can run without a database or an API key.</p>
+        </a>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="nonfunctional-tests.html" class="btn btn-ghost">Non-Functional Tests →</a>
+        <a href="blackbox-whitebox.html" class="btn btn-primary">Next: Black-box vs White-box →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

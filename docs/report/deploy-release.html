@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deploy &amp; Release: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="deploy-release.html" class="navlink active">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-5xl">
+
+      <span class="badge badge-slate">Reference</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Deploy &amp; Release</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        What happens between a merge to <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">main</code>
+        and the app being live, how to roll back, and how to stop a local run. Source:
+        <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">.github/workflows/deploy.yml</code>,
+        <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">docs/DEPLOY.md</code>.
+      </p>
+
+      <!-- Pipeline -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">From merge to production</h2>
+      <div class="card p-6">
+        <div class="scrollx">
+        <svg viewBox="0 0 980 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Deploy pipeline flowchart" class="min-w-[760px]">
+          <defs>
+            <marker id="arrP" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748b"/></marker>
+          </defs>
+          <style>
+            .pbx{fill:#fff;stroke:#2563eb;stroke-width:1.6;rx:8}
+            .pbg{fill:#dc2626;rx:8}
+            .pt{font:600 11.5px -apple-system,sans-serif;fill:#1e293b;text-anchor:middle}
+            .ptw{font:600 11.5px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
+            .pd{font:9.5px -apple-system,sans-serif;fill:#64748b;text-anchor:middle}
+            .pdw{font:9.5px -apple-system,sans-serif;fill:#fecaca;text-anchor:middle}
+          </style>
+
+          <rect x="10" y="80" width="130" height="60" class="pbx"/>
+          <text x="75" y="105" class="pt">Merge to main</text>
+          <text x="75" y="122" class="pd">CI already green</text>
+
+          <rect x="180" y="80" width="150" height="60" class="pbx"/>
+          <text x="255" y="100" class="pt">Build 10 images</text>
+          <text x="255" y="117" class="pd">auth, chat, settings,</text>
+          <text x="255" y="130" class="pd">shell, auth-service...</text>
+
+          <rect x="370" y="20" width="150" height="60" class="pbg"/>
+          <text x="445" y="45" class="ptw">Trivy scan</text>
+          <text x="445" y="62" class="pdw">HIGH+ blocks here</text>
+
+          <rect x="370" y="140" width="150" height="60" class="pbx"/>
+          <text x="445" y="165" class="pt">SBOM (CycloneDX)</text>
+          <text x="445" y="182" class="pd">+ Grype report</text>
+
+          <rect x="560" y="80" width="150" height="60" class="pbx"/>
+          <text x="635" y="100" class="pt">Push to GHCR</text>
+          <text x="635" y="117" class="pd">tag: commit SHA</text>
+          <text x="635" y="130" class="pd">+ SBOM + provenance</text>
+
+          <rect x="750" y="80" width="90" height="60" class="pbx"/>
+          <text x="795" y="105" class="pt">SSH deploy</text>
+          <text x="795" y="122" class="pd">to Azure VM</text>
+
+          <rect x="870" y="80" width="95" height="60" fill="#16a34a" rx="8"/>
+          <text x="917" y="105" class="ptw">Smoke test</text>
+          <text x="917" y="122" class="pdw">curl, retries</text>
+
+          <line x1="140" y1="110" x2="180" y2="110" stroke="#64748b" stroke-width="2" marker-end="url(#arrP)"/>
+          <line x1="330" y1="100" x2="370" y2="60" stroke="#64748b" stroke-width="2" marker-end="url(#arrP)"/>
+          <line x1="330" y1="120" x2="370" y2="165" stroke="#64748b" stroke-width="2" marker-end="url(#arrP)"/>
+          <line x1="520" y1="55" x2="560" y2="95" stroke="#64748b" stroke-width="2" marker-end="url(#arrP)"/>
+          <line x1="520" y1="165" x2="560" y2="115" stroke="#64748b" stroke-width="2" marker-end="url(#arrP)"/>
+          <line x1="710" y1="110" x2="750" y2="110" stroke="#64748b" stroke-width="2" marker-end="url(#arrP)"/>
+          <line x1="840" y1="110" x2="870" y2="110" stroke="#64748b" stroke-width="2" marker-end="url(#arrP)"/>
+        </svg>
+        </div>
+        <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+          The deploy workflow triggers after CI succeeds on <code class="mono text-xs bg-slate-100 px-1 py-0.5 rounded">main</code>,
+          or by hand. The VM never builds anything: it only pulls images already tagged with
+          that commit's SHA, then reloads Caddy and runs a smoke test against the public URL.
+        </p>
+        <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+          A HIGH or CRITICAL Trivy finding on any image stops the deploy before it reaches GHCR.
+          The SBOM/Grype step reports known vulnerabilities but does not block, that gate belongs
+          to the Trivy step.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Rolling back</h2>
+      <div class="card p-6">
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Re-run the deploy workflow by hand against an older commit SHA (Actions, deploy, Run workflow). The
+          VM pulls that commit's already-built, already-scanned images from GHCR, so a rollback is just
+          pointing the VM at a different tag, no rebuild needed.
+        </p>
+      </div>
+
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">Stop it</h2>
+      <div class="card p-0 overflow-hidden">
+        <div class="bg-slate-900 px-4 py-2 text-xs text-slate-400">Terminal</div>
+        <pre class="bg-slate-950 text-slate-100 text-[12.5px] p-4 overflow-x-auto leading-relaxed"><code>docker compose -f compose.yaml down          # stop and remove containers
+docker compose -f compose.yaml down -v       # also remove volumes (Postgres data, uploads, Grafana)</code></pre>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="architecture.html" class="btn btn-ghost">← Architecture</a>
+        <a href="requirements.html" class="btn btn-primary">Part 1: Requirements →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

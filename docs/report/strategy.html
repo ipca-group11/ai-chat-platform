@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testing Strategy: AI Chat Platform</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="index.html" class="navlink">Overview</a>
+      <a href="project.html" class="navlink">The Project</a>
+      <a href="stack.html" class="navlink">Tech Stack</a>
+      <a href="architecture.html" class="navlink">Architecture</a>
+      <a href="deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="strategy.html" class="navlink active">Testing Strategy</a>
+      <a href="blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-4xl">
+
+      <span class="badge badge-slate">Strategy</span>
+      <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Testing Strategy</h1>
+      <p class="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+        How the 30 testing epics fit together: what runs first, what depends on what, and why security and
+        the core chat flow get priority over everything else.
+      </p>
+
+      <!-- Pyramid -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">The test pyramid for this project</h2>
+      <div class="card p-6">
+        <div class="flex flex-col items-center gap-1.5 max-w-lg mx-auto">
+          <div class="w-[30%] h-14 bg-blue-700 text-white rounded-lg flex items-center justify-center text-xs font-semibold text-center px-2">E2E (12 suites)</div>
+          <div class="w-[48%] h-14 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-semibold text-center px-2">Integration · Contract · API schema</div>
+          <div class="w-[68%] h-14 bg-blue-500 text-white rounded-lg flex items-center justify-center text-xs font-semibold text-center px-2">Component · Snapshot</div>
+          <div class="w-[92%] h-16 bg-blue-400 text-white rounded-lg flex items-center justify-center text-sm font-bold text-center px-2">Unit (largest layer, fast, cheap, run on every save)</div>
+        </div>
+        <p class="text-sm text-slate-600 mt-5 leading-relaxed">
+          Most tests sit at the bottom: fast, isolated, no network. Each layer up costs more to run and
+          catches a different class of bug. E2E is the smallest layer on purpose, reserved for full user
+          journeys a lower layer can't see.
+        </p>
+        <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+          Security, performance and accessibility sit outside this pyramid entirely. They check different
+          qualities, not correctness, so they run on their own schedule.
+        </p>
+      </div>
+
+      <!-- Prioritisation -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">What gets priority</h2>
+      <p class="text-sm text-slate-500 mb-4">Three things matter most in a multi-user chat app talking to a paid LLM: it can't leak data, the core flow can't break, and the AI's answers have to be shown correctly.</p>
+      <div class="grid sm:grid-cols-3 gap-4">
+        <div class="card p-5">
+          <div class="badge badge-red mb-2">Highest priority</div>
+          <div class="font-semibold text-slate-900 text-sm">Security</div>
+          <p class="text-xs text-slate-500 mt-1.5">SAST, dependency scanning, secret scanning, container scanning, DAST, pentest, prompt injection, PII masking, GDPR retention.</p>
+        </div>
+        <div class="card p-5">
+          <div class="badge badge-amber mb-2">Highest priority</div>
+          <div class="font-semibold text-slate-900 text-sm">Core user flows</div>
+          <p class="text-xs text-slate-500 mt-1.5">End-to-end tests, remote failure handling, SSE reconnection, concurrency, stream cancellation, the things a real user hits daily.</p>
+        </div>
+        <div class="card p-5">
+          <div class="badge badge-blue mb-2">High priority</div>
+          <div class="font-semibold text-slate-900 text-sm">Chat correctness</div>
+          <p class="text-xs text-slate-500 mt-1.5">Provider adapter replay, API schema validation, contract tests, integration tests, making sure the AI's answer is shown right.</p>
+        </div>
+      </div>
+
+      <!-- Pipeline -->
+      <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">How it's ordered end to end</h2>
+      <p class="text-sm text-slate-500 mb-4">Each stage only needs the one before it to be usable, not every single test in it finished.</p>
+
+      <div class="space-y-3">
+        <div class="card p-4 border-l-4 !border-l-blue-600">
+          <div class="flex items-center gap-2 text-sm font-bold text-slate-900">Stage 1 <span class="text-slate-400 font-normal">· runs on every PR, nothing to wait for</span></div>
+          <p class="text-xs text-slate-500 mt-1">Mock server, unit tests, SAST, dependency scan, secret scan, container scan, SBOM.</p>
+        </div>
+        <div class="card p-4 border-l-4 !border-l-blue-500">
+          <div class="flex items-center gap-2 text-sm font-bold text-slate-900">Stage 2 <span class="text-slate-400 font-normal">· needs the mock server and units green</span></div>
+          <p class="text-xs text-slate-500 mt-1">Component tests, snapshot tests, contract tests, API schema validation, integration tests.</p>
+        </div>
+        <div class="card p-4 border-l-4 !border-l-blue-400">
+          <div class="flex items-center gap-2 text-sm font-bold text-slate-900">Stage 3 <span class="text-slate-400 font-normal">· needs contracts &amp; integration green</span></div>
+          <p class="text-xs text-slate-500 mt-1">End-to-end (frontend &amp; backend), remote failure, SSE reconnection, concurrency, stream cancellation, provider adapter replay, accessibility, visual regression, bundle size.</p>
+        </div>
+        <div class="card p-4 border-l-4 !border-l-blue-300">
+          <div class="flex items-center gap-2 text-sm font-bold text-slate-900">Stage 4 <span class="text-slate-400 font-normal">· needs a running deploy, not the PR diff</span></div>
+          <p class="text-xs text-slate-500 mt-1">DAST, penetration test, performance, load testing, prompt injection, scheduled, against staging.</p>
+        </div>
+        <div class="card p-4 border-l-4 !border-l-slate-300">
+          <div class="flex items-center gap-2 text-sm font-bold text-slate-900">Ongoing <span class="text-slate-400 font-normal">· every build, not gated on the others</span></div>
+          <p class="text-xs text-slate-500 mt-1">PII masking, GDPR retention, coverage thresholds.</p>
+        </div>
+      </div>
+
+      <div class="mt-10 flex justify-between">
+        <a href="automation.html" class="btn btn-ghost">← Part 2: Automation</a>
+        <a href="functional-tests.html" class="btn btn-primary">Next: Functional Tests →</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

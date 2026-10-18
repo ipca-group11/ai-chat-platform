@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAST: AI Chat Platform</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="../index.html" class="navlink">Overview</a>
+      <a href="../project.html" class="navlink">The Project</a>
+      <a href="../stack.html" class="navlink">Tech Stack</a>
+      <a href="../architecture.html" class="navlink">Architecture</a>
+      <a href="../deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="../requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="../automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="../strategy.html" class="navlink">Testing Strategy</a>
+      <a href="../blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="../functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="../nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-3xl">
+
+      <div class="text-xs text-slate-400 flex items-center gap-1.5">
+        <a href="../nonfunctional-tests.html" class="hover:text-blue-600">Non-Functional Tests</a><span>/</span><span class="text-slate-600">SAST</span>
+      </div>
+      <div class="flex items-start justify-between gap-4 mt-3 flex-wrap">
+        <h1 class="text-2xl font-extrabold text-slate-900">SAST</h1>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-27" target="_blank" class="btn btn-primary shrink-0">View on Jira, AICHAT-27 ↗</a>
+        <a href="run/sast.html" class="btn btn-ghost shrink-0">How to run →</a>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mt-4">
+        <span class="badge badge-blue">Security</span>
+        <span class="badge badge-slate">Non-functional</span>
+        <span class="badge badge-slate">White-box</span>
+      </div>
+
+      <div class="card p-6 mt-6">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">What it checks</div>
+        <p class="text-sm text-slate-700 leading-relaxed">Static analysis of the source code itself, looking for the kind of vulnerability patterns a human reviewer would miss on a big diff.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 mt-4">
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tooling</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>Semgrep / CodeQL</li>
+          </ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Cadence</div>
+          <p class="text-sm text-slate-600">Every pull request; a high-severity finding blocks the merge.</p>
+        </div>
+      </div>
+
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
+      </div>
+      <div class="space-y-3">
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Description</div>
+          <p class="text-sm text-slate-600 leading-relaxed mb-2">This epic adds static analysis to the codebase so insecure patterns, like hardcoded secrets or an unprotected endpoint, get caught in the source before they ever reach main, rather than being found later in production or during a pentest. It covers choosing a tool, configuring real rules for this stack, cleaning up what the first scan finds, and turning the scan into a gate that actually blocks a bad pull request.</p>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Inputs</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Source code across the frontend shell, micro-frontends, and backend services</li><li>Pull request events and their diffs</li><li>Rule packs and custom rules tuned to this stack's known risk patterns</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Acceptance Criteria</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>A tool is chosen and configured with rule packs and custom rules relevant to this codebase.</li><li>Findings already present in the codebase are triaged, so the gate starts from a clean, understood baseline.</li><li>A pull request introducing a new high-severity issue, like a hardcoded secret, is blocked from merging.</li><li>Findings show up in the pull request in a form a developer can actually read and act on.</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tooling / Tech Stack</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Semgrep CE</li><li>GitHub Actions, running the scan as a required check on every pull request</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Definition of Ready</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>The tool choice and its licensing fit for a private repo are agreed.</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Definition of Done</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>The scan runs automatically on every pull request.</li><li>A new high-severity finding blocks the merge; anything not yet automated is called out rather than hidden.</li></ul>
+        </div>
+      </div>
+      <div class="mt-10 flex justify-between">
+        <a href="../nonfunctional-tests.html" class="btn btn-ghost">← Back to Non-Functional Tests</a>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-27" target="_blank" class="btn btn-ghost">Open AICHAT-27 on Jira ↗</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

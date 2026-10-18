@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual regression testing: AI Chat Platform</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+  <aside class="w-64 shrink-0 border-r border-slate-200 bg-white hidden lg:flex flex-col">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+        <div><div class="font-bold text-sm text-slate-900 leading-tight">AI Chat Platform</div><div class="text-xs text-slate-500 leading-tight">Software Testing Report</div></div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto px-3 py-3">
+      <a href="../index.html" class="navlink">Overview</a>
+      <a href="../project.html" class="navlink">The Project</a>
+      <a href="../stack.html" class="navlink">Tech Stack</a>
+      <a href="../architecture.html" class="navlink">Architecture</a>
+      <a href="../deploy-release.html" class="navlink">Deploy &amp; Release</a>
+      <div class="navgroup-title">Part 1: Requirements</div>
+      <a href="../requirements.html" class="navlink">Functionalities &amp; Test Cases</a>
+      <div class="navgroup-title">Part 2: Automation</div>
+      <a href="../automation.html" class="navlink">Automated Tests</a>
+      <div class="navgroup-title">Strategy</div>
+      <a href="../strategy.html" class="navlink">Testing Strategy</a>
+      <a href="../blackbox-whitebox.html" class="navlink">Black-box vs White-box</a>
+      <div class="navgroup-title">Test Types</div>
+      <a href="../functional-tests.html" class="navlink">Functional Tests</a>
+      <a href="../nonfunctional-tests.html" class="navlink">Non-Functional Tests</a>
+    </nav>
+    <div class="px-4 py-4 border-t border-slate-100">
+      <a href="https://ipca-grupo11.atlassian.net/jira/software/projects/AICHAT/list" target="_blank" class="btn btn-primary w-full justify-center">Open Jira board ↗</a>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div class="px-6 sm:px-10 py-10 max-w-3xl">
+
+      <div class="text-xs text-slate-400 flex items-center gap-1.5">
+        <a href="../nonfunctional-tests.html" class="hover:text-blue-600">Non-Functional Tests</a><span>/</span><span class="text-slate-600">Visual regression testing</span>
+      </div>
+      <div class="flex items-start justify-between gap-4 mt-3 flex-wrap">
+        <h1 class="text-2xl font-extrabold text-slate-900">Visual regression testing</h1>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-19" target="_blank" class="btn btn-primary shrink-0">View on Jira, AICHAT-19 ↗</a>
+        <a href="run/visual-regression.html" class="btn btn-ghost shrink-0">How to run →</a>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mt-4">
+        <span class="badge badge-blue">Non-functional</span>
+        <span class="badge badge-slate">Non-functional</span>
+        <span class="badge badge-slate">Black-box</span>
+      </div>
+
+      <div class="card p-6 mt-6">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">What it checks</div>
+        <p class="text-sm text-slate-700 leading-relaxed">Pixel-diffed screenshots of the key screens, in both themes. This catches a layout break that a functional assertion wouldn't notice, because the text is still technically there.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 mt-4">
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tooling</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <li>Playwright's toHaveScreenshot</li>
+            <li>Fixed fonts and seeded data for stable renders</li>
+          </ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Cadence</div>
+          <p class="text-sm text-slate-600">Every pull request; a diff fails CI and attaches the before/after image.</p>
+        </div>
+      </div>
+
+
+      <div class="flex items-center gap-2 mt-10 mb-3">
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Full epic details, from Jira</h2>
+      </div>
+      <div class="space-y-3">
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Description</div>
+          <p class="text-sm text-slate-600 leading-relaxed mb-2">Visual regression testing catches UI changes that functional tests don't look for, like a layout shift, a broken style, a missing icon, or a theme that stopped applying correctly. It works by comparing a screenshot of each key screen against a committed reference image on every pull request, in both light and dark theme, so a visual bug gets flagged before it reaches users.</p>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Inputs</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>The platform's key screens, reachable in a stable, predictable state</li><li>A fixed rendering environment: pinned fonts, a frozen clock, and seeded test data, so screenshots don't vary for reasons unrelated to the UI</li><li>Light and dark theme variants of each screen</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Acceptance Criteria</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Every key screen has a committed reference screenshot for light and dark theme.</li><li>A pull request that changes a screen's appearance beyond an agreed threshold fails its CI check and blocks merging.</li><li>A reviewer can see exactly what changed, visually, without needing to run anything locally.</li><li>Updating a baseline on purpose, after a real UI change, is a documented, reviewed step rather than something done quietly.</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tooling / Tech Stack</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>Playwright's screenshot snapshot testing</li><li>Docker, to keep screenshot rendering consistent between machines and CI</li><li>CI artifact upload for diff images</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Definition of Ready</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>The screens to cover, and what counts as an acceptable visual difference, are agreed.</li><li>The UI is stable enough, already covered by unit and component tests, that baselines are meaningful rather than chasing a moving target.</li></ul>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Definition of Done</div>
+          <ul class="text-sm text-slate-600 list-disc pl-5 space-y-1"><li>The visual suite runs automatically on every pull request and blocks merge on a real diff.</li><li>Baselines exist for every key screen in both themes, and the process for updating them is documented.</li></ul>
+        </div>
+      </div>
+      <div class="mt-10 flex justify-between">
+        <a href="../nonfunctional-tests.html" class="btn btn-ghost">← Back to Non-Functional Tests</a>
+        <a href="https://ipca-grupo11.atlassian.net/browse/AICHAT-19" target="_blank" class="btn btn-ghost">Open AICHAT-19 on Jira ↗</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
