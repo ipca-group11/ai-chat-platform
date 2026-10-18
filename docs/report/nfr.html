@@ -45,7 +45,7 @@
   </aside>
 
   <main class="flex-1 min-w-0">
-    <div class="px-6 sm:px-10 py-10 max-w-5xl">
+    <div class="px-6 sm:px-10 py-10">
 
       <span class="badge badge-slate">Reference</span>
       <h1 class="text-2xl font-extrabold text-slate-900 mt-3">Non-Functional Requirements</h1>
@@ -61,9 +61,9 @@
       <h2 class="text-base font-bold text-slate-900 mt-10 mb-3">ISO/IEC 25010, the 8 quality characteristics</h2>
       <div class="card p-6">
         <div class="scrollx">
-        <svg viewBox="0 0 1000 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ISO 25010 product quality tree" class="min-w-[820px]">
+        <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ISO 25010 product quality tree" class="min-w-[820px]">
           <defs>
-            <marker id="arrQ" markerWidth="8" markerHeight="8" refX="6" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="#94a3b8"/></marker>
+            <marker id="arrQ" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#94a3b8"/></marker>
           </defs>
           <style>
             .qroot{fill:#0f172a} .qbox{fill:#2563eb} .qt{font:600 11px -apple-system,sans-serif;fill:#fff;text-anchor:middle} .qrt{font:700 12.5px -apple-system,sans-serif;fill:#fff;text-anchor:middle}
@@ -71,28 +71,29 @@
           <rect x="400" y="10" width="200" height="40" rx="8" class="qroot"/>
           <text x="500" y="35" class="qrt">Software Product Quality</text>
 
+          <!-- connectors: trunk under the root, a drop with an arrowhead into each box -->
+          <line x1="500" y1="50" x2="500" y2="65" stroke="#cbd5e1" stroke-width="1.3"/>
+          <line x1="80" y1="65" x2="920" y2="65" stroke="#cbd5e1" stroke-width="1.3"/>
+          <line x1="80" y1="65" x2="80" y2="117" stroke="#cbd5e1" stroke-width="1.3" marker-end="url(#arrQ)"/>
+          <line x1="200" y1="65" x2="200" y2="117" stroke="#cbd5e1" stroke-width="1.3" marker-end="url(#arrQ)"/>
+          <line x1="320" y1="65" x2="320" y2="117" stroke="#cbd5e1" stroke-width="1.3" marker-end="url(#arrQ)"/>
+          <line x1="440" y1="65" x2="440" y2="117" stroke="#cbd5e1" stroke-width="1.3" marker-end="url(#arrQ)"/>
+          <line x1="560" y1="65" x2="560" y2="117" stroke="#cbd5e1" stroke-width="1.3" marker-end="url(#arrQ)"/>
+          <line x1="680" y1="65" x2="680" y2="117" stroke="#cbd5e1" stroke-width="1.3" marker-end="url(#arrQ)"/>
+          <line x1="800" y1="65" x2="800" y2="117" stroke="#cbd5e1" stroke-width="1.3" marker-end="url(#arrQ)"/>
+          <line x1="920" y1="65" x2="920" y2="117" stroke="#cbd5e1" stroke-width="1.3" marker-end="url(#arrQ)"/>
+
           <!-- 8 boxes -->
           <g>
-            <rect x="10"  y="120" width="110" height="60" rx="8" class="qbox"/><text x="65" y="146" class="qt">Functional</text><text x="65" y="160" class="qt">Suitability</text>
-            <rect x="130" y="120" width="110" height="60" rx="8" class="qbox"/><text x="185" y="146" class="qt">Performance</text><text x="185" y="160" class="qt">Efficiency</text>
-            <rect x="250" y="120" width="110" height="60" rx="8" class="qbox"/><text x="305" y="153" class="qt">Compatibility</text>
-            <rect x="370" y="120" width="110" height="60" rx="8" class="qbox"/><text x="425" y="153" class="qt">Usability</text>
-            <rect x="490" y="120" width="110" height="60" rx="8" class="qbox"/><text x="545" y="153" class="qt">Reliability</text>
-            <rect x="610" y="120" width="110" height="60" rx="8" class="qbox"/><text x="665" y="153" class="qt">Security</text>
-            <rect x="730" y="120" width="110" height="60" rx="8" class="qbox"/><text x="785" y="153" class="qt">Maintainability</text>
-            <rect x="850" y="120" width="110" height="60" rx="8" class="qbox"/><text x="905" y="153" class="qt">Portability</text>
+            <rect x="25"  y="120" width="110" height="60" rx="8" class="qbox"/><text x="80" y="146" class="qt">Functional</text><text x="80" y="160" class="qt">Suitability</text>
+            <rect x="145" y="120" width="110" height="60" rx="8" class="qbox"/><text x="200" y="146" class="qt">Performance</text><text x="200" y="160" class="qt">Efficiency</text>
+            <rect x="265" y="120" width="110" height="60" rx="8" class="qbox"/><text x="320" y="153" class="qt">Compatibility</text>
+            <rect x="385" y="120" width="110" height="60" rx="8" class="qbox"/><text x="440" y="153" class="qt">Usability</text>
+            <rect x="505" y="120" width="110" height="60" rx="8" class="qbox"/><text x="560" y="153" class="qt">Reliability</text>
+            <rect x="625" y="120" width="110" height="60" rx="8" class="qbox"/><text x="680" y="153" class="qt">Security</text>
+            <rect x="745" y="120" width="110" height="60" rx="8" class="qbox"/><text x="800" y="153" class="qt">Maintainability</text>
+            <rect x="865" y="120" width="110" height="60" rx="8" class="qbox"/><text x="920" y="153" class="qt">Portability</text>
           </g>
-
-          <line x1="65" y1="120" x2="480" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
-          <line x1="185" y1="120" x2="490" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
-          <line x1="305" y1="120" x2="498" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
-          <line x1="425" y1="120" x2="500" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
-          <line x1="545" y1="120" x2="502" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
-          <line x1="665" y1="120" x2="510" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
-          <line x1="785" y1="120" x2="520" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
-          <line x1="905" y1="120" x2="530" y2="50" stroke="#cbd5e1" stroke-width="1.3"/>
-
-          <text x="500" y="220" font-size="11.5" fill="#64748b" text-anchor="middle">Each characteristic has its own sub-characteristics (shown below, per box, with this project's priority).</text>
         </svg>
         </div>
       </div>
