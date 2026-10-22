@@ -74,7 +74,7 @@ jobs:
         if: steps.key.outputs.present == 'true'
         run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost && df -h /
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: steps.key.outputs.present == 'true'
 
       - uses: pnpm/action-setup@v4
