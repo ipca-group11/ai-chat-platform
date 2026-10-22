@@ -61,7 +61,7 @@ jobs:
       # Build once into the local daemon and scan it (AICHAT-7). HIGH+ findings fail the job
       # before anything reaches GHCR, so the deploy never starts. The push below reuses the
       # layer cache. Run instructions: docs/AICHAT-7/README.md.
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .
           file: ${{ matrix.dockerfile }}
@@ -97,7 +97,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 90
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .
           file: ${{ matrix.dockerfile }}
