@@ -12,12 +12,12 @@
     "axe-summary": "tsx src/tests/support/axe-summary-cli.ts"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.10.1",
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "1.63.0",
+    "@playwright/test": "1.64.1",
     "@types/node": "^24.13.6",
     "tsx": "^4.19.2",
     "typescript": "6.0.3",
-    "typescript-eslint": "^8.70.1"
+    "typescript-eslint": "^8.71.2"
   }
 }
