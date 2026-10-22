@@ -22,8 +22,8 @@
     "@platform/eslint-config": "workspace:*",
     "@platform/test-config": "workspace:*",
     "@types/node": "^24.13.6",
-    "@vitest/coverage-v8": "5.0.1",
+    "@vitest/coverage-v8": "5.0.5",
     "typescript": "6.0.3",
-    "vitest": "5.0.1"
+    "vitest": "5.0.5"
   }
 }

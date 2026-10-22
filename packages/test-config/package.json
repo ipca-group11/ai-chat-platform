@@ -21,11 +21,11 @@
   },
   "devDependencies": {
     "@platform/eslint-config": "workspace:*",
-    "@testcontainers/postgresql": "^12.2.0",
+    "@testcontainers/postgresql": "^12.2.1",
     "@types/node": "^24.13.6",
-    "@vitest/coverage-v8": "5.0.1",
-    "testcontainers": "^12.2.0",
+    "@vitest/coverage-v8": "5.0.5",
+    "testcontainers": "^12.2.1",
     "typescript": "6.0.3",
-    "vitest": "5.0.1"
+    "vitest": "5.0.5"
   }
 }

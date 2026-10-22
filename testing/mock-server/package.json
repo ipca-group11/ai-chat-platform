@@ -29,12 +29,12 @@
     "@platform/test-config": "workspace:*",
     "@types/express": "^4.17.25",
     "@types/node": "^24.13.6",
-    "@types/supertest": "^6.0.3",
-    "@vitest/coverage-v8": "5.0.1",
+    "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "5.0.5",
     "esbuild": "^0.28.2",
-    "supertest": "^7.2.1",
+    "supertest": "^7.3.1",
     "tsx": "^4.23.15",
     "typescript": "6.0.3",
-    "vitest": "5.0.1"
+    "vitest": "5.0.5"
   }
 }
