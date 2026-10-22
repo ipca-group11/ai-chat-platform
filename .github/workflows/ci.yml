@@ -46,7 +46,7 @@ jobs:
       # nx.json + the lockfile stands in for it so unaffected projects are replayed
       # from cache instead of re-run (AC-14).
       - name: Cache Nx computation cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .nx/cache
           key: nx-${{ runner.os }}-${{ hashFiles('nx.json', 'pnpm-lock.yaml') }}-${{ github.sha }}
